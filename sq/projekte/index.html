@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LindiMaps | Portofoli i Projekteve</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Butoni për lart */
+        #scroll-to-top {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(20px);
+        }
+        #scroll-to-top.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        /* Animacion i pikes ne logo */
+        @keyframes pulse-dot {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-dot { animation: pulse-dot 2s infinite ease-in-out; transform-origin: center; }
+        
+        .logo-container:hover .logo-bg { background-color: #2563eb; }
+        .logo-bg { transition: background-color 0.3s ease; }
+
+        /* Estetika e kartelave */
+        .project-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .project-card:hover {
+            transform: translateY(-10px);
+        }
+        .image-overlay {
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.4) 50%, transparent 100%);
+            transition: all 0.5s ease;
+        }
+
+        /* Klasa e re për zgjerimin e tekstit */
+        .expanded-text {
+            -webkit-line-clamp: unset !important;
+            display: block !important;
+        }
+
+        /* Floating Language Switcher Style */
+        .lang-switcher-side {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2000;
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .lang-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            padding: 2px;
+            border-radius: 6px;
+        }
+        .lang-item:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+        .lang-item.active {
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+        .flag-icon {
+            width: 20px;
+            height: 14px;
+            object-fit: cover;
+            border-radius: 2px;
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
+
+    <!-- SIDE LANGUAGE PANEL -->
+    <div class="lang-switcher-side">
+        <a href="projekte.html" class="lang-item active" title="Shqip">
+            <img src="https://flagcdn.com/w40/al.png" alt="AL" class="flag-icon">
+        </a>
+        <a href="projects_en.html" class="lang-item" title="English">
+            <img src="https://flagcdn.com/w40/gb.png" alt="EN" class="flag-icon">
+        </a>
+    </div>
+
+    <!-- NAVIGIMI -->
+    <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-[1000] border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- LOGO LINDIMAPS -->
+            <a href="index.html" class="flex items-center gap-3 group logo-container">
+                <div class="logo-bg h-11 w-11 flex items-center justify-center bg-slate-900 rounded-xl shadow-md">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.2"/>
+                        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                        <circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
+                    </svg>
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-2xl font-black tracking-tighter leading-none">
+                        <span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span>
+                    </h1>
+                    <span class="text-[9px] uppercase tracking-[0.4em] font-bold text-slate-400 mt-1">Spatial Intelligence</span>
+                </div>
+            </a>
+            
+            <!-- MENU DESKTOP -->
+            <div class="hidden md:flex items-center space-x-8 font-bold text-[13px] uppercase tracking-widest text-slate-600">
+                <a href="index.html" class="hover:text-blue-600 transition pb-1">Kreu</a>
+                <a href="sherbime.html" class="hover:text-blue-600 transition pb-1">Shërbime</a>
+                <a href="projekte.html" class="text-blue-600 border-b-2 border-blue-600 pb-1">Projekte</a>
+                <a href="rreth-nesh.html" class="hover:text-blue-600 transition pb-1">Rreth Nesh</a>
+                <a href="kontakte.html" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-blue-600 transition shadow-lg shadow-slate-200">Kontakte</a>
+            </div>
+
+            <!-- MOBILE TOGGLE -->
+            <div class="md:hidden">
+                <button id="menu-btn" class="p-2 text-slate-900 focus:outline-none">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 px-6 py-8 space-y-6 shadow-2xl animate-in slide-in-from-top duration-300">
+            <a href="index.html" class="block text-xl font-black text-slate-700">Kreu</a>
+            <a href="sherbime.html" class="block text-xl font-black text-slate-700">Shërbime</a>
+            <a href="projekte.html" class="block text-xl font-black text-blue-600">Projekte</a>
+            <a href="rreth-nesh.html" class="block text-xl font-black text-slate-700">Rreth Nesh</a>
+            <a href="kontakte.html" class="block text-xl font-black text-slate-700">Kontakte</a>
+        </div>
+    </nav>
+
+    <!-- HEADER -->
+    <header class="py-24 bg-slate-950 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+        <div class="max-w-7xl mx-auto px-6 relative z-10 text-center flex flex-col items-center">
+            <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter mb-4">
+                Projektet <span class="text-blue-500">Tona</span>
+            </h2>
+            <div class="h-1.5 w-24 bg-gradient-to-right from-blue-600 to-cyan-400 rounded-full mb-8" style="background: linear-gradient(to right, #2563eb, #2dd4bf);"></div>
+            <p class="text-slate-400 max-w-xl mx-auto text-sm md:text-base leading-relaxed">Eksploroni portofolin tonë të zgjidhjeve gjeohapësinore dhe inxhinierike në të gjithë Shqipërinë.</p>
+        </div>
+    </header>
+
+    <!-- PROJEKTET GRID -->
+    <section class="py-24 max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            
+            <!-- Projekt 1 -->
+            <div class="project-card bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100 group">
+                <div class="relative h-80">
+                    <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=800" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt="Kadastra Inxhinierike">
+                    <div class="image-overlay absolute inset-0 p-10 flex flex-col justify-end">
+                        <span class="text-blue-400 text-[10px] font-black tracking-widest uppercase mb-2">Infrastrukturë GIS</span>
+                        <h3 class="text-2xl font-black text-white uppercase tracking-tight leading-none mb-2">Ndërtimi Aplikacionit WEB GIS</h3>
+                        <p class="description-text text-slate-300 text-sm font-medium line-clamp-2 transition-all duration-500">Krijimi i një aplikacioni WEB GIS për hartografimin dhe dokumentimin e zonave të trashëgimisë kulturore "Lubonjë, Korçë". Ky projekt mundëson akses të shpejtë në të dhënat hapësinore dhe menaxhimin efikas të burimeve historike përmes teknologjisë cloud.</p>
+                    </div>
+                </div>
+                <div class="p-10 flex items-center justify-between border-t border-slate-50">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Viti</span>
+                        <span class="text-xs font-bold text-slate-900">Përfunduar Tetor 2024</span>
+                    </div>
+                    <button class="details-toggle text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline">Detaje</button>
+                </div>
+            </div>
+
+            <!-- Projekt 2 -->
+            <div class="project-card bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100 group">
+                <div class="relative h-80">
+                    <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt="Monitorim Mjedisor">
+                    <div class="image-overlay absolute inset-0 p-10 flex flex-col justify-end">
+                        <span class="text-emerald-400 text-[10px] font-black tracking-widest uppercase mb-2">Monitorim Satelitor</span>
+                        <h3 class="text-2xl font-black text-white uppercase tracking-tight leading-none mb-2">Monitorimi i Pyjeve</h3>
+                        <p class="description-text text-slate-300 text-sm font-medium line-clamp-2 transition-all duration-500">Analizë gjeohapësinore e mbulesës tokës duke përdorur Inteligjencën Artificiale për të identifikuar ndryshimet në biomasë dhe zonat e mbrojtura në kohë reale.</p>
+                    </div>
+                </div>
+                <div class="p-10 flex items-center justify-between border-t border-slate-50">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Viti</span>
+                        <span class="text-xs font-bold text-slate-900">Aktiv 2024</span>
+                    </div>
+                    <button class="details-toggle text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline">Detaje</button>
+                </div>
+            </div>
+
+            <!-- Projekt 3 -->
+            <div class="project-card bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100 group">
+                <div class="relative h-80">
+                    <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt="Fotogrametri">
+                    <div class="image-overlay absolute inset-0 p-10 flex flex-col justify-end">
+                        <span class="text-orange-400 text-[10px] font-black tracking-widest uppercase mb-2">3D Mapping</span>
+                        <h3 class="text-2xl font-black text-white uppercase tracking-tight leading-none mb-2">Harta 3D e zonave arkeologjike Lezhë</h3>
+                        <p class="description-text text-slate-300 text-sm font-medium line-clamp-2 transition-all duration-500">Generation of 3D models of the Lezha fortress, using drones and advanced photogrammetry techniques for the digital preservation of the monument.</p>
+                    </div>
+                </div>
+                <div class="p-10 flex items-center justify-between border-t border-slate-50">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Viti</span>
+                        <span class="text-xs font-bold text-slate-900">Përfunduar 2025</span>
+                    </div>
+                    <button class="details-toggle text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline">Detaje</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 text-white py-24 text-center border-t border-slate-900">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="mb-12 flex flex-col items-center gap-4">
+                 <div class="h-14 w-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-600/30">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
+                 </div>
+                 <h4 class="text-4xl font-black tracking-tighter uppercase leading-none">LINDI<span class="text-blue-500">MAPS</span></h4>
+                 <p class="text-slate-500 font-bold tracking-[0.4em] uppercase text-[10px]">Spatial Intelligence Studio</p>
+            </div>
+            <div class="h-px w-full max-w-sm mx-auto bg-slate-900 my-12"></div>
+            <p class="text-xs text-slate-600 font-bold tracking-widest uppercase italic">© 2024 LindiMaps Studio.</p>
+        </div>
+    </footer>
+
+    <!-- BUTONI SCROLL TO TOP -->
+    <button id="scroll-to-top" class="fixed bottom-8 right-8 bg-blue-600 text-white p-5 rounded-2xl shadow-2xl hover:bg-blue-700 transition-all z-[1100] group">
+        <svg class="w-6 h-6 transform group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path>
+        </svg>
+    </button>
+
+    <script>
+        // Menu Mobile
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+
+        // Scroll to Top
+        const scrollTopBtn = document.getElementById('scroll-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) { scrollTopBtn.classList.add('show'); } 
+            else { scrollTopBtn.classList.remove('show'); }
+        });
+        scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+        // LOGJIKA PER ZGJERIMIN E TEKSTIT (DETAJET)
+        document.querySelectorAll('.details-toggle').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Gjejme elementin e tekstit brenda te njejtes kartele
+                const card = this.closest('.project-card');
+                const textElement = card.querySelector('.description-text');
+                const overlay = card.querySelector('.image-overlay');
+                
+                // Toggle klasen qe heq limitin e rreshtave
+                textElement.classList.toggle('expanded-text');
+                
+                // Ndryshojme tekstin e butonit
+                if (textElement.classList.contains('expanded-text')) {
+                    this.textContent = 'Mbyll';
+                    // Bejme overlay-in pak me te erret qe teksti te lexohet me mire kur eshte i gjate
+                    overlay.style.background = 'linear-gradient(to top, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.8) 70%, rgba(15, 23, 42, 0.4) 100%)';
+                } else {
+                    this.textContent = 'Detaje';
+                    overlay.style.background = ''; // Kthehet ne stilin origjinal te CSS
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
