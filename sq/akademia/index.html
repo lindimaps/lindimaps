@@ -571,6 +571,46 @@
         document.body.style.overflow = 'auto';
       }, 300);
     }
+
+    // =========================
+    // 5) After-download UX (SUKSES + HIDE BUTTON)
+    // =========================
+    (function setupAfterDownloadUX() {
+      const successMsgId = "download-success-msg";
+
+      function ensureSuccessMsgEl() {
+        let el = document.getElementById(successMsgId);
+        if (!el) {
+          el = document.createElement("div");
+          el.id = successMsgId;
+          el.className = "hidden text-sm font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-left";
+          el.innerText = "Materiali u shkarkua me sukses.";
+          // vendose poshtë panelit të download
+          downloadPanel.appendChild(el);
+        }
+        return el;
+      }
+
+      // kur zgjedh modul tjetër, fshi mesazhin
+      const _oldSelectModule = selectModule;
+      selectModule = function(name, index, element) {
+        _oldSelectModule(name, index, element);
+        const el = document.getElementById(successMsgId);
+        if (el) el.classList.add("hidden");
+      };
+
+      // kur klikohet butoni i download-it
+      finalDownloadBtn.addEventListener("click", () => {
+        const el = ensureSuccessMsgEl();
+        el.classList.remove("hidden");
+
+        // hiq butonin e pdf-së që të mos mbetet aty
+        downloadBtnContainer.classList.add("hidden");
+
+        // (opsionale) pastro kodin
+        passInput.value = "";
+      });
+    })();
   </script>
 </body>
 </html>
