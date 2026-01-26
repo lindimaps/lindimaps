@@ -12,6 +12,8 @@
   <!-- Phone Flags (intl-tel-input) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.css">
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/intlTelInput.min.js"></script>
+  <!-- utils (për formatim E.164) -->
+  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js"></script>
 
   <style>
     .academy-bg { background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1920&q=80'); }
@@ -344,8 +346,8 @@
       itiPhone = window.intlTelInput(phoneInput, {
         initialCountry: "al",
         preferredCountries: ["al"],
-        separateDialCode: false,
-        nationalMode: false,
+        separateDialCode: true,   // +355 shfaqet veçmas
+        nationalMode: true,       // lejon të shkruash vetëm 688728974
         autoPlaceholder: "polite",
         formatOnDisplay: true
       });
@@ -392,25 +394,18 @@
       const course    = document.getElementById('reg-course').value;
       const message   = document.getElementById('reg-message').value.trim();
 
-      // telefoni (E.164)
-      const phoneE164 = itiPhone ? itiPhone.getNumber() : document.getElementById('reg-phone').value.trim();
+      // telefoni (mjafton të mos jetë bosh)
+      const rawPhone = document.getElementById('reg-phone').value.trim();
 
-      // validim
-      if (!itiPhone || !itiPhone.isValidNumber()) {
-        alert("Numri i telefonit është i pavlefshëm. Zgjidh shtetin dhe vendos numrin korrekt.\nShembull: +355688728974");
+      if (!rawPhone) {
+        alert("Të lutem plotëso fushën e telefonit.");
         btn.disabled = false;
         btn.classList.remove('opacity-70');
         return;
       }
 
-      // max 14 shifra (pa +)
-      const digitsOnly = phoneE164.replace(/\D/g, "");
-      if (digitsOnly.length > 14) {
-        alert("Numri i telefonit është shumë i gjatë. Maksimumi 14 shifra (pa +).");
-        btn.disabled = false;
-        btn.classList.remove('opacity-70');
-        return;
-      }
+      // ruaje sa më korrekt: nëse ka iti, merre E.164, përndryshe raw
+      const phoneE164 = itiPhone ? itiPhone.getNumber() : rawPhone;
 
       try {
         const { error } = await supabaseClient
