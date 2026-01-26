@@ -580,3 +580,24 @@
     </script>
 </body>
 </html>
+SQL që duhet të kesh në Supabase (shkurt, vetëm që të punojë)
+Run në SQL Editor:
+
+create table if not exists academy_registrations (
+  id uuid primary key default gen_random_uuid(),
+  first_name text not null,
+  last_name text not null,
+  email text not null,
+  course text not null,
+  message text,
+  created_at timestamptz not null default now()
+);
+
+alter table academy_registrations enable row level security;
+
+drop policy if exists "public_insert_academy_registrations" on academy_registrations;
+create policy "public_insert_academy_registrations"
+on academy_registrations
+for insert
+to anon
+with check (true);
