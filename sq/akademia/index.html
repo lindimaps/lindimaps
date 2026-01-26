@@ -300,12 +300,13 @@
             </p>
           </div>
 
-          <div id="download-btn-container" class="hidden w-full animate-bounce">
-            <a href="#" target="_blank" rel="noopener" id="final-download-btn" class="flex items-center justify-center gap-3 w-full py-5 bg-emerald-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">
+          <div id="download-btn-container" class="hidden w-full">
+            <button id="final-download-btn" type="button" class="flex items-center justify-center gap-3 w-full py-5 bg-emerald-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">
               Shkarko Leksionin (PDF)
-            </a>
+            </button>
           </div>
 
+          <div id="download-success" class="hidden text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-left"></div>
           <div id="download-error" class="hidden text-sm font-bold text-red-600 bg-red-50 border border-red-100 rounded-2xl p-4 text-left"></div>
         </div>
       </div>
@@ -325,7 +326,7 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1anFqZ2NjaWFqd2Zic3ZtbG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MTgwOTQsImV4cCI6MjA4NDk5NDA5NH0.0FGl0sxQTuIkSB_xPmEYwyE4-rsAdIZlIQcRWgtqJh4";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const ACADEMY_BUCKET = "lindimaps-academy"; // bucket-i yt ekziston me këtë emër
+    const ACADEMY_BUCKET = "lindimaps-academy";
 
     function showToast() {
       const x = document.getElementById("toast");
@@ -345,8 +346,8 @@
       itiPhone = window.intlTelInput(phoneInput, {
         initialCountry: "al",
         preferredCountries: ["al"],
-        separateDialCode: true,   // +355 shfaqet veçmas
-        nationalMode: true,       // mjafton 688728974
+        separateDialCode: true,
+        nationalMode: true,
         autoPlaceholder: "polite",
         formatOnDisplay: true
       });
@@ -393,7 +394,6 @@
       const course    = document.getElementById('reg-course').value;
       const message   = document.getElementById('reg-message').value.trim();
 
-      // telefoni: mjafton të mos mbetet bosh
       const rawPhone = document.getElementById('reg-phone').value.trim();
       if (!rawPhone) {
         alert("Të lutem plotëso fushën e telefonit.");
@@ -402,7 +402,6 @@
         return;
       }
 
-      // ruaje si E.164 kur është e mundur (p.sh +355688728974)
       const phoneE164 = itiPhone ? itiPhone.getNumber() : rawPhone;
 
       try {
@@ -424,7 +423,6 @@
         showToast();
         closeRegistrationModal();
         e.target.reset();
-
         if (itiPhone) itiPhone.setCountry("al");
       } catch (err) {
         alert("Gabim gjatë dërgimit. Kontrollo Supabase/RLS/URL-Key.\n\n" + (err?.message || err));
@@ -467,34 +465,33 @@
     menuBtn.addEventListener('click', toggleMenu);
 
     // =========================
-    // 3) Course data
+    // 3) Course data (modules janë vetëm titujt; file krijohet automatikisht si: 1_title.pdf, 2_title.pdf ...)
     // =========================
     const courseData = {
       'qgis-full': {
         title: 'QGIS Training Manual',
         slug: 'qgis',
-        // Këtu emrat e file-ve janë fiks sipas Storage (si p.sh. 01-1-intro.pdf)
         modules: [
-          { name: '1. Intro', file: '01-1-intro.pdf' },
-          { name: '2. Basic Map', file: '02-2-basic-map.pdf' },
-          { name: '3. Classifying Data', file: '03-3-classifying-data.pdf' },
-          { name: '4. Layouts', file: '04-4-layouts.pdf' },
-          { name: '5. Creation', file: '05-5-creation.pdf' },
-          { name: '6. Analysis', file: '06-6-analysis.pdf' },
-          { name: '7. Rasters', file: '07-7-rasters.pdf' },
-          { name: '8. Hydrology', file: '08-8-hydrology.pdf' },
-          { name: '9. Plugins', file: '09-9-plugins.pdf' },
-          { name: '10. Online Resources', file: '10-10-online-resources.pdf' },
-          { name: '11. QGIS Server', file: '11-11-qgis-server.pdf' },
-          { name: '12. GRASS', file: '12-12-grass.pdf' },
-          { name: '13. Assessment', file: '13-13-assessment.pdf' },
-          { name: '14. Forestry', file: '14-14-forestry.pdf' },
-          { name: '15. PostgreSQL', file: '15-15-postgresql.pdf' },
-          { name: '16. PostGIS', file: '16-16-postgis.pdf' },
-          { name: '17. Processing', file: '17-17-processing.pdf' },
-          { name: '18. Spatial DB', file: '18-18-spatial-db.pdf' },
-          { name: '19. Contributing', file: '19-19-contributing.pdf' },
-          { name: '20. Exercise Data', file: '20-20-exercise-data.pdf' }
+          'Intro',
+          'Basic Map',
+          'Classifying Data',
+          'Layouts',
+          'Creation',
+          'Analysis',
+          'Rasters',
+          'Hydrology',
+          'Plugins',
+          'Online Resources',
+          'QGIS Server',
+          'GRASS',
+          'Assessment',
+          'Forestry',
+          'PostgreSQL',
+          'PostGIS',
+          'Processing',
+          'Spatial DB',
+          'Contributing',
+          'Exercise Data'
         ]
       },
       'arcgis-pro': {
@@ -523,10 +520,10 @@
     const downloadBtnContainer = document.getElementById('download-btn-container');
     const finalDownloadBtn = document.getElementById('final-download-btn');
     const downloadError = document.getElementById('download-error');
+    const downloadSuccess = document.getElementById('download-success');
 
     let selectedCourseSlug = null;
     let selectedModuleIndex = null;
-    let selectedFileName = null; // (për QGIS ku file është fiks)
 
     function openModal(courseId) {
       const data = courseData[courseId];
@@ -537,15 +534,13 @@
       selectedCourseSlug = data.slug;
 
       data.modules.forEach((mod, index) => {
-        const label = (typeof mod === "string") ? mod : mod.name;
-
         const div = document.createElement('div');
         div.className = "module-item flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-blue-400 cursor-pointer transition-all";
         div.onclick = () => selectModule(mod, index, div);
 
         div.innerHTML = `
           <div class="h-6 w-6 flex-shrink-0 bg-slate-200 text-slate-500 rounded-lg flex items-center justify-center text-[9px] font-black module-num">${index + 1}</div>
-          <span class="text-slate-700 font-bold text-xs uppercase tracking-tight">${label}</span>
+          <span class="text-slate-700 font-bold text-xs uppercase tracking-tight">${mod}</span>
         `;
         modalModules.appendChild(div);
       });
@@ -559,11 +554,8 @@
       document.body.style.overflow = 'hidden';
     }
 
-    function selectModule(mod, index, element) {
+    function selectModule(name, index, element) {
       selectedModuleIndex = index;
-
-      const label = (typeof mod === "string") ? mod : mod.name;
-      selectedFileName = (typeof mod === "string") ? null : (mod.file || null);
 
       document.querySelectorAll('.module-item').forEach(el => {
         el.classList.remove('border-blue-500', 'bg-blue-50/50');
@@ -579,67 +571,98 @@
 
       downloadPlaceholder.classList.add('hidden');
       downloadPanel.classList.remove('hidden');
-      activeModuleName.innerText = label;
+      activeModuleName.innerText = name;
+
       passInput.value = '';
       downloadBtnContainer.classList.add('hidden');
       downloadError.classList.add('hidden');
       downloadError.innerText = '';
-      finalDownloadBtn.href = "#";
+      downloadSuccess.classList.add('hidden');
+      downloadSuccess.innerText = '';
     }
 
-    function slugifyModule(i, title) {
-      const num = String(i + 1).padStart(2, '0');
-      const slug = title
+    // krijon emrin: 1_intro.pdf, 2_basic-map.pdf ...
+    function buildFileName(index, title) {
+      const num = index + 1;
+      const safeTitle = String(title || '')
         .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
+        .replace(/[ë]/g, 'e')
+        .replace(/[ç]/g, 'c')
+        .replace(/[^a-z0-9\s-]/g, '')
         .trim()
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
-      return `${num}-${slug}.pdf`;
+
+      return `${num}_${safeTitle}.pdf`;
     }
 
     async function prepareDownloadLink() {
-      // nëse file emri është fiks (QGIS), përdore atë
-      let fileName = selectedFileName;
-
-      // për kurset e tjera, përdor gjenerimin që ke pasur
-      if (!fileName) {
-        const data = Object.values(courseData).find(c => c.slug === selectedCourseSlug);
-        const mod = data?.modules?.[selectedModuleIndex];
-        const title = (typeof mod === "string") ? mod : (mod?.name || `module-${selectedModuleIndex+1}`);
-        fileName = slugifyModule(selectedModuleIndex, title);
-      }
+      const data = Object.values(courseData).find(c => c.slug === selectedCourseSlug);
+      const title = data?.modules?.[selectedModuleIndex] || `module-${selectedModuleIndex+1}`;
+      const fileName = buildFileName(selectedModuleIndex, title);
 
       const objectPath = `${selectedCourseSlug}/${fileName}`;
       const { data: pub } = supabaseClient.storage.from(ACADEMY_BUCKET).getPublicUrl(objectPath);
 
       if (!pub?.publicUrl) {
-        throw new Error("Nuk u gjenerua public URL. Kontrollo bucket name/path.");
+        throw new Error("Nuk u gjenerua public URL. Kontrollo bucket/path.");
       }
-
       return pub.publicUrl;
+    }
+
+    function showDownloadSuccess(msg) {
+      downloadSuccess.innerText = msg;
+      downloadSuccess.classList.remove('hidden');
+      setTimeout(() => {
+        downloadSuccess.classList.add('hidden');
+        downloadSuccess.innerText = '';
+      }, 2500);
+    }
+
+    async function triggerDownload(url) {
+      // Shkarkim pa shfaqur link në UI
+      const a = document.createElement('a');
+      a.href = url;
+      a.setAttribute('download', ''); // e detyron browserin të provojë download
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     }
 
     async function checkPassword() {
       if (passInput.value === "1955") {
         try {
           const url = await prepareDownloadLink();
-          finalDownloadBtn.href = url;
-          downloadBtnContainer.classList.remove('hidden');
 
-          // Pasi të klikohet dhe të fillojë shkarkimi: hiqe linkun / fshi butonin
-          finalDownloadBtn.onclick = () => {
-            // e lëmë të hapet download, pastaj e fshehim dhe e kthejmë href në #
-            setTimeout(() => {
+          // Shfaq butonin e shkarkimit (pa link)
+          downloadBtnContainer.classList.remove('hidden');
+          downloadError.classList.add('hidden');
+          downloadError.innerText = '';
+          downloadSuccess.classList.add('hidden');
+          downloadSuccess.innerText = '';
+
+          finalDownloadBtn.onclick = async () => {
+            try {
+              await triggerDownload(url);
+
+              // Pas shkarkimit: fshi kodin 1955, fshi butonin, dhe shfaq mesazh suksesi (që zhduket)
+              passInput.value = '';
               downloadBtnContainer.classList.add('hidden');
-              finalDownloadBtn.href = "#";
               finalDownloadBtn.onclick = null;
-            }, 200);
+
+              showDownloadSuccess("File u shkarkua me sukses.");
+            } catch (e) {
+              downloadBtnContainer.classList.add('hidden');
+              downloadError.classList.remove('hidden');
+              downloadError.innerText = "Ndodhi një gabim gjatë shkarkimit.";
+            }
           };
+
         } catch (err) {
           downloadBtnContainer.classList.add('hidden');
           downloadError.classList.remove('hidden');
-          downloadError.innerText = "PDF nuk u gjet. Kontrollo emrin e bucket/folder/file në Supabase Storage.\n\n" + (err?.message || err);
+          downloadError.innerText = "PDF nuk u gjet. Kontrollo emrin e file në Storage (format: 1_emer.pdf).\n\n" + (err?.message || err);
         }
       } else {
         passInput.classList.add('ring-red-500', 'ring-2');
@@ -653,10 +676,11 @@
       downloadBtnContainer.classList.add('hidden');
       downloadError.classList.add('hidden');
       downloadError.innerText = '';
+      downloadSuccess.classList.add('hidden');
+      downloadSuccess.innerText = '';
       selectedCourseSlug = null;
       selectedModuleIndex = null;
-      selectedFileName = null;
-      finalDownloadBtn.href = "#";
+      passInput.value = '';
       finalDownloadBtn.onclick = null;
     }
 
