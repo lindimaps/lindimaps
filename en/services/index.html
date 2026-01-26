@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LindiMaps | Our Services</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        #scroll-to-top {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(20px);
+        }
+        #scroll-to-top.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-dot { animation: pulse-dot 2s infinite ease-in-out; transform-origin: center; }
+        
+        /* Advanced Hover Effect - Title Visible, Info Hidden */
+        .service-card { 
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent; /* Hiq kutinë blu gjatë prekjes në mobile */
+        }
+        
+        .service-image {
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: brightness(0.7);
+        }
+        
+        /* Modifikuar për të mbështetur hover dhe klasën active për mobile */
+        .service-card:hover .service-image,
+        .service-card.active .service-image {
+            transform: scale(1.1);
+            filter: brightness(0.4);
+        }
+
+        .service-overlay {
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.2) 100%);
+            transition: all 0.5s ease;
+        }
+
+        /* Initial state: Info is pushed down and invisible */
+        .info-content {
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Hover & Active state: Info slides up and becomes visible */
+        .service-card:hover .info-content,
+        .service-card.active .info-content {
+            max-height: 200px;
+            opacity: 1;
+            transform: translateY(0);
+            margin-top: 1rem;
+        }
+
+        /* Title always visible, but moves slightly up on hover & active */
+        .title-content {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .service-card:hover .title-content,
+        .service-card.active .title-content {
+            transform: translateY(-5px);
+        }
+
+        /* Floating Language Switcher Style */
+        .lang-switcher-side {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2000;
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .lang-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            padding: 2px;
+            border-radius: 6px;
+        }
+        .lang-item:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+        .lang-item.active {
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+        .flag-icon {
+            width: 20px;
+            height: 14px;
+            object-fit: cover;
+            border-radius: 2px;
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
+
+    <!-- SIDE LANGUAGE PANEL -->
+    <div class="lang-switcher-side">
+        <a href="sherbime.html" class="lang-item" title="Albanian">
+            <img src="https://flagcdn.com/w40/al.png" alt="AL" class="flag-icon">
+        </a>
+        <a href="services_en.html" class="lang-item active" title="English">
+            <img src="https://flagcdn.com/w40/gb.png" alt="EN" class="flag-icon">
+        </a>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-[1000] border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="h-11 w-11 flex items-center justify-center bg-slate-900 rounded-xl shadow-md group-hover:bg-blue-600 transition-colors duration-300">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.2"/>
+                        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                        <circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
+                    </svg>
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-2xl font-black tracking-tighter leading-none text-slate-900">
+                        LINDI<span class="logo-gradient">MAPS</span>
+                    </h1>
+                    <span class="text-[9px] uppercase tracking-[0.4em] font-bold text-slate-400 mt-1">Spatial Intelligence</span>
+                </div>
+            </a>
+            
+            <div class="hidden md:flex items-center space-x-8 font-bold text-[13px] uppercase tracking-widest text-slate-600">
+                <a href="index_en.html" class="hover:text-blue-600 transition pb-1">Home</a>
+                <a href="services_en.html" class="text-blue-600 border-b-2 border-blue-600 pb-1">Services</a>
+                <a href="projects_en.html" class="hover:text-blue-600 transition pb-1">Projects</a>
+                <a href="about_en.html" class="hover:text-blue-600 transition pb-1">About Us</a>
+                <a href="contact_en.html" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-blue-600 transition shadow-lg shadow-slate-200">Contact</a>
+            </div>
+
+            <div class="md:hidden">
+                <button id="menu-btn" class="p-2 text-slate-900 focus:outline-none">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 px-6 py-8 space-y-6">
+            <a href="index_en.html" class="block text-xl font-black text-slate-700">Home</a>
+            <a href="services_en.html" class="block text-xl font-black text-blue-600">Services</a>
+            <a href="projects_en.html" class="block text-xl font-black text-slate-700">Projects</a>
+            <a href="about_en.html" class="block text-xl font-black text-slate-700">About Us</a>
+            <a href="contact_en.html" class="block text-xl font-black text-slate-700">Contact</a>
+        </div>
+    </nav>
+
+    <!-- HEADER SECTION -->
+    <header class="py-24 bg-slate-900 text-white text-center relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0 100 L100 0 L100 100 Z" fill="white"></path>
+            </svg>
+        </div>
+        <div class="relative z-10">
+            <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-6">Our Services</h2>
+            <div class="h-1.5 w-24 bg-blue-600 mx-auto rounded-full mb-8"></div>
+            <p class="max-w-2xl mx-auto text-slate-400 text-lg px-6">
+                Advanced technological solutions for the analysis, visualization, and management of spatial data.
+            </p>
+        </div>
+    </header>
+
+    <!-- SERVICES LIST -->
+    <section class="py-24 max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Service 1 -->
+            <div class="service-card group rounded-[2.5rem] shadow-xl border border-slate-100 h-[420px]">
+                <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&q=80&w=800" alt="GIS Systems" class="service-image absolute inset-0 w-full h-full object-cover">
+                <div class="service-overlay absolute inset-0"></div>
+                <div class="relative h-full p-10 flex flex-col justify-end text-white">
+                    <div class="w-14 h-14 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                    </div>
+                    <div class="title-content">
+                        <h3 class="text-2xl font-black uppercase tracking-tighter">GIS Systems</h3>
+                    </div>
+                    <div class="info-content">
+                        <p class="text-slate-200 text-sm leading-relaxed">Implementation of geographic databases, spatial analysis, and thematic mapping for public and private sectors.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service 2 -->
+            <div class="service-card group rounded-[2.5rem] shadow-xl border border-slate-100 h-[420px]">
+                <img src="https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&q=80&w=800" alt="Photogrammetry" class="service-image absolute inset-0 w-full h-full object-cover">
+                <div class="service-overlay absolute inset-0"></div>
+                <div class="relative h-full p-10 flex flex-col justify-end text-white">
+                    <div class="w-14 h-14 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
+                    </div>
+                    <div class="title-content">
+                        <h3 class="text-2xl font-black uppercase tracking-tighter">Photogrammetry</h3>
+                    </div>
+                    <div class="info-content">
+                        <p class="text-slate-200 text-sm leading-relaxed">Processing drone imagery to generate 3D models, high-resolution orthophotos, and digital elevation models (DSM/DTM).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service 3 -->
+            <div class="service-card group rounded-[2.5rem] shadow-xl border border-slate-100 h-[420px]">
+                <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800" alt="Territorial Analysis" class="service-image absolute inset-0 w-full h-full object-cover">
+                <div class="service-overlay absolute inset-0"></div>
+                <div class="relative h-full p-10 flex flex-col justify-end text-white">
+                    <div class="w-14 h-14 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <div class="title-content">
+                        <h3 class="text-2xl font-black uppercase tracking-tighter">Territorial Analysis</h3>
+                    </div>
+                    <div class="info-content">
+                        <p class="text-slate-200 text-sm leading-relaxed">Studies on land use, urban area monitoring, and natural hazard assessment through geo-spatial methods.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service 4 -->
+            <div class="service-card group rounded-[2.5rem] shadow-xl border border-slate-100 h-[420px]">
+                <img src="https://www.magnasoft.com/wp-content/uploads/2023/09/Envisioning-the-Future-The-Digital-Transformation-of-Land-Administration-and-Cadastral-Mapping-scaled.jpg" alt="Digital Cadastre" class="service-image absolute inset-0 w-full h-full object-cover">
+                <div class="service-overlay absolute inset-0"></div>
+                <div class="relative h-full p-10 flex flex-col justify-end text-white">
+                    <div class="w-14 h-14 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    </div>
+                    <div class="title-content">
+                        <h3 class="text-2xl font-black uppercase tracking-tighter">Digital Cadastre</h3>
+                    </div>
+                    <div class="info-content">
+                        <p class="text-slate-200 text-sm leading-relaxed">Digitization of parcels and buildings, updating cadastral data, and integration into GIS platforms.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service 5 -->
+            <div class="service-card group rounded-[2.5rem] shadow-xl border border-slate-100 h-[420px]">
+                <img src="https://cdn.prod.website-files.com/65818ff33a5087c1f3bbb728/66a78c4f7819b56edf3f56d4_20240729T1230-f7afc7e9-34ae-486d-9c7e-b356f8259dc2.jpeg" alt="Technical Consulting" class="service-image absolute inset-0 w-full h-full object-cover">
+                <div class="service-overlay absolute inset-0"></div>
+                <div class="relative h-full p-10 flex flex-col justify-end text-white">
+                    <div class="w-14 h-14 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <div class="title-content">
+                        <h3 class="text-2xl font-black uppercase tracking-tighter">Technical Consulting</h3>
+                    </div>
+                    <div class="info-content">
+                        <p class="text-slate-200 text-sm leading-relaxed">Professional assistance in choosing spatial technologies and managing infrastructure projects.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service 6 -->
+            <div class="service-card group rounded-[2.5rem] shadow-xl border border-slate-100 h-[420px]">
+                <img src="https://www.openware.com.kw/content/dam/esrisites/en-us/arcgis/products/web-appbuilder/images/banner-screens-web-app-builder.jpg" alt="Web GIS Developer" class="service-image absolute inset-0 w-full h-full object-cover">
+                <div class="service-overlay absolute inset-0"></div>
+                <div class="relative h-full p-10 flex flex-col justify-end text-white">
+                    <!-- IKONA: E ndryshuar në Glob për Web GIS -->
+        <div class="w-14 h-14 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white rounded-2xl flex items-center justify-center mb-6">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.6 9h16.8M3.6 15h16.8"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3a15.3 15.3 0 014.5 9 15.3 15.3 0 01-4.5 9 15.3 15.3 0 01-4.5-9A15.3 15.3 0 0112 3z"></path>
+            </svg>
+        </div>
+                    <div class="title-content">
+                        <h3 class="text-2xl font-black uppercase tracking-tighter">Web GIS Developer</h3>
+                    </div>
+                    <div class="info-content">
+                        <p class="text-slate-200 text-sm leading-relaxed">Creating maps and Web GIS applications.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- METHODOLOGY -->
+    <section class="py-24 bg-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+                <div class="max-w-xl">
+                    <h3 class="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-4">How We Work</h3>
+                    <div class="h-1.5 w-20 bg-blue-600 rounded-full"></div>
+                </div>
+                <p class="text-slate-400 font-medium">A precise process guarantees maximum results.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="relative p-6 border-l border-slate-800">
+                    <span class="text-6xl font-black text-slate-800 absolute -top-4 -left-4">01</span>
+                    <h4 class="text-xl font-bold mb-4 relative z-10">Data Collection</h4>
+                    <p class="text-slate-400 text-sm">Use of sensors and official sources to collect base information.</p>
+                </div>
+                <div class="relative p-6 border-l border-slate-800">
+                    <span class="text-6xl font-black text-slate-800 absolute -top-4 -left-4">02</span>
+                    <h4 class="text-xl font-bold mb-4 relative z-10">Processing & Analysis</h4>
+                    <p class="text-slate-400 text-sm">Utilizing GIS algorithms to transform data into intelligence.</p>
+                </div>
+                <div class="relative p-6 border-l border-slate-800">
+                    <span class="text-6xl font-black text-slate-800 absolute -top-4 -left-4">03</span>
+                    <h4 class="text-xl font-bold mb-4 relative z-10">Quality Assurance</h4>
+                    <p class="text-slate-400 text-sm">Rigorous technical checks to ensure geometric and attribute accuracy.</p>
+                </div>
+                <div class="relative p-6 border-l border-slate-800">
+                    <span class="text-6xl font-black text-slate-800 absolute -top-4 -left-4">04</span>
+                    <h4 class="text-xl font-bold mb-4 relative z-10">Project Delivery</h4>
+                    <p class="text-slate-400 text-sm">Presentation of the final solution via interactive maps or reports.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA FOOTER -->
+    <section class="py-24 bg-blue-600 text-white text-center">
+        <div class="max-w-4xl mx-auto px-6">
+            <h3 class="text-3xl md:text-5xl font-black uppercase mb-8 leading-tight">Ready to start your next project?</h3>
+            <a href="kontakte.html" class="inline-block bg-slate-900 text-white px-12 py-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-white hover:text-blue-600 transition-all shadow-2xl">Contact Us Today</a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 text-white py-24 text-center border-t border-slate-900">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="mb-12 flex flex-col items-center gap-4">
+                 <div class="h-14 w-14 bg-blue-600 rounded-2xl flex items-center justify-center">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
+                 </div>
+                 <h4 class="text-4xl font-black tracking-tighter uppercase">LINDI<span class="text-blue-500">MAPS</span></h4>
+                 <p class="text-slate-500 font-bold tracking-[0.4em] uppercase text-[10px]">Spatial Intelligence Studio</p>
+            </div>
+            <div class="h-px w-full bg-slate-900 my-12"></div>
+            <p class="text-xs text-slate-600 font-bold tracking-widest uppercase italic">© 2024 LindiMaps Studio.</p>
+        </div>
+    </footer>
+
+    <!-- SCROLL TO TOP -->
+    <button id="scroll-to-top" class="fixed bottom-8 right-8 bg-blue-600 text-white p-5 rounded-2xl shadow-2xl hover:bg-blue-700 transition-all z-[1100] group">
+        <svg class="w-6 h-6 transform group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path>
+        </svg>
+    </button>
+
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+
+        // Touch logic for Service Cards
+        const cards = document.querySelectorAll('.service-card');
+        cards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Nëse karta është aktive, e heqim (second click). Nëse jo, e aktivizojmë.
+                const isActive = this.classList.contains('active');
+                
+                // Heqim 'active' nga të gjitha kartat e tjera
+                cards.forEach(c => c.classList.remove('active'));
+                
+                if (!isActive) {
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Heq efektin nëse përdoruesi klikon jashtë kartave
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.service-card')) {
+                cards.forEach(c => c.classList.remove('active'));
+            }
+        });
+
+        const scrollTopBtn = document.getElementById('scroll-to-top');
+        window.addEventListener('scroll', () => {
+            const scrollPosition = window.innerHeight + window.pageYOffset;
+            const pageHeight = document.documentElement.scrollHeight;
+            if (scrollPosition > pageHeight - 150) {
+                scrollTopBtn.classList.add('show');
+            } else {
+                scrollTopBtn.classList.remove('show');
+            }
+        });
+        scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    </script>
+</body>
+</html>
