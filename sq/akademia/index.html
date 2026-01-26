@@ -12,7 +12,6 @@
   <!-- Phone Flags (intl-tel-input) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.css">
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/intlTelInput.min.js"></script>
-  <!-- utils (për formatim E.164) -->
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js"></script>
 
   <style>
@@ -56,8 +55,8 @@
 
   <!-- PANEL I GJUHES -->
   <div class="fixed left-5 top-1/2 -translate-y-1/2 z-[2000] flex flex-row gap-2 bg-white/80 backdrop-blur-md p-1.5 rounded-xl border border-black/5 shadow-xl">
-    <a href="/sq/akademia/" class="p-1 rounded-md shadow-sm border-2 border-blue-600"><img src="https://flagcdn.com/w40/al.png" class="w-5 h-3.5 object-cover rounded-sm"></a>
-    <a href="/en/academy/" class="p-1 rounded-md hover:scale-110 transition"><img src="https://flagcdn.com/w40/gb.png" class="w-5 h-3.5 object-cover rounded-sm"></a>
+    <a href="LindimapAcademy.html" class="p-1 rounded-md shadow-sm border-2 border-blue-600"><img src="https://flagcdn.com/w40/al.png" class="w-5 h-3.5 object-cover rounded-sm"></a>
+    <a href="LindimapAcademy_en.html" class="p-1 rounded-md hover:scale-110 transition"><img src="https://flagcdn.com/w40/gb.png" class="w-5 h-3.5 object-cover rounded-sm"></a>
   </div>
 
   <!-- MODERN NAVIGIMI -->
@@ -79,7 +78,7 @@
 
       <div class="hidden lg:flex items-center space-x-10 relative z-[1200]">
         <div class="flex items-center space-x-8 font-bold text-[12px] uppercase tracking-widest text-slate-600">
-          <a href="/" class="nav-link">Studio</a>
+          <a href="index.html" class="nav-link">Studio</a>
           <a href="#" class="nav-link active text-blue-600">Academy</a>
           <a href="#programet" class="nav-link">Kurset</a>
         </div>
@@ -101,7 +100,7 @@
 
   <!-- MOBILE OVERLAY -->
   <div id="mobile-menu-overlay" class="fixed inset-0 bg-slate-950 z-[1050] flex flex-col items-center justify-center space-y-8 text-center px-6">
-    <a href="/" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-white">Studio</a>
+    <a href="index.html" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-white">Studio</a>
     <a href="#" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-blue-400">Academy</a>
     <a href="#programet" onclick="closeMenu()" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-white">Kurset</a>
     <button onclick="openRegistrationModal(); closeMenu()" class="mobile-nav-item opacity-0 translate-y-4 px-10 py-4 bg-blue-600 rounded-2xl text-xl font-black text-white">Regjistrohu</button>
@@ -326,7 +325,7 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1anFqZ2NjaWFqd2Zic3ZtbG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MTgwOTQsImV4cCI6MjA4NDk5NDA5NH0.0FGl0sxQTuIkSB_xPmEYwyE4-rsAdIZlIQcRWgtqJh4";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const ACADEMY_BUCKET = "lindimaps-academy"; // ndrysho vetëm nëse bucket-i yt quhet ndryshe
+    const ACADEMY_BUCKET = "lindimaps-academy"; // bucket-i yt ekziston me këtë emër
 
     function showToast() {
       const x = document.getElementById("toast");
@@ -347,7 +346,7 @@
         initialCountry: "al",
         preferredCountries: ["al"],
         separateDialCode: true,   // +355 shfaqet veçmas
-        nationalMode: true,       // lejon të shkruash vetëm 688728974
+        nationalMode: true,       // mjafton 688728974
         autoPlaceholder: "polite",
         formatOnDisplay: true
       });
@@ -394,9 +393,8 @@
       const course    = document.getElementById('reg-course').value;
       const message   = document.getElementById('reg-message').value.trim();
 
-      // telefoni (mjafton të mos jetë bosh)
+      // telefoni: mjafton të mos mbetet bosh
       const rawPhone = document.getElementById('reg-phone').value.trim();
-
       if (!rawPhone) {
         alert("Të lutem plotëso fushën e telefonit.");
         btn.disabled = false;
@@ -404,7 +402,7 @@
         return;
       }
 
-      // ruaje sa më korrekt: nëse ka iti, merre E.164, përndryshe raw
+      // ruaje si E.164 kur është e mundur (p.sh +355688728974)
       const phoneE164 = itiPhone ? itiPhone.getNumber() : rawPhone;
 
       try {
@@ -427,10 +425,7 @@
         closeRegistrationModal();
         e.target.reset();
 
-        // reset tel input (ta kthejë prapë AL)
-        if (itiPhone) {
-          itiPhone.setCountry("al");
-        }
+        if (itiPhone) itiPhone.setCountry("al");
       } catch (err) {
         alert("Gabim gjatë dërgimit. Kontrollo Supabase/RLS/URL-Key.\n\n" + (err?.message || err));
       } finally {
@@ -478,8 +473,28 @@
       'qgis-full': {
         title: 'QGIS Training Manual',
         slug: 'qgis',
+        // Këtu emrat e file-ve janë fiks sipas Storage (si p.sh. 01-1-intro.pdf)
         modules: [
-          '1. Intro','2. Basic Map','3. Classifying Data','4. Layouts','5. Creation','6. Analysis','7. Rasters','8. Hydrology','9. Plugins','10. Online Resources','11. QGIS Server','12. GRASS','13. Assessment','14. Forestry','15. PostgreSQL','16. PostGIS','17. Processing','18. Spatial DB','19. Contributing','20. Exercise Data'
+          { name: '1. Intro', file: '01-1-intro.pdf' },
+          { name: '2. Basic Map', file: '02-2-basic-map.pdf' },
+          { name: '3. Classifying Data', file: '03-3-classifying-data.pdf' },
+          { name: '4. Layouts', file: '04-4-layouts.pdf' },
+          { name: '5. Creation', file: '05-5-creation.pdf' },
+          { name: '6. Analysis', file: '06-6-analysis.pdf' },
+          { name: '7. Rasters', file: '07-7-rasters.pdf' },
+          { name: '8. Hydrology', file: '08-8-hydrology.pdf' },
+          { name: '9. Plugins', file: '09-9-plugins.pdf' },
+          { name: '10. Online Resources', file: '10-10-online-resources.pdf' },
+          { name: '11. QGIS Server', file: '11-11-qgis-server.pdf' },
+          { name: '12. GRASS', file: '12-12-grass.pdf' },
+          { name: '13. Assessment', file: '13-13-assessment.pdf' },
+          { name: '14. Forestry', file: '14-14-forestry.pdf' },
+          { name: '15. PostgreSQL', file: '15-15-postgresql.pdf' },
+          { name: '16. PostGIS', file: '16-16-postgis.pdf' },
+          { name: '17. Processing', file: '17-17-processing.pdf' },
+          { name: '18. Spatial DB', file: '18-18-spatial-db.pdf' },
+          { name: '19. Contributing', file: '19-19-contributing.pdf' },
+          { name: '20. Exercise Data', file: '20-20-exercise-data.pdf' }
         ]
       },
       'arcgis-pro': {
@@ -511,6 +526,7 @@
 
     let selectedCourseSlug = null;
     let selectedModuleIndex = null;
+    let selectedFileName = null; // (për QGIS ku file është fiks)
 
     function openModal(courseId) {
       const data = courseData[courseId];
@@ -521,13 +537,15 @@
       selectedCourseSlug = data.slug;
 
       data.modules.forEach((mod, index) => {
+        const label = (typeof mod === "string") ? mod : mod.name;
+
         const div = document.createElement('div');
         div.className = "module-item flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-blue-400 cursor-pointer transition-all";
         div.onclick = () => selectModule(mod, index, div);
 
         div.innerHTML = `
           <div class="h-6 w-6 flex-shrink-0 bg-slate-200 text-slate-500 rounded-lg flex items-center justify-center text-[9px] font-black module-num">${index + 1}</div>
-          <span class="text-slate-700 font-bold text-xs uppercase tracking-tight">${mod}</span>
+          <span class="text-slate-700 font-bold text-xs uppercase tracking-tight">${label}</span>
         `;
         modalModules.appendChild(div);
       });
@@ -541,8 +559,11 @@
       document.body.style.overflow = 'hidden';
     }
 
-    function selectModule(name, index, element) {
+    function selectModule(mod, index, element) {
       selectedModuleIndex = index;
+
+      const label = (typeof mod === "string") ? mod : mod.name;
+      selectedFileName = (typeof mod === "string") ? null : (mod.file || null);
 
       document.querySelectorAll('.module-item').forEach(el => {
         el.classList.remove('border-blue-500', 'bg-blue-50/50');
@@ -558,11 +579,12 @@
 
       downloadPlaceholder.classList.add('hidden');
       downloadPanel.classList.remove('hidden');
-      activeModuleName.innerText = name;
+      activeModuleName.innerText = label;
       passInput.value = '';
       downloadBtnContainer.classList.add('hidden');
       downloadError.classList.add('hidden');
       downloadError.innerText = '';
+      finalDownloadBtn.href = "#";
     }
 
     function slugifyModule(i, title) {
@@ -577,12 +599,18 @@
     }
 
     async function prepareDownloadLink() {
-      const data = Object.values(courseData).find(c => c.slug === selectedCourseSlug);
-      const title = data?.modules?.[selectedModuleIndex] || `module-${selectedModuleIndex+1}`;
-      const fileName = slugifyModule(selectedModuleIndex, title);
+      // nëse file emri është fiks (QGIS), përdore atë
+      let fileName = selectedFileName;
+
+      // për kurset e tjera, përdor gjenerimin që ke pasur
+      if (!fileName) {
+        const data = Object.values(courseData).find(c => c.slug === selectedCourseSlug);
+        const mod = data?.modules?.[selectedModuleIndex];
+        const title = (typeof mod === "string") ? mod : (mod?.name || `module-${selectedModuleIndex+1}`);
+        fileName = slugifyModule(selectedModuleIndex, title);
+      }
 
       const objectPath = `${selectedCourseSlug}/${fileName}`;
-
       const { data: pub } = supabaseClient.storage.from(ACADEMY_BUCKET).getPublicUrl(objectPath);
 
       if (!pub?.publicUrl) {
@@ -598,6 +626,16 @@
           const url = await prepareDownloadLink();
           finalDownloadBtn.href = url;
           downloadBtnContainer.classList.remove('hidden');
+
+          // Pasi të klikohet dhe të fillojë shkarkimi: hiqe linkun / fshi butonin
+          finalDownloadBtn.onclick = () => {
+            // e lëmë të hapet download, pastaj e fshehim dhe e kthejmë href në #
+            setTimeout(() => {
+              downloadBtnContainer.classList.add('hidden');
+              finalDownloadBtn.href = "#";
+              finalDownloadBtn.onclick = null;
+            }, 200);
+          };
         } catch (err) {
           downloadBtnContainer.classList.add('hidden');
           downloadError.classList.remove('hidden');
@@ -617,7 +655,9 @@
       downloadError.innerText = '';
       selectedCourseSlug = null;
       selectedModuleIndex = null;
+      selectedFileName = null;
       finalDownloadBtn.href = "#";
+      finalDownloadBtn.onclick = null;
     }
 
     function closeModal() {
