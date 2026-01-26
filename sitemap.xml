@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Root -->
+  <url>
+    <loc>https://www.lindimaps.com/</loc>
+    <priority>1.00</priority>
+  </url>
+
+  <!-- EN -->
+  <url>
+    <loc>https://www.lindimaps.com/en/</loc>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://www.lindimaps.com/en/about/</loc>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://www.lindimaps.com/en/services/</loc>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://www.lindimaps.com/en/projects/</loc>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://www.lindimaps.com/en/academy/</loc>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://www.lindimaps.com/en/contact/</loc>
+    <priority>0.70</priority>
+  </url>
+
+  <!-- SQ -->
+  <url>
+    <loc>https://www.lindimaps.com/sq/</loc>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://www.lindimaps.com/sq/rreth-nesh/</loc>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://www.lindimaps.com/sq/sherbime/</loc>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://www.lindimaps.com/sq/projekte/</loc>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://www.lindimaps.com/sq/akademia/</loc>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://www.lindimaps.com/sq/kontakte/</loc>
+    <priority>0.70</priority>
+  </url>
+
+</urlset>
