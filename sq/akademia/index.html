@@ -254,7 +254,7 @@
         </div>
     </footer>
 
-    <!-- MODAL REGJISTRIMI (E RE) -->
+    <!-- MODAL REGJISTRIMI -->
     <div id="reg-modal" class="modal-hidden fixed inset-0 z-[4000] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" onclick="closeRegistrationModal()"></div>
         <div class="relative bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="reg-modal-content">
@@ -331,21 +331,21 @@
         <svg class="w-5 h-5 transform group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg>
     </button>
 
-    <!-- 1) Supabase library -->
+    <!-- Supabase library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- 2) Your script + Supabase integration -->
     <script>
         // ---------------------------
-        // SUPABASE CONFIG (EDIT THIS)
+        // SUPABASE CONFIG
         // ---------------------------
         const SUPABASE_URL = "https://fujqjgcciajwfbsvmlnk.supabase.co";
-        const SUPABASE_ANON_KEY = "PASTE_ANON_KEY_HERE";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1anFqZ2NjaWFqd2Zic3ZtbG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MTgwOTQsImV4cCI6MjA4NDk5NDA5NH0.0FGl0sxQTuIkSB_xPmEYwyE4-rsAdIZlIQcRWgtqJh4";
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // IMPORTANT: must match your bucket name EXACTLY in Supabase Storage
         const PDF_BUCKET = "course-pdfs";
 
-        // Map select values -> storage folders / course IDs
+        // Map select values -> course IDs (folder names for PDFs)
         const COURSE_MAP = {
             qgis: "qgis-full",
             arcgis: "arcgis-pro",
@@ -393,7 +393,7 @@
             }, 300);
         }
 
-        // Supabase INSERT for registration
+        // INSERT to Supabase
         async function handleRegistration(e) {
             e.preventDefault();
 
@@ -424,10 +424,9 @@
                 showToast("Faleminderit! Regjistrimi u ruajt me sukses.");
                 closeRegistrationModal();
                 form.reset();
-
             } catch (err) {
-                console.error(err);
-                showToast("Gabim! Regjistrimi nuk u ruajt.");
+                console.error("Registration insert error:", err);
+                showToast("Gabim! Regjistrimi nuk u ruajt. Shiko Console.");
             }
         }
 
@@ -464,7 +463,7 @@
         menuBtn.addEventListener('click', toggleMenu);
 
         // ---------------------------
-        // Course Modal Logic
+        // Course Modal Logic + PDF
         // ---------------------------
         const courseData = {
             'qgis-full': { title: 'QGIS Training Manual', modules: ['1. Intro', '2. Basic Map', '3. Classifying Data', '4. Layouts', '5. Creation', '6. Analysis', '7. Rasters', '8. Hydrology', '9. Plugins', '10. Online Resources', '11. QGIS Server', '12. GRASS', '13. Assessment', '14. Forestry', '15. PostgreSQL', '16. PostGIS', '17. Processing', '18. Spatial DB', '19. Contributing', '20. Exercise Data'] },
@@ -532,20 +531,49 @@
             downloadBtnContainer.classList.add('hidden');
         }
 
-        function checkPassword() {
-            if(passInput.value === "1955") {
+        async function bucketSelfTest() {
+            // Helps identify why "Bucket not found" happens
+            try {
+                const { data, error } = await sb.storage.from(PDF_BUCKET).list("", { limit: 1 });
+                if (error) throw error;
+                console.log("Bucket OK:", PDF_BUCKET, data);
+            } catch (err) {
+                console.error("Bucket test error:", err);
+                showToast("Bucket problem (shiko Console).");
+            }
+        }
+
+        async function checkPassword() {
+            if (passInput.value === "1955") {
                 if (!selectedCourseId || !selectedModuleIndex) {
                     showToast("Zgjidh një modul fillimisht.");
                     return;
                 }
 
+                // optional: test bucket once (remove if you don't want logs)
+                // await bucketSelfTest();
+
                 const url = getPdfUrl(selectedCourseId, selectedModuleIndex);
+
+                // quick check: see if file exists (HEAD request)
+                try {
+                    const res = await fetch(url, { method: "HEAD" });
+                    if (!res.ok) {
+                        showToast("PDF nuk u gjet. Kontrollo emrin/path-in në Storage.");
+                        console.warn("PDF missing:", url, res.status);
+                        return;
+                    }
+                } catch (e) {
+                    // if HEAD blocked by browser, still proceed
+                    console.warn("HEAD check failed, proceeding:", e);
+                }
+
                 finalDownloadBtn.href = url;
                 finalDownloadBtn.target = "_blank";
                 finalDownloadBtn.rel = "noopener";
 
                 downloadBtnContainer.classList.remove('hidden');
-                showToast("Kodi është i saktë. Mund ta shkarkosh PDF.");
+                showToast("Kodi është i saktë. Mund ta hapësh PDF.");
             } else {
                 passInput.classList.add('ring-red-500', 'ring-2');
                 setTimeout(() => passInput.classList.remove('ring-red-500', 'ring-2'), 1000);
@@ -577,27 +605,9 @@
         window.closeModal = closeModal;
         window.checkPassword = checkPassword;
         window.closeMenu = closeMenu;
+
+        // Uncomment to test bucket immediately on page load:
+        // bucketSelfTest();
     </script>
 </body>
 </html>
-SQL që duhet të kesh në Supabase (shkurt, vetëm që të punojë)
-Run në SQL Editor:
-
-create table if not exists academy_registrations (
-  id uuid primary key default gen_random_uuid(),
-  first_name text not null,
-  last_name text not null,
-  email text not null,
-  course text not null,
-  message text,
-  created_at timestamptz not null default now()
-);
-
-alter table academy_registrations enable row level security;
-
-drop policy if exists "public_insert_academy_registrations" on academy_registrations;
-create policy "public_insert_academy_registrations"
-on academy_registrations
-for insert
-to anon
-with check (true);
