@@ -124,6 +124,7 @@
                     <a href="/en/" class="nav-link">Studio</a>
                     <a href="#" class="nav-link active text-blue-600">Academy</a>
                     <a href="#programs" class="nav-link">Courses</a>
+                    <a href="#" class="nav-link">About</a>
                 </div>
                 <div class="h-6 w-px bg-slate-200"></div>
                 <a href="mailto:contact.lindimap@gmail.com" onclick="handleContactClick(event)" class="group relative bg-blue-600 text-white px-6 py-2.5 rounded-full font-bold text-[12px] uppercase tracking-widest overflow-hidden transition-all hover:scale-105 shadow-xl shadow-blue-200 block">
@@ -302,7 +303,6 @@
             const email = "contact.lindimap@gmail.com";
             setTimeout(() => {
                 if (document.hasFocus()) {
-                    // Fallback to execCommand for compatibility in frames
                     const textArea = document.createElement("textarea");
                     textArea.value = email;
                     document.body.appendChild(textArea);
