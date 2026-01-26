@@ -276,18 +276,43 @@
             <input type="password" id="pass-input" placeholder="Vendosni Kodin" class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all mb-4">
             <button onclick="checkPassword()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition">Verifiko Aksesin</button>
             <p class="text-[11px] text-slate-400 mt-4 font-bold uppercase tracking-widest">
-              *Kodi hap linkun e shkarkimit.
+              *Kodi hap materialin e leksionit.
             </p>
           </div>
 
-          <div id="download-btn-container" class="hidden w-full animate-bounce">
-            <a href="#" target="_blank" rel="noopener" id="final-download-btn" class="flex items-center justify-center gap-3 w-full py-5 bg-emerald-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">
-              Shkarko Leksionin (PDF)
-            </a>
+          <!-- BUTONI: HAP LEKSIONIN -->
+          <div id="download-btn-container" class="hidden w-full">
+            <button type="button" id="open-lesson-btn" class="flex items-center justify-center gap-3 w-full py-5 bg-emerald-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:opacity-95 transition">
+              Hap Leksionin (PDF)
+            </button>
           </div>
 
           <div id="download-error" class="hidden text-sm font-bold text-red-600 bg-red-50 border border-red-100 rounded-2xl p-4 text-left"></div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VIEWER (LEXIMI I PDF) -->
+  <div id="pdf-viewer-modal" class="modal-hidden fixed inset-0 z-[5000] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" onclick="closePdfViewer()"></div>
+
+    <div class="relative bg-white w-full max-w-6xl rounded-[2.5rem] shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0 duration-300"
+         id="pdf-viewer-content" onclick="event.stopPropagation()">
+
+      <button onclick="closePdfViewer()" class="absolute top-5 right-6 z-50 p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 rounded-full transition-all group">
+        <svg class="w-6 h-6 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+
+      <div class="p-6 md:p-8 bg-slate-50 border-b border-slate-200 text-left">
+        <div class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Materiali</div>
+        <div id="pdf-viewer-title" class="text-xl md:text-2xl font-black text-slate-900 tracking-tighter uppercase italic">Leksioni</div>
+      </div>
+
+      <div class="bg-white">
+        <iframe id="pdf-iframe" title="PDF Viewer" class="w-full h-[75vh] md:h-[78vh]"></iframe>
       </div>
     </div>
   </div>
@@ -303,9 +328,7 @@
     // =========================
     const SUPABASE_URL = "https://fujqjgcciajwfbsvmlnk.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1anFqZ2NjaWFqd2Zic3ZtbG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MTgwOTQsImV4cCI6MjA4NDk5NDA5NH0.0FGl0sxQTuIkSB_xPmEYwyE4-rsAdIZlIQcRWgtqJh4";
-
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     const ACADEMY_BUCKET = "lindimaps-academy";
 
     function showToast() {
@@ -447,7 +470,7 @@
     const activeModuleName = document.getElementById('active-module-name');
     const passInput = document.getElementById('pass-input');
     const downloadBtnContainer = document.getElementById('download-btn-container');
-    const finalDownloadBtn = document.getElementById('final-download-btn');
+    const openLessonBtn = document.getElementById('open-lesson-btn');
     const downloadError = document.getElementById('download-error');
 
     let selectedCourseSlug = null;
@@ -504,6 +527,10 @@
       downloadBtnContainer.classList.add('hidden');
       downloadError.classList.add('hidden');
       downloadError.innerText = '';
+
+      // fshi mesazhin e suksesit nëse ekziston
+      const successEl = document.getElementById("lesson-success-msg");
+      if (successEl) successEl.classList.add("hidden");
     }
 
     function slugifyModule(i, title) {
@@ -517,7 +544,7 @@
       return `${num}-${slug}.pdf`;
     }
 
-    async function prepareDownloadLink() {
+    async function prepareViewLink() {
       const data = Object.values(courseData).find(c => c.slug === selectedCourseSlug);
       const title = data?.modules?.[selectedModuleIndex] || `module-${selectedModuleIndex+1}`;
       const fileName = slugifyModule(selectedModuleIndex, title);
@@ -531,19 +558,30 @@
         throw new Error("Nuk u gjenerua public URL. Kontrollo bucket name/path.");
       }
 
-      return pub.publicUrl;
+      // Fshih toolbar-in e PDF viewer (nëse mbështetet)
+      return pub.publicUrl + "#toolbar=0&navpanes=0&scrollbar=0";
     }
+
+    // ruaj linkun e leksionit për butonin "Hap Leksionin"
+    let currentLessonUrl = null;
 
     async function checkPassword() {
       if (passInput.value === "1955") {
         try {
-          const url = await prepareDownloadLink();
-          finalDownloadBtn.href = url;
+          const url = await prepareViewLink();
+          currentLessonUrl = url;
+
           downloadBtnContainer.classList.remove('hidden');
+          downloadError.classList.add('hidden');
+          downloadError.innerText = '';
+
+          // lidh butonin "Hap"
+          openLessonBtn.onclick = () => openPdfViewer(url, activeModuleName.innerText);
+
         } catch (err) {
           downloadBtnContainer.classList.add('hidden');
           downloadError.classList.remove('hidden');
-          downloadError.innerText = "PDF nuk u gjet. Kontrollo emrin e bucket/folder/file në Supabase Storage.\n\n" + (err?.message || err);
+          downloadError.innerText = "Materiali nuk u gjet. Kontrollo emrin e bucket/folder/file në Supabase Storage.\n\n" + (err?.message || err);
         }
       } else {
         passInput.classList.add('ring-red-500', 'ring-2');
@@ -559,7 +597,10 @@
       downloadError.innerText = '';
       selectedCourseSlug = null;
       selectedModuleIndex = null;
-      finalDownloadBtn.href = "#";
+      currentLessonUrl = null;
+
+      const successEl = document.getElementById("lesson-success-msg");
+      if (successEl) successEl.classList.add("hidden");
     }
 
     function closeModal() {
@@ -573,44 +614,61 @@
     }
 
     // =========================
-    // 5) After-download UX (SUKSES + HIDE BUTTON)
+    // 5) PDF VIEWER MODAL (LEXIM, PA LINK SHKARKIMI)
     // =========================
-    (function setupAfterDownloadUX() {
-      const successMsgId = "download-success-msg";
+    const pdfViewerModal = document.getElementById("pdf-viewer-modal");
+    const pdfViewerContent = document.getElementById("pdf-viewer-content");
+    const pdfIframe = document.getElementById("pdf-iframe");
+    const pdfViewerTitle = document.getElementById("pdf-viewer-title");
 
-      function ensureSuccessMsgEl() {
-        let el = document.getElementById(successMsgId);
-        if (!el) {
-          el = document.createElement("div");
-          el.id = successMsgId;
-          el.className = "hidden text-sm font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-left";
-          el.innerText = "Materiali u shkarkua me sukses.";
-          // vendose poshtë panelit të download
-          downloadPanel.appendChild(el);
-        }
-        return el;
+    function openPdfViewer(url, title) {
+      pdfViewerTitle.innerText = title || "Leksioni";
+      pdfIframe.src = url;
+
+      pdfViewerModal.classList.add('modal-visible');
+      pdfViewerModal.classList.remove('modal-hidden');
+      setTimeout(() => {
+        pdfViewerContent.classList.remove('scale-95', 'opacity-0');
+        pdfViewerContent.classList.add('scale-100', 'opacity-100');
+      }, 10);
+
+      // blloko scroll
+      document.body.style.overflow = 'hidden';
+
+      // shfaq mesazh sukses + hiq butonin
+      showLessonSuccessAndHideButton();
+    }
+
+    function closePdfViewer() {
+      pdfViewerContent.classList.remove('scale-100', 'opacity-100');
+      pdfViewerContent.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+        pdfViewerModal.classList.add('modal-hidden');
+        pdfViewerModal.classList.remove('modal-visible');
+        pdfIframe.src = ""; // pastro iframe
+        document.body.style.overflow = 'hidden'; // mbaj i bllokuar sepse je ende te course-modal
+      }, 250);
+    }
+
+    // =========================
+    // 6) After-open UX (SUKSES + HIDE BUTTON)
+    // =========================
+    function showLessonSuccessAndHideButton() {
+      const successId = "lesson-success-msg";
+
+      let el = document.getElementById(successId);
+      if (!el) {
+        el = document.createElement("div");
+        el.id = successId;
+        el.className = "hidden text-sm font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-left";
+        el.innerText = "Materiali u hap me sukses.";
+        downloadPanel.appendChild(el);
       }
 
-      // kur zgjedh modul tjetër, fshi mesazhin
-      const _oldSelectModule = selectModule;
-      selectModule = function(name, index, element) {
-        _oldSelectModule(name, index, element);
-        const el = document.getElementById(successMsgId);
-        if (el) el.classList.add("hidden");
-      };
-
-      // kur klikohet butoni i download-it
-      finalDownloadBtn.addEventListener("click", () => {
-        const el = ensureSuccessMsgEl();
-        el.classList.remove("hidden");
-
-        // hiq butonin e pdf-së që të mos mbetet aty
-        downloadBtnContainer.classList.add("hidden");
-
-        // (opsionale) pastro kodin
-        passInput.value = "";
-      });
-    })();
+      el.classList.remove("hidden");
+      downloadBtnContainer.classList.add("hidden"); // hiq butonin
+      passInput.value = "";
+    }
   </script>
 </body>
 </html>
