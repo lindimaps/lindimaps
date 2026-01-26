@@ -43,9 +43,9 @@
         .course-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .course-card:hover { transform: translateY(-10px); }
 
-        #course-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
-        #course-modal.hidden { opacity: 0; visibility: hidden; display: none; }
-        #course-modal.flex { opacity: 1; visibility: visible; }
+        #course-modal, #reg-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal-hidden { opacity: 0; visibility: hidden; display: none; }
+        .modal-visible { opacity: 1; visibility: visible; display: flex !important; }
 
         .scrollbar-thin::-webkit-scrollbar { width: 6px; }
         .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
@@ -98,7 +98,7 @@
 <body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
 
     <!-- Toast për njoftim -->
-    <div id="toast">E-maili u kopjua! Mund ta dërgoni tani.</div>
+    <div id="toast">Faleminderit! Kërkesa u dërgua me sukses.</div>
 
     <!-- PANEL I GJUHES -->
     <div class="fixed left-5 top-1/2 -translate-y-1/2 z-[2000] flex flex-row gap-2 bg-white/80 backdrop-blur-md p-1.5 rounded-xl border border-black/5 shadow-xl">
@@ -126,9 +126,9 @@
                     <a href="#programet" class="nav-link">Kurset</a>
                 </div>
                 <div class="h-6 w-px bg-slate-200"></div>
-                <a href="mailto:contact.lindimap@gmail.com" onclick="handleContactClick(event)" class="group relative bg-blue-600 text-white px-6 py-2.5 rounded-full font-bold text-[12px] uppercase tracking-widest overflow-hidden transition-all hover:scale-105 shadow-xl shadow-blue-200 block">
+                <button onclick="openRegistrationModal()" class="group relative bg-blue-600 text-white px-6 py-2.5 rounded-full font-bold text-[12px] uppercase tracking-widest overflow-hidden transition-all hover:scale-105 shadow-xl shadow-blue-200 block">
                     <span class="relative z-10">Regjistrohu</span>
-                </a>
+                </button>
             </div>
 
             <button id="menu-btn" class="lg:hidden relative z-[1200] p-3 text-slate-900">
@@ -146,7 +146,7 @@
         <a href="index.html" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-white">Studio</a>
         <a href="#" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-blue-400">Academy</a>
         <a href="#programet" onclick="closeMenu()" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-white">Kurset</a>
-        <a href="mailto:contact.lindimap@gmail.com" class="mobile-nav-item opacity-0 translate-y-4 px-10 py-4 bg-blue-600 rounded-2xl text-xl font-black text-white">Regjistrohu</a>
+        <button onclick="openRegistrationModal(); closeMenu()" class="mobile-nav-item opacity-0 translate-y-4 px-10 py-4 bg-blue-600 rounded-2xl text-xl font-black text-white">Regjistrohu</button>
     </div>
 
     <!-- HERO ACADEMY -->
@@ -185,12 +185,11 @@
                 </div>
             </div>
 
-            <!-- ArcGIS Pro Card (Updated with Modern Logo concept) -->
+            <!-- ArcGIS Pro Card -->
             <div class="course-card bg-white rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 flex flex-col">
                 <div class="h-56 bg-gradient-to-br from-blue-500 to-indigo-700 relative flex items-center justify-center overflow-hidden">
                     <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')]"></div>
                     <div class="relative z-10 bg-white/10 backdrop-blur-md p-6 rounded-full border border-white/20 shadow-2xl">
-                        <!-- Simulated 3D ArcGIS Globe Icon using SVG for placeholder consistency -->
                         <svg width="80" height="80" viewBox="0 0 24 24" fill="none" class="filter drop-shadow-lg text-white">
                             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2" class="opacity-40" />
                             <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor" fill-opacity="0.3"/>
@@ -209,12 +208,11 @@
                 </div>
             </div>
 
-            <!-- Global Mapper Card (Updated with Modern Logo concept) -->
+            <!-- Global Mapper Card -->
             <div class="course-card bg-white rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 flex flex-col">
                 <div class="h-56 bg-gradient-to-br from-slate-700 to-slate-900 relative flex items-center justify-center overflow-hidden">
                     <div class="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/shattered-island.png')]"></div>
                     <div class="relative z-10 bg-white/10 backdrop-blur-lg p-7 rounded-3xl border border-white/10 shadow-inner">
-                        <!-- Modern Global Mapper 'G' icon Concept -->
                         <div class="w-20 h-20 flex items-center justify-center border-4 border-blue-400 rounded-full border-t-transparent animate-spin-slow rotate-45">
                              <div class="w-12 h-12 bg-green-500 rounded-full shadow-lg shadow-green-500/50"></div>
                         </div>
@@ -256,8 +254,42 @@
         </div>
     </footer>
 
-    <!-- MODAL (Mbetet i njëjtë) -->
-    <div id="course-modal" class="hidden fixed inset-0 z-[3000] flex items-center justify-center p-4">
+    <!-- MODAL REGJISTRIMI (E RE) -->
+    <div id="reg-modal" class="modal-hidden fixed inset-0 z-[4000] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" onclick="closeRegistrationModal()"></div>
+        <div class="relative bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="reg-modal-content">
+            <button onclick="closeRegistrationModal()" class="absolute top-6 right-8 z-50 p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full transition-all group">
+                <svg class="w-6 h-6 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="p-10 md:p-12">
+                <div class="text-center mb-8">
+                    <span class="text-blue-600 font-black text-[10px] uppercase tracking-[0.3em] mb-2 block">Application Form</span>
+                    <h3 class="text-3xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">Regjistrohu Tani</h3>
+                </div>
+                <form id="registration-form" onsubmit="handleRegistration(event)" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" placeholder="Emri" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+                        <input type="text" placeholder="Mbiemri" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+                    </div>
+                    <input type="email" placeholder="Email Adresa" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+                    <select required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all appearance-none">
+                        <option value="" disabled selected>Zgjidhni Kursin</option>
+                        <option value="qgis">QGIS Training</option>
+                        <option value="arcgis">ArcGIS Pro</option>
+                        <option value="globalmapper">Global Mapper</option>
+                    </select>
+                    <textarea placeholder="Subjekti / Mesazhi juaj" rows="3" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"></textarea>
+                    
+                    <button type="submit" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-900 transition shadow-xl shadow-blue-100 mt-4">
+                        Dërgo Aplikimin
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SILABUSI -->
+    <div id="course-modal" class="modal-hidden fixed inset-0 z-[3000] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" onclick="closeModal()"></div>
         <div class="relative bg-white w-full max-w-5xl rounded-[3rem] shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0 duration-300 flex flex-col md:flex-row h-auto max-h-[90vh]" id="modal-content" onclick="event.stopPropagation()">
             <button onclick="closeModal()" class="absolute top-6 right-8 z-50 p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 rounded-full transition-all group">
@@ -299,24 +331,109 @@
         <svg class="w-5 h-5 transform group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg>
     </button>
 
+    <!-- 1) Supabase library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- 2) Your script + Supabase integration -->
     <script>
-        function handleContactClick(e) {
-            const email = "contact.lindimap@gmail.com";
-            setTimeout(() => {
-                if (document.hasFocus()) {
-                    navigator.clipboard.writeText(email).then(() => {
-                        showToast();
-                    });
-                }
-            }, 500);
+        // ---------------------------
+        // SUPABASE CONFIG (EDIT THIS)
+        // ---------------------------
+        const SUPABASE_URL = "https://fujqjgcciajwfbsvmlnk.supabase.co";
+        const SUPABASE_ANON_KEY = "PASTE_ANON_KEY_HERE";
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const PDF_BUCKET = "course-pdfs";
+
+        // Map select values -> storage folders / course IDs
+        const COURSE_MAP = {
+            qgis: "qgis-full",
+            arcgis: "arcgis-pro",
+            globalmapper: "global-mapper"
+        };
+
+        function getPdfUrl(courseId, moduleIndex) {
+            return `${SUPABASE_URL}/storage/v1/object/public/${PDF_BUCKET}/${courseId}/${moduleIndex}.pdf`;
         }
 
-        function showToast() {
+        // ---------------------------
+        // Toast
+        // ---------------------------
+        function showToast(text) {
             const x = document.getElementById("toast");
+            if (text) x.textContent = text;
             x.className = "show";
             setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
         }
 
+        // ---------------------------
+        // Registration Modal Logic
+        // ---------------------------
+        function openRegistrationModal() {
+            const modal = document.getElementById('reg-modal');
+            const content = document.getElementById('reg-modal-content');
+            modal.classList.add('modal-visible');
+            modal.classList.remove('modal-hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRegistrationModal() {
+            const modal = document.getElementById('reg-modal');
+            const content = document.getElementById('reg-modal-content');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('modal-hidden');
+                modal.classList.remove('modal-visible');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Supabase INSERT for registration
+        async function handleRegistration(e) {
+            e.preventDefault();
+
+            const form = e.target;
+
+            const inputs = form.querySelectorAll("input");
+            const first_name = inputs[0].value.trim();
+            const last_name  = inputs[1].value.trim();
+            const email      = inputs[2].value.trim();
+            const courseRaw  = form.querySelector("select").value;
+            const message    = form.querySelector("textarea").value.trim();
+
+            const course = COURSE_MAP[courseRaw] || courseRaw;
+
+            try {
+                const { error } = await sb
+                    .from("academy_registrations")
+                    .insert([{
+                        first_name,
+                        last_name,
+                        email,
+                        course,
+                        message
+                    }]);
+
+                if (error) throw error;
+
+                showToast("Faleminderit! Regjistrimi u ruajt me sukses.");
+                closeRegistrationModal();
+                form.reset();
+
+            } catch (err) {
+                console.error(err);
+                showToast("Gabim! Regjistrimi nuk u ruajt.");
+            }
+        }
+
+        // ---------------------------
+        // Menu + Back To Top
+        // ---------------------------
         const menuBtn = document.getElementById('menu-btn');
         const overlay = document.getElementById('mobile-menu-overlay');
         const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
@@ -331,15 +448,24 @@
             overlay.classList.toggle('active');
             if(overlay.classList.contains('active')) {
                 mobileNavItems.forEach((item, idx) => {
-                    setTimeout(() => { item.classList.remove('opacity-0', 'translate-y-4'); item.classList.add('opacity-100', 'translate-y-0'); }, 100 + (idx * 50));
+                    setTimeout(() => { 
+                        item.classList.remove('opacity-0', 'translate-y-4'); 
+                        item.classList.add('opacity-100', 'translate-y-0'); 
+                    }, 100 + (idx * 50));
                 });
             } else {
-                mobileNavItems.forEach(item => { item.classList.add('opacity-0', 'translate-y-4'); item.classList.remove('opacity-100', 'translate-y-0'); });
+                mobileNavItems.forEach(item => { 
+                    item.classList.add('opacity-0', 'translate-y-4'); 
+                    item.classList.remove('opacity-100', 'translate-y-0'); 
+                });
             }
         }
         function closeMenu() { overlay.classList.remove('active'); }
         menuBtn.addEventListener('click', toggleMenu);
 
+        // ---------------------------
+        // Course Modal Logic
+        // ---------------------------
         const courseData = {
             'qgis-full': { title: 'QGIS Training Manual', modules: ['1. Intro', '2. Basic Map', '3. Classifying Data', '4. Layouts', '5. Creation', '6. Analysis', '7. Rasters', '8. Hydrology', '9. Plugins', '10. Online Resources', '11. QGIS Server', '12. GRASS', '13. Assessment', '14. Forestry', '15. PostgreSQL', '16. PostGIS', '17. Processing', '18. Spatial DB', '19. Contributing', '20. Exercise Data'] },
             'arcgis-pro': { title: 'ArcGIS Pro: Training', modules: ['Overview', 'Create Project', 'Navigation', 'Add Data', 'Proximity', 'Export', 'Labels', 'Layout'] },
@@ -355,32 +481,50 @@
         const activeModuleName = document.getElementById('active-module-name');
         const passInput = document.getElementById('pass-input');
         const downloadBtnContainer = document.getElementById('download-btn-container');
+        const finalDownloadBtn = document.getElementById('final-download-btn');
+
+        let selectedCourseId = null;
+        let selectedModuleIndex = null;
 
         function openModal(courseId) {
+            selectedCourseId = courseId;
+            selectedModuleIndex = null;
+
             const data = courseData[courseId];
             modalTitle.innerText = data.title;
             modalModules.innerHTML = '';
             resetDownloadPanel();
+
             data.modules.forEach((mod, index) => {
                 const div = document.createElement('div');
                 div.className = "module-item flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-blue-400 cursor-pointer transition-all";
-                div.onclick = () => selectModule(mod, div);
+                div.onclick = () => selectModule(mod, div, index + 1);
                 div.innerHTML = `<div class="h-6 w-6 flex-shrink-0 bg-slate-200 text-slate-500 rounded-lg flex items-center justify-center text-[9px] font-black module-num">${index + 1}</div><span class="text-slate-700 font-bold text-xs uppercase tracking-tight">${mod}</span>`;
                 modalModules.appendChild(div);
             });
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            setTimeout(() => { modalContent.classList.remove('scale-95', 'opacity-0'); modalContent.classList.add('scale-100', 'opacity-100'); }, 10);
+
+            modal.classList.add('modal-visible');
+            modal.classList.remove('modal-hidden');
+            setTimeout(() => { 
+                modalContent.classList.remove('scale-95', 'opacity-0'); 
+                modalContent.classList.add('scale-100', 'opacity-100'); 
+            }, 10);
             document.body.style.overflow = 'hidden';
         }
 
-        function selectModule(name, element) {
+        function selectModule(name, element, moduleIndex) {
+            selectedModuleIndex = moduleIndex;
+
             document.querySelectorAll('.module-item').forEach(el => {
                 el.classList.remove('border-blue-500', 'bg-blue-50/50');
-                el.querySelector('.module-num').classList.replace('bg-blue-600', 'bg-slate-200');
+                el.querySelector('.module-num').classList.remove('bg-blue-600');
+                el.querySelector('.module-num').classList.add('bg-slate-200');
             });
+
             element.classList.add('border-blue-500', 'bg-blue-50/50');
-            element.querySelector('.module-num').classList.replace('bg-slate-200', 'bg-blue-600');
+            element.querySelector('.module-num').classList.remove('bg-slate-200');
+            element.querySelector('.module-num').classList.add('bg-blue-600');
+
             downloadPlaceholder.classList.add('hidden');
             downloadPanel.classList.remove('hidden');
             activeModuleName.innerText = name;
@@ -389,8 +533,20 @@
         }
 
         function checkPassword() {
-            if(passInput.value === "1955") downloadBtnContainer.classList.remove('hidden');
-            else {
+            if(passInput.value === "1955") {
+                if (!selectedCourseId || !selectedModuleIndex) {
+                    showToast("Zgjidh një modul fillimisht.");
+                    return;
+                }
+
+                const url = getPdfUrl(selectedCourseId, selectedModuleIndex);
+                finalDownloadBtn.href = url;
+                finalDownloadBtn.target = "_blank";
+                finalDownloadBtn.rel = "noopener";
+
+                downloadBtnContainer.classList.remove('hidden');
+                showToast("Kodi është i saktë. Mund ta shkarkosh PDF.");
+            } else {
                 passInput.classList.add('ring-red-500', 'ring-2');
                 setTimeout(() => passInput.classList.remove('ring-red-500', 'ring-2'), 1000);
             }
@@ -405,8 +561,22 @@
         function closeModal() {
             modalContent.classList.remove('scale-100', 'opacity-100');
             modalContent.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => { modal.classList.replace('flex', 'hidden'); document.body.style.overflow = 'auto'; }, 300);
+            setTimeout(() => { 
+                modal.classList.add('modal-hidden');
+                modal.classList.remove('modal-visible');
+                document.body.style.overflow = 'auto'; 
+            }, 300);
         }
+
+        // expose globals (needed for inline onclick / onsubmit)
+        window.openRegistrationModal = openRegistrationModal;
+        window.closeRegistrationModal = closeRegistrationModal;
+        window.handleRegistration = handleRegistration;
+
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.checkPassword = checkPassword;
+        window.closeMenu = closeMenu;
     </script>
 </body>
 </html>
