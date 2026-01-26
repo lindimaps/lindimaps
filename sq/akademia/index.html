@@ -299,10 +299,11 @@
 
   <script>
     // =========================
-    // 0) Supabase Config
+    // 0) Supabase Config (GATI)
     // =========================
-    const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
-    const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
+    const SUPABASE_URL = "https://fujqjgcciajwfbsvmlnk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1anFqZ2NjaWFqd2Zic3ZtbG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MTgwOTQsImV4cCI6MjA4NDk5NDA5NH0.0FGl0sxQTuIkSB_xPmEYwyE4-rsAdIZlIQcRWgtqJh4";
+
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const ACADEMY_BUCKET = "lindimaps-academy";
@@ -521,13 +522,9 @@
       const title = data?.modules?.[selectedModuleIndex] || `module-${selectedModuleIndex+1}`;
       const fileName = slugifyModule(selectedModuleIndex, title);
 
-      // Folder mapping
-      // qgis -> qgis/
-      // arcgis-pro -> arcgis-pro/
-      // global-mapper -> global-mapper/
       const objectPath = `${selectedCourseSlug}/${fileName}`;
 
-      // Public URL (requires bucket public)
+      // Public URL (bucket duhet PUBLIC)
       const { data: pub } = supabaseClient.storage.from(ACADEMY_BUCKET).getPublicUrl(objectPath);
 
       if (!pub?.publicUrl) {
