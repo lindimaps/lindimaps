@@ -1,473 +1,579 @@
 <!DOCTYPE html>
 <html lang="sq">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academy | LindiMaps Trajnime GIS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .academy-bg { background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1920&q=80'); }
-        .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .nav-link { position: relative; transition: color 0.3s ease; }
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #3b82f6;
-            transition: width 0.3s ease;
-            border-radius: 2px;
-        }
-        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academy | LindiMaps Trajnime GIS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        #mobile-menu-overlay {
-            transition: all 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-            clip-path: circle(0% at 92% 5%);
-            pointer-events: none;
-        }
-        #mobile-menu-overlay.active {
-            clip-path: circle(150% at 90% 5%);
-            pointer-events: auto;
-        }
+  <!-- Supabase JS (UMD) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        @keyframes pulse-dot {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .animate-dot { animation: pulse-dot 2s infinite ease-in-out; transform-origin: center; }
-
-        .course-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .course-card:hover { transform: translateY(-10px); }
-
-        #course-modal, #reg-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
-        .modal-hidden { opacity: 0; visibility: hidden; display: none; }
-        .modal-visible { opacity: 1; visibility: visible; display: flex !important; }
-
-        .scrollbar-thin::-webkit-scrollbar { width: 6px; }
-        .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-        .scrollbar-thin::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-
-        #back-to-top {
-            transition: all 0.3s ease;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px);
-        }
-        #back-to-top.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .footer-logo-text {
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            letter-spacing: -0.05em;
-        }
-        
-        #toast {
-            visibility: hidden;
-            min-width: 250px;
-            margin-left: -125px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 12px;
-            padding: 16px;
-            position: fixed;
-            z-index: 5000;
-            left: 50%;
-            bottom: 30px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        #toast.show {
-            visibility: visible;
-            -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
-        }
-        @-webkit-keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @-webkit-keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-    </style>
+  <style>
+    .academy-bg { background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1920&q=80'); }
+    .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav-link { position: relative; transition: color 0.3s ease; }
+    .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: #3b82f6; transition: width 0.3s ease; border-radius: 2px; }
+    .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+    #mobile-menu-overlay { transition: all 0.5s cubic-bezier(0.77, 0, 0.175, 1); clip-path: circle(0% at 92% 5%); pointer-events: none; }
+    #mobile-menu-overlay.active { clip-path: circle(150% at 90% 5%); pointer-events: auto; }
+    @keyframes pulse-dot { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+    .animate-dot { animation: pulse-dot 2s infinite ease-in-out; transform-origin: center; }
+    .course-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    .course-card:hover { transform: translateY(-10px); }
+    #course-modal, #reg-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
+    .modal-hidden { opacity: 0; visibility: hidden; display: none; }
+    .modal-visible { opacity: 1; visibility: visible; display: flex !important; }
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    #back-to-top { transition: all 0.3s ease; opacity: 0; visibility: hidden; transform: translateY(20px); }
+    #back-to-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+    .footer-logo-text { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.05em; }
+    #toast { visibility: hidden; min-width: 250px; margin-left: -125px; background-color: #333; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 5000; left: 50%; bottom: 30px; font-size: 14px; font-weight: bold; }
+    #toast.show { visibility: visible; -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+    @-webkit-keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+    @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+    @-webkit-keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+  </style>
 </head>
+
 <body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
 
-    <!-- Toast për njoftim -->
-    <div id="toast">Faleminderit! Kërkesa u dërgua me sukses.</div>
+  <!-- Toast për njoftim -->
+  <div id="toast">Faleminderit! Kërkesa u dërgua me sukses.</div>
 
-    <!-- PANEL I GJUHES -->
-    <div class="fixed left-5 top-1/2 -translate-y-1/2 z-[2000] flex flex-row gap-2 bg-white/80 backdrop-blur-md p-1.5 rounded-xl border border-black/5 shadow-xl">
-        <a href="LindimapAcademy.html" class="p-1 rounded-md shadow-sm border-2 border-blue-600"><img src="https://flagcdn.com/w40/al.png" class="w-5 h-3.5 object-cover rounded-sm"></a>
-        <a href="LindimapAcademy_en.html" class="p-1 rounded-md hover:scale-110 transition"><img src="https://flagcdn.com/w40/gb.png" class="w-5 h-3.5 object-cover rounded-sm"></a>
+  <!-- PANEL I GJUHES -->
+  <div class="fixed left-5 top-1/2 -translate-y-1/2 z-[2000] flex flex-row gap-2 bg-white/80 backdrop-blur-md p-1.5 rounded-xl border border-black/5 shadow-xl">
+    <a href="LindimapAcademy.html" class="p-1 rounded-md shadow-sm border-2 border-blue-600"><img src="https://flagcdn.com/w40/al.png" class="w-5 h-3.5 object-cover rounded-sm"></a>
+    <a href="LindimapAcademy_en.html" class="p-1 rounded-md hover:scale-110 transition"><img src="https://flagcdn.com/w40/gb.png" class="w-5 h-3.5 object-cover rounded-sm"></a>
+  </div>
+
+  <!-- MODERN NAVIGIMI -->
+  <div class="fixed top-0 left-0 w-full z-[1100] px-4 py-4 md:px-8">
+    <nav class="max-w-7xl mx-auto bg-white/70 backdrop-blur-xl border border-white/20 shadow-lg rounded-[24px] px-6 py-3 flex justify-between items-center relative">
+      <a href="#" class="flex items-center gap-3 group relative z-[1200]">
+        <div class="h-10 w-10 flex items-center justify-center bg-slate-900 rounded-xl">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.2"/>
+            <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2"/>
+            <circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <h1 class="text-xl font-black tracking-tighter leading-none"><span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span></h1>
+          <span class="text-[8px] uppercase tracking-[0.4em] font-bold text-slate-400 mt-1">Academy</span>
+        </div>
+      </a>
+
+      <div class="hidden lg:flex items-center space-x-10 relative z-[1200]">
+        <div class="flex items-center space-x-8 font-bold text-[12px] uppercase tracking-widest text-slate-600">
+          <a href="index.html" class="nav-link">Studio</a>
+          <a href="#" class="nav-link active text-blue-600">Academy</a>
+          <a href="#programet" class="nav-link">Kurset</a>
+        </div>
+        <div class="h-6 w-px bg-slate-200"></div>
+        <button onclick="openRegistrationModal()" class="group relative bg-blue-600 text-white px-6 py-2.5 rounded-full font-bold text-[12px] uppercase tracking-widest overflow-hidden transition-all hover:scale-105 shadow-xl shadow-blue-200 block">
+          <span class="relative z-10">Regjistrohu</span>
+        </button>
+      </div>
+
+      <button id="menu-btn" class="lg:hidden relative z-[1200] p-3 text-slate-900">
+        <div id="hamburger" class="w-6 h-5 relative flex flex-col justify-between overflow-hidden">
+          <span class="w-full h-0.5 bg-current transform transition-all duration-300 origin-left"></span>
+          <span class="w-full h-0.5 bg-current transform transition-all duration-300"></span>
+          <span class="w-full h-0.5 bg-current transform transition-all duration-300 origin-left"></span>
+        </div>
+      </button>
+    </nav>
+  </div>
+
+  <!-- MOBILE OVERLAY -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-slate-950 z-[1050] flex flex-col items-center justify-center space-y-8 text-center px-6">
+    <a href="index.html" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-white">Studio</a>
+    <a href="#" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-blue-400">Academy</a>
+    <a href="#programet" onclick="closeMenu()" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-white">Kurset</a>
+    <button onclick="openRegistrationModal(); closeMenu()" class="mobile-nav-item opacity-0 translate-y-4 px-10 py-4 bg-blue-600 rounded-2xl text-xl font-black text-white">Regjistrohu</button>
+  </div>
+
+  <!-- HERO ACADEMY -->
+  <header class="academy-bg bg-cover bg-center h-[60vh] relative flex items-center justify-center text-white text-center">
+    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"></div>
+    <div class="relative z-10 px-6 max-w-4xl">
+      <span class="bg-blue-600 px-4 py-1 rounded-full text-[10px] font-black tracking-[0.3em] uppercase mb-6 inline-block">Mëso nga Ekspertët</span>
+      <h2 class="text-5xl md:text-7xl font-black mb-6 tracking-tighter uppercase leading-[1]">LindiMaps <span class="text-blue-400">Academy</span></h2>
+      <p class="text-lg md:text-xl text-slate-300 font-light max-w-2xl mx-auto italic">Platforma juaj për zhvillim profesional në GIS.</p>
+    </div>
+  </header>
+
+  <!-- PROGRAMET -->
+  <section id="programet" class="py-24 max-w-7xl mx-auto px-6">
+    <div class="text-left mb-16">
+      <h3 class="text-4xl font-black text-slate-900 tracking-tighter uppercase">Programet e Trajnimit</h3>
+      <p class="text-slate-500 mt-2 font-medium">Zgjidhni softuerin tuaj dhe shikoni modulet e plota.</p>
     </div>
 
-    <!-- MODERN NAVIGIMI -->
-    <div class="fixed top-0 left-0 w-full z-[1100] px-4 py-4 md:px-8">
-        <nav class="max-w-7xl mx-auto bg-white/70 backdrop-blur-xl border border-white/20 shadow-lg rounded-[24px] px-6 py-3 flex justify-between items-center relative">
-            <a href="#" class="flex items-center gap-3 group relative z-[1200]">
-                <div class="h-10 w-10 flex items-center justify-center bg-slate-900 rounded-xl">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.2"/><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2"/><circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/></svg>
-                </div>
-                <div class="flex flex-col">
-                    <h1 class="text-xl font-black tracking-tighter leading-none"><span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span></h1>
-                    <span class="text-[8px] uppercase tracking-[0.4em] font-bold text-slate-400 mt-1">Academy</span>
-                </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <!-- QGIS Card -->
+      <div class="course-card bg-white rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 flex flex-col">
+        <div class="h-56 bg-gradient-to-br from-emerald-400 to-green-600 relative flex items-center justify-center overflow-hidden">
+          <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+          <div class="relative z-10 bg-white/20 backdrop-blur-md p-6 rounded-[2rem] border border-white/30 shadow-2xl">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/QGIS_logo_new.svg" class="w-24 h-24 filter brightness-0 invert" alt="Modern QGIS Logo">
+          </div>
+          <div class="absolute top-6 left-6 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-[10px] font-black uppercase text-emerald-600">QGIS Training Manual</div>
+        </div>
+        <div class="p-10 flex-grow">
+          <h4 class="text-2xl font-black mb-4 leading-tight">QGIS</h4>
+          <p class="text-slate-500 text-sm leading-relaxed mb-6">Mësoni menaxhimin e të dhënave dhe hartografinë profesionale me qGIS.</p>
+        </div>
+        <div class="px-10 pb-10">
+          <button onclick="openModal('qgis-full')" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition">Shiko Temat e Trajnimit</button>
+        </div>
+      </div>
+
+      <!-- ArcGIS Pro Card -->
+      <div class="course-card bg-white rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 flex flex-col">
+        <div class="h-56 bg-gradient-to-br from-blue-500 to-indigo-700 relative flex items-center justify-center overflow-hidden">
+          <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')]"></div>
+          <div class="relative z-10 bg-white/10 backdrop-blur-md p-6 rounded-full border border-white/20 shadow-2xl">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" class="filter drop-shadow-lg text-white">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2" class="opacity-40" />
+              <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor" fill-opacity="0.3"/>
+              <path d="M12 6v12M6 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="absolute top-6 left-6 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-[10px] font-black uppercase text-blue-700">ArcGIS Pro Training</div>
+        </div>
+        <div class="p-10 flex-grow">
+          <h4 class="text-2xl font-black mb-4 leading-tight">ArcGIS Pro</h4>
+          <p class="text-slate-500 text-sm leading-relaxed mb-6">Mësoni menaxhimin e të dhënave dhe hartografinë profesionale me ArcGIS Pro.</p>
+        </div>
+        <div class="px-10 pb-10">
+          <button onclick="openModal('arcgis-pro')" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition">Shiko Temat e Trajnimit</button>
+        </div>
+      </div>
+
+      <!-- Global Mapper Card -->
+      <div class="course-card bg-white rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 flex flex-col">
+        <div class="h-56 bg-gradient-to-br from-slate-700 to-slate-900 relative flex items-center justify-center overflow-hidden">
+          <div class="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/shattered-island.png')]"></div>
+          <div class="relative z-10 bg-white/10 backdrop-blur-lg p-7 rounded-3xl border border-white/10 shadow-inner">
+            <div class="w-20 h-20 flex items-center justify-center border-4 border-blue-400 rounded-full border-t-transparent animate-spin-slow rotate-45">
+              <div class="w-12 h-12 bg-green-500 rounded-full shadow-lg shadow-green-500/50"></div>
+            </div>
+          </div>
+          <div class="absolute top-6 left-6 bg-purple-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase text-white shadow-lg">Global Mapper Pro</div>
+        </div>
+        <div class="p-10 flex-grow">
+          <h4 class="text-2xl font-black mb-4 leading-tight">Global Mapper</h4>
+          <p class="text-slate-500 text-sm leading-relaxed mb-6">Mësoni menaxhimin e të dhënave dhe hartografinë profesionale me Global Mapper.</p>
+        </div>
+        <div class="px-10 pb-10">
+          <button onclick="openModal('global-mapper')" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition">Shiko Temat e Trajnimit</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 text-white pt-24 pb-12 px-6 mt-12">
+    <div class="max-w-7xl mx-auto flex flex-col items-center text-center">
+      <div class="footer-logo-text flex flex-col items-center">
+        <div class="flex items-center justify-center gap-4 mb-2">
+          <span class="text-5xl md:text-6xl font-black tracking-tighter text-white">LINDI</span>
+          <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-900/40">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white" class="md:w-6 md:h-6"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
+          </div>
+          <span class="text-5xl md:text-6xl font-black tracking-tighter text-blue-500">MAPS</span>
+        </div>
+        <p class="text-[10px] md:text-[11px] uppercase tracking-[0.5em] font-bold text-slate-400 opacity-80 mt-2">Spatial Intelligence Studio & Academy</p>
+      </div>
+
+      <div class="mt-16 pt-8 border-t border-slate-800 w-full flex flex-col md:flex-row justify-between items-center gap-6">
+        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">© 2024 LindiMaps Studio & Academy. Të gjitha të drejtat të rezervuara.</p>
+        <a href="mailto:contact.lindimap@gmail.com" class="text-slate-400 hover:text-blue-400 transition text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+          contact.lindimap@gmail.com
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL REGJISTRIMI -->
+  <div id="reg-modal" class="modal-hidden fixed inset-0 z-[4000] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" onclick="closeRegistrationModal()"></div>
+    <div class="relative bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="reg-modal-content">
+      <button onclick="closeRegistrationModal()" class="absolute top-6 right-8 z-50 p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full transition-all group">
+        <svg class="w-6 h-6 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+
+      <div class="p-10 md:p-12">
+        <div class="text-center mb-8">
+          <span class="text-blue-600 font-black text-[10px] uppercase tracking-[0.3em] mb-2 block">Application Form</span>
+          <h3 class="text-3xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">Regjistrohu Tani</h3>
+        </div>
+
+        <form id="registration-form" onsubmit="handleRegistration(event)" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <input id="reg-firstname" type="text" placeholder="Emri" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+            <input id="reg-lastname" type="text" placeholder="Mbiemri" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+          </div>
+
+          <input id="reg-email" type="email" placeholder="Email Adresa" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+
+          <select id="reg-course" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all appearance-none">
+            <option value="" disabled selected>Zgjidhni Kursin</option>
+            <option value="qgis">QGIS Training</option>
+            <option value="arcgis">ArcGIS Pro</option>
+            <option value="globalmapper">Global Mapper</option>
+          </select>
+
+          <textarea id="reg-message" placeholder="Subjekti / Mesazhi juaj" rows="3" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"></textarea>
+
+          <button id="reg-submit-btn" type="submit" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-900 transition shadow-xl shadow-blue-100 mt-4">
+            Dërgo Aplikimin
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SILABUSI -->
+  <div id="course-modal" class="modal-hidden fixed inset-0 z-[3000] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" onclick="closeModal()"></div>
+
+    <div class="relative bg-white w-full max-w-5xl rounded-[3rem] shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0 duration-300 flex flex-col md:flex-row h-auto max-h-[90vh]" id="modal-content" onclick="event.stopPropagation()">
+      <button onclick="closeModal()" class="absolute top-6 right-8 z-50 p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 rounded-full transition-all group">
+        <svg class="w-6 h-6 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+
+      <div class="w-full md:w-1/2 p-8 md:p-12 border-b md:border-b-0 md:border-r border-slate-100 overflow-y-auto scrollbar-thin bg-white">
+        <div class="mb-8 pr-12">
+          <span class="text-blue-600 font-black text-[10px] uppercase tracking-[0.3em] mb-2 block">Silabusi i Detajuar</span>
+          <h3 id="modal-title" class="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Titulli</h3>
+        </div>
+        <div class="space-y-2 pb-10" id="modal-modules"></div>
+      </div>
+
+      <div class="w-full md:w-1/2 p-8 md:p-12 bg-slate-50 flex flex-col justify-center items-center text-center relative">
+        <div id="download-placeholder" class="space-y-4">
+          <div class="w-20 h-20 bg-blue-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          </div>
+          <h4 class="text-xl font-black text-slate-900 uppercase tracking-tighter italic">Përzgjidhni Modulin</h4>
+        </div>
+
+        <div id="download-panel" class="hidden w-full space-y-6">
+          <div class="text-left w-full">
+            <span class="text-blue-600 font-black text-[10px] uppercase tracking-[0.3em] block">Aksesimi i Materialit</span>
+            <h5 id="active-module-name" class="text-lg font-black text-slate-900 uppercase tracking-tighter leading-tight italic">Moduli</h5>
+          </div>
+
+          <div class="w-full bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+            <input type="password" id="pass-input" placeholder="Vendosni Kodin" class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all mb-4">
+            <button onclick="checkPassword()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition">Verifiko Aksesin</button>
+            <p class="text-[11px] text-slate-400 mt-4 font-bold uppercase tracking-widest">
+              *Kodi hap linkun e shkarkimit.
+            </p>
+          </div>
+
+          <div id="download-btn-container" class="hidden w-full animate-bounce">
+            <a href="#" target="_blank" rel="noopener" id="final-download-btn" class="flex items-center justify-center gap-3 w-full py-5 bg-emerald-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">
+              Shkarko Leksionin (PDF)
             </a>
-            
-            <div class="hidden lg:flex items-center space-x-10 relative z-[1200]">
-                <div class="flex items-center space-x-8 font-bold text-[12px] uppercase tracking-widest text-slate-600">
-                    <a href="index.html" class="nav-link">Studio</a>
-                    <a href="#" class="nav-link active text-blue-600">Academy</a>
-                    <a href="#programet" class="nav-link">Kurset</a>
-                </div>
-                <div class="h-6 w-px bg-slate-200"></div>
-                <button onclick="openRegistrationModal()" class="group relative bg-blue-600 text-white px-6 py-2.5 rounded-full font-bold text-[12px] uppercase tracking-widest overflow-hidden transition-all hover:scale-105 shadow-xl shadow-blue-200 block">
-                    <span class="relative z-10">Regjistrohu</span>
-                </button>
-            </div>
+          </div>
 
-            <button id="menu-btn" class="lg:hidden relative z-[1200] p-3 text-slate-900">
-                <div id="hamburger" class="w-6 h-5 relative flex flex-col justify-between overflow-hidden">
-                    <span class="w-full h-0.5 bg-current transform transition-all duration-300 origin-left"></span>
-                    <span class="w-full h-0.5 bg-current transform transition-all duration-300"></span>
-                    <span class="w-full h-0.5 bg-current transform transition-all duration-300 origin-left"></span>
-                </div>
-            </button>
-        </nav>
+          <div id="download-error" class="hidden text-sm font-bold text-red-600 bg-red-50 border border-red-100 rounded-2xl p-4 text-left"></div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- MOBILE OVERLAY -->
-    <div id="mobile-menu-overlay" class="fixed inset-0 bg-slate-950 z-[1050] flex flex-col items-center justify-center space-y-8 text-center px-6">
-        <a href="index.html" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-white">Studio</a>
-        <a href="#" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-blue-400">Academy</a>
-        <a href="#programet" onclick="closeMenu()" class="mobile-nav-item opacity-0 translate-y-4 text-4xl font-black text-white">Kurset</a>
-        <button onclick="openRegistrationModal(); closeMenu()" class="mobile-nav-item opacity-0 translate-y-4 px-10 py-4 bg-blue-600 rounded-2xl text-xl font-black text-white">Regjistrohu</button>
-    </div>
+  <!-- BACK TO TOP -->
+  <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-8 right-8 z-[1000] p-4 bg-slate-900 text-white rounded-2xl shadow-2xl hover:bg-blue-600 hover:scale-110 transition-all border border-white/10 group">
+    <svg class="w-5 h-5 transform group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg>
+  </button>
 
-    <!-- HERO ACADEMY -->
-    <header class="academy-bg bg-cover bg-center h-[60vh] relative flex items-center justify-center text-white text-center">
-        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"></div>
-        <div class="relative z-10 px-6 max-w-4xl">
-            <span class="bg-blue-600 px-4 py-1 rounded-full text-[10px] font-black tracking-[0.3em] uppercase mb-6 inline-block">Mëso nga Ekspertët</span>
-            <h2 class="text-5xl md:text-7xl font-black mb-6 tracking-tighter uppercase leading-[1]">LindiMaps <span class="text-blue-400">Academy</span></h2>
-            <p class="text-lg md:text-xl text-slate-300 font-light max-w-2xl mx-auto italic">Platforma juaj për zhvillim profesional në GIS.</p>
-        </div>
-    </header>
+  <script>
+    // =========================
+    // 0) Supabase Config
+    // =========================
+    const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
+    const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    <!-- PROGRAMET -->
-    <section id="programet" class="py-24 max-w-7xl mx-auto px-6">
-        <div class="text-left mb-16">
-            <h3 class="text-4xl font-black text-slate-900 tracking-tighter uppercase">Programet e Trajnimit</h3>
-            <p class="text-slate-500 mt-2 font-medium">Zgjidhni softuerin tuaj dhe shikoni modulet e plota.</p>
-        </div>
+    const ACADEMY_BUCKET = "lindimaps-academy";
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <!-- QGIS Card -->
-            <div class="course-card bg-white rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 flex flex-col">
-                <div class="h-56 bg-gradient-to-br from-emerald-400 to-green-600 relative flex items-center justify-center overflow-hidden">
-                    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-                    <div class="relative z-10 bg-white/20 backdrop-blur-md p-6 rounded-[2rem] border border-white/30 shadow-2xl">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/QGIS_logo_new.svg" class="w-24 h-24 filter brightness-0 invert" alt="Modern QGIS Logo">
-                    </div>
-                    <div class="absolute top-6 left-6 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-[10px] font-black uppercase text-emerald-600">QGIS Training Manual</div>
-                </div>
-                <div class="p-10 flex-grow">
-                    <h4 class="text-2xl font-black mb-4 leading-tight">QGIS</h4>
-                    <p class="text-slate-500 text-sm leading-relaxed mb-6">Mësoni menaxhimin e të dhënave dhe hartografinë profesionale me qGIS.</p>
-                </div>
-                <div class="px-10 pb-10">
-                    <button onclick="openModal('qgis-full')" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition">Shiko Temat e Trajnimit</button>
-                </div>
-            </div>
+    function showToast() {
+      const x = document.getElementById("toast");
+      x.className = "show";
+      setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
 
-            <!-- ArcGIS Pro Card -->
-            <div class="course-card bg-white rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 flex flex-col">
-                <div class="h-56 bg-gradient-to-br from-blue-500 to-indigo-700 relative flex items-center justify-center overflow-hidden">
-                    <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')]"></div>
-                    <div class="relative z-10 bg-white/10 backdrop-blur-md p-6 rounded-full border border-white/20 shadow-2xl">
-                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" class="filter drop-shadow-lg text-white">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2" class="opacity-40" />
-                            <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor" fill-opacity="0.3"/>
-                            <path d="M12 6v12M6 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                            <circle cx="12" cy="12" r="3" fill="currentColor"/>
-                        </svg>
-                    </div>
-                    <div class="absolute top-6 left-6 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-[10px] font-black uppercase text-blue-700">ArcGIS Pro Training</div>
-                </div>
-                <div class="p-10 flex-grow">
-                    <h4 class="text-2xl font-black mb-4 leading-tight">ArcGIS Pro</h4>
-                    <p class="text-slate-500 text-sm leading-relaxed mb-6">Mësoni menaxhimin e të dhënave dhe hartografinë profesionale me ArcGIS Pro.</p>
-                </div>
-                <div class="px-10 pb-10">
-                    <button onclick="openModal('arcgis-pro')" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition">Shiko Temat e Trajnimit</button>
-                </div>
-            </div>
+    // =========================
+    // 1) Registration Modal Logic
+    // =========================
+    function openRegistrationModal() {
+      const modal = document.getElementById('reg-modal');
+      const content = document.getElementById('reg-modal-content');
+      modal.classList.add('modal-visible');
+      modal.classList.remove('modal-hidden');
+      setTimeout(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+      }, 10);
+      document.body.style.overflow = 'hidden';
+    }
 
-            <!-- Global Mapper Card -->
-            <div class="course-card bg-white rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 flex flex-col">
-                <div class="h-56 bg-gradient-to-br from-slate-700 to-slate-900 relative flex items-center justify-center overflow-hidden">
-                    <div class="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/shattered-island.png')]"></div>
-                    <div class="relative z-10 bg-white/10 backdrop-blur-lg p-7 rounded-3xl border border-white/10 shadow-inner">
-                        <div class="w-20 h-20 flex items-center justify-center border-4 border-blue-400 rounded-full border-t-transparent animate-spin-slow rotate-45">
-                             <div class="w-12 h-12 bg-green-500 rounded-full shadow-lg shadow-green-500/50"></div>
-                        </div>
-                    </div>
-                    <div class="absolute top-6 left-6 bg-purple-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase text-white shadow-lg">Global Mapper Pro</div>
-                </div>
-                <div class="p-10 flex-grow">
-                    <h4 class="text-2xl font-black mb-4 leading-tight">Global Mapper </h4>
-                    <p class="text-slate-500 text-sm leading-relaxed mb-6">Mësoni menaxhimin e të dhënave dhe hartografinë profesionale me Global Mapper.</p>
-                </div>
-                <div class="px-10 pb-10">
-                    <button onclick="openModal('global-mapper')" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition">Shiko Temat e Trajnimit</button>
-                </div>
-            </div>
-        </div>
-    </section>
+    function closeRegistrationModal() {
+      const modal = document.getElementById('reg-modal');
+      const content = document.getElementById('reg-modal-content');
+      content.classList.remove('scale-100', 'opacity-100');
+      content.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+        modal.classList.add('modal-hidden');
+        modal.classList.remove('modal-visible');
+        document.body.style.overflow = 'auto';
+      }, 300);
+    }
 
-    <!-- FOOTER -->
-    <footer class="bg-slate-900 text-white pt-24 pb-12 px-6 mt-12">
-        <div class="max-w-7xl mx-auto flex flex-col items-center text-center">
-            <div class="footer-logo-text flex flex-col items-center">
-                <div class="flex items-center justify-center gap-4 mb-2">
-                    <span class="text-5xl md:text-6xl font-black tracking-tighter text-white">LINDI</span>
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-900/40">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="white" class="md:w-6 md:h-6"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
-                    </div>
-                    <span class="text-5xl md:text-6xl font-black tracking-tighter text-blue-500">MAPS</span>
-                </div>
-                <p class="text-[10px] md:text-[11px] uppercase tracking-[0.5em] font-bold text-slate-400 opacity-80 mt-2">Spatial Intelligence Studio & Academy</p>
-            </div>
+    async function handleRegistration(e) {
+      e.preventDefault();
 
-            <div class="mt-16 pt-8 border-t border-slate-800 w-full flex flex-col md:flex-row justify-between items-center gap-6">
-                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">© 2024 LindiMaps Studio & Academy. Të gjitha të drejtat të rezervuara.</p>
-                <a href="mailto:contact.lindimap@gmail.com" class="text-slate-400 hover:text-blue-400 transition text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    contact.lindimap@gmail.com
-                </a>
-            </div>
-        </div>
-    </footer>
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      btn.classList.add('opacity-70');
 
-    <!-- MODAL REGJISTRIMI (E RE) -->
-    <div id="reg-modal" class="modal-hidden fixed inset-0 z-[4000] flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" onclick="closeRegistrationModal()"></div>
-        <div class="relative bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="reg-modal-content">
-            <button onclick="closeRegistrationModal()" class="absolute top-6 right-8 z-50 p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full transition-all group">
-                <svg class="w-6 h-6 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <div class="p-10 md:p-12">
-                <div class="text-center mb-8">
-                    <span class="text-blue-600 font-black text-[10px] uppercase tracking-[0.3em] mb-2 block">Application Form</span>
-                    <h3 class="text-3xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">Regjistrohu Tani</h3>
-                </div>
-                <form id="registration-form" onsubmit="handleRegistration(event)" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="text" placeholder="Emri" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-                        <input type="text" placeholder="Mbiemri" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-                    </div>
-                    <input type="email" placeholder="Email Adresa" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-                    <select required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all appearance-none">
-                        <option value="" disabled selected>Zgjidhni Kursin</option>
-                        <option value="qgis">QGIS Training</option>
-                        <option value="arcgis">ArcGIS Pro</option>
-                        <option value="globalmapper">Global Mapper</option>
-                    </select>
-                    <textarea placeholder="Subjekti / Mesazhi juaj" rows="3" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"></textarea>
-                    
-                    <button type="submit" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-900 transition shadow-xl shadow-blue-100 mt-4">
-                        Dërgo Aplikimin
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+      const firstName = document.getElementById('reg-firstname').value.trim();
+      const lastName  = document.getElementById('reg-lastname').value.trim();
+      const email     = document.getElementById('reg-email').value.trim();
+      const course    = document.getElementById('reg-course').value;
+      const message   = document.getElementById('reg-message').value.trim();
 
-    <!-- MODAL SILABUSI -->
-    <div id="course-modal" class="modal-hidden fixed inset-0 z-[3000] flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" onclick="closeModal()"></div>
-        <div class="relative bg-white w-full max-w-5xl rounded-[3rem] shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0 duration-300 flex flex-col md:flex-row h-auto max-h-[90vh]" id="modal-content" onclick="event.stopPropagation()">
-            <button onclick="closeModal()" class="absolute top-6 right-8 z-50 p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 rounded-full transition-all group">
-                <svg class="w-6 h-6 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <div class="w-full md:w-1/2 p-8 md:p-12 border-b md:border-b-0 md:border-r border-slate-100 overflow-y-auto scrollbar-thin bg-white">
-                <div class="mb-8 pr-12">
-                    <span class="text-blue-600 font-black text-[10px] uppercase tracking-[0.3em] mb-2 block">Silabusi i Detajuar</span>
-                    <h3 id="modal-title" class="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Titulli</h3>
-                </div>
-                <div class="space-y-2 pb-10" id="modal-modules"></div>
-            </div>
-            <div class="w-full md:w-1/2 p-8 md:p-12 bg-slate-50 flex flex-col justify-center items-center text-center relative">
-                <div id="download-placeholder" class="space-y-4">
-                    <div class="w-20 h-20 bg-blue-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                        <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    </div>
-                    <h4 class="text-xl font-black text-slate-900 uppercase tracking-tighter italic">Përzgjidhni Modulin</h4>
-                </div>
-                <div id="download-panel" class="hidden w-full space-y-6">
-                    <div class="text-left w-full">
-                        <span class="text-blue-600 font-black text-[10px] uppercase tracking-[0.3em] block">Aksesimi i Materialit</span>
-                        <h5 id="active-module-name" class="text-lg font-black text-slate-900 uppercase tracking-tighter leading-tight italic">Moduli</h5>
-                    </div>
-                    <div class="w-full bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
-                        <input type="password" id="pass-input" placeholder="Vendosni Kodin" class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all mb-4">
-                        <button onclick="checkPassword()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition">Verifiko Aksesin</button>
-                    </div>
-                    <div id="download-btn-container" class="hidden w-full animate-bounce">
-                        <a href="#" id="final-download-btn" class="flex items-center justify-center gap-3 w-full py-5 bg-emerald-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-transform" style="display: flex !important;">Shkarko Leksionin (PDF)</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+      try {
+        const { error } = await supabaseClient
+          .from('academy_applications')
+          .insert([{
+            first_name: firstName,
+            last_name: lastName,
+            email: email,
+            course: course,
+            message: message,
+            page_lang: 'sq',
+            user_agent: navigator.userAgent
+          }]);
 
-    <!-- BACK TO TOP -->
-    <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-8 right-8 z-[1000] p-4 bg-slate-900 text-white rounded-2xl shadow-2xl hover:bg-blue-600 hover:scale-110 transition-all border border-white/10 group">
-        <svg class="w-5 h-5 transform group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg>
-    </button>
+        if (error) throw error;
 
-    <script>
-        function showToast() {
-            const x = document.getElementById("toast");
-            x.className = "show";
-            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-        }
+        showToast();
+        closeRegistrationModal();
+        e.target.reset();
+      } catch (err) {
+        alert("Gabim gjatë dërgimit. Kontrollo Supabase/RLS/URL-Key.\n\n" + (err?.message || err));
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-70');
+      }
+    }
 
-        // Registration Logic
-        function openRegistrationModal() {
-            const modal = document.getElementById('reg-modal');
-            const content = document.getElementById('reg-modal-content');
-            modal.classList.add('modal-visible');
-            modal.classList.remove('modal-hidden');
-            setTimeout(() => {
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
-            }, 10);
-            document.body.style.overflow = 'hidden';
-        }
+    // =========================
+    // 2) Mobile menu / back-to-top
+    // =========================
+    const menuBtn = document.getElementById('menu-btn');
+    const overlay = document.getElementById('mobile-menu-overlay');
+    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+    const backToTopBtn = document.getElementById('back-to-top');
 
-        function closeRegistrationModal() {
-            const modal = document.getElementById('reg-modal');
-            const content = document.getElementById('reg-modal-content');
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                modal.classList.add('modal-hidden');
-                modal.classList.remove('modal-visible');
-                document.body.style.overflow = 'auto';
-            }, 300);
-        }
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 500) backToTopBtn.classList.add('show');
+      else backToTopBtn.classList.remove('show');
+    });
 
-        function handleRegistration(e) {
-            e.preventDefault();
-            showToast();
-            closeRegistrationModal();
-            e.target.reset();
-        }
-
-        const menuBtn = document.getElementById('menu-btn');
-        const overlay = document.getElementById('mobile-menu-overlay');
-        const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
-        const backToTopBtn = document.getElementById('back-to-top');
-
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 500) backToTopBtn.classList.add('show');
-            else backToTopBtn.classList.remove('show');
+    function toggleMenu() {
+      overlay.classList.toggle('active');
+      if(overlay.classList.contains('active')) {
+        mobileNavItems.forEach((item, idx) => {
+          setTimeout(() => {
+            item.classList.remove('opacity-0', 'translate-y-4');
+            item.classList.add('opacity-100', 'translate-y-0');
+          }, 100 + (idx * 50));
         });
+      } else {
+        mobileNavItems.forEach(item => {
+          item.classList.add('opacity-0', 'translate-y-4');
+          item.classList.remove('opacity-100', 'translate-y-0');
+        });
+      }
+    }
+    function closeMenu() { overlay.classList.remove('active'); }
+    menuBtn.addEventListener('click', toggleMenu);
 
-        function toggleMenu() {
-            overlay.classList.toggle('active');
-            if(overlay.classList.contains('active')) {
-                mobileNavItems.forEach((item, idx) => {
-                    setTimeout(() => { item.classList.remove('opacity-0', 'translate-y-4'); item.classList.add('opacity-100', 'translate-y-0'); }, 100 + (idx * 50));
-                });
-            } else {
-                mobileNavItems.forEach(item => { item.classList.add('opacity-0', 'translate-y-4'); item.classList.remove('opacity-100', 'translate-y-0'); });
-            }
+    // =========================
+    // 3) Course data
+    // =========================
+    const courseData = {
+      'qgis-full': {
+        title: 'QGIS Training Manual',
+        slug: 'qgis',
+        modules: [
+          '1. Intro','2. Basic Map','3. Classifying Data','4. Layouts','5. Creation','6. Analysis','7. Rasters','8. Hydrology','9. Plugins','10. Online Resources','11. QGIS Server','12. GRASS','13. Assessment','14. Forestry','15. PostgreSQL','16. PostGIS','17. Processing','18. Spatial DB','19. Contributing','20. Exercise Data'
+        ]
+      },
+      'arcgis-pro': {
+        title: 'ArcGIS Pro: Training',
+        slug: 'arcgis-pro',
+        modules: ['Overview','Create Project','Navigation','Add Data','Proximity','Export','Labels','Layout']
+      },
+      'global-mapper': {
+        title: 'Global Mapper Guide',
+        slug: 'global-mapper',
+        modules: ['Installation','Interface','Layers','Import','Georectify','Digitizer','Attributes','3D Terrain','Lidar','Fly-Through','Pro Analysis','Export']
+      }
+    };
+
+    // =========================
+    // 4) Modal syllabus
+    // =========================
+    const modal = document.getElementById('course-modal');
+    const modalContent = document.getElementById('modal-content');
+    const modalTitle = document.getElementById('modal-title');
+    const modalModules = document.getElementById('modal-modules');
+    const downloadPlaceholder = document.getElementById('download-placeholder');
+    const downloadPanel = document.getElementById('download-panel');
+    const activeModuleName = document.getElementById('active-module-name');
+    const passInput = document.getElementById('pass-input');
+    const downloadBtnContainer = document.getElementById('download-btn-container');
+    const finalDownloadBtn = document.getElementById('final-download-btn');
+    const downloadError = document.getElementById('download-error');
+
+    let selectedCourseSlug = null;
+    let selectedModuleIndex = null;
+
+    function openModal(courseId) {
+      const data = courseData[courseId];
+      modalTitle.innerText = data.title;
+      modalModules.innerHTML = '';
+      resetDownloadPanel();
+
+      selectedCourseSlug = data.slug;
+
+      data.modules.forEach((mod, index) => {
+        const div = document.createElement('div');
+        div.className = "module-item flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-blue-400 cursor-pointer transition-all";
+        div.onclick = () => selectModule(mod, index, div);
+
+        div.innerHTML = `
+          <div class="h-6 w-6 flex-shrink-0 bg-slate-200 text-slate-500 rounded-lg flex items-center justify-center text-[9px] font-black module-num">${index + 1}</div>
+          <span class="text-slate-700 font-bold text-xs uppercase tracking-tight">${mod}</span>
+        `;
+        modalModules.appendChild(div);
+      });
+
+      modal.classList.add('modal-visible');
+      modal.classList.remove('modal-hidden');
+      setTimeout(() => {
+        modalContent.classList.remove('scale-95', 'opacity-0');
+        modalContent.classList.add('scale-100', 'opacity-100');
+      }, 10);
+      document.body.style.overflow = 'hidden';
+    }
+
+    function selectModule(name, index, element) {
+      selectedModuleIndex = index;
+
+      document.querySelectorAll('.module-item').forEach(el => {
+        el.classList.remove('border-blue-500', 'bg-blue-50/50');
+        const n = el.querySelector('.module-num');
+        if (n) n.classList.remove('bg-blue-600');
+        if (n) n.classList.add('bg-slate-200');
+      });
+
+      element.classList.add('border-blue-500', 'bg-blue-50/50');
+      const num = element.querySelector('.module-num');
+      if (num) num.classList.remove('bg-slate-200');
+      if (num) num.classList.add('bg-blue-600');
+
+      downloadPlaceholder.classList.add('hidden');
+      downloadPanel.classList.remove('hidden');
+      activeModuleName.innerText = name;
+      passInput.value = '';
+      downloadBtnContainer.classList.add('hidden');
+      downloadError.classList.add('hidden');
+      downloadError.innerText = '';
+    }
+
+    function slugifyModule(i, title) {
+      const num = String(i + 1).padStart(2, '0');
+      const slug = title
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+      return `${num}-${slug}.pdf`;
+    }
+
+    async function prepareDownloadLink() {
+      const data = Object.values(courseData).find(c => c.slug === selectedCourseSlug);
+      const title = data?.modules?.[selectedModuleIndex] || `module-${selectedModuleIndex+1}`;
+      const fileName = slugifyModule(selectedModuleIndex, title);
+
+      // Folder mapping
+      // qgis -> qgis/
+      // arcgis-pro -> arcgis-pro/
+      // global-mapper -> global-mapper/
+      const objectPath = `${selectedCourseSlug}/${fileName}`;
+
+      // Public URL (requires bucket public)
+      const { data: pub } = supabaseClient.storage.from(ACADEMY_BUCKET).getPublicUrl(objectPath);
+
+      if (!pub?.publicUrl) {
+        throw new Error("Nuk u gjenerua public URL. Kontrollo bucket name/path.");
+      }
+
+      return pub.publicUrl;
+    }
+
+    async function checkPassword() {
+      if (passInput.value === "1955") {
+        try {
+          const url = await prepareDownloadLink();
+          finalDownloadBtn.href = url;
+          downloadBtnContainer.classList.remove('hidden');
+        } catch (err) {
+          downloadBtnContainer.classList.add('hidden');
+          downloadError.classList.remove('hidden');
+          downloadError.innerText = "PDF nuk u gjet. Kontrollo emrin e bucket/folder/file në Supabase Storage.\n\n" + (err?.message || err);
         }
-        function closeMenu() { overlay.classList.remove('active'); }
-        menuBtn.addEventListener('click', toggleMenu);
+      } else {
+        passInput.classList.add('ring-red-500', 'ring-2');
+        setTimeout(() => passInput.classList.remove('ring-red-500', 'ring-2'), 1000);
+      }
+    }
 
-        const courseData = {
-            'qgis-full': { title: 'QGIS Training Manual', modules: ['1. Intro', '2. Basic Map', '3. Classifying Data', '4. Layouts', '5. Creation', '6. Analysis', '7. Rasters', '8. Hydrology', '9. Plugins', '10. Online Resources', '11. QGIS Server', '12. GRASS', '13. Assessment', '14. Forestry', '15. PostgreSQL', '16. PostGIS', '17. Processing', '18. Spatial DB', '19. Contributing', '20. Exercise Data'] },
-            'arcgis-pro': { title: 'ArcGIS Pro: Training', modules: ['Overview', 'Create Project', 'Navigation', 'Add Data', 'Proximity', 'Export', 'Labels', 'Layout'] },
-            'global-mapper': { title: 'Global Mapper Guide', modules: ['Installation', 'Interface', 'Layers', 'Import', 'Georectify', 'Digitizer', 'Attributes', '3D Terrain', 'Lidar', 'Fly-Through', 'Pro Analysis', 'Export'] }
-        };
+    function resetDownloadPanel() {
+      downloadPlaceholder.classList.remove('hidden');
+      downloadPanel.classList.add('hidden');
+      downloadBtnContainer.classList.add('hidden');
+      downloadError.classList.add('hidden');
+      downloadError.innerText = '';
+      selectedCourseSlug = null;
+      selectedModuleIndex = null;
+      finalDownloadBtn.href = "#";
+    }
 
-        const modal = document.getElementById('course-modal');
-        const modalContent = document.getElementById('modal-content');
-        const modalTitle = document.getElementById('modal-title');
-        const modalModules = document.getElementById('modal-modules');
-        const downloadPlaceholder = document.getElementById('download-placeholder');
-        const downloadPanel = document.getElementById('download-panel');
-        const activeModuleName = document.getElementById('active-module-name');
-        const passInput = document.getElementById('pass-input');
-        const downloadBtnContainer = document.getElementById('download-btn-container');
-
-        function openModal(courseId) {
-            const data = courseData[courseId];
-            modalTitle.innerText = data.title;
-            modalModules.innerHTML = '';
-            resetDownloadPanel();
-            data.modules.forEach((mod, index) => {
-                const div = document.createElement('div');
-                div.className = "module-item flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-blue-400 cursor-pointer transition-all";
-                div.onclick = () => selectModule(mod, div);
-                div.innerHTML = `<div class="h-6 w-6 flex-shrink-0 bg-slate-200 text-slate-500 rounded-lg flex items-center justify-center text-[9px] font-black module-num">${index + 1}</div><span class="text-slate-700 font-bold text-xs uppercase tracking-tight">${mod}</span>`;
-                modalModules.appendChild(div);
-            });
-            modal.classList.add('modal-visible');
-            modal.classList.remove('modal-hidden');
-            setTimeout(() => { modalContent.classList.remove('scale-95', 'opacity-0'); modalContent.classList.add('scale-100', 'opacity-100'); }, 10);
-            document.body.style.overflow = 'hidden';
-        }
-
-        function selectModule(name, element) {
-            document.querySelectorAll('.module-item').forEach(el => {
-                el.classList.remove('border-blue-500', 'bg-blue-50/50');
-                el.querySelector('.module-num').classList.replace('bg-blue-600', 'bg-slate-200');
-            });
-            element.classList.add('border-blue-500', 'bg-blue-50/50');
-            element.querySelector('.module-num').classList.replace('bg-slate-200', 'bg-blue-600');
-            downloadPlaceholder.classList.add('hidden');
-            downloadPanel.classList.remove('hidden');
-            activeModuleName.innerText = name;
-            passInput.value = '';
-            downloadBtnContainer.classList.add('hidden');
-        }
-
-        function checkPassword() {
-            // Kodi: 1955
-            if(passInput.value === "1955") {
-                downloadBtnContainer.classList.remove('hidden');
-                // Sigurohemi që të shfaqet në mobile
-                downloadBtnContainer.style.display = 'block';
-            } else {
-                passInput.classList.add('ring-red-500', 'ring-2');
-                setTimeout(() => passInput.classList.remove('ring-red-500', 'ring-2'), 1000);
-            }
-        }
-
-        function resetDownloadPanel() {
-            downloadPlaceholder.classList.remove('hidden');
-            downloadPanel.classList.add('hidden');
-            downloadBtnContainer.classList.add('hidden');
-        }
-
-        function closeModal() {
-            modalContent.classList.remove('scale-100', 'opacity-100');
-            modalContent.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => { 
-                modal.classList.add('modal-hidden');
-                modal.classList.remove('modal-visible');
-                document.body.style.overflow = 'auto'; 
-            }, 300);
-        }
-    </script>
+    function closeModal() {
+      modalContent.classList.remove('scale-100', 'opacity-100');
+      modalContent.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+        modal.classList.add('modal-hidden');
+        modal.classList.remove('modal-visible');
+        document.body.style.overflow = 'auto';
+      }, 300);
+    }
+  </script>
 </body>
 </html>
