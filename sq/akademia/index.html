@@ -9,6 +9,10 @@
   <!-- Supabase JS (UMD) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <!-- Phone Flags (intl-tel-input) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.css">
+  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/intlTelInput.min.js"></script>
+
   <style>
     .academy-bg { background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1920&q=80'); }
     .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -36,6 +40,10 @@
     @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
     @-webkit-keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+    /* intl-tel-input - ta mbushë gjerësinë si input-i yt */
+    .iti { width: 100%; }
+    .iti__tel-input { width: 100%; }
   </style>
 </head>
 
@@ -224,6 +232,17 @@
 
           <input id="reg-email" type="email" placeholder="Email Adresa" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
 
+          <!-- TELEFONI ME FLAMUJ + SHTETE -->
+          <input
+            id="reg-phone"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            placeholder="Numri i telefonit"
+            required
+            class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+          >
+
           <select id="reg-course" required class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl font-bold text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all appearance-none">
             <option value="" disabled selected>Zgjidhni Kursin</option>
             <option value="qgis">QGIS Training</option>
@@ -241,7 +260,7 @@
     </div>
   </div>
 
-  <!-- MODAL SILABUSI -->
+  <!-- MODAL SILABUSI (siç e ke pasur) -->
   <div id="course-modal" class="modal-hidden fixed inset-0 z-[3000] flex items-center justify-center p-4">
     <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" onclick="closeModal()"></div>
 
@@ -303,16 +322,35 @@
     // =========================
     const SUPABASE_URL = "https://fujqjgcciajwfbsvmlnk.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1anFqZ2NjaWFqd2Zic3ZtbG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MTgwOTQsImV4cCI6MjA4NDk5NDA5NH0.0FGl0sxQTuIkSB_xPmEYwyE4-rsAdIZlIQcRWgtqJh4";
-
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const ACADEMY_BUCKET = "lindimaps-academy";
+    const ACADEMY_BUCKET = "lindimaps-academy"; // ndrysho vetëm nëse bucket-i yt quhet ndryshe
 
     function showToast() {
       const x = document.getElementById("toast");
       x.className = "show";
       setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }
+
+    // =========================
+    // 0.1) Phone input flags
+    // =========================
+    let itiPhone = null;
+
+    function initPhoneInput() {
+      const phoneInput = document.getElementById("reg-phone");
+      if (!phoneInput || typeof window.intlTelInput !== "function") return;
+
+      itiPhone = window.intlTelInput(phoneInput, {
+        initialCountry: "al",
+        preferredCountries: ["al"],
+        separateDialCode: false,
+        nationalMode: false,
+        autoPlaceholder: "polite",
+        formatOnDisplay: true
+      });
+    }
+    window.addEventListener("DOMContentLoaded", initPhoneInput);
 
     // =========================
     // 1) Registration Modal Logic
@@ -354,6 +392,26 @@
       const course    = document.getElementById('reg-course').value;
       const message   = document.getElementById('reg-message').value.trim();
 
+      // telefoni (E.164)
+      const phoneE164 = itiPhone ? itiPhone.getNumber() : document.getElementById('reg-phone').value.trim();
+
+      // validim
+      if (!itiPhone || !itiPhone.isValidNumber()) {
+        alert("Numri i telefonit është i pavlefshëm. Zgjidh shtetin dhe vendos numrin korrekt.\nShembull: +355688728974");
+        btn.disabled = false;
+        btn.classList.remove('opacity-70');
+        return;
+      }
+
+      // max 14 shifra (pa +)
+      const digitsOnly = phoneE164.replace(/\D/g, "");
+      if (digitsOnly.length > 14) {
+        alert("Numri i telefonit është shumë i gjatë. Maksimumi 14 shifra (pa +).");
+        btn.disabled = false;
+        btn.classList.remove('opacity-70');
+        return;
+      }
+
       try {
         const { error } = await supabaseClient
           .from('academy_applications')
@@ -361,6 +419,7 @@
             first_name: firstName,
             last_name: lastName,
             email: email,
+            phone: phoneE164,
             course: course,
             message: message,
             page_lang: 'sq',
@@ -372,6 +431,11 @@
         showToast();
         closeRegistrationModal();
         e.target.reset();
+
+        // reset tel input (ta kthejë prapë AL)
+        if (itiPhone) {
+          itiPhone.setCountry("al");
+        }
       } catch (err) {
         alert("Gabim gjatë dërgimit. Kontrollo Supabase/RLS/URL-Key.\n\n" + (err?.message || err));
       } finally {
@@ -524,7 +588,6 @@
 
       const objectPath = `${selectedCourseSlug}/${fileName}`;
 
-      // Public URL (bucket duhet PUBLIC)
       const { data: pub } = supabaseClient.storage.from(ACADEMY_BUCKET).getPublicUrl(objectPath);
 
       if (!pub?.publicUrl) {
