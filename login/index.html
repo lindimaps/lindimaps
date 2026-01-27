@@ -105,132 +105,164 @@
         </p>
     </div>
 
-    <script>
-        // ✅ SUPABASE (vendosur me vlerat që më dhe)
-        const SUPABASE_URL = "https://fujqjgcciajwfbsvmlnk.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1anFqZ2NjaWFqd2Zic3ZtbG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MTgwOTQsImV4cCI6MjA4NDk5NDA5NH0.0FGl0sxQTuIkSB_xPmEYwyE4-rsAdIZlIQcRWgtqJh4";
+  <script>
+  const SUPABASE_URL = "https://fujqjgcciajwfbsvmlnk.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1anFqZ2NjaWFqd2Zic3ZtbG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MTgwOTQsImV4cCI6MjA4NDk5NDA5NH0.0FGl0sxQTuIkSB_xPmEYwyE4-rsAdIZlIQcRWgtqJh4";
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const msg = document.getElementById("msg");
-        const emailEl = document.getElementById("email");
-        const passEl = document.getElementById("password");
-        const loginBtn = document.getElementById("loginBtn");
-        const signupBtn = document.getElementById("signupBtn");
-        const resetBtn = document.getElementById("resetBtn");
+  const msg = document.getElementById("msg");
+  const emailEl = document.getElementById("email");
+  const passEl = document.getElementById("password");
+  const loginBtn = document.getElementById("loginBtn");
+  const signupBtn = document.getElementById("signupBtn");
+  const resetBtn = document.getElementById("resetBtn");
 
-        function showMsg(text, type = "ok") {
-            msg.classList.remove("hidden");
-            if (type === "ok") {
-                msg.className = "mb-6 p-4 rounded-2xl text-sm font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100";
-            } else {
-                msg.className = "mb-6 p-4 rounded-2xl text-sm font-semibold bg-red-50 text-red-700 border border-red-100";
-            }
-            msg.textContent = text;
-        }
+  function showMsg(text, type = "ok") {
+    msg.classList.remove("hidden");
+    msg.className = (type === "ok")
+      ? "mb-6 p-4 rounded-2xl text-sm font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100"
+      : "mb-6 p-4 rounded-2xl text-sm font-semibold bg-red-50 text-red-700 border border-red-100";
+    msg.textContent = text;
+  }
 
-        function getNext() {
-            const url = new URL(window.location.href);
-            // default: akademia shqip
-            return url.searchParams.get("next") || "/sq/akademia/";
-        }
+  function getNext() {
+    const url = new URL(window.location.href);
+    return url.searchParams.get("next") || "/sq/akademia/";
+  }
 
-        async function redirectIfLoggedIn() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) window.location.href = getNext();
-        }
-        redirectIfLoggedIn();
+  function setBusy(isBusy, text) {
+    loginBtn.disabled = isBusy;
+    signupBtn.disabled = isBusy;
+    resetBtn.disabled = isBusy;
+    loginBtn.textContent = isBusy ? (text || "Duke u procesuar...") : "Hyr në Platformë";
+  }
 
-        function setBusy(isBusy, text) {
-            loginBtn.disabled = isBusy;
-            signupBtn.disabled = isBusy;
-            resetBtn.disabled = isBusy;
-            loginBtn.textContent = isBusy ? (text || "Duke u procesuar...") : "Hyr në Platformë";
-        }
+  // ✅ Debug: kap çdo error JS që mund të ndalojë eventet
+  window.addEventListener("error", (e) => {
+    console.error("JS error:", e.error || e.message);
+    showMsg("Gabim teknik (hap Console/F12).", "err");
+  });
 
-        // ✅ LOGIN
-        document.getElementById("authForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            msg.classList.add("hidden");
-            setBusy(true, "Duke u futur...");
+  // ✅ Nëse je i loguar, ridrejto te next
+  (async () => {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) console.warn("getSession error:", error);
+      if (session) window.location.href = getNext();
+    } catch (e) {
+      console.error(e);
+      showMsg("Gabim teknik (shiko Console).", "err");
+    }
+  })();
 
-            const email = emailEl.value.trim();
-            const password = passEl.value;
+  // ✅ LOGIN
+  document.getElementById("authForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msg.classList.add("hidden");
+    setBusy(true, "Duke u futur...");
 
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const email = emailEl.value.trim();
+      const password = passEl.value;
 
-            if (error) {
-                setBusy(false);
-                return showMsg("Gabim: " + error.message, "err");
-            }
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-            window.location.href = getNext();
-        });
+      if (error) {
+        setBusy(false);
+        console.error("login error:", error);
+        return showMsg("Gabim: " + error.message, "err");
+      }
 
-        // ✅ SIGNUP + krijo rresht te academy_users (inactive)
-        signupBtn.addEventListener("click", async () => {
-            msg.classList.add("hidden");
+      if (!data?.session) {
+        setBusy(false);
+        return showMsg("Login nuk u kompletua. Kontrollo URL Configuration te Supabase.", "err");
+      }
 
-            const email = emailEl.value.trim();
-            const password = passEl.value;
+      window.location.href = getNext();
+    } catch (e2) {
+      setBusy(false);
+      console.error(e2);
+      showMsg("Gabim teknik (shiko Console).", "err");
+    }
+  });
 
-            if (!email || !password) return showMsg("Plotësoni email-in dhe fjalëkalimin.", "err");
-            if (password.length < 6) return showMsg("Fjalëkalimi duhet të ketë të paktën 6 karaktere.", "err");
+  // ✅ SIGNUP
+  signupBtn.addEventListener("click", async () => {
+    msg.classList.add("hidden");
 
-            setBusy(true, "Duke krijuar llogarinë...");
+    const email = emailEl.value.trim();
+    const password = passEl.value;
 
-            const { data, error } = await supabase.auth.signUp({ email, password });
-            if (error) {
-                setBusy(false);
-                return showMsg("Gabim: " + error.message, "err");
-            }
+    if (!email || !password) return showMsg("Shkruaj email dhe fjalëkalim.", "err");
+    if (password.length < 6) return showMsg("Fjalëkalimi min 6 karaktere.", "err");
 
-            // data.user mund të jetë null në disa raste (p.sh. email confirmation i fortë).
-            // Prandaj marrim session ose user-in nga getUser().
-            let userId = data?.user?.id;
+    setBusy(true, "Duke krijuar llogarinë...");
 
-            if (!userId) {
-                const { data: userData } = await supabase.auth.getUser();
-                userId = userData?.user?.id;
-            }
+    try {
+      const { data, error } = await supabase.auth.signUp({ email, password });
 
-            // Nëse s’kemi userId ende, s’ka problem: user do e marrë pas konfirmimit dhe login-it.
-            // Por për rastin ideal, e fusim menjëherë në academy_users.
-            if (userId) {
-                const { error: insertErr } = await supabase
-                    .from("academy_users")
-                    .insert({ user_id: userId, active: false, role: "student" });
+      if (error) {
+        setBusy(false);
+        console.error("signup error:", error);
+        return showMsg("Gabim: " + error.message, "err");
+      }
 
-                // Nëse rreshti ekziston, mos e bëj problem.
-                if (insertErr && !String(insertErr.message || "").toLowerCase().includes("duplicate")) {
-                    // jo fatal, thjesht informim
-                    console.warn("academy_users insert error:", insertErr);
-                }
-            }
+      // Nëse email confirmation është ON, Supabase mund të mos japë session menjëherë.
+      // Kjo është normale.
+      const userId = data?.user?.id || null;
 
-            setBusy(false);
+      if (userId) {
+        const { error: insertErr } = await supabase
+          .from("academy_users")
+          .insert({ user_id: userId, active: false, role: "student" });
 
-            showMsg("Regjistrimi u krye! Kontrolloni email-in për konfirmim (nëse e keni aktiv). Pastaj prisni aprovimin.", "ok");
-        });
+        if (insertErr) console.warn("academy_users insert error:", insertErr);
+      } else {
+        console.warn("No userId returned on signUp (email confirmation likely ON).");
+      }
 
-        // ✅ RESET PASSWORD
-        resetBtn.addEventListener("click", async () => {
-            msg.classList.add("hidden");
+      setBusy(false);
 
-            const email = emailEl.value.trim();
-            if (!email) return showMsg("Shkruani email-in tuaj për të resetuar fjalëkalimin.", "err");
+      showMsg(
+        "Regjistrimi u krye. Kontrollo email-in për konfirmim (nëse e ke aktiv). Pastaj bëj login dhe prisni aprovimin.",
+        "ok"
+      );
+    } catch (e2) {
+      setBusy(false);
+      console.error(e2);
+      showMsg("Gabim teknik (shiko Console).", "err");
+    }
+  });
 
-            setBusy(true, "Duke dërguar linkun...");
+  // ✅ RESET PASSWORD
+  resetBtn.addEventListener("click", async () => {
+    msg.classList.add("hidden");
 
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.origin + "/login/"
-            });
+    const email = emailEl.value.trim();
+    if (!email) return showMsg("Shkruaj email-in fillimisht.", "err");
 
-            setBusy(false);
+    setBusy(true, "Duke dërguar linkun...");
 
-            if (error) return showMsg("Gabim: " + error.message, "err");
-            showMsg("Linku për reset u dërgua në email-in tuaj.", "ok");
-        });
-    </script>
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + "/login/"
+      });
+
+      setBusy(false);
+
+      if (error) {
+        console.error("reset error:", error);
+        return showMsg("Gabim: " + error.message, "err");
+      }
+
+      showMsg("Linku për reset u dërgua në email.", "ok");
+    } catch (e2) {
+      setBusy(false);
+      console.error(e2);
+      showMsg("Gabim teknik (shiko Console).", "err");
+    }
+  });
+</script>
 </body>
 </html>
