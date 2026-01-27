@@ -8,6 +8,46 @@
 
   <!-- Supabase JS (UMD) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 🔐 GUARD – VENDOSE FIKS KËTU -->
+  <script>
+    const supabase = window.supabase.createClient(
+      "https://fujqjgcciajwfbsvmlnk.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1anFqZ2NjaWFqd2Zic3ZtbG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MTgwOTQsImV4cCI6MjA4NDk5NDA5NH0.0FGl0sxQTuIkSB_xPmEYwyE4-rsAdIZlIQcRWgtqJh4"
+    );
+
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      // ❌ Jo i loguar → login
+      if (!session) {
+        const next = encodeURIComponent(window.location.pathname);
+        window.location.href = "/login/?next=" + next;
+        return;
+      }
+
+      // 🔍 Kontroll autorizimi
+      const { data, error } = await supabase
+        .from("academy_users")
+        .select("active")
+        .eq("user_id", session.user.id)
+        .single();
+
+      // ❌ Jo i aprovuar
+      if (error || !data || data.active !== true) {
+        document.documentElement.innerHTML = `
+          <head><meta charset="UTF-8"><title>Nuk keni akses</title></head>
+          <body style="font-family:system-ui;padding:40px;text-align:center">
+            <h1 style="font-size:28px;margin-bottom:8px">🚫 Nuk keni akses</h1>
+            <p>Llogaria juaj nuk është aprovuar ende.</p>
+            <p style="margin-top:16px">
+              <a href="/login/" style="color:#2563eb">Kthehu te Login</a>
+            </p>
+          </body>
+        `;
+      }
+    })();
+  </script>
+  <!-- 🔐 FUNDI I GUARD -->
 
   <!-- Phone Flags (intl-tel-input) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.css">
