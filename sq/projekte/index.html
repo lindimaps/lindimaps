@@ -169,7 +169,7 @@
     <section class="py-24 max-w-7xl mx-auto px-6">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             
-            <!-- Projekt 1 -->
+            <!-- Projekt 1 me butonin e hartës -->
             <div class="project-card bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100 group">
                 <div class="relative h-80">
                     <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=800" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt="Kadastra Inxhinierike">
@@ -184,7 +184,13 @@
                         <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Viti</span>
                         <span class="text-xs font-bold text-slate-900">Përfunduar Tetor 2024</span>
                     </div>
-                    <button class="details-toggle text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline">Detaje</button>
+                    <!-- KETU ESHTE SHTUAR BUTONI "SHIKO HARTEN" -->
+                    <div class="flex items-center gap-4">
+                        <button onclick="openProjectModal('https://storymaps.arcgis.com/stories/43523107564d461fbb8ea118df18efd3')" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">
+                            Shiko Hartën
+                        </button>
+                        <button class="details-toggle text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline">Detaje</button>
+                    </div>
                 </div>
             </div>
 
@@ -251,6 +257,34 @@
         </svg>
     </button>
 
+    <!-- DRITARJA MODAL PER STORYMAPS -->
+    <div id="project-modal" class="fixed inset-0 z-[2000] hidden bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-10 opacity-0 transition-opacity duration-300">
+        <div id="modal-content" class="bg-white rounded-[2rem] shadow-2xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col overflow-hidden relative transform scale-95 transition-transform duration-300 border border-slate-100">
+            
+            <!-- Koka e Dritares (Header) -->
+            <div class="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-slate-50/80 backdrop-blur-md z-20">
+                <div class="flex items-center gap-3">
+                    <div class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></div>
+                    <h3 class="font-black text-slate-800 tracking-tight uppercase text-sm">Ndërtimi Aplikacionit WEB GIS</h3>
+                </div>
+                <button id="close-modal" class="text-slate-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-xl transition-all">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Korniza e Hartës (Iframe) -->
+            <div class="flex-grow w-full bg-slate-100 relative">
+                <!-- Animacion ngarkimi derisa iframe te hapet -->
+                <div class="absolute inset-0 flex items-center justify-center z-0">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+                <iframe id="modal-iframe" class="w-full h-full border-0 relative z-10 bg-transparent" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Menu Mobile
         const menuBtn = document.getElementById('menu-btn');
@@ -288,7 +322,59 @@
                 }
             });
         });
+
+        // ==========================================
+        // LOGJIKA PER DRITAREN MODAL (STORYMAPS)
+        // ==========================================
+        const modal = document.getElementById('project-modal');
+        const modalContent = document.getElementById('modal-content');
+        const iframe = document.getElementById('modal-iframe');
+        const closeModalBtn = document.getElementById('close-modal');
+
+        // Funksioni per te hapur dritaren
+        window.openProjectModal = function(url) {
+            iframe.src = url; // Vendosim linkun e ArcGIS
+            modal.classList.remove('hidden');
+            
+            // Animacioni i shfaqjes me pak vonesë për t'u ekzekutuar saktë
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+            }, 10);
+            
+            // Ndalojme scrollin e faqes kryesore prapa modalit
+            document.body.style.overflow = 'hidden';
+        };
+
+        // Funksioni per te mbyllur dritaren
+        function closeModal() {
+            modal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+            
+            // Presim qe animacioni mbylljes te mbaroje pastaj e fshehim
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                iframe.src = ''; // Heqim linkun qe iframe te mos konsumoje resurse nga mbrapa
+                document.body.style.overflow = ''; // Rikthejm scrollin e faqes
+            }, 300);
+        }
+
+        // Event listener për të mbyllur me butonin X
+        closeModalBtn.addEventListener('click', closeModal);
+
+        // Event listener për të mbyllur kur klikohet jashtë dritares së bardhë (në zonën e errët)
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Event listener për të mbyllur me butonin "ESC" në tastierë
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>
-
