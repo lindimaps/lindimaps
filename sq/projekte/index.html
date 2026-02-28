@@ -8,7 +8,6 @@
     <style>
         .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* Butoni për lart */
         #scroll-to-top {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
@@ -23,7 +22,6 @@
             transform: translateY(0);
         }
 
-        /* Animacion i pikes ne logo */
         @keyframes pulse-dot {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.3); opacity: 0.7; }
@@ -34,7 +32,6 @@
         .logo-container:hover .logo-bg { background-color: #2563eb; }
         .logo-bg { transition: background-color 0.3s ease; }
 
-        /* Estetika e kartelave */
         .project-card {
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -46,13 +43,46 @@
             transition: all 0.5s ease;
         }
 
-        /* Klasa e re për zgjerimin e tekstit */
+        /* Stilizimi i Scrollbar-it (Ashensorit) brenda tekstit */
+        .description-text::-webkit-scrollbar {
+            width: 4px;
+        }
+        .description-text::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .description-text::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 10px;
+        }
+
+        .description-text {
+            transition: all 0.4s ease;
+        }
+
+        /* Kur klikohet "Detaje", teksti behet me ashensor */
         .expanded-text {
             -webkit-line-clamp: unset !important;
             display: block !important;
+            max-height: 220px; /* Lartesia maksimale para se te dale scroll-i */
+            overflow-y: auto !important;
+            padding-right: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 rgba(255, 255, 255, 0.05);
         }
 
-        /* Floating Language Switcher Style */
+        /* Fshih butonin e hartes kur nuk eshte i zgjeruar teksti */
+        .map-btn-hidden {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .expanded-text .map-btn-hidden {
+            display: inline-block;
+            opacity: 1;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
         .lang-switcher-side {
             position: fixed;
             left: 20px;
@@ -95,7 +125,6 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
 
-    <!-- SIDE LANGUAGE PANEL -->
     <div class="lang-switcher-side">
         <a href="/sq/projekte/" class="lang-item active" title="Shqip">
             <img src="https://flagcdn.com/w40/al.png" alt="AL" class="flag-icon">
@@ -105,10 +134,8 @@
         </a>
     </div>
 
-    <!-- NAVIGIMI -->
     <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-[1000] border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <!-- LOGO LINDIMAPS -->
             <a href="/" class="flex items-center gap-3 group logo-container">
                 <div class="logo-bg h-11 w-11 flex items-center justify-center bg-slate-900 rounded-xl shadow-md">
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -125,7 +152,6 @@
                 </div>
             </a>
             
-            <!-- MENU DESKTOP -->
             <div class="hidden md:flex items-center space-x-8 font-bold text-[13px] uppercase tracking-widest text-slate-600">
                 <a href="/" class="hover:text-blue-600 transition pb-1">Kreu</a>
                 <a href="/sq/sherbime/" class="hover:text-blue-600 transition pb-1">Shërbime</a>
@@ -134,7 +160,6 @@
                 <a href="/sq/kontakte/" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-blue-600 transition shadow-lg shadow-slate-200">Kontakte</a>
             </div>
 
-            <!-- MOBILE TOGGLE -->
             <div class="md:hidden">
                 <button id="menu-btn" class="p-2 text-slate-900 focus:outline-none">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,21 +178,19 @@
         </div>
     </nav>
 
-    <!-- HEADER -->
     <header class="py-24 bg-slate-950 relative overflow-hidden">
         <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
         <div class="max-w-7xl mx-auto px-6 relative z-10 text-center flex flex-col items-center">
             <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter mb-4">
                 Projektet <span class="text-blue-500">Tona</span>
             </h2>
-            <div class="h-1.5 w-24 bg-gradient-to-right from-blue-600 to-cyan-400 rounded-full mb-8" style="background: linear-gradient(to right, #2563eb, #2dd4bf);"></div>
+            <div class="h-1.5 w-24 rounded-full mb-8" style="background: linear-gradient(to right, #2563eb, #2dd4bf);"></div>
             <p class="text-slate-400 max-w-xl mx-auto text-sm md:text-base leading-relaxed">Eksploroni portofolin tonë të zgjidhjeve gjeohapësinore dhe inxhinierike në të gjithë Shqipërinë.</p>
         </div>
     </header>
 
-    <!-- PROJEKTET GRID -->
     <section class="py-24 max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 items-start">
             
             <!-- Projekt 1 -->
             <div class="project-card bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100 group">
@@ -176,7 +199,15 @@
                     <div class="image-overlay absolute inset-0 p-10 flex flex-col justify-end">
                         <span class="text-blue-400 text-[10px] font-black tracking-widest uppercase mb-2">Infrastrukturë GIS</span>
                         <h3 class="text-2xl font-black text-white uppercase tracking-tight leading-none mb-2">Ndërtimi Aplikacionit WEB GIS</h3>
-                        <p class="description-text text-slate-300 text-sm font-medium line-clamp-2 transition-all duration-500">Krijimi i një aplikacioni WEB GIS për hartografimin dhe dokumentimin e zonave të trashëgimisë kulturore "Lubonjë, Korçë". Ky projekt mundëson akses të shpejtë në të dhënat hapësinore dhe menaxhimin efikas të burimeve historike përmes teknologjisë cloud.</p>
+                        <div class="description-text text-slate-300 text-sm font-medium line-clamp-2">
+                            <p>Krijimi i një aplikacioni WEB GIS për hartografimin dhe dokumentimin e zonave të trashëgimisë kulturore "Lubonjë, Korçë". Ky projekt mundëson akses të shpejtë në të dhënat hapësinore dhe menaxhimin efikas të burimeve historike përmes teknologjisë cloud.</p>
+                            <p class="mt-2">Përdoruesit mund të navigojnë në harta interaktive, të shohin detajet e objekteve dhe të shkarkojnë raporte teknike direkt nga platforma.</p>
+                            <p class="mt-2">Sistemi ofron mjete për matje distancash, sipërfaqesh dhe analizë 3D të relievit rreth objekteve arkeologjike, duke e bërë atë një mjet të domosdoshëm për studiuesit.</p>
+                            <!-- Butoni brenda tekstit -->
+                            <button onclick="openProjectModal('https://storymaps.arcgis.com/stories/43523107564d461fbb8ea118df18efd3', 'Ndërtimi Aplikacionit WEB GIS')" class="map-btn-hidden bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">
+                                Shiko Hartën
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="p-10 flex items-center justify-between border-t border-slate-50">
@@ -184,12 +215,7 @@
                         <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Viti</span>
                         <span class="text-xs font-bold text-slate-900">Përfunduar Tetor 2024</span>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <button onclick="openProjectModal('https://storymaps.arcgis.com/stories/43523107564d461fbb8ea118df18efd3', 'Ndërtimi Aplikacionit WEB GIS')" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">
-                            Shiko Hartën
-                        </button>
-                        <button class="details-toggle text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline">Detaje</button>
-                    </div>
+                    <button class="details-toggle text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline">Detaje</button>
                 </div>
             </div>
 
@@ -200,7 +226,10 @@
                     <div class="image-overlay absolute inset-0 p-10 flex flex-col justify-end">
                         <span class="text-emerald-400 text-[10px] font-black tracking-widest uppercase mb-2">Monitorim Satelitor</span>
                         <h3 class="text-2xl font-black text-white uppercase tracking-tight leading-none mb-2">Monitorimi i Pyjeve</h3>
-                        <p class="description-text text-slate-300 text-sm font-medium line-clamp-2 transition-all duration-500">Analizë gjeohapësinore e mbulesës tokës duke përdorur Inteligjencën Artificiale për të identifikuar ndryshimet në biomasë dhe zonat e mbrojtura në kohë reale.</p>
+                        <div class="description-text text-slate-300 text-sm font-medium line-clamp-2">
+                            <p>Analizë gjeohapësinore e mbulesës tokës duke përdorur Inteligjencën Artificiale për të identifikuar ndryshimet në biomasë dhe zonat e mbrojtura në kohë reale.</p>
+                            <p class="mt-2">Sistemi automatik njofton autoritetet për çdo ndërhyrje të paligjshme ose ndryshim drastik të mjedisit përmes analizës së imazheve satelitore Sentinel.</p>
+                        </div>
                     </div>
                 </div>
                 <div class="p-10 flex items-center justify-between border-t border-slate-50">
@@ -219,7 +248,14 @@
                     <div class="image-overlay absolute inset-0 p-10 flex flex-col justify-end">
                         <span class="text-orange-400 text-[10px] font-black tracking-widest uppercase mb-2">3D Mapping</span>
                         <h3 class="text-2xl font-black text-white uppercase tracking-tight leading-none mb-2">Harta 3D e zonave arkeologjike Lezhë</h3>
-                        <p class="description-text text-slate-300 text-sm font-medium line-clamp-2 transition-all duration-500"> Gjenerimi i modeleve 3D të kalasë së Lezhës, duke përdorur dronë dhe teknika të avancuara të fotogrametrisë për ruajtjen dixhitale të monumentit. </p>
+                        <div class="description-text text-slate-300 text-sm font-medium line-clamp-2">
+                            <p>Gjenerimi i modeleve 3D të kalasë së Lezhës, duke përdorur dronë dhe teknika të avancuara të fotogrametrisë për ruajtjen dixhitale të monumentit.</p>
+                            <p class="mt-2">Modelet e përfituara shërbejnë si arkivë digjitale për restaurimet e ardhshme dhe si mjete edukative për turizmin virtual.</p>
+                            <!-- Butoni brenda tekstit -->
+                            <button onclick="openProjectModal('https://storymaps.arcgis.com/stories/136af9b1b3be4e889d61f2b25a7f64a4', 'Harta 3D Arkeologjike Lezhë')" class="map-btn-hidden bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">
+                                Shiko Hartën
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="p-10 flex items-center justify-between border-t border-slate-50">
@@ -227,19 +263,13 @@
                         <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Viti</span>
                         <span class="text-xs font-bold text-slate-900">Përfunduar 2025</span>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <button onclick="openProjectModal('https://storymaps.arcgis.com/stories/136af9b1b3be4e889d61f2b25a7f64a4', 'Harta 3D Arkeologjike Lezhë')" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">
-                            Shiko Hartën
-                        </button>
-                        <button class="details-toggle text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline">Detaje</button>
-                    </div>
+                    <button class="details-toggle text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline">Detaje</button>
                 </div>
             </div>
 
         </div>
     </section>
 
-    <!-- FOOTER -->
     <footer class="bg-slate-950 text-white py-24 text-center border-t border-slate-900">
         <div class="max-w-7xl mx-auto px-6">
             <div class="mb-12 flex flex-col items-center gap-4">
@@ -254,18 +284,14 @@
         </div>
     </footer>
 
-    <!-- BUTONI SCROLL TO TOP -->
     <button id="scroll-to-top" class="fixed bottom-8 right-8 bg-blue-600 text-white p-5 rounded-2xl shadow-2xl hover:bg-blue-700 transition-all z-[1100] group">
         <svg class="w-6 h-6 transform group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path>
         </svg>
     </button>
 
-    <!-- DRITARJA MODAL PER STORYMAPS -->
     <div id="project-modal" class="fixed inset-0 z-[2000] hidden bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-10 opacity-0 transition-opacity duration-300">
         <div id="modal-content" class="bg-white rounded-[2rem] shadow-2xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col overflow-hidden relative transform scale-95 transition-transform duration-300 border border-slate-100">
-            
-            <!-- Koka e Dritares (Header) -->
             <div class="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-slate-50/80 backdrop-blur-md z-20">
                 <div class="flex items-center gap-3">
                     <div class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></div>
@@ -277,8 +303,6 @@
                     </svg>
                 </button>
             </div>
-            
-            <!-- Korniza e Hartës (Iframe) -->
             <div class="flex-grow w-full bg-slate-100 relative">
                 <div class="absolute inset-0 flex items-center justify-center z-0">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -289,12 +313,10 @@
     </div>
 
     <script>
-        // Menu Mobile
         const menuBtn = document.getElementById('menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
         menuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
 
-        // Scroll to Top
         const scrollTopBtn = document.getElementById('scroll-to-top');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 400) { scrollTopBtn.classList.add('show'); } 
@@ -302,7 +324,6 @@
         });
         scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
-        // LOGJIKA PER ZGJERIMIN E TEKSTIT (DETAJET)
         document.querySelectorAll('.details-toggle').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -314,15 +335,15 @@
                 
                 if (textElement.classList.contains('expanded-text')) {
                     this.textContent = 'Mbyll';
-                    overlay.style.background = 'linear-gradient(to top, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.8) 70%, rgba(15, 23, 42, 0.4) 100%)';
+                    overlay.style.background = 'linear-gradient(to top, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.9) 70%, rgba(15, 23, 42, 0.6) 100%)';
                 } else {
                     this.textContent = 'Detaje';
                     overlay.style.background = ''; 
+                    textElement.scrollTop = 0; // Ktheje ne krye kur mbyllet
                 }
             });
         });
 
-        // LOGJIKA PER DRITAREN MODAL (STORYMAPS)
         const modal = document.getElementById('project-modal');
         const modalContent = document.getElementById('modal-content');
         const modalTitle = document.getElementById('modal-title');
@@ -333,19 +354,16 @@
             iframe.src = url; 
             modalTitle.textContent = title;
             modal.classList.remove('hidden');
-            
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 modalContent.classList.remove('scale-95');
             }, 10);
-            
             document.body.style.overflow = 'hidden';
         };
 
         function closeModal() {
             modal.classList.add('opacity-0');
             modalContent.classList.add('scale-95');
-            
             setTimeout(() => {
                 modal.classList.add('hidden');
                 iframe.src = ''; 
@@ -354,17 +372,11 @@
         }
 
         closeModalBtn.addEventListener('click', closeModal);
-
         modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeModal();
-            }
+            if (e.target === modal) closeModal();
         });
-
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                closeModal();
-            }
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
         });
     </script>
 </body>
