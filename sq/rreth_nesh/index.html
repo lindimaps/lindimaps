@@ -8,7 +8,6 @@
     <style>
         .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* Butoni për lart */
         #scroll-to-top {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
@@ -23,7 +22,6 @@
             transform: translateY(0);
         }
 
-        /* Animacion i pikes ne logo */
         @keyframes pulse-dot {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.3); opacity: 0.7; }
@@ -34,7 +32,6 @@
         .logo-container:hover .logo-bg { background-color: #2563eb; }
         .logo-bg { transition: background-color 0.3s ease; }
 
-        /* Profile image effects */
         .profile-border { position: relative; z-index: 10; }
         .profile-border::after { 
             content: ''; position: absolute; top: -15px; right: -15px; bottom: 15px; left: 15px; 
@@ -50,7 +47,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Timeline Styles */
         .timeline-container { position: relative; }
         .timeline-container::before {
             content: ''; position: absolute; left: 50%; transform: translateX(-50%);
@@ -60,7 +56,6 @@
             .timeline-container::before { left: 20px; }
         }
 
-        /* Floating Language Switcher Style */
         .lang-switcher-side {
             position: fixed;
             left: 20px;
@@ -85,22 +80,10 @@
             padding: 2px;
             border-radius: 6px;
         }
-        .lang-item:hover {
-            transform: scale(1.1);
-            background: white;
-        }
-        .lang-item.active {
-            box-shadow: 0 0 0 2px #3b82f6;
-        }
-        .flag-icon {
-            width: 20px;
-            height: 14px;
-            object-fit: cover;
-            border-radius: 2px;
-            display: block;
-        }
+        .lang-item:hover { transform: scale(1.1); background: white; }
+        .lang-item.active { box-shadow: 0 0 0 2px #3b82f6; }
+        .flag-icon { width: 20px; height: 14px; object-fit: cover; border-radius: 2px; display: block; }
 
-        /* 3D CAROUSEL MODIFIED FOR MANUAL SLIDING */
         .carousel-3d-container {
             perspective: 1200px;
             width: 100%;
@@ -130,13 +113,8 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             transition: opacity 0.5s, filter 0.5s;
         }
-        .carousel-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .carousel-item img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Navigation Buttons for Carousel */
         .carousel-controls {
             display: flex;
             justify-content: center;
@@ -156,20 +134,13 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .control-btn:hover {
-            background: #3b82f6;
-            border-color: #3b82f6;
-            transform: scale(1.1);
-        }
+        .control-btn:hover { background: #3b82f6; border-color: #3b82f6; transform: scale(1.1); }
 
-        #publications-modal {
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
+        #publications-modal, #cv-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
 
-    <!-- SIDE LANGUAGE PANEL -->
     <div class="lang-switcher-side">
         <a href="/sq/rreth_nesh/" class="lang-item active" title="Shqip">
             <img src="https://flagcdn.com/w40/al.png" alt="AL" class="flag-icon">
@@ -179,7 +150,6 @@
         </a>
     </div>
 
-    <!-- NAVIGIMI -->
     <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-[1000] border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="/" class="flex items-center gap-3 group logo-container">
@@ -224,7 +194,6 @@
         </div>
     </nav>
 
-    <!-- HERO SECTION -->
     <header class="relative py-32 bg-slate-900 text-white overflow-hidden">
         <div class="absolute inset-0 opacity-10 pointer-events-none">
             <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -240,7 +209,6 @@
         </div>
     </header>
 
-    <!-- THE FOUNDER SECTION -->
     <section class="py-24 max-w-7xl mx-auto px-6">
         <div class="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 overflow-hidden border border-slate-100">
             <div class="flex flex-col lg:flex-row">
@@ -249,12 +217,14 @@
                         <div class="aspect-[4/5] bg-slate-200 rounded-3xl overflow-hidden shadow-2xl relative">
                             <img src="https://fujqjgcciajwfbsvmlnk.supabase.co/storage/v1/object/sign/Media/Profile%20Photo/erland%20alla.JPG?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MDk0YTIxNy0zZDE5LTQwNTMtYjk3Yy05ZjI0MzI1ZTkxNjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpYS9Qcm9maWxlIFBob3RvL2VybGFuZCBhbGxhLkpQRyIsImlhdCI6MTc3MjEwMzY0OSwiZXhwIjoxODAzNjM5NjQ5fQ.-jWwPFWe1MBYu2SI4RqDBs-lNHBIyiE6g1xWv6-pXoA" 
                                  alt="M.Sc Erland Alla" 
-                                 onerror="this.src='https://via.placeholder.com/600x750?text=Erland+Alla'"
                                  class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500">
                             
                             <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-900/80 to-transparent">
                                 <p class="text-white font-black text-xl uppercase tracking-tighter">M.Sc Erland Alla</p>
-                                <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">Themelues & Lead Engineer</p>
+                                <p id="cv-trigger" class="text-blue-400 text-xs font-bold uppercase tracking-widest cursor-pointer hover:text-white transition-colors duration-300 flex items-center gap-2">
+                                    Themelues & Lead Engineer
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -264,15 +234,10 @@
                     <h3 class="text-3xl md:text-5xl font-black text-slate-900 uppercase tracking-tighter mb-8">Ekspert në <br/>Gjeoinformatikë</h3>
                     
                     <div class="space-y-6 text-slate-600 leading-relaxed text-lg">
-                        <p>
-                            Inxhinier gjeoinformatikë me përvojë të gjerë në analizën gjeohapësinore, përpunimin e të dhënave satelitore dhe implementimin e teknologjive GIS në projekte kombëtare dhe ndërkombëtare.
-                        </p>
-                        <p>
-                            Fokusi im kryesor qëndron në zhvillimin e produkteve të avancuara gjeohapësinore që mbështesin vendimmarrjen e bazuar në të dhëna dhe bashkëpunimin ndërdisiplinor.
-                        </p>
+                        <p>Inxhinier gjeoinformatikë me përvojë të gjerë në analizën gjeohapësinore, përpunimin e të dhënave satelitore dhe implementimin e teknologjive GIS në projekte kombëtare dhe ndërkombëtare.</p>
+                        <p>Fokusi im kryesor qëndron në zhvillimin e produkteve të avancuara gjeohapësinore që mbështesin vendimmarrjen e bazuar në të dhëna dhe bashkëpunimin ndërdisiplinor.</p>
                     </div>
 
-                    <!-- Updated Stats Section -->
                     <div class="mt-12 flex flex-wrap gap-10 border-t border-slate-50 pt-8">
                         <div class="flex flex-col">
                             <span class="text-3xl font-black text-slate-900">M.Sc</span>
@@ -284,10 +249,7 @@
                         </div>
                         <div class="flex flex-col cursor-pointer group" id="co-author-trigger">
                             <span class="text-3xl font-black text-slate-900 group-hover:text-blue-600 transition">Co-Author</span>
-                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-widest flex items-center gap-1">
-                                Publikime Shkencore 
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
-                            </span>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-widest flex items-center gap-1">Publikime Shkencore <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></span>
                         </div>
                     </div>
                 </div>
@@ -295,7 +257,6 @@
         </div>
     </section>
 
-    <!-- HISTORIA JONE -->
     <section class="py-24 bg-white border-y border-slate-100">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-20">
@@ -307,31 +268,23 @@
             <div class="timeline-container space-y-12">
                 <div class="relative flex items-center justify-between md:flex-row-reverse w-full">
                     <div class="hidden md:block w-5/12"></div>
-                    <div class="z-20 flex items-center justify-center bg-blue-600 w-10 h-10 rounded-full shadow-xl border-4 border-white">
-                        <span class="text-white text-[10px] font-bold">2024</span>
-                    </div>
+                    <div class="z-20 flex items-center justify-center bg-blue-600 w-10 h-10 rounded-full shadow-xl border-4 border-white"><span class="text-white text-[10px] font-bold">2024</span></div>
                     <div class="w-full md:w-5/12 bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:shadow-lg transition-shadow">
                         <h4 class="text-xl font-black text-slate-900 mb-2 uppercase">Fillimet</h4>
                         <p class="text-slate-600 text-sm leading-relaxed">Fillimi i konceptit të një platforme që pasqyron pasionin dhe përvojën time në fushën e Gjeoinformacionit (GIS)</p>
                     </div>
                 </div>
-
                 <div class="relative flex items-center justify-between w-full">
                     <div class="hidden md:block w-5/12"></div>
-                    <div class="z-20 flex items-center justify-center bg-slate-900 w-10 h-10 rounded-full shadow-xl border-4 border-white">
-                        <span class="text-white text-[10px] font-bold">2025</span>
-                    </div>
+                    <div class="z-20 flex items-center justify-center bg-slate-900 w-10 h-10 rounded-full shadow-xl border-4 border-white"><span class="text-white text-[10px] font-bold">2025</span></div>
                     <div class="w-full md:w-5/12 bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:shadow-lg transition-shadow">
                         <h4 class="text-xl font-black text-slate-900 mb-2 uppercase text-right md:text-left">Zgjerimi</h4>
                         <p class="text-slate-600 text-sm leading-relaxed text-right md:text-left">Integrimi i teknologjive GIS dhe Remote Sensing në bashkëpunimet e para me sektorin publik.</p>
                     </div>
                 </div>
-
                 <div class="relative flex items-center justify-between md:flex-row-reverse w-full">
                     <div class="hidden md:block w-5/12"></div>
-                    <div class="z-20 flex items-center justify-center bg-blue-600 w-10 h-10 rounded-full shadow-xl border-4 border-white">
-                        <span class="text-white text-[10px] font-bold">SOT</span>
-                    </div>
+                    <div class="z-20 flex items-center justify-center bg-blue-600 w-10 h-10 rounded-full shadow-xl border-4 border-white"><span class="text-white text-[10px] font-bold">SOT</span></div>
                     <div class="w-full md:w-5/12 bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:shadow-lg transition-shadow">
                         <h4 class="text-xl font-black text-slate-900 mb-2 uppercase">Risi në GIS</h4>
                         <p class="text-slate-600 text-sm leading-relaxed">Një pikë referimi për zgjidhje dhe planifikime të ndryshme gjeohapësinore.</p>
@@ -341,14 +294,12 @@
         </div>
     </section>
 
-    <!-- VLERAT TONA -->
     <section class="py-24 bg-slate-900 text-white">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-20">
                 <h3 class="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-4">Vlerat tona</h3>
                 <div class="h-1.5 w-20 bg-blue-600 mx-auto rounded-full"></div>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="glass-card p-10 rounded-[2.5rem]">
                     <h4 class="text-2xl font-black uppercase mb-4 text-blue-500">Inovacioni</h4>
@@ -366,7 +317,6 @@
         </div>
     </section>
 
-    <!-- FOOTER -->
     <footer class="bg-slate-950 text-white py-24 text-center border-t border-slate-900">
         <div class="max-w-7xl mx-auto px-6">
             <div class="mb-12 flex flex-col items-center gap-4">
@@ -381,84 +331,70 @@
         </div>
     </footer>
 
-    <!-- PUBLICATIONS MODAL -->
     <div id="publications-modal" class="fixed inset-0 z-[5000] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl opacity-0 invisible">
         <div class="relative w-full max-w-4xl">
-            <!-- Close Button -->
             <button id="close-modal" class="absolute -top-12 right-0 text-white hover:text-blue-400 flex items-center gap-2 font-black uppercase text-xs tracking-widest transition">
-                Mbyll
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                Mbyll <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
-
             <div class="text-center mb-10">
                 <span class="text-blue-500 font-black text-[10px] uppercase tracking-[0.4em] mb-2 block">Portofoli Akademik</span>
                 <h3 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">Botimet Shkencore</h3>
-                <p class="text-slate-400 mt-4 text-sm max-w-lg mx-auto">Shfletoni botimet duke përdorur butonat më poshtë.</p>
             </div>
-
-            <!-- 3D CAROUSEL (Manual Control) -->
             <div class="carousel-3d-container">
                 <div id="carousel-box" class="carousel-3d">
-                    <!-- Publication 1 -->
-                    <a href="https://www.intechopen.com/chapters/1218612" target="_blank" class="carousel-item">
-                        <img src="https://fujqjgcciajwfbsvmlnk.supabase.co/storage/v1/object/sign/Media/Botimet%20Shkencore%20Kopertinat/Island%20Ecology.JPG?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MDk0YTIxNy0zZDE5LTQwNTMtYjk3Yy05ZjI0MzI1ZTkxNjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpYS9Cb3RpbWV0IFNoa2VuY29yZSBLb3BlcnRpbmF0L0lzbGFuZCBFY29sb2d5LkpQRyIsImlhdCI6MTc3MjMxOTU4OCwiZXhwIjoxODAzODU1NTg4fQ.qAcF_l74get0ZpvOQOf7TcZts6SN6hTtQQM9mo2-vEM" alt="IntechOpen Publication">
-                    </a>
-                    <!-- Publication 2 -->
-                    <a href="https://www.intechopen.com/chapters/1218612" target="_blank" class="carousel-item">
-                        <img src="https://fujqjgcciajwfbsvmlnk.supabase.co/storage/v1/object/sign/Media/Botimet%20Shkencore%20Kopertinat/Heritage%20Management.JPG?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MDk0YTIxNy0zZDE5LTQwNTMtYjk3Yy05ZjI0MzI1ZTkxNjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpYS9Cb3RpbWV0IFNoa2VuY29yZSBLb3BlcnRpbmF0L0hlcml0YWdlIE1hbmFnZW1lbnQuSlBHIiwiaWF0IjoxNzcyMzE5NTQ3LCJleHAiOjE4MDM4NTU1NDd9.swDyzezu6Y-VNN44Dp_JUeWOl41UNMCmlGG0Fma-Ork" alt="IntechOpen Publication 2">
-                    </a>
-                    <!-- Publication 3 -->
-                    <a href="https://online-journals.org/index.php/i-jim/article/view/54599" target="_blank" class="carousel-item">
-                        <img src="https://online-journals.org/public/journals/4/cover_issue_1275_en_US.png" alt="i-JIM Publication">
-                    </a>
+                    <a href="https://www.intechopen.com/chapters/1218612" target="_blank" class="carousel-item"><img src="https://fujqjgcciajwfbsvmlnk.supabase.co/storage/v1/object/sign/Media/Botimet%20Shkencore%20Kopertinat/Island%20Ecology.JPG?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MDk0YTIxNy0zZDE5LTQwNTMtYjk3Yy05ZjI0MzI1ZTkxNjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpYS9Cb3RpbWV0IFNoa2VuY29yZSBLb3BlcnRpbmF0L0lzbGFuZCBFY29sb2d5LkpQRyIsImlhdCI6MTc3MjMxOTU4OCwiZXhwIjoxODAzODU1NTg4fQ.qAcF_l74get0ZpvOQOf7TcZts6SN6hTtQQM9mo2-vEM" alt="Publikim 1"></a>
+                    <a href="https://www.intechopen.com/chapters/1218612" target="_blank" class="carousel-item"><img src="https://fujqjgcciajwfbsvmlnk.supabase.co/storage/v1/object/sign/Media/Botimet%20Shkencore%20Kopertinat/Heritage%20Management.JPG?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MDk0YTIxNy0zZDE5LTQwNTMtYjk3Yy05ZjI0MzI1ZTkxNjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpYS9Cb3RpbWV0IFNoa2VuY29yZSBLb3BlcnRpbmF0L0hlcml0YWdlIE1hbmFnZW1lbnQuSlBHIiwiaWF0IjoxNzcyMzE5NTQ3LCJleHAiOjE4MDM4NTU1NDd9.swDyzezu6Y-VNN44Dp_JUeWOl41UNMCmlGG0Fma-Ork" alt="Publikim 2"></a>
+                    <a href="https://online-journals.org/index.php/i-jim/article/view/54599" target="_blank" class="carousel-item"><img src="https://online-journals.org/public/journals/4/cover_issue_1275_en_US.png" alt="Publikim 3"></a>
                 </div>
             </div>
-
-            <!-- Carousel Controls -->
             <div class="carousel-controls">
-                <button id="prev-slide" class="control-btn" title="Para">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
-                </button>
-                <button id="next-slide" class="control-btn" title="Pas">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
-                </button>
+                <button id="prev-slide" class="control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+                <button id="next-slide" class="control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
             </div>
         </div>
     </div>
 
-    <!-- SCROLL TO TOP -->
+    <div id="cv-modal" class="fixed inset-0 z-[6000] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-2xl opacity-0 invisible">
+        <div class="relative w-full max-w-3xl h-[85vh] flex flex-col bg-white/5 p-4 rounded-[2.5rem] border border-white/10">
+            <div class="flex items-center justify-between mb-4 px-2">
+                <div class="flex flex-col">
+                    <span class="text-blue-500 font-black text-[9px] uppercase tracking-[0.4em] mb-1 block">Curriculum Vitae</span>
+                    <h3 class="text-xl font-black text-white uppercase tracking-tighter">Erland Alla</h3>
+                </div>
+                <button id="close-cv" class="text-white/60 hover:text-white flex items-center gap-2 font-black uppercase text-[10px] tracking-widest transition group">
+                    <span class="opacity-0 group-hover:opacity-100 transition-opacity">Mbyll</span>
+                    <div class="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-red-500/20 group-hover:text-red-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </div>
+                </button>
+            </div>
+            <div class="flex-1 bg-white rounded-2xl overflow-hidden shadow-inner relative">
+                <iframe src="https://fujqjgcciajwfbsvmlnk.supabase.co/storage/v1/object/public/lindimaps-academy/qgis/1_intro.pdf#toolbar=0&navpanes=0&scrollbar=1" class="w-full h-full border-none"></iframe>
+            </div>
+        </div>
+    </div>
+
     <button id="scroll-to-top" class="fixed bottom-8 right-8 bg-blue-600 text-white p-5 rounded-2xl shadow-2xl hover:bg-blue-700 transition-all z-[1100] group">
-        <svg class="w-6 h-6 transform group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path>
-        </svg>
+        <svg class="w-6 h-6 transform group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg>
     </button>
 
     <script>
         const menuBtn = document.getElementById('menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
-        menuBtn.addEventListener('click', () => { 
-            mobileMenu.classList.toggle('hidden'); 
-        });
+        menuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
 
         const scrollTopBtn = document.getElementById('scroll-to-top');
         window.addEventListener('scroll', () => {
             const scrollPosition = window.innerHeight + window.pageYOffset;
             const pageHeight = document.documentElement.scrollHeight;
-            if (scrollPosition > pageHeight - 150) {
-                scrollTopBtn.classList.add('show');
-            } else {
-                scrollTopBtn.classList.remove('show');
-            }
+            if (scrollPosition > pageHeight - 150) scrollTopBtn.classList.add('show');
+            else scrollTopBtn.classList.remove('show');
         });
-        scrollTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+        scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
-        // MODAL & CAROUSEL LOGIC
-        const modal = document.getElementById('publications-modal');
-        const trigger = document.getElementById('co-author-trigger');
-        const closeBtn = document.getElementById('close-modal');
-        
+        const modalPub = document.getElementById('publications-modal');
+        const triggerPub = document.getElementById('co-author-trigger');
+        const closeBtnPub = document.getElementById('close-modal');
         const carouselBox = document.getElementById('carousel-box');
         const prevBtn = document.getElementById('prev-slide');
         const nextBtn = document.getElementById('next-slide');
@@ -469,55 +405,54 @@
         const angleUnit = 360 / totalItems;
 
         function updateCarouselPosition() {
-            const rotationAngle = currentIndex * -angleUnit;
-            carouselBox.style.transform = `rotateY(${rotationAngle}deg)`;
-            
-            // Adjust individual items focus
+            carouselBox.style.transform = `rotateY(${currentIndex * -angleUnit}deg)`;
             items.forEach((item, index) => {
-                const itemAngle = index * angleUnit;
-                item.style.transform = `rotateY(${itemAngle}deg) translateZ(250px)`;
-                
-                // Determine if this item is currently in front
+                item.style.transform = `rotateY(${index * angleUnit}deg) translateZ(250px)`;
                 const normalizedCurrent = ((currentIndex % totalItems) + totalItems) % totalItems;
-                if (index === normalizedCurrent) {
-                    item.style.opacity = "1";
-                    item.style.filter = "none";
-                } else {
-                    item.style.opacity = "0.4";
-                    item.style.filter = "grayscale(0.5) blur(1px)";
-                }
+                item.style.opacity = index === normalizedCurrent ? "1" : "0.4";
+                item.style.filter = index === normalizedCurrent ? "none" : "grayscale(0.5) blur(1px)";
             });
         }
 
-        nextBtn.addEventListener('click', () => {
-            currentIndex++;
-            updateCarouselPosition();
-        });
-
-        prevBtn.addEventListener('click', () => {
-            currentIndex--;
-            updateCarouselPosition();
-        });
-
-        trigger.addEventListener('click', () => {
-            modal.classList.remove('invisible', 'opacity-0');
-            modal.classList.add('visible', 'opacity-100');
+        nextBtn.addEventListener('click', () => { currentIndex++; updateCarouselPosition(); });
+        prevBtn.addEventListener('click', () => { currentIndex--; updateCarouselPosition(); });
+        
+        triggerPub.addEventListener('click', () => {
+            modalPub.classList.remove('invisible', 'opacity-0');
+            modalPub.classList.add('visible', 'opacity-100');
             document.body.style.overflow = 'hidden';
-            updateCarouselPosition(); // Initial render position
+            updateCarouselPosition();
         });
 
-        const closeModal = () => {
-            modal.classList.add('invisible', 'opacity-0');
-            modal.classList.remove('visible', 'opacity-100');
+        const closeModalPub = () => {
+            modalPub.classList.add('invisible', 'opacity-0');
+            modalPub.classList.remove('visible', 'opacity-100');
             document.body.style.overflow = 'auto';
         };
+        closeBtnPub.addEventListener('click', closeModalPub);
 
-        closeBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
+        const modalCv = document.getElementById('cv-modal');
+        const triggerCv = document.getElementById('cv-trigger');
+        const closeBtnCv = document.getElementById('close-cv');
+
+        triggerCv.addEventListener('click', () => {
+            modalCv.classList.remove('invisible', 'opacity-0');
+            modalCv.classList.add('visible', 'opacity-100');
+            document.body.style.overflow = 'hidden';
         });
 
-        // Initialize carousel positioning on load
+        const closeModalCv = () => {
+            modalCv.classList.add('invisible', 'opacity-0');
+            modalCv.classList.remove('visible', 'opacity-100');
+            document.body.style.overflow = 'auto';
+        };
+        closeBtnCv.addEventListener('click', closeModalCv);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modalPub) closeModalPub();
+            if (e.target === modalCv) closeModalCv();
+        });
+        
         updateCarouselPosition();
     </script>
 </body>
