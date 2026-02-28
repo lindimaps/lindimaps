@@ -100,49 +100,67 @@
             display: block;
         }
 
-        /* 3D CAROUSEL STYLES */
+        /* 3D CAROUSEL MODIFIED FOR MANUAL SLIDING */
         .carousel-3d-container {
             perspective: 1200px;
             width: 100%;
-            height: 350px;
+            height: 380px;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
         .carousel-3d {
             position: relative;
-            width: 180px;
-            height: 260px;
+            width: 200px;
+            height: 280px;
             transform-style: preserve-3d;
-            animation: rotate-carousel 15s infinite linear;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .carousel-item {
             position: absolute;
-            width: 180px;
-            height: 260px;
+            width: 200px;
+            height: 280px;
             left: 0;
             top: 0;
             cursor: pointer;
-            transition: transform 0.5s;
             backface-visibility: hidden;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: opacity 0.5s, filter 0.5s;
         }
         .carousel-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .carousel-item:nth-child(1) { transform: rotateY(0deg) translateZ(220px); }
-        .carousel-item:nth-child(2) { transform: rotateY(120deg) translateZ(220px); }
-        .carousel-item:nth-child(3) { transform: rotateY(240deg) translateZ(220px); }
 
-        @keyframes rotate-carousel {
-            from { transform: rotateY(0deg); }
-            to { transform: rotateY(360deg); }
+        /* Navigation Buttons for Carousel */
+        .carousel-controls {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 20px;
         }
-        .carousel-3d:hover { animation-play-state: paused; }
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .control-btn:hover {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            transform: scale(1.1);
+        }
 
         #publications-modal {
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -372,15 +390,15 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
 
-            <div class="text-center mb-16">
+            <div class="text-center mb-10">
                 <span class="text-blue-500 font-black text-[10px] uppercase tracking-[0.4em] mb-2 block">Portofoli Akademik</span>
                 <h3 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">Botimet Shkencore</h3>
-                <p class="text-slate-400 mt-4 text-sm max-w-lg mx-auto">Klikoni mbi kopertinat për të lexuar artikujt e plotë shkencorë.</p>
+                <p class="text-slate-400 mt-4 text-sm max-w-lg mx-auto">Shfletoni botimet duke përdorur butonat më poshtë.</p>
             </div>
 
-            <!-- 3D CAROUSEL -->
+            <!-- 3D CAROUSEL (Manual Control) -->
             <div class="carousel-3d-container">
-                <div class="carousel-3d">
+                <div id="carousel-box" class="carousel-3d">
                     <!-- Publication 1 -->
                     <a href="https://www.intechopen.com/chapters/1218612" target="_blank" class="carousel-item">
                         <img src="https://fujqjgcciajwfbsvmlnk.supabase.co/storage/v1/object/sign/Media/Botimet%20Shkencore%20Kopertinat/Island%20Ecology.JPG?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MDk0YTIxNy0zZDE5LTQwNTMtYjk3Yy05ZjI0MzI1ZTkxNjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpYS9Cb3RpbWV0IFNoa2VuY29yZSBLb3BlcnRpbmF0L0lzbGFuZCBFY29sb2d5LkpQRyIsImlhdCI6MTc3MjMxOTU4OCwiZXhwIjoxODAzODU1NTg4fQ.qAcF_l74get0ZpvOQOf7TcZts6SN6hTtQQM9mo2-vEM" alt="IntechOpen Publication">
@@ -394,6 +412,16 @@
                         <img src="https://online-journals.org/public/journals/4/cover_issue_1275_en_US.png" alt="i-JIM Publication">
                     </a>
                 </div>
+            </div>
+
+            <!-- Carousel Controls -->
+            <div class="carousel-controls">
+                <button id="prev-slide" class="control-btn" title="Para">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <button id="next-slide" class="control-btn" title="Pas">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                </button>
             </div>
         </div>
     </div>
@@ -426,27 +454,71 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // MODAL LOGIC
+        // MODAL & CAROUSEL LOGIC
         const modal = document.getElementById('publications-modal');
         const trigger = document.getElementById('co-author-trigger');
         const closeBtn = document.getElementById('close-modal');
+        
+        const carouselBox = document.getElementById('carousel-box');
+        const prevBtn = document.getElementById('prev-slide');
+        const nextBtn = document.getElementById('next-slide');
+        const items = document.querySelectorAll('.carousel-item');
+        
+        let currentIndex = 0;
+        const totalItems = items.length;
+        const angleUnit = 360 / totalItems;
+
+        function updateCarouselPosition() {
+            const rotationAngle = currentIndex * -angleUnit;
+            carouselBox.style.transform = `rotateY(${rotationAngle}deg)`;
+            
+            // Adjust individual items focus
+            items.forEach((item, index) => {
+                const itemAngle = index * angleUnit;
+                item.style.transform = `rotateY(${itemAngle}deg) translateZ(250px)`;
+                
+                // Determine if this item is currently in front
+                const normalizedCurrent = ((currentIndex % totalItems) + totalItems) % totalItems;
+                if (index === normalizedCurrent) {
+                    item.style.opacity = "1";
+                    item.style.filter = "none";
+                } else {
+                    item.style.opacity = "0.4";
+                    item.style.filter = "grayscale(0.5) blur(1px)";
+                }
+            });
+        }
+
+        nextBtn.addEventListener('click', () => {
+            currentIndex++;
+            updateCarouselPosition();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            currentIndex--;
+            updateCarouselPosition();
+        });
 
         trigger.addEventListener('click', () => {
             modal.classList.remove('invisible', 'opacity-0');
             modal.classList.add('visible', 'opacity-100');
-            document.body.style.overflow = 'hidden'; // Stop scrolling
+            document.body.style.overflow = 'hidden';
+            updateCarouselPosition(); // Initial render position
         });
 
         const closeModal = () => {
             modal.classList.add('invisible', 'opacity-0');
             modal.classList.remove('visible', 'opacity-100');
-            document.body.style.overflow = 'auto'; // Resume scrolling
+            document.body.style.overflow = 'auto';
         };
 
         closeBtn.addEventListener('click', closeModal);
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
         });
+
+        // Initialize carousel positioning on load
+        updateCarouselPosition();
     </script>
 </body>
 </html>
