@@ -45,14 +45,24 @@
 
         /* Stilizimi i Scrollbar-it (Ashensorit) brenda tekstit */
         .description-text::-webkit-scrollbar {
-            width: 4px;
+            width: 6px; /* Pak me i trashe per telfonin */
+            display: block;
         }
         .description-text::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
         }
         .description-text::-webkit-scrollbar-thumb {
             background: #3b82f6;
             border-radius: 10px;
+            border: 1px solid rgba(15, 23, 42, 0.9);
+        }
+
+        /* Forco vizualizimin ne mobile */
+        @media (max-width: 768px) {
+            .description-text.expanded-text {
+                -webkit-overflow-scrolling: touch;
+            }
         }
 
         .description-text {
@@ -65,9 +75,9 @@
             display: block !important;
             max-height: 220px; /* Lartesia maksimale para se te dale scroll-i */
             overflow-y: auto !important;
-            padding-right: 8px;
+            padding-right: 12px;
             scrollbar-width: thin;
-            scrollbar-color: #3b82f6 rgba(255, 255, 255, 0.05);
+            scrollbar-color: #3b82f6 rgba(255, 255, 255, 0.1);
         }
 
         /* Fshih butonin e hartes kur nuk eshte i zgjeruar teksti */
@@ -200,7 +210,7 @@
                         <span class="text-blue-400 text-[10px] font-black tracking-widest uppercase mb-2">Infrastrukturë GIS</span>
                         <h3 class="text-2xl font-black text-white uppercase tracking-tight leading-none mb-2">Ndërtimi Aplikacionit WEB GIS</h3>
                         <div class="description-text text-slate-300 text-sm font-medium line-clamp-2">
-                            <p>Krijimi i një aplikacioni WEB GIS për hartografimin dhe dokumentimin e zonave të trashëgimisë kulturore "Lubonjë, Korçë". Ky projekt mundëson akses të shpejtë në të dhënat hapësinore dhe menaxhimin efikas të burimeve historike përmes teknologjisë cloud.</p>
+                            <p>Krijimi i një aplikacioni WEB GIS për hartografimin dhe dokumentimin e zonave të trashëgimisë kulturore "Lubonjë, Korçë". Ky projekt mundëson akses të shpejtë në të dhënat hapësinore dhe menaxhimen efikas të burimeve historike përmes teknologjisë cloud.</p>
                             <p class="mt-2">Përdoruesit mund të navigojnë në harta interaktive, të shohin detajet e objekteve dhe të shkarkojnë raporte teknike direkt nga platforma.</p>
                             <p class="mt-2">Sistemi ofron mjete për matje distancash, sipërfaqesh dhe analizë 3D të relievit rreth objekteve arkeologjike, duke e bërë atë një mjet të domosdoshëm për studiuesit.</p>
                             <!-- Butoni brenda tekstit -->
