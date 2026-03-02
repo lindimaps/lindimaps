@@ -37,15 +37,19 @@
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent; /* Hiq kornizen e klikimit ne mobile */
         }
 
         .project-image-container {
+            -webkit-clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
             clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
-            transition: clip-path 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Aktivizimi ne Hover (Desktop) dhe ne klikim (Mobile) */
         .project-card:hover .project-image-container,
-        .project-card:active .project-image-container {
+        .project-card.active-touch .project-image-container {
+            -webkit-clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
             clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
         }
 
@@ -57,7 +61,7 @@
         }
 
         .project-card:hover .content-reveal,
-        .project-card:active .content-reveal {
+        .project-card.active-touch .content-reveal {
             max-height: 300px;
             opacity: 1;
             margin-top: 1rem;
@@ -68,7 +72,7 @@
         }
 
         .project-card:hover .info-wrapper,
-        .project-card:active .info-wrapper {
+        .project-card.active-touch .info-wrapper {
             transform: translateY(-10px);
         }
         /* --- FUNDI I GRIDIT TE RI --- */
@@ -188,7 +192,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 items-start">
             
             <!-- Projekt 1 -->
-            <div class="project-card h-[500px] md:h-[550px] bg-slate-900 rounded-[2.5rem] shadow-xl group">
+            <div class="project-card h-[500px] md:h-[550px] bg-slate-900 rounded-[2.5rem] shadow-xl group" onclick="toggleTouchCard(this)">
                 <div class="project-image-container absolute inset-0">
                     <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1200" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt="WEB GIS">
                     <div class="absolute inset-0 image-overlay opacity-90"></div>
@@ -202,7 +206,7 @@
                     
                     <div class="content-reveal">
                         <p class="text-slate-300 text-sm mb-6 line-clamp-3">Platformë interaktive për dokumentimin e zonave të trashëgimisë kulturore. Mundëson akses në të dhënat hapësinore përmes teknologjisë cloud.</p>
-                        <button onclick="openProjectModal('https://storymaps.arcgis.com/stories/43523107564d461fbb8ea118df18efd3', 'WEB GIS Lubonjë')" class="bg-white text-slate-950 px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white transition shadow-lg w-full md:w-auto">Shiko Hartën</button>
+                        <button onclick="event.stopPropagation(); openProjectModal('https://storymaps.arcgis.com/stories/43523107564d461fbb8ea118df18efd3', 'WEB GIS Lubonjë')" class="bg-white text-slate-950 px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white transition shadow-lg w-full md:w-auto">Shiko Hartën</button>
                     </div>
                     
                     <div class="mt-4 pt-4 border-t border-white/10 flex justify-between items-center group-hover:opacity-0 transition-opacity">
@@ -213,7 +217,7 @@
             </div>
 
             <!-- Projekt 2 -->
-            <div class="project-card h-[500px] md:h-[550px] bg-slate-900 rounded-[2.5rem] shadow-xl group">
+            <div class="project-card h-[500px] md:h-[550px] bg-slate-900 rounded-[2.5rem] shadow-xl group" onclick="toggleTouchCard(this)">
                 <div class="project-image-container absolute inset-0">
                     <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt="Monitorim">
                     <div class="absolute inset-0 image-overlay opacity-90"></div>
@@ -227,7 +231,7 @@
                     
                     <div class="content-reveal">
                         <p class="text-slate-300 text-sm mb-6 line-clamp-3">Analizë gjeohapësinore e mbulesës tokës duke përdorur Inteligjencën Artificiale për identifikimin e ndryshimeve në biomasë.</p>
-                        <button class="border border-white/30 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-slate-950 transition w-full md:w-auto">Detaje Teknike</button>
+                        <button onclick="event.stopPropagation()" class="border border-white/30 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-slate-950 transition w-full md:w-auto">Detaje Teknike</button>
                     </div>
                     
                     <div class="mt-4 pt-4 border-t border-white/10 flex justify-between items-center group-hover:opacity-0 transition-opacity">
@@ -238,7 +242,7 @@
             </div>
 
             <!-- Projekt 3 -->
-            <div class="project-card h-[500px] md:h-[550px] bg-slate-900 rounded-[2.5rem] shadow-xl group">
+            <div class="project-card h-[500px] md:h-[550px] bg-slate-900 rounded-[2.5rem] shadow-xl group" onclick="toggleTouchCard(this)">
                 <div class="project-image-container absolute inset-0">
                     <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1200" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt="3D Mapping">
                     <div class="absolute inset-0 image-overlay opacity-90"></div>
@@ -252,7 +256,7 @@
                     
                     <div class="content-reveal">
                         <p class="text-slate-300 text-sm mb-6 line-clamp-3">Gjenerimi i modeleve 3D të kalasë së Lezhës duke përdorur fotogrametrinë për ruajtjen dixhitale të monumentit.</p>
-                        <button onclick="openProjectModal('https://storymaps.arcgis.com/stories/136af9b1b3be4e889d61f2b25a7f64a4', 'Kalaja Lezhë 3D')" class="bg-orange-600 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition shadow-lg w-full md:w-auto">Eksploro Modelin</button>
+                        <button onclick="event.stopPropagation(); openProjectModal('https://storymaps.arcgis.com/stories/136af9b1b3be4e889d61f2b25a7f64a4', 'Kalaja Lezhë 3D')" class="bg-orange-600 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition shadow-lg w-full md:w-auto">Eksploro Modelin</button>
                     </div>
                     
                     <div class="mt-4 pt-4 border-t border-white/10 flex justify-between items-center group-hover:opacity-0 transition-opacity">
@@ -315,6 +319,24 @@
             else { scrollTopBtn.classList.remove('show'); }
         });
         scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+        /* SHTIMI I FUNKSIONIT TE KLIKIMIT PER MOBILE */
+        function toggleTouchCard(element) {
+            // Kontrollo nese jemi ne mobile (< 1024px)
+            if (window.innerWidth < 1024) {
+                const isActive = element.classList.contains('active-touch');
+                
+                // Mbyll te gjitha kartat e tjera
+                document.querySelectorAll('.project-card').forEach(card => {
+                    card.classList.remove('active-touch');
+                });
+
+                // Nese nuk ishte aktive, aktivizoje
+                if (!isActive) {
+                    element.classList.add('active-touch');
+                }
+            }
+        }
 
         const modal = document.getElementById('project-modal');
         const modalContent = document.getElementById('modal-content');
