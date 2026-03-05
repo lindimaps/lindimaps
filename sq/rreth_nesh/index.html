@@ -84,11 +84,11 @@
         .lang-item.active { box-shadow: 0 0 0 2px #3b82f6; }
         .flag-icon { width: 20px; height: 14px; object-fit: cover; border-radius: 2px; display: block; }
 
-        /* --- STILI I KARUSELIT 3D (Sipas versionit tend te suksesshem) --- */
+        /* --- STILI I KARUSELIT 3D --- */
         .carousel-3d-container {
             perspective: 1200px;
             width: 100%;
-            height: 420px; /* Lartesia e rregulluar */
+            height: 420px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -116,14 +116,14 @@
             background: #fff;
         }
 
-        /* Publication Carousel Items (Different size) */
+        /* Publication Carousel Items (Specific Size) */
+        #carousel-box { width: 200px; height: 280px; }
         #carousel-box .carousel-item {
             width: 200px;
             height: 280px;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        #carousel-box { width: 200px; height: 280px; }
 
         /* --- STILI I "MOCK FRAME" PER RRJETIN --- */
         .mock-frame {
@@ -168,9 +168,9 @@
         }
 
         .control-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
+            background: rgba(15, 23, 42, 0.05); /* Versioni i ndritur */
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            color: #0f172a;
             width: 44px;
             height: 44px;
             border-radius: 50%;
@@ -180,7 +180,14 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .control-btn:hover { background: #3b82f6; border-color: #3b82f6; transform: scale(1.1); }
+        .control-btn:hover { background: #3b82f6; border-color: #3b82f6; color: white; transform: scale(1.1); }
+
+        /* Stilimi per modalet (white icons) */
+        .modal-control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
 
         #publications-modal, #cv-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
         .cv-scroll-wrapper {
@@ -310,11 +317,11 @@
         </div>
     </section>
 
-    <!-- SEKSIONI I KARUSELIT 3D (Rrjeti Profesional) -->
-    <section class="py-24 bg-slate-950 text-white overflow-hidden">
+    <!-- SEKSIONI I RRJETIT PROFESIONAL (Sfondi i Bardhë, Titull i Zi) -->
+    <section class="py-24 bg-white overflow-hidden">
         <div class="max-w-7xl mx-auto px-6 text-center mb-16">
             <span class="text-blue-500 font-black text-[10px] uppercase tracking-[0.4em] mb-4 block">Lidhjet Dixhitale</span>
-            <h3 class="text-3xl md:text-5xl font-black uppercase tracking-tighter">Rrjeti Profesional</h3>
+            <h3 class="text-3xl md:text-5xl font-black uppercase tracking-tighter text-slate-900">Rrjeti Profesional</h3>
             <div class="h-1.5 w-16 bg-blue-600 mx-auto rounded-full mt-6"></div>
         </div>
 
@@ -528,10 +535,6 @@
                             <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                             <span>contact@lindimaps.com</span>
                         </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <span>Hën - Pre | 09:00 - 17:00</span>
-                        </li>
                     </ul>
                 </div>
             </div>
@@ -540,10 +543,6 @@
                 <p class="text-[11px] text-slate-500 font-bold tracking-widest uppercase">
                     © 2024 LindiMaps Studio. Të gjitha të drejtat të rezervuara.
                 </p>
-                <div class="flex gap-8 text-[11px] text-slate-500 font-bold tracking-widest uppercase">
-                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
-                </div>
             </div>
         </div>
     </footer>
@@ -567,8 +566,8 @@
                 </div>
             </div>
             <div class="carousel-controls">
-                <button id="prev-slide" class="control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <button id="next-slide" class="control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
+                <button id="prev-slide" class="control-btn modal-control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+                <button id="next-slide" class="control-btn modal-control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
             </div>
         </div>
     </div>
@@ -614,10 +613,7 @@
         });
         scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
-        // Publications Carousel Logic (Original)
-        const modalPub = document.getElementById('publications-modal');
-        const triggerPub = document.getElementById('co-author-trigger');
-        const closeBtnPub = document.getElementById('close-modal');
+        // --- LOGJIKA ORIGJINALE E KARUSELIT TE BOTIMEVE (CO-AUTHOR) ---
         const carouselBox = document.getElementById('carousel-box');
         const prevBtn = document.getElementById('prev-slide');
         const nextBtn = document.getElementById('next-slide');
@@ -640,6 +636,10 @@
         nextBtn.addEventListener('click', () => { currentIndex++; updateCarouselPosition(); });
         prevBtn.addEventListener('click', () => { currentIndex--; updateCarouselPosition(); });
         
+        const modalPub = document.getElementById('publications-modal');
+        const triggerPub = document.getElementById('co-author-trigger');
+        const closeBtnPub = document.getElementById('close-modal');
+
         triggerPub.addEventListener('click', () => {
             modalPub.classList.remove('invisible', 'opacity-0');
             modalPub.classList.add('visible', 'opacity-100');
@@ -672,7 +672,7 @@
         };
         closeBtnCv.addEventListener('click', closeModalCv);
 
-        // --- FUNKSIONI I PERDITESUAR PER RRJETIN PROFESIONAL (Sipas ver. tend) ---
+        // --- FUNKSIONI PER KARUSELIN 3D TE RRJETIT ---
         function setup3DCarousel(containerId, prevBtnId, nextBtnId, zTranslate = 300) {
             const box = document.getElementById(containerId);
             const prev = document.getElementById(prevBtnId);
@@ -705,7 +705,7 @@
         }
 
         window.onload = function () {
-            // Inicializo karuselin e rrjetit profesional me 300px thellesi
+            // Inicializo rrjetin profesional
             setup3DCarousel('network-carousel-box', 'net-prev', 'net-next', 300);
             updateCarouselPosition();
         }
