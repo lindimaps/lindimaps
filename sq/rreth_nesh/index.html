@@ -168,7 +168,7 @@
         }
 
         .control-btn {
-            background: rgba(15, 23, 42, 0.05); /* Versioni i ndritur */
+            background: rgba(15, 23, 42, 0.05);
             border: 1px solid rgba(15, 23, 42, 0.1);
             color: #0f172a;
             width: 44px;
@@ -479,7 +479,7 @@
         </div>
     </section>
 
-    <!-- Professional Footer (The Footprint) -->
+  <!-- Professional Footer (The Footprint) -->
     <footer class="bg-slate-950 text-white border-t border-white/5 pt-20 pb-10">
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
@@ -548,29 +548,18 @@
                 </div>
             </div>
 
-            <!-- Bottom Bar -->
-            <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-                <p class="text-[11px] text-slate-500 font-bold tracking-widest uppercase">
-                    © 2024 LindiMaps Studio. Të gjitha të drejtat të rezervuara.
-                </p>
-                <div class="flex gap-8 text-[11px] text-slate-500 font-bold tracking-widest uppercase">
-                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
-                </div>
-            </div>
-        </div>
-    </footer>
 
     <!-- Publications Modal -->
     <div id="publications-modal" class="fixed inset-0 z-[5000] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl opacity-0 invisible">
-        <div class="relative w-full max-w-4xl">
+        <div class="relative w-full max-w-4xl flex flex-col items-center">
             <button id="close-modal" class="absolute -top-12 right-0 text-white hover:text-blue-400 flex items-center gap-2 font-black uppercase text-xs tracking-widest transition">
                 Mbyll <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
-            <div class="text-center mb-10">
+            <div class="text-center mb-10 w-full">
                 <span class="text-blue-500 font-black text-[10px] uppercase tracking-[0.4em] mb-2 block">Portofoli Akademik</span>
                 <h3 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">Botimet Shkencore</h3>
             </div>
+            
             <div class="carousel-3d-container">
                 <div id="carousel-box" class="carousel-3d">
                     <a href="https://www.intechopen.com/chapters/1218612" target="_blank" class="carousel-item"><img src="https://fujqjgcciajwfbsvmlnk.supabase.co/storage/v1/object/sign/Media/Botimet%20Shkencore%20Kopertinat/Island%20Ecology.JPG?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MDk0YTIxNy0zZDE5LTQwNTMtYjk3Yy05ZjI0MzI1ZTkxNjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpYS9Cb3RpbWV0IFNoa2VuY29yZSBLb3BlcnRpbmF0L0lzbGFuZCBFY29sb2d5LkpQRyIsImlhdCI6MTc3MjMxOTU4OCwiZXhwIjoxODAzODU1NTg4fQ.qAcF_l74get0ZpvOQOf7TcZts6SN6hTtQQM9mo2-vEM" alt="Publikim 1"></a>
@@ -579,7 +568,9 @@
                     <a href="https://www.researchgate.net/publication/393674156_LUBONJA_-_NJE_KAPITULL_I_RI_NE_TRASHEGIMINE_KULTURORE_DHE_NATYRORE_SHQIPTARE?channel=doi&linkId=687540da3c12dc437a3eb078&showFulltext=true" target="_blank" class="carousel-item"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTn5tXM0v-m4XJ9LhSS171CVOkDlhB0ZqtVA&s" alt="Publikim 4"></a>
                 </div>
             </div>
-            <div class="carousel-controls">
+
+            <!-- BUTONAT E MODALIT - TASHME NE QENDER TE PLOTE -->
+            <div class="flex justify-center gap-10 mt-10 w-full">
                 <button id="prev-slide" class="control-btn modal-control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
                 <button id="next-slide" class="control-btn modal-control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
             </div>
