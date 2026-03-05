@@ -93,14 +93,19 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            cursor: grab;
         }
+        .carousel-3d-container:active { cursor: grabbing; }
+        
         .carousel-3d {
             position: relative;
             width: 240px;
             height: 320px;
             transform-style: preserve-3d;
             transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none; /* Lejon drag ne container */
         }
+        
         .carousel-item {
             position: absolute;
             width: 240px;
@@ -112,13 +117,14 @@
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            transition: opacity 0.5s, filter 0.5s;
+            transition: opacity 0.5s, filter 0.5s, transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
             background: #fff;
+            pointer-events: auto; /* Aktivizon klikimin ne linke */
         }
 
         /* Publication Carousel Items (Specific Size) */
-        #carousel-box { width: 200px; height: 280px; }
-        #carousel-box .carousel-item {
+        #pub-carousel-box { width: 200px; height: 280px; }
+        #pub-carousel-box .carousel-item {
             width: 200px;
             height: 280px;
             border-radius: 12px;
@@ -152,10 +158,13 @@
             text-align: center;
         }
         .network-logo {
-            max-width: 120px;
-            max-height: 80px;
+            width: auto;
+            height: auto;
+            max-width: 80%;
+            max-height: 85px;
             object-fit: contain;
             margin-bottom: 16px;
+            flex-shrink: 0;
         }
         .frame-footer {
             padding: 12px;
@@ -182,14 +191,14 @@
         }
         .control-btn:hover { background: #3b82f6; border-color: #3b82f6; color: white; transform: scale(1.1); }
 
-        /* Stilimi per modalet (white icons) */
+        /* Modal specific controls (white) */
         .modal-control-btn {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
         }
 
-        #publications-modal, #cv-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
+        #publications-modal, #network-modal, #cv-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
         .cv-scroll-wrapper {
             position: relative;
             width: 100%;
@@ -307,9 +316,15 @@
                             <span class="text-3xl font-black text-slate-900">GIS</span>
                             <span class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Specializimi</span>
                         </div>
+                        <!-- Botimet Trigger -->
                         <div class="flex flex-col cursor-pointer group" id="co-author-trigger">
                             <span class="text-3xl font-black text-slate-900 group-hover:text-blue-600 transition">Co-Author</span>
-                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-widest flex items-center gap-1">Publikime Shkencore <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></span>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-widest flex items-center gap-1">Botime Shkencore <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></span>
+                        </div>
+                        <!-- Rrjeti Trigger -->
+                        <div class="flex flex-col cursor-pointer group" id="network-trigger">
+                            <span class="text-3xl font-black text-slate-900 group-hover:text-blue-600 transition">Prezenca</span>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-widest flex items-center gap-1">Lidhjet Dixhitale <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></span>
                         </div>
                     </div>
                 </div>
@@ -317,110 +332,7 @@
         </div>
     </section>
 
-    <!-- SEKSIONI I RRJETIT PROFESIONAL (Përshtatur si kartë me sfond të bardhë) -->
-    <section class="py-12 max-w-7xl mx-auto px-6">
-        <div class="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 overflow-hidden border border-slate-100 py-20 relative">
-            <div class="text-center mb-16 px-6">
-                <span class="text-blue-500 font-black text-[10px] uppercase tracking-[0.4em] mb-4 block">Lidhjet Dixhitale</span>
-                <h3 class="text-3xl md:text-5xl font-black uppercase tracking-tighter text-slate-900">Rrjeti Profesional</h3>
-                <div class="h-1.5 w-16 bg-blue-600 mx-auto rounded-full mt-6"></div>
-            </div>
-
-            <div class="carousel-3d-container">
-                <div id="network-carousel-box" class="carousel-3d">
-                    <!-- LinkedIn -->
-                    <a href="https://www.linkedin.com/in/erland-alla/" target="_blank" class="carousel-item">
-                        <div class="mock-frame">
-                            <div class="frame-header">
-                                <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
-                            </div>
-                            <div class="frame-body">
-                                <svg class="network-logo" fill="#0077b5" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                                <h5 class="text-slate-900 font-black uppercase text-xs">LinkedIn</h5>
-                            </div>
-                            <div class="frame-footer">linkedin.com</div>
-                        </div>
-                    </a>
-
-                    <!-- ResearchGate -->
-                    <a href="https://www.researchgate.net/profile/Erland-Alla" target="_blank" class="carousel-item">
-                        <div class="mock-frame">
-                            <div class="frame-header">
-                                <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
-                            </div>
-                            <div class="frame-body">
-                                <img src="data:image/png;base64,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" class="network-logo" alt="ResearchGate">
-                                <h5 class="text-slate-900 font-black uppercase text-xs">ResearchGate</h5>
-                            </div>
-                            <div class="frame-footer">researchgate.net</div>
-                        </div>
-                    </a>
-
-                    <!-- Google Scholar -->
-                    <a href="https://scholar.google.com/citations?user=8HofjlEAAAAJ&hl=en" target="_blank" class="carousel-item">
-                        <div class="mock-frame">
-                            <div class="frame-header">
-                                <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
-                            </div>
-                            <div class="frame-body">
-                                <img src="https://scholar.google.com/intl/en/scholar/images/2x/scholar_logo_64dp.png" class="network-logo" alt="Google Scholar">
-                                <h5 class="text-slate-900 font-black uppercase text-xs">Google Scholar</h5>
-                            </div>
-                            <div class="frame-footer">scholar.google.com</div>
-                        </div>
-                    </a>
-
-                    <!-- ORCID -->
-                    <a href="https://orcid.org/0009-0008-5121-7564" target="_blank" class="carousel-item">
-                        <div class="mock-frame">
-                            <div class="frame-header">
-                                <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
-                            </div>
-                            <div class="frame-body">
-                                <img src="https://orcid.org/assets/vectors/orcid.logo.svg" class="network-logo" alt="ORCID">
-                                <h5 class="text-slate-900 font-black uppercase text-xs">ORCID iD</h5>
-                            </div>
-                            <div class="frame-footer">orcid.org</div>
-                        </div>
-                    </a>
-
-                    <!-- IntechOpen -->
-                    <a href="https://www.intechopen.com/profiles/635428" target="_blank" class="carousel-item">
-                        <div class="mock-frame">
-                            <div class="frame-header">
-                                <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
-                            </div>
-                            <div class="frame-body">
-                                <img src="https://media.licdn.com/dms/image/v2/D560BAQFBSVMtCL2fdA/company-logo_100_100/B56ZZjK1LxGQAQ-/0/1745420506274/intechopen_logo?e=1774483200&v=beta&t=Dum6ItscxBCUhKvxkm3C8QubZ_ARad4u2Mjil0WsoCk" class="network-logo" alt="IntechOpen">
-                                <h5 class="text-slate-900 font-black uppercase text-xs">IntechOpen</h5>
-                            </div>
-                            <div class="frame-footer">intechopen.com</div>
-                        </div>
-                    </a>
-
-                    <!-- Geo-WB6 -->
-                    <a href="https://www.geo-wb6.net/network" target="_blank" class="carousel-item">
-                        <div class="mock-frame">
-                            <div class="frame-header">
-                                <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
-                            </div>
-                            <div class="frame-body">
-                                <img src="https://files.cdn-files-a.com/uploads/9342349/400_filter_nobg_66b6b279b7c19.png" class="network-logo" alt="GeoWeb6">
-                                <h5 class="text-slate-900 font-black uppercase text-xs">Geo-WB6</h5>
-                            </div>
-                            <div class="frame-footer">geo-wb6.net</div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <div class="flex justify-center gap-10 mt-12 px-6">
-                <button id="net-prev" class="control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <button id="net-next" class="control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-            </div>
-        </div>
-    </section>
-
+    <!-- Historia Section -->
     <section class="py-24 bg-white border-y border-slate-100">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-20">
@@ -458,6 +370,7 @@
         </div>
     </section>
 
+    <!-- Vlerat Section -->
     <section class="py-24 bg-slate-900 text-white">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-20">
@@ -551,35 +464,103 @@
             </div>
 
 
-    <!-- Publications Modal -->
+    <!-- MODAL 1: BOTIMET SHKENCORE (PUBLICATIONS) -->
     <div id="publications-modal" class="fixed inset-0 z-[5000] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl opacity-0 invisible">
-        <div class="relative w-full max-w-4xl flex flex-col items-center">
-            <button id="close-modal" class="absolute -top-12 right-0 text-white hover:text-blue-400 flex items-center gap-2 font-black uppercase text-xs tracking-widest transition">
-                Mbyll <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
+        <div class="relative w-full max-w-4xl flex flex-col items-center bg-white/5 p-8 rounded-[2.5rem] border border-white/10">
+            <div class="w-full flex justify-end mb-4">
+                <button id="close-pub" class="text-white hover:text-blue-400 flex items-center gap-2 font-black uppercase text-xs tracking-widest transition group">
+                    <span>Mbyll</span>
+                    <div class="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-red-500/20 group-hover:text-red-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </div>
+                </button>
+            </div>
             <div class="text-center mb-10 w-full">
                 <span class="text-blue-500 font-black text-[10px] uppercase tracking-[0.4em] mb-2 block">Portofoli Akademik</span>
                 <h3 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">Botimet Shkencore</h3>
             </div>
-            
             <div class="carousel-3d-container">
-                <div id="carousel-box" class="carousel-3d">
+                <div id="pub-carousel-box" class="carousel-3d">
                     <a href="https://www.intechopen.com/chapters/1218612" target="_blank" class="carousel-item"><img src="https://fujqjgcciajwfbsvmlnk.supabase.co/storage/v1/object/sign/Media/Botimet%20Shkencore%20Kopertinat/Island%20Ecology.JPG?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MDk0YTIxNy0zZDE5LTQwNTMtYjk3Yy05ZjI0MzI1ZTkxNjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpYS9Cb3RpbWV0IFNoa2VuY29yZSBLb3BlcnRpbmF0L0lzbGFuZCBFY29sb2d5LkpQRyIsImlhdCI6MTc3MjMxOTU4OCwiZXhwIjoxODAzODU1NTg4fQ.qAcF_l74get0ZpvOQOf7TcZts6SN6hTtQQM9mo2-vEM" alt="Publikim 1"></a>
                     <a href="https://www.intechopen.com/chapters/1218612" target="_blank" class="carousel-item"><img src="https://fujqjgcciajwfbsvmlnk.supabase.co/storage/v1/object/sign/Media/Botimet%20Shkencore%20Kopertinat/Heritage%20Management.JPG?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MDk0YTIxNy0zZDE5LTQwNTMtYjk3Yy05ZjI0MzI1ZTkxNjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpYS9Cb3RpbWV0IFNoa2VuY29yZSBLb3BlcnRpbmF0L0hlcml0YWdlIE1hbmFnZW1lbnQuSlBHIiwiaWF0IjoxNzcyMzE5NTQ3LCJleHAiOjE4MDM4NTU1NDd9.swDyzezu6Y-VNN44Dp_JUeWOl41UNMCmlGG0Fma-Ork" alt="Publikim 2"></a>
                     <a href="https://online-journals.org/index.php/i-jim/article/view/54599" target="_blank" class="carousel-item"><img src="https://online-journals.org/public/journals/4/cover_issue_1275_en_US.png" alt="Publikim 3"></a>
                     <a href="https://www.researchgate.net/publication/393674156_LUBONJA_-_NJE_KAPITULL_I_RI_NE_TRASHEGIMINE_KULTURORE_DHE_NATYRORE_SHQIPTARE?channel=doi&linkId=687540da3c12dc437a3eb078&showFulltext=true" target="_blank" class="carousel-item"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTn5tXM0v-m4XJ9LhSS171CVOkDlhB0ZqtVA&s" alt="Publikim 4"></a>
                 </div>
             </div>
-
-            <!-- BUTONAT E MODALIT - TASHME NE QENDER TE PLOTE -->
             <div class="flex justify-center gap-10 mt-10 w-full">
-                <button id="prev-slide" class="control-btn modal-control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <button id="next-slide" class="control-btn modal-control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
+                <button id="pub-prev" class="control-btn modal-control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+                <button id="pub-next" class="control-btn modal-control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
             </div>
         </div>
     </div>
 
-    <!-- CV Modal -->
+    <!-- MODAL 2: RRJETI PROFESIONAL (NETWORK) -->
+    <div id="network-modal" class="fixed inset-0 z-[5000] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl opacity-0 invisible">
+        <div class="relative w-full max-w-4xl flex flex-col items-center bg-white/5 p-8 rounded-[2.5rem] border border-white/10">
+            <div class="w-full flex justify-end mb-4">
+                <button id="close-net" class="text-white hover:text-blue-400 flex items-center gap-2 font-black uppercase text-xs tracking-widest transition group">
+                    <span>Mbyll</span>
+                    <div class="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-red-500/20 group-hover:text-red-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </div>
+                </button>
+            </div>
+            <div class="text-center mb-10 w-full">
+                <span class="text-blue-500 font-black text-[10px] uppercase tracking-[0.4em] mb-2 block">Prezenca Dixhitale</span>
+                <h3 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">Rrjeti Profesional</h3>
+            </div>
+            <div class="carousel-3d-container">
+                <div id="net-carousel-box" class="carousel-3d">
+                    <a href="https://www.linkedin.com/in/erland-alla/" target="_blank" class="carousel-item">
+                        <div class="mock-frame">
+                            <div class="frame-header"><div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div></div>
+                            <div class="frame-body">
+                                <svg class="network-logo" fill="#0077b5" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                                <h5 class="text-slate-900 font-black uppercase text-xs">LinkedIn</h5>
+                            </div>
+                            <div class="frame-footer">linkedin.com</div>
+                        </div>
+                    </a>
+                    <a href="https://www.researchgate.net/profile/Erland-Alla" target="_blank" class="carousel-item">
+                        <div class="mock-frame">
+                            <div class="frame-header"><div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div></div>
+                            <div class="frame-body">
+                                <img src="https://c5.rgstatic.net/m/32868743212969/images/template/rg_logo_square_brand.png" class="network-logo" alt="ResearchGate">
+                                <h5 class="text-slate-900 font-black uppercase text-xs">ResearchGate</h5>
+                            </div>
+                            <div class="frame-footer">researchgate.net</div>
+                        </div>
+                    </a>
+                    <a href="https://scholar.google.com/citations?user=8HofjlEAAAAJ&hl=en" target="_blank" class="carousel-item">
+                        <div class="mock-frame">
+                            <div class="frame-header"><div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div></div>
+                            <div class="frame-body">
+                                <img src="https://scholar.google.com/intl/en/scholar/images/2x/scholar_logo_64dp.png" class="network-logo" alt="Google Scholar">
+                                <h5 class="text-slate-900 font-black uppercase text-xs">Google Scholar</h5>
+                            </div>
+                            <div class="frame-footer">scholar.google.com</div>
+                        </div>
+                    </a>
+                    <a href="https://orcid.org/0009-0008-5121-7564" target="_blank" class="carousel-item">
+                        <div class="mock-frame">
+                            <div class="frame-header"><div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div></div>
+                            <div class="frame-body">
+                                <img src="https://orcid.org/assets/vectors/orcid.logo.svg" class="network-logo" alt="ORCID">
+                                <h5 class="text-slate-900 font-black uppercase text-xs">ORCID iD</h5>
+                            </div>
+                            <div class="frame-footer">orcid.org</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="flex justify-center gap-10 mt-10 w-full">
+                <button id="net-prev" class="control-btn modal-control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+                <button id="net-next" class="control-btn modal-control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: CV -->
     <div id="cv-modal" class="fixed inset-0 z-[6000] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-2xl opacity-0 invisible">
         <div class="relative w-full max-w-3xl h-[85vh] flex flex-col bg-white/5 p-4 rounded-[2.5rem] border border-white/10">
             <div class="flex items-center justify-between mb-4 px-2">
@@ -605,12 +586,10 @@
     </button>
 
     <script>
-        // Menu Mobile Logic
         const menuBtn = document.getElementById('menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
         menuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
 
-        // Scroll to Top Logic
         const scrollTopBtn = document.getElementById('scroll-to-top');
         window.addEventListener('scroll', () => {
             const scrollPosition = window.innerHeight + window.pageYOffset;
@@ -620,79 +599,25 @@
         });
         scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
-        // --- LOGJIKA ORIGJINALE E KARUSELIT TE BOTIMEVE (CO-AUTHOR) ---
-        const carouselBox = document.getElementById('carousel-box');
-        const prevBtn = document.getElementById('prev-slide');
-        const nextBtn = document.getElementById('next-slide');
-        const items = carouselBox.querySelectorAll('.carousel-item');
-        
-        let currentIndex = 0;
-        const totalItems = items.length;
-        const angleUnit = 360 / totalItems;
-
-        function updateCarouselPosition() {
-            carouselBox.style.transform = `rotateY(${currentIndex * -angleUnit}deg)`;
-            items.forEach((item, index) => {
-                item.style.transform = `rotateY(${index * angleUnit}deg) translateZ(250px)`;
-                const normalizedCurrent = ((currentIndex % totalItems) + totalItems) % totalItems;
-                item.style.opacity = index === normalizedCurrent ? "1" : "0.4";
-                item.style.filter = index === normalizedCurrent ? "none" : "grayscale(0.5) blur(1px)";
-            });
-        }
-
-        nextBtn.addEventListener('click', () => { currentIndex++; updateCarouselPosition(); });
-        prevBtn.addEventListener('click', () => { currentIndex--; updateCarouselPosition(); });
-        
-        const modalPub = document.getElementById('publications-modal');
-        const triggerPub = document.getElementById('co-author-trigger');
-        const closeBtnPub = document.getElementById('close-modal');
-
-        triggerPub.addEventListener('click', () => {
-            modalPub.classList.remove('invisible', 'opacity-0');
-            modalPub.classList.add('visible', 'opacity-100');
-            document.body.style.overflow = 'hidden';
-            updateCarouselPosition();
-        });
-
-        const closeModalPub = () => {
-            modalPub.classList.add('invisible', 'opacity-0');
-            modalPub.classList.remove('visible', 'opacity-100');
-            document.body.style.overflow = 'auto';
-        };
-        closeBtnPub.addEventListener('click', closeModalPub);
-
-        // CV Modal Logic
-        const modalCv = document.getElementById('cv-modal');
-        const triggerCv = document.getElementById('cv-trigger');
-        const closeBtnCv = document.getElementById('close-cv');
-
-        triggerCv.addEventListener('click', () => {
-            modalCv.classList.remove('invisible', 'opacity-0');
-            modalCv.classList.add('visible', 'opacity-100');
-            document.body.style.overflow = 'hidden';
-        });
-
-        const closeModalCv = () => {
-            modalCv.classList.add('invisible', 'opacity-0');
-            modalCv.classList.remove('visible', 'opacity-100');
-            document.body.style.overflow = 'auto';
-        };
-        closeBtnCv.addEventListener('click', closeModalCv);
-
-        // --- FUNKSIONI PER KARUSELIN 3D TE RRJETIT ---
+        // --- FUNKSIONI UNIVERZAL PER KARUSELIN 3D ME DRAG & SWIPE ---
         function setup3DCarousel(containerId, prevBtnId, nextBtnId, zTranslate = 300) {
+            const container = document.getElementById(containerId).parentElement;
             const box = document.getElementById(containerId);
             const prev = document.getElementById(prevBtnId);
             const next = document.getElementById(nextBtnId);
-            const carouselItems = box.querySelectorAll('.carousel-item');
+            const items = box.querySelectorAll('.carousel-item');
             
             let currentIdx = 0;
-            const total = carouselItems.length;
+            const total = items.length;
             const angle = 360 / total;
+
+            let isDragging = false;
+            let startX = 0;
+            let currentRotation = 0;
 
             function update() {
                 box.style.transform = `rotateY(${currentIdx * -angle}deg)`;
-                carouselItems.forEach((item, index) => {
+                items.forEach((item, index) => {
                     item.style.transform = `rotateY(${index * angle}deg) translateZ(${zTranslate}px)`;
                     const norm = ((currentIdx % total) + total) % total;
                     if (index === norm) {
@@ -706,21 +631,109 @@
                     }
                 });
             }
-            next.addEventListener('click', () => { currentIdx++; update(); });
-            prev.addEventListener('click', () => { currentIdx--; update(); });
+
+            // Button controls
+            next.onclick = (e) => { e.stopPropagation(); currentIdx++; update(); };
+            prev.onclick = (e) => { e.stopPropagation(); currentIdx--; update(); };
+
+            // Drag/Swipe controls
+            const onStart = (e) => {
+                isDragging = true;
+                startX = e.pageX || e.touches[0].pageX;
+                box.style.transition = 'none';
+            };
+
+            const onMove = (e) => {
+                if (!isDragging) return;
+                const x = e.pageX || e.touches[0].pageX;
+                const diff = (x - startX) * 0.5; // Sensitivity
+                box.style.transform = `rotateY(${(currentIdx * -angle) + diff}deg)`;
+            };
+
+            const onEnd = (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                const x = e.changedTouches ? e.changedTouches[0].pageX : e.pageX;
+                const diff = x - startX;
+                
+                box.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+                
+                if (Math.abs(diff) > 50) { // Threshold for slide
+                    if (diff > 0) currentIdx--;
+                    else currentIdx++;
+                }
+                update();
+            };
+
+            container.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+            
+            container.addEventListener('touchstart', onStart, { passive: true });
+            container.addEventListener('touchmove', onMove, { passive: true });
+            container.addEventListener('touchend', onEnd);
+
             update();
         }
 
-        window.onload = function () {
-            // Inicializo rrjetin profesional
-            setup3DCarousel('network-carousel-box', 'net-prev', 'net-next', 300);
-            updateCarouselPosition();
-        }
+        // Modals Management
+        const modalPub = document.getElementById('publications-modal');
+        const triggerPub = document.getElementById('co-author-trigger');
+        const closePub = document.getElementById('close-pub');
 
-        window.addEventListener('click', (e) => {
-            if (e.target === modalPub) closeModalPub();
-            if (e.target === modalCv) closeModalCv();
+        triggerPub.addEventListener('click', () => {
+            modalPub.classList.remove('invisible', 'opacity-0');
+            modalPub.classList.add('visible', 'opacity-100');
+            document.body.style.overflow = 'hidden';
+            setup3DCarousel('pub-carousel-box', 'pub-prev', 'pub-next', 250);
         });
+
+        closePub.addEventListener('click', () => {
+            modalPub.classList.add('invisible', 'opacity-0');
+            modalPub.classList.remove('visible', 'opacity-100');
+            document.body.style.overflow = 'auto';
+        });
+
+        const modalNet = document.getElementById('network-modal');
+        const triggerNet = document.getElementById('network-trigger');
+        const closeNet = document.getElementById('close-net');
+
+        triggerNet.addEventListener('click', () => {
+            modalNet.classList.remove('invisible', 'opacity-0');
+            modalNet.classList.add('visible', 'opacity-100');
+            document.body.style.overflow = 'hidden';
+            setup3DCarousel('net-carousel-box', 'net-prev', 'net-next', 300);
+        });
+
+        closeNet.addEventListener('click', () => {
+            modalNet.classList.add('invisible', 'opacity-0');
+            modalNet.classList.remove('visible', 'opacity-100');
+            document.body.style.overflow = 'auto';
+        });
+
+        // CV Modal Logic
+        const modalCv = document.getElementById('cv-modal');
+        const triggerCv = document.getElementById('cv-trigger');
+        const closeCv = document.getElementById('close-cv');
+
+        triggerCv.addEventListener('click', () => {
+            modalCv.classList.remove('invisible', 'opacity-0');
+            modalCv.classList.add('visible', 'opacity-100');
+            document.body.style.overflow = 'hidden';
+        });
+        const closeModalCv = () => {
+            modalCv.classList.add('invisible', 'opacity-0');
+            modalCv.classList.remove('visible', 'opacity-100');
+            document.body.style.overflow = 'auto';
+        };
+        closeCv.addEventListener('click', closeModalCv);
+
+        // Close on outside click
+        window.onclick = (e) => {
+            if (e.target === modalPub) closePub.click();
+            if (e.target === modalNet) closeNet.click();
+            if (e.target === modalCv) closeModalCv();
+        };
     </script>
 </body>
 </html>
