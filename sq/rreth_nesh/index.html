@@ -138,14 +138,57 @@
 
         #publications-modal, #cv-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
         
-        /* Fixed Scroll Fix for Mobile iFrames */
         .cv-scroll-wrapper {
             position: relative;
             width: 100%;
             height: 100%;
             overflow: auto;
-            -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
+            -webkit-overflow-scrolling: touch;
         }
+
+        /* --- STILI I RI PER RRJETIN PROFESIONAL --- */
+        .mock-frame {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            background: #f8fafc;
+        }
+        .frame-header {
+            height: 32px;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 6px;
+        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .frame-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+        .network-logo {
+            max-width: 120px;
+            max-height: 80px;
+            object-fit: contain;
+            margin-bottom: 16px;
+        }
+        .frame-footer {
+            padding: 12px;
+            background: white;
+            border-top: 1px solid #f1f5f9;
+            font-size: 10px;
+            color: #64748b;
+            text-align: center;
+            font-weight: bold;
+        }
+        .network-item { background: #fff; width: 240px; height: 320px; }
+        #network-carousel-box { width: 240px; height: 320px; }
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
@@ -263,6 +306,109 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- SEKSIONI I RI: KARUSELI I RRJETIT PROFESIONAL -->
+    <section class="py-24 bg-slate-950 text-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 text-center mb-16">
+            <span class="text-blue-500 font-black text-[10px] uppercase tracking-[0.4em] mb-4 block">Lidhjet Dixhitale</span>
+            <h3 class="text-3xl md:text-5xl font-black uppercase tracking-tighter">Rrjeti Profesional</h3>
+            <div class="h-1.5 w-16 bg-blue-600 mx-auto rounded-full mt-6"></div>
+        </div>
+
+        <div class="carousel-3d-container">
+            <div id="network-carousel-box" class="carousel-3d">
+                
+                <!-- LinkedIn -->
+                <a href="https://www.linkedin.com/in/erland-alla/" target="_blank" class="carousel-item network-item">
+                    <div class="mock-frame">
+                        <div class="frame-header">
+                            <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
+                        </div>
+                        <div class="frame-body">
+                            <svg class="network-logo" fill="#0077b5" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                            <h5 class="text-slate-900 font-black uppercase text-xs">LinkedIn</h5>
+                        </div>
+                        <div class="frame-footer">linkedin.com</div>
+                    </div>
+                </a>
+
+                <!-- ResearchGate -->
+                <a href="https://www.researchgate.net/profile/Erland-Alla" target="_blank" class="carousel-item network-item">
+                    <div class="mock-frame">
+                        <div class="frame-header">
+                            <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
+                        </div>
+                        <div class="frame-body">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/ResearchGate_icon_Logo.png" class="network-logo" alt="ResearchGate">
+                            <h5 class="text-slate-900 font-black uppercase text-xs">ResearchGate</h5>
+                        </div>
+                        <div class="frame-footer">researchgate.net</div>
+                    </div>
+                </a>
+
+                <!-- Google Scholar -->
+                <a href="https://scholar.google.com/citations?user=8HofjlEAAAAJ&hl=en" target="_blank" class="carousel-item network-item">
+                    <div class="mock-frame">
+                        <div class="frame-header">
+                            <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
+                        </div>
+                        <div class="frame-body">
+                            <img src="https://scholar.google.com/intl/en/scholar/images/2x/scholar_logo_64dp.png" class="network-logo" alt="Google Scholar">
+                            <h5 class="text-slate-900 font-black uppercase text-xs">Google Scholar</h5>
+                        </div>
+                        <div class="frame-footer">scholar.google.com</div>
+                    </div>
+                </a>
+
+                <!-- ORCID -->
+                <a href="https://orcid.org/0009-0008-5121-7564" target="_blank" class="carousel-item network-item">
+                    <div class="mock-frame">
+                        <div class="frame-header">
+                            <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
+                        </div>
+                        <div class="frame-body">
+                            <img src="https://orcid.org/assets/vectors/orcid.logo.svg" class="network-logo" alt="ORCID">
+                            <h5 class="text-slate-900 font-black uppercase text-xs">ORCID iD</h5>
+                        </div>
+                        <div class="frame-footer">orcid.org</div>
+                    </div>
+                </a>
+
+                <!-- IntechOpen -->
+                <a href="https://www.intechopen.com/profiles/635428" target="_blank" class="carousel-item network-item">
+                    <div class="mock-frame">
+                        <div class="frame-header">
+                            <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
+                        </div>
+                        <div class="frame-body">
+                            <img src="https://cdnintech.com/web/frontend/www/assets/06.74/svg/20logo.svg" class="network-logo" alt="IntechOpen">
+                            <h5 class="text-slate-900 font-black uppercase text-xs">IntechOpen</h5>
+                        </div>
+                        <div class="frame-footer">intechopen.com</div>
+                    </div>
+                </a>
+
+                <!-- Geo-WB6 -->
+                <a href="https://www.geo-wb6.net/network" target="_blank" class="carousel-item network-item">
+                    <div class="mock-frame">
+                        <div class="frame-header">
+                            <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
+                        </div>
+                        <div class="frame-body">
+                            <img src="https://files.cdn-files-a.com/uploads/9342349/400_filter_nobg_66b6b279b7c19.png" class="network-logo" alt="GeoWeb6">
+                            <h5 class="text-slate-900 font-black uppercase text-xs">Geo-WB6</h5>
+                        </div>
+                        <div class="frame-footer">geo-wb6.net</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="flex justify-center gap-10 mt-12">
+            <button id="net-prev" class="control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <button id="net-next" class="control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </div>
     </section>
 
@@ -448,7 +594,6 @@
                     </div>
                 </button>
             </div>
-            <!-- Wrapper added to ensure scrolling works on all mobile devices -->
             <div class="flex-1 bg-white rounded-2xl overflow-hidden shadow-inner relative cv-scroll-wrapper">
                 <iframe src="https://fujqjgcciajwfbsvmlnk.supabase.co/storage/v1/object/public/lindimaps-academy/qgis/1_intro.pdf#toolbar=0&navpanes=0&scrollbar=1" class="w-full h-full border-none min-h-[600px]"></iframe>
             </div>
@@ -460,10 +605,12 @@
     </button>
 
     <script>
+        // Menu Mobile Logic
         const menuBtn = document.getElementById('menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
         menuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
 
+        // Scroll to Top Logic
         const scrollTopBtn = document.getElementById('scroll-to-top');
         window.addEventListener('scroll', () => {
             const scrollPosition = window.innerHeight + window.pageYOffset;
@@ -473,13 +620,14 @@
         });
         scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
+        // Original Publication Carousel Logic
         const modalPub = document.getElementById('publications-modal');
         const triggerPub = document.getElementById('co-author-trigger');
         const closeBtnPub = document.getElementById('close-modal');
         const carouselBox = document.getElementById('carousel-box');
         const prevBtn = document.getElementById('prev-slide');
         const nextBtn = document.getElementById('next-slide');
-        const items = document.querySelectorAll('.carousel-item');
+        const items = carouselBox.querySelectorAll('.carousel-item');
         
         let currentIndex = 0;
         const totalItems = items.length;
@@ -512,6 +660,7 @@
         };
         closeBtnPub.addEventListener('click', closeModalPub);
 
+        // CV Modal Logic
         const modalCv = document.getElementById('cv-modal');
         const triggerCv = document.getElementById('cv-trigger');
         const closeBtnCv = document.getElementById('close-cv');
@@ -529,12 +678,48 @@
         };
         closeBtnCv.addEventListener('click', closeModalCv);
 
+        // --- FUNKSIONI I RI PER KARUSELIN 3D TE RRJETIT ---
+        function setup3DCarousel(containerId, prevBtnId, nextBtnId, zTranslate = 300) {
+            const box = document.getElementById(containerId);
+            const prev = document.getElementById(prevBtnId);
+            const next = document.getElementById(nextBtnId);
+            const items = box.querySelectorAll('.carousel-item');
+            
+            let currentIdx = 0;
+            const total = items.length;
+            const angle = 360 / total;
+
+            function update() {
+                box.style.transform = `rotateY(${currentIdx * -angle}deg)`;
+                items.forEach((item, index) => {
+                    item.style.transform = `rotateY(${index * angle}deg) translateZ(${zTranslate}px)`;
+                    const norm = ((currentIdx % total) + total) % total;
+                    if (index === norm) {
+                        item.style.opacity = "1";
+                        item.style.filter = "none";
+                        item.style.zIndex = "10";
+                    } else {
+                        item.style.opacity = "0.3";
+                        item.style.filter = "grayscale(0.8) blur(2px)";
+                        item.style.zIndex = "1";
+                    }
+                });
+            }
+            next.addEventListener('click', () => { currentIdx++; update(); });
+            prev.addEventListener('click', () => { currentIdx--; update(); });
+            update();
+        }
+
+        window.onload = function () {
+            // Inicializo karuselin e rrjetit profesional
+            setup3DCarousel('network-carousel-box', 'net-prev', 'net-next', 300);
+            updateCarouselPosition();
+        }
+
         window.addEventListener('click', (e) => {
             if (e.target === modalPub) closeModalPub();
             if (e.target === modalCv) closeModalCv();
         });
-        
-        updateCarouselPosition();
     </script>
 </body>
 </html>
