@@ -120,8 +120,70 @@
             border-radius: 2px;
             display: block;
         }
+
+        
+               /* LOGO CAROUSEL ANIMATION */
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-280px * 8)); }
+        }
+        .slider {
+            background: white;
+            height: 160px;
+            margin: auto;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+        }
+        .slider::before, .slider::after {
+            background: linear-gradient(to right, white 0%, rgba(255, 255, 255, 0) 100%);
+            content: "";
+            height: 160px;
+            position: absolute;
+            width: 150px;
+            z-index: 2;
+        }
+        .slider::after { right: 0; top: 0; transform: rotateZ(180deg); }
+        .slider::before { left: 0; top: 0; }
+        .slide-track {
+            animation: scroll 40s linear infinite;
+            display: flex;
+            width: calc(280px * 16);
+        }
+        .slide {
+            height: 160px;
+            width: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+        }
+        .slide img {
+            max-height: 80px;
+            max-width: 220px;
+            filter: grayscale(100%);
+            opacity: 0.6;
+            transition: all 0.4s ease;
+            object-fit: contain;
+        }
+        .slide:hover img {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.08);
+        }
+        /* Academy Branding */
+        .academy-logo-text {
+            color: #1e293b;
+        }
+        .academy-maps-text {
+            background: linear-gradient(to right, #38bdf8, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
+
+    
 <body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
 
     <div class="lang-switcher-side">
@@ -270,6 +332,38 @@
                 </div>
             </div>
 
+        </div>
+    </section>
+
+       <!-- LOGO CAROUSEL (NEW PART) -->
+    <section class="py-20 bg-white border-y border-slate-100 overflow-hidden">
+        <div class="text-center mb-10">
+            <h3 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-2">Rrjeti i Bashkëpunimit</h3>
+            <p class="text-xl font-extrabold text-slate-900 italic">Institucionet Partnere</p>
+        </div>
+        
+        <div class="slider">
+            <div class="slide-track">
+                <div class="slide"><a href="https://nasri.gov.al" target="_blank"><img src="http://nasri.gov.al/wp-content/uploads/2022/05/logo_new-removebg-preview.png" alt="AKKSHI"></a></div>
+                <div class="slide"><a href="https://fgjm.edu.al" target="_blank"><img src="https://fgjm.edu.al/wp-content/uploads/2021/04/logoo.png" alt="FGJM"></a></div>
+                <div class="slide"><a href="https://akad.gov.al/" target="_blank"><img src="https://akad.gov.al/wp-content/uploads/2024/03/testttt.png" alt="ASHSH"></a></div>
+                <div class="slide"><a href="https://unitir.edu.al/" target="_blank"><img src="https://unitir.edu.al/wp-content/uploads/2019/08/logo.png" alt="UNITIR"></a></div>
+                <div class="slide"><a href="https://fhf.edu.al/" target="_blank"><img src="https://fhf.edu.al/wp-content/themes/fhf-theme/resources/images/svg/logo.svg" alt="FHF"></a></div>
+                <div class="slide"><a href="https://drtkkorce.com/" target="_blank"><img src="https://drtkkorce.com/wp-content/uploads/2024/06/DRTK-1.png" alt="DRTK Korçë"></a></div>
+                <div class="slide"><a href="https://bashkiakorce.gov.al" target="_blank"><img src="https://bashkiakorce.gov.al/wp-content/uploads/2024/08/korca_logo.png" alt="Bashkia Korçë"></a></div>
+                <div class="slide"><a href="https://lezha.gov.al/" target="_blank"><img src="https://lezha.gov.al/wp-content/uploads/2022/07/PNG-NEW-no-lissus_013700960_11036.png" alt="Bashkia Lezhë"></a></div>
+                <div class="slide"><a href="https://upt.edu.al/" target="_blank"><img src="https://autex.org/sites/default/files/portfolio-images/Members_Tirana_logo_900_675.png" alt="UPT"></a></div>
+                <!-- Duplicate for seamless loop -->
+                <div class="slide"><a href="https://nasri.gov.al" target="_blank"><img src="http://nasri.gov.al/wp-content/uploads/2022/05/logo_new-removebg-preview.png" alt="AKKSHI"></a></div>
+                <div class="slide"><a href="https://fgjm.edu.al" target="_blank"><img src="https://fgjm.edu.al/wp-content/uploads/2021/04/logoo.png" alt="FGJM"></a></div>
+                <div class="slide"><a href="https://akad.gov.al/" target="_blank"><img src="https://akad.gov.al/wp-content/uploads/2024/03/testttt.png" alt="ASHSH"></a></div>
+                <div class="slide"><a href="https://unitir.edu.al/" target="_blank"><img src="https://unitir.edu.al/wp-content/uploads/2019/08/logo.png" alt="UNITIR"></a></div>
+                <div class="slide"><a href="https://fhf.edu.al/" target="_blank"><img src="https://fhf.edu.al/wp-content/themes/fhf-theme/resources/images/svg/logo.svg" alt="FHF"></a></div>
+                <div class="slide"><a href="https://drtkkorce.com/" target="_blank"><img src="https://drtkkorce.com/wp-content/uploads/2024/06/DRTK-1.png" alt="DRTK Korçë"></a></div>
+                <div class="slide"><a href="https://bashkiakorce.gov.al" target="_blank"><img src="https://bashkiakorce.gov.al/wp-content/uploads/2024/08/korca_logo.png" alt="Bashkia Korçë"></a></div>
+                <div class="slide"><a href="https://lezha.gov.al/" target="_blank"><img src="https://lezha.gov.al/wp-content/uploads/2022/07/PNG-NEW-no-lissus_013700960_11036.png" alt="Bashkia Lezhë"></a></div>
+                <div class="slide"><a href="https://upt.edu.al/" target="_blank"><img src="https://autex.org/sites/default/files/portfolio-images/Members_Tirana_logo_900_675.png" alt="UPT"></a></div>
+            </div>
         </div>
     </section>
 
