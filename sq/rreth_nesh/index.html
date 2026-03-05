@@ -146,6 +146,104 @@
             overflow: auto;
             -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
         }
+      /* --- STILI KRYESOR I KARUSELIT --- */
+        .carousel-3d-container {
+            perspective: 1200px; /* Krijon ndjenjën e thellësisë 3D */
+            width: 100%;
+            height: 420px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .carousel-3d {
+            position: relative;
+            width: 240px;
+            height: 320px;
+            transform-style: preserve-3d; /* Lejon elementet fëmijë të lëvizin në hapësirë 3D */
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .carousel-item {
+            position: absolute;
+            width: 240px;
+            height: 320px;
+            left: 0;
+            top: 0;
+            cursor: pointer;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            transition: opacity 0.5s, filter 0.5s;
+            background: #fff;
+        }
+
+        /* --- STILI I "MOCK FRAME" (IMITIMI I DRITARES) --- */
+        .mock-frame {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            background: #f8fafc;
+        }
+
+        .frame-header {
+            height: 32px;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 6px;
+        }
+
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        .frame-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .network-logo {
+            max-width: 120px;
+            max-height: 80px;
+            object-fit: contain;
+            margin-bottom: 16px;
+        }
+
+        .frame-footer {
+            padding: 12px;
+            background: white;
+            border-top: 1px solid #f1f5f9;
+            font-size: 10px;
+            color: #64748b;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* --- KONTROLLET --- */
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .control-btn:hover { background: #3b82f6; border-color: #3b82f6; transform: scale(1.1); }
+
+        
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
@@ -265,7 +363,105 @@
             </div>
         </div>
     </section>
+ <!-- SEKSIONI I KARUSELIT -->
+    <div class="carousel-3d-container">
+        <div id="network-carousel-box" class="carousel-3d">
+            
+            <!-- LinkedIn -->
+            <a href="https://www.linkedin.com/in/erland-alla/" target="_blank" class="carousel-item">
+                <div class="mock-frame">
+                    <div class="frame-header">
+                        <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
+                    </div>
+                    <div class="frame-body">
+                        <svg class="network-logo" fill="#0077b5" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                        <h5 class="text-slate-900 font-black uppercase text-xs">LinkedIn</h5>
+                    </div>
+                    <div class="frame-footer">linkedin.com</div>
+                </div>
+            </a>
 
+            <!-- ResearchGate -->
+            <a href="https://www.researchgate.net/profile/Erland-Alla" target="_blank" class="carousel-item">
+                <div class="mock-frame">
+                    <div class="frame-header">
+                        <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
+                    </div>
+                    <div class="frame-body">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAWlBMVEUA0K/////2/Pyc7N862sEl1rr6/f3U9vHo+vcw2L4f1bjA8+vt+/kN0rPb+POw8OZs49B+5taO6tu58eil7uLN9e925dPX9/LF9O1a4Mpl4s5F3MSL6dq78uk4s0utAAABKElEQVRIie3T246DIBAGYH45iBwG2y4WS/f9X3PBbZtsNqGY9NI/McaLLwzjDGNHjnwwZpJ+F/DnqOki95AvpcOIOO2oitzMTLKin0wulot4s6MuoSxj87y0jDfGSCOl8S8yA+ANcqVxvBLRNYVcyZAYWwLODbIGB5VsigNcKHfRutTEcWqWnzCU/pgbYViYtyqIRbvcJHwjjN0GJM8yQcHdm+JFJIHKXxf3wPObiXkSM26kJ08yuVrYHuIj1NwnKslyWr8VYu/Qc8BpB2jevSYcyo4a7l2b/hYm2AmwO4lJUO0h+UfY6kDdq/hocumC7d2sB5GxbEnndUZgre/sMHQZcdcALfWck4a6tKd+C+mykrQtFstpgFrfkrr29fn9EGvHKUeOfD4/PFMLrxz1WIoAAAAASUVORK5CYII=" class="network-logo" alt="ResearchGate">
+                        <h5 class="text-slate-900 font-black uppercase text-xs">ResearchGate</h5>
+                    </div>
+                    <div class="frame-footer">researchgate.net</div>
+                </div>
+            </a>
+
+            <!-- Google Scholar -->
+            <a href="https://scholar.google.com/citations?user=8HofjlEAAAAJ&hl=en" target="_blank" class="carousel-item">
+                <div class="mock-frame">
+                    <div class="frame-header">
+                        <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
+                    </div>
+                    <div class="frame-body">
+                        <img src="https://scholar.google.com/intl/en/scholar/images/2x/scholar_logo_64dp.png" class="network-logo" alt="Google Scholar">
+                        <h5 class="text-slate-900 font-black uppercase text-xs">Google Scholar</h5>
+                    </div>
+                    <div class="frame-footer">scholar.google.com</div>
+                </div>
+            </a>
+
+            <!-- ORCID -->
+            <a href="https://orcid.org/0009-0008-5121-7564" target="_blank" class="carousel-item">
+                <div class="mock-frame">
+                    <div class="frame-header">
+                        <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
+                    </div>
+                    <div class="frame-body">
+                        <img src="https://orcid.org/assets/vectors/orcid.logo.svg" class="network-logo" alt="ORCID">
+                        <h5 class="text-slate-900 font-black uppercase text-xs">ORCID iD</h5>
+                    </div>
+                    <div class="frame-footer">orcid.org</div>
+                </div>
+            </a>
+
+            <!-- IntechOpen -->
+            <a href="https://www.intechopen.com/profiles/635428" target="_blank" class="carousel-item">
+                <div class="mock-frame">
+                    <div class="frame-header">
+                        <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
+                    </div>
+                    <div class="frame-body">
+                        <img src="https://cdnintech.com/web/frontend/www/assets/06.74/svg/20logo.svg" class="network-logo" alt="IntechOpen">
+                        <h5 class="text-slate-900 font-black uppercase text-xs">IntechOpen</h5>
+                    </div>
+                    <div class="frame-footer">intechopen.com</div>
+                </div>
+            </a>
+
+            <!-- Geo-WB6 -->
+            <a href="https://www.geo-wb6.net/network" target="_blank" class="carousel-item">
+                <div class="mock-frame">
+                    <div class="frame-header">
+                        <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
+                    </div>
+                    <div class="frame-body">
+                        <img src="https://files.cdn-files-a.com/uploads/9342349/400_filter_nobg_66b6b279b7c19.png" class="network-logo" alt="GeoWeb6">
+                        <h5 class="text-slate-900 font-black uppercase text-xs">Geo-WB6</h5>
+                    </div>
+                    <div class="frame-footer">geo-wb6.net</div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- BUTONAT E KONTROLLIT -->
+    <div class="flex gap-10 mt-10">
+        <button id="net-prev" class="control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+        <button id="net-next" class="control-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+
+
+    
     <section class="py-24 bg-white border-y border-slate-100">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-20">
@@ -535,6 +731,58 @@
         });
         
         updateCarouselPosition();
+    </script>
+    <script>
+        /**
+         * Funksioni për konfigurimin e Karuselit 3D
+         * @param {string} containerId - ID e div-it mbajtës të karuselit
+         * @param {string} prevBtnId - ID e butonit "Para"
+         * @param {string} nextBtnId - ID e butonit "Pas"
+         * @param {number} zTranslate - Distanca e elementeve nga qendra (thellësia)
+         */
+        function setup3DCarousel(containerId, prevBtnId, nextBtnId, zTranslate = 300) {
+            const box = document.getElementById(containerId);
+            const prev = document.getElementById(prevBtnId);
+            const next = document.getElementById(nextBtnId);
+            const items = box.querySelectorAll('.carousel-item');
+            
+            let currentIndex = 0;
+            const total = items.length;
+            const angleUnit = 360 / total; // Llogarit këndin e rrotullimit bazuar në numrin e elementeve
+
+            function update() {
+                // Rrotullon të gjithë kutinë mbajtëse
+                box.style.transform = `rotateY(${currentIndex * -angleUnit}deg)`;
+                
+                // Pozicionon secilin element në rreth
+                items.forEach((item, index) => {
+                    item.style.transform = `rotateY(${index * angleUnit}deg) translateZ(${zTranslate}px)`;
+                    
+                    // Gjen elementin që është aktualisht në fokus
+                    const normalized = ((currentIndex % total) + total) % total;
+                    
+                    if (index === normalized) {
+                        item.style.opacity = "1";
+                        item.style.filter = "none";
+                        item.style.zIndex = "10";
+                    } else {
+                        item.style.opacity = "0.3";
+                        item.style.filter = "grayscale(0.8) blur(2px)";
+                        item.style.zIndex = "1";
+                    }
+                });
+            }
+
+            // Dëgjuesit e ngjarjeve për klikimet
+            next.addEventListener('click', () => { currentIndex++; update(); });
+            prev.addEventListener('click', () => { currentIndex--; update(); });
+            
+            // Ekzekutimi fillestar
+            update();
+        }
+
+        // Aktivizon karuselin me distancë 300px
+        setup3DCarousel('network-carousel-box', 'net-prev', 'net-next', 300);
     </script>
 </body>
 </html>
