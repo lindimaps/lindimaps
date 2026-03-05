@@ -84,10 +84,11 @@
         .lang-item.active { box-shadow: 0 0 0 2px #3b82f6; }
         .flag-icon { width: 20px; height: 14px; object-fit: cover; border-radius: 2px; display: block; }
 
+        /* --- STILI I KARUSELIT 3D (Sipas versionit tend te suksesshem) --- */
         .carousel-3d-container {
             perspective: 1200px;
             width: 100%;
-            height: 380px;
+            height: 420px; /* Lartesia e rregulluar */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -95,58 +96,36 @@
         }
         .carousel-3d {
             position: relative;
-            width: 200px;
-            height: 280px;
+            width: 240px;
+            height: 320px;
             transform-style: preserve-3d;
             transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .carousel-item {
             position: absolute;
-            width: 200px;
-            height: 280px;
+            width: 240px;
+            height: 320px;
             left: 0;
             top: 0;
             cursor: pointer;
             backface-visibility: hidden;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             transition: opacity 0.5s, filter 0.5s;
-        }
-        .carousel-item img { width: 100%; height: 100%; object-fit: cover; }
-
-        .carousel-controls {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            margin-top: 20px;
-        }
-        .control-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .control-btn:hover { background: #3b82f6; border-color: #3b82f6; transform: scale(1.1); }
-
-        #publications-modal, #cv-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
-        
-        .cv-scroll-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
+            background: #fff;
         }
 
-        /* --- STILI I RI PER RRJETIN PROFESIONAL --- */
+        /* Publication Carousel Items (Different size) */
+        #carousel-box .carousel-item {
+            width: 200px;
+            height: 280px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #carousel-box { width: 200px; height: 280px; }
+
+        /* --- STILI I "MOCK FRAME" PER RRJETIN --- */
         .mock-frame {
             display: flex;
             flex-direction: column;
@@ -187,8 +166,30 @@
             text-align: center;
             font-weight: bold;
         }
-        .network-item { background: #fff; width: 240px; height: 320px; }
-        #network-carousel-box { width: 240px; height: 320px; }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .control-btn:hover { background: #3b82f6; border-color: #3b82f6; transform: scale(1.1); }
+
+        #publications-modal, #cv-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .cv-scroll-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
@@ -309,7 +310,7 @@
         </div>
     </section>
 
-    <!-- SEKSIONI I RI: KARUSELI I RRJETIT PROFESIONAL -->
+    <!-- SEKSIONI I KARUSELIT 3D (Rrjeti Profesional) -->
     <section class="py-24 bg-slate-950 text-white overflow-hidden">
         <div class="max-w-7xl mx-auto px-6 text-center mb-16">
             <span class="text-blue-500 font-black text-[10px] uppercase tracking-[0.4em] mb-4 block">Lidhjet Dixhitale</span>
@@ -319,9 +320,8 @@
 
         <div class="carousel-3d-container">
             <div id="network-carousel-box" class="carousel-3d">
-                
                 <!-- LinkedIn -->
-                <a href="https://www.linkedin.com/in/erland-alla/" target="_blank" class="carousel-item network-item">
+                <a href="https://www.linkedin.com/in/erland-alla/" target="_blank" class="carousel-item">
                     <div class="mock-frame">
                         <div class="frame-header">
                             <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
@@ -335,7 +335,7 @@
                 </a>
 
                 <!-- ResearchGate -->
-                <a href="https://www.researchgate.net/profile/Erland-Alla" target="_blank" class="carousel-item network-item">
+                <a href="https://www.researchgate.net/profile/Erland-Alla" target="_blank" class="carousel-item">
                     <div class="mock-frame">
                         <div class="frame-header">
                             <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
@@ -349,7 +349,7 @@
                 </a>
 
                 <!-- Google Scholar -->
-                <a href="https://scholar.google.com/citations?user=8HofjlEAAAAJ&hl=en" target="_blank" class="carousel-item network-item">
+                <a href="https://scholar.google.com/citations?user=8HofjlEAAAAJ&hl=en" target="_blank" class="carousel-item">
                     <div class="mock-frame">
                         <div class="frame-header">
                             <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
@@ -363,7 +363,7 @@
                 </a>
 
                 <!-- ORCID -->
-                <a href="https://orcid.org/0009-0008-5121-7564" target="_blank" class="carousel-item network-item">
+                <a href="https://orcid.org/0009-0008-5121-7564" target="_blank" class="carousel-item">
                     <div class="mock-frame">
                         <div class="frame-header">
                             <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
@@ -377,7 +377,7 @@
                 </a>
 
                 <!-- IntechOpen -->
-                <a href="https://www.intechopen.com/profiles/635428" target="_blank" class="carousel-item network-item">
+                <a href="https://www.intechopen.com/profiles/635428" target="_blank" class="carousel-item">
                     <div class="mock-frame">
                         <div class="frame-header">
                             <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
@@ -391,7 +391,7 @@
                 </a>
 
                 <!-- Geo-WB6 -->
-                <a href="https://www.geo-wb6.net/network" target="_blank" class="carousel-item network-item">
+                <a href="https://www.geo-wb6.net/network" target="_blank" class="carousel-item">
                     <div class="mock-frame">
                         <div class="frame-header">
                             <div class="dot bg-red-400"></div><div class="dot bg-yellow-400"></div><div class="dot bg-green-400"></div>
@@ -472,11 +472,9 @@
         </div>
     </section>
 
-    <!-- Professional Footer (The Footprint) -->
     <footer class="bg-slate-950 text-white border-t border-white/5 pt-20 pb-10">
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-                <!-- Column 1: Brand -->
                 <div class="space-y-6">
                     <a href="/" class="flex items-center gap-3">
                         <div class="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center">
@@ -497,7 +495,6 @@
                     </div>
                 </div>
 
-                <!-- Column 2: Quick Links -->
                 <div>
                     <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Eksploro</h5>
                     <ul class="space-y-4 text-sm text-slate-400 font-medium">
@@ -509,7 +506,6 @@
                     </ul>
                 </div>
 
-                <!-- Column 3: Services -->
                 <div>
                     <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Shërbimet GIS</h5>
                     <ul class="space-y-4 text-sm text-slate-400 font-medium">
@@ -521,7 +517,6 @@
                     </ul>
                 </div>
 
-                <!-- Column 4: Contact -->
                 <div>
                     <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Zyra</h5>
                     <ul class="space-y-4 text-sm text-slate-400">
@@ -541,7 +536,6 @@
                 </div>
             </div>
 
-            <!-- Bottom Bar -->
             <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
                 <p class="text-[11px] text-slate-500 font-bold tracking-widest uppercase">
                     © 2024 LindiMaps Studio. Të gjitha të drejtat të rezervuara.
@@ -620,7 +614,7 @@
         });
         scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
-        // Original Publication Carousel Logic
+        // Publications Carousel Logic (Original)
         const modalPub = document.getElementById('publications-modal');
         const triggerPub = document.getElementById('co-author-trigger');
         const closeBtnPub = document.getElementById('close-modal');
@@ -678,20 +672,20 @@
         };
         closeBtnCv.addEventListener('click', closeModalCv);
 
-        // --- FUNKSIONI I RI PER KARUSELIN 3D TE RRJETIT ---
+        // --- FUNKSIONI I PERDITESUAR PER RRJETIN PROFESIONAL (Sipas ver. tend) ---
         function setup3DCarousel(containerId, prevBtnId, nextBtnId, zTranslate = 300) {
             const box = document.getElementById(containerId);
             const prev = document.getElementById(prevBtnId);
             const next = document.getElementById(nextBtnId);
-            const items = box.querySelectorAll('.carousel-item');
+            const carouselItems = box.querySelectorAll('.carousel-item');
             
             let currentIdx = 0;
-            const total = items.length;
+            const total = carouselItems.length;
             const angle = 360 / total;
 
             function update() {
                 box.style.transform = `rotateY(${currentIdx * -angle}deg)`;
-                items.forEach((item, index) => {
+                carouselItems.forEach((item, index) => {
                     item.style.transform = `rotateY(${index * angle}deg) translateZ(${zTranslate}px)`;
                     const norm = ((currentIdx % total) + total) % total;
                     if (index === norm) {
@@ -711,7 +705,7 @@
         }
 
         window.onload = function () {
-            // Inicializo karuselin e rrjetit profesional
+            // Inicializo karuselin e rrjetit profesional me 300px thellesi
             setup3DCarousel('network-carousel-box', 'net-prev', 'net-next', 300);
             updateCarouselPosition();
         }
