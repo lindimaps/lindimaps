@@ -752,6 +752,22 @@
         });
         
         updateCarouselPosition();
+
+
+         const updatePubCarousel = setup3DCarousel('carousel-box', 'prev-slide', 'next-slide', 250);
+        setup3DCarousel('network-carousel-box', 'net-prev', 'net-next', 300);
+
+        const modalPub = document.getElementById('publications-modal');
+        const triggerPub = document.getElementById('co-author-trigger');
+        const closeBtnPub = document.getElementById('close-modal');
+
+        triggerPub.addEventListener('click', () => {
+            modalPub.classList.remove('invisible', 'opacity-0');
+            modalPub.classList.add('visible', 'opacity-100');
+            document.body.style.overflow = 'hidden';
+            updatePubCarousel();
+        });
+        
     </script>
 </body>
 </html>
