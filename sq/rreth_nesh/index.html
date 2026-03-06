@@ -627,7 +627,6 @@
 
             let isDragging = false;
             let startX = 0;
-            let currentRotation = 0;
 
             function update() {
                 box.style.transform = `rotateY(${currentIdx * -angle}deg)`;
@@ -699,7 +698,10 @@
             modalPub.classList.remove('invisible', 'opacity-0');
             modalPub.classList.add('visible', 'opacity-100');
             document.body.style.overflow = 'hidden';
-            setup3DCarousel('pub-carousel-box', 'pub-prev', 'pub-next', 250);
+            // Përdorim setTimeout për të lejuar browser-in të bëjë render modalin përpara se të llogarisë 3D
+            setTimeout(() => {
+                setup3DCarousel('pub-carousel-box', 'pub-prev', 'pub-next', 250);
+            }, 50);
         });
 
         closePub.addEventListener('click', () => {
@@ -716,7 +718,9 @@
             modalNet.classList.remove('invisible', 'opacity-0');
             modalNet.classList.add('visible', 'opacity-100');
             document.body.style.overflow = 'hidden';
-            setup3DCarousel('net-carousel-box', 'net-prev', 'net-next', 300);
+            setTimeout(() => {
+                setup3DCarousel('net-carousel-box', 'net-prev', 'net-next', 300);
+            }, 50);
         });
 
         closeNet.addEventListener('click', () => {
