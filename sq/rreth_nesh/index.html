@@ -613,10 +613,10 @@
         });
         scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
-        // --- FUNKSIONI UNIVERZAL PER KARUSELIN 3D ME DRAG & SWIPE ---
+        // --- FUNKSIONI UNIVERZAL PER KARUSELIN 3D ---
         function setup3DCarousel(containerId, prevBtnId, nextBtnId, zTranslate = 300) {
-            const container = document.getElementById(containerId).parentElement;
             const box = document.getElementById(containerId);
+            const container = box.parentElement;
             const prev = document.getElementById(prevBtnId);
             const next = document.getElementById(nextBtnId);
             const items = box.querySelectorAll('.carousel-item');
@@ -629,14 +629,16 @@
             let startX = 0;
 
             function update() {
+                // Pozicionimi 3D i elementit kryesor
                 box.style.transform = `rotateY(${currentIdx * -angle}deg)`;
+                
+                // Përditësimi i dukshmërisë për secilin item
                 items.forEach((item, index) => {
-                    item.style.transform = `rotateY(${index * angle}deg) translateZ(${zTranslate}px)`;
                     const norm = ((currentIdx % total) + total) % total;
                     if (index === norm) {
                         item.style.opacity = "1";
                         item.style.filter = "none";
-                        item.style.zIndex = "10";
+                        item.style.zIndex = "20";
                     } else {
                         item.style.opacity = "0.3";
                         item.style.filter = "grayscale(0.8) blur(2px)";
@@ -645,9 +647,26 @@
                 });
             }
 
-            // Button controls
-            next.onclick = (e) => { e.stopPropagation(); currentIdx++; update(); };
-            prev.onclick = (e) => { e.stopPropagation(); currentIdx--; update(); };
+            // --- INITIAL SETUP (Detyron rreshtimin 3D sapo thirret) ---
+            items.forEach((item, index) => {
+                item.style.transform = `rotateY(${index * angle}deg) translateZ(${zTranslate}px)`;
+            });
+
+            // Button controls me prioritet
+            next.onclick = (e) => { 
+                e.preventDefault();
+                e.stopPropagation(); 
+                currentIdx++; 
+                box.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+                update(); 
+            };
+            prev.onclick = (e) => { 
+                e.preventDefault();
+                e.stopPropagation(); 
+                currentIdx--; 
+                box.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+                update(); 
+            };
 
             // Drag/Swipe controls
             const onStart = (e) => {
@@ -659,7 +678,7 @@
             const onMove = (e) => {
                 if (!isDragging) return;
                 const x = e.pageX || e.touches[0].pageX;
-                const diff = (x - startX) * 0.5; // Sensitivity
+                const diff = (x - startX) * 0.4;
                 box.style.transform = `rotateY(${(currentIdx * -angle) + diff}deg)`;
             };
 
@@ -671,13 +690,14 @@
                 
                 box.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
                 
-                if (Math.abs(diff) > 50) { // Threshold for slide
+                if (Math.abs(diff) > 40) {
                     if (diff > 0) currentIdx--;
                     else currentIdx++;
                 }
                 update();
             };
 
+            // Event Listeners
             container.addEventListener('mousedown', onStart);
             window.addEventListener('mousemove', onMove);
             window.addEventListener('mouseup', onEnd);
@@ -686,6 +706,7 @@
             container.addEventListener('touchmove', onMove, { passive: true });
             container.addEventListener('touchend', onEnd);
 
+            // Thirrja e parë për të rregulluar opacity/z-index
             update();
         }
 
@@ -698,10 +719,9 @@
             modalPub.classList.remove('invisible', 'opacity-0');
             modalPub.classList.add('visible', 'opacity-100');
             document.body.style.overflow = 'hidden';
-            // Përdorim setTimeout për të lejuar browser-in të bëjë render modalin përpara se të llogarisë 3D
             setTimeout(() => {
-                setup3DCarousel('pub-carousel-box', 'pub-prev', 'pub-next', 250);
-            }, 50);
+                setup3DCarousel('pub-carousel-box', 'pub-prev', 'pub-next', 240);
+            }, 100);
         });
 
         closePub.addEventListener('click', () => {
@@ -719,8 +739,8 @@
             modalNet.classList.add('visible', 'opacity-100');
             document.body.style.overflow = 'hidden';
             setTimeout(() => {
-                setup3DCarousel('net-carousel-box', 'net-prev', 'net-next', 300);
-            }, 50);
+                setup3DCarousel('net-carousel-box', 'net-prev', 'net-next', 280);
+            }, 100);
         });
 
         closeNet.addEventListener('click', () => {
