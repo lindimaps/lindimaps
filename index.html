@@ -416,16 +416,15 @@
         scrollTopBtn.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
-    </script>
-    <!-- 1. STILI (Mund ta vendosni brenda <style> ekzistues ose si <style> më vete) -->
+   <!-- 1. STILI (Përshtatur me branding e Lindimaps) -->
 <style>
     #lindimaps-cookie-overlay {
         position: fixed;
         inset: 0;
         background: rgba(15, 23, 42, 0.7);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        display: none; /* Fshihet fillimisht */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: none;
         align-items: center;
         justify-content: center;
         z-index: 10000;
@@ -437,34 +436,54 @@
         background: white;
         width: 100%;
         max-width: 460px;
-        border-radius: 28px;
+        border-radius: 32px;
         overflow: hidden;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        animation: cookieIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        animation: cookieIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     @keyframes cookieIn {
-        from { opacity: 0; transform: scale(0.9) translateY(20px); }
+        from { opacity: 0; transform: scale(0.9) translateY(30px); }
         to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .cookie-header {
         background: #0f172a;
-        padding: 40px 20px 30px;
+        padding: 45px 20px 35px;
         text-align: center;
         color: white;
+        position: relative;
     }
 
-    .cookie-logo-icon {
+    /* Logo Lindimaps e integruar */
+    .cookie-logo-container {
+        width: 64px;
+        height: 64px;
         background: #1e293b;
-        width: 60px;
-        height: 60px;
-        border-radius: 16px;
+        border-radius: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 auto 20px;
-        border: 1px solid rgba(59, 130, 246, 0.5);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .cookie-dot-pulse {
+        animation: cookie-pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes cookie-pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.3); opacity: 0.7; }
+    }
+
+    .cookie-title-gradient {
+        background: linear-gradient(to right, #3b82f6, #2dd4bf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 900;
     }
 
     .cookie-body { padding: 30px; }
@@ -473,18 +492,21 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 16px;
+        padding: 18px;
         background: #f8fafc;
-        border-radius: 16px;
+        border-radius: 20px;
         margin-bottom: 12px;
         border: 1px solid #e2e8f0;
+        transition: all 0.2s;
     }
 
+    .cookie-option:hover { border-color: #3b82f6; background: white; }
+
     .cookie-option h4 { margin: 0; font-weight: 700; color: #0f172a; font-size: 15px; }
-    .cookie-option p { margin: 4px 0 0; font-size: 12px; color: #64748b; line-height: 1.4; }
+    .cookie-option p { margin: 4px 0 0; font-size: 12px; color: #64748b; line-height: 1.5; }
 
     .cookie-footer {
-        padding: 0 30px 30px;
+        padding: 0 30px 35px;
         display: flex;
         flex-direction: column;
         gap: 12px;
@@ -494,69 +516,73 @@
         background: #2563eb;
         color: white;
         border: none;
-        padding: 14px;
-        border-radius: 12px;
+        padding: 16px;
+        border-radius: 14px;
         font-weight: 800;
         text-transform: uppercase;
-        font-size: 12px;
-        letter-spacing: 0.05em;
+        font-size: 11px;
+        letter-spacing: 0.1em;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     }
 
-    .btn-cookie-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .btn-cookie-primary:hover { background: #1d4ed8; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3); }
 
     .btn-cookie-secondary {
         background: white;
         color: #0f172a;
         border: 1px solid #e2e8f0;
-        padding: 14px;
-        border-radius: 12px;
+        padding: 15px;
+        border-radius: 14px;
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 12px;
-        letter-spacing: 0.05em;
+        font-size: 11px;
+        letter-spacing: 0.1em;
         cursor: pointer;
+        transition: all 0.3s;
     }
 
-    .btn-cookie-secondary:hover { background: #f8fafc; }
+    .btn-cookie-secondary:hover { background: #f1f5f9; border-color: #cbd5e1; }
 
-    /* Switch toggle */
-    .switch-c { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    /* Switch toggle Custom */
+    .switch-c { position: relative; display: inline-block; width: 48px; height: 26px; flex-shrink: 0; }
     .switch-c input { opacity: 0; width: 0; height: 0; }
     .slider-c { position: absolute; cursor: pointer; inset: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
-    .slider-c:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    .slider-c:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     input:checked + .slider-c { background-color: #3b82f6; }
-    input:checked + .slider-c:before { transform: translateX(20px); }
+    input:checked + .slider-c:before { transform: translateX(22px); }
 </style>
 
 <!-- 2. STRUKTURA HTML -->
 <div id="lindimaps-cookie-overlay">
     <div class="cookie-card">
         <div class="cookie-header">
-            <div class="cookie-logo-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round"/>
-                    <circle cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1"/>
+            <div class="cookie-logo-container">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                    <circle class="cookie-dot-pulse" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1"/>
                 </svg>
             </div>
-            <h2 style="margin:0; font-size: 22px; font-weight: 900; letter-spacing: -0.025em; text-transform: uppercase;">Privatësia juaj</h2>
-            <p style="margin:8px 0 0; opacity: 0.7; font-size: 14px;">Zgjidhni cilësimet për eksperiencën tuaj në LindiMaps.</p>
+            <h2 style="margin:0; font-size: 24px; font-weight: 900; letter-spacing: -0.05em; text-transform: uppercase;">
+                Lindi<span class="cookie-title-gradient">Maps</span> Privacy
+            </h2>
+            <p style="margin:10px 0 0; opacity: 0.6; font-size: 13px; font-weight: 500; letter-spacing: 0.02em;">Inteligjenca hapësinore fillon me privatësinë tuaj.</p>
         </div>
         
         <div class="cookie-body">
             <div class="cookie-option">
                 <div>
-                    <h4>Cookies Teknikë</h4>
-                    <p>Të domosdoshme për funksionimin e hartave GIS.</p>
+                    <h4>Sistemi GIS</h4>
+                    <p>Cookies teknikë për hartat dhe performancën.</p>
                 </div>
-                <span style="font-size: 10px; font-weight: 800; color: #94a3b8; background: #e2e8f0; padding: 4px 10px; border-radius: 20px;">AKTIVE</span>
+                <span style="font-size: 9px; font-weight: 900; color: #475569; background: #e2e8f0; padding: 5px 12px; border-radius: 30px; letter-spacing: 0.05em;">ESENCIALE</span>
             </div>
 
             <div class="cookie-option">
                 <div>
-                    <h4>Analitika Hapësinore</h4>
-                    <p>Na ndihmon të përmirësojmë platformën tonë.</p>
+                    <h4>Analitika e Vizitave</h4>
+                    <p>Na ndihmon të kuptojmë nevojat e përdoruesve.</p>
                 </div>
                 <label class="switch-c">
                     <input type="checkbox" id="ga-checkbox" checked>
@@ -564,15 +590,15 @@
                 </label>
             </div>
             
-            <p style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 20px;">
-                Duke pranuar, ju pajtoheni me 
-                <a href="/sq/privacy/" style="color:#3b82f6; font-weight: 700; text-decoration: none;">Politikën e Privatësisë</a>.
+            <p style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 25px; line-height: 1.6;">
+                Duke vazhduar, ju pranoni 
+                <a href="/sq/privacy/" style="color:#3b82f6; font-weight: 700; text-decoration: none; border-bottom: 1px solid rgba(59, 130, 246, 0.3);">Politikën tonë të Privatësisë</a>.
             </p>
         </div>
 
         <div class="cookie-footer">
             <button id="cookie-accept-all" class="btn-cookie-primary">Prano të Gjitha</button>
-            <button id="cookie-save-settings" class="btn-cookie-secondary">Ruaj Cilësimet</button>
+            <button id="cookie-save-settings" class="btn-cookie-secondary">Cilësimet e Mia</button>
         </div>
     </div>
 </div>
@@ -580,12 +606,14 @@
 <!-- 3. LOGJIKA JAVASCRIPT -->
 <script>
     (function() {
-        const GA_ID = 'G-XXXXXXXXXX'; // Vendos ID-në tënde këtu
         const overlay = document.getElementById('lindimaps-cookie-overlay');
 
         function initGA() {
-            console.log("🟢 LindiMaps: Analitika u aktivizua.");
-            // Kodi i Google Analytics këtu
+            // Kontrolloni nëse GA nuk është i ngarkuar tashmë
+            if (!window.dataLayer) {
+                console.log("🟢 LindiMaps: Analitika u aktivizua.");
+                // Integrimi i vërtetë i Google Analytics do të shkonte këtu
+            }
         }
 
         function checkConsent() {
@@ -612,15 +640,27 @@
         };
 
         function closeOverlay() {
-            overlay.style.display = 'none';
-            document.body.style.overflow = '';
+            // Animacion i thjeshtë mbylljeje
+            const card = overlay.querySelector('.cookie-card');
+            card.style.transform = 'scale(0.95)';
+            card.style.opacity = '0';
+            card.style.transition = 'all 0.3s ease';
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.body.style.overflow = '';
+            }, 300);
         }
 
-        // Nis kontrollin pas 1 sekonde
-        setTimeout(checkConsent, 1000);
+        // Nis kontrollin pas një vonese të vogël për eksperiencë më të mirë
+        if (document.readyState === 'complete') {
+            setTimeout(checkConsent, 1200);
+        } else {
+            window.addEventListener('load', () => setTimeout(checkConsent, 1200));
+        }
     })();
 
-    // Funksion global për ta thirrur nga butoni në Footer (opsionale)
+    // Mund ta thirrni këtë nga një buton në Footer: <button onclick="resetCookies()">Cilësimet</button>
     function resetCookies() {
         localStorage.removeItem('lindimaps_consent');
         location.reload();
