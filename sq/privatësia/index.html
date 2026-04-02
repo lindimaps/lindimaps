@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Politika e Privatësisë | LindiMaps</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .glass-effect { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(226, 232, 240, 0.5); }
+        .hero-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        
+        h2 { color: #0f172a; font-weight: 800; font-size: 1.75rem; margin-top: 3rem; margin-bottom: 1.25rem; letter-spacing: -0.025em; }
+        p { color: #475569; line-height: 1.8; margin-bottom: 1.5rem; font-size: 1.05rem; }
+        
+        .policy-list li { position: relative; padding-left: 1.75rem; margin-bottom: 1rem; color: #475569; line-height: 1.6; }
+        .policy-list li::before { 
+            content: ""; 
+            position: absolute; 
+            left: 0; 
+            top: 0.6rem; 
+            width: 8px; 
+            height: 8px; 
+            background: #3b82f6; 
+            border-radius: 2px;
+            transform: rotate(45deg);
+        }
+
+        /* Scroll to Top - Njëjtë si index.html */
+        #scroll-to-top {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(20px);
+        }
+        #scroll-to-top.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <!-- NAVIGIMI (I kopjuar nga index.html për konsistencë) -->
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="h-10 w-10 flex items-center justify-center bg-slate-900 rounded-xl group-hover:scale-110 transition-transform shadow-lg">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h1 class="text-xl font-black tracking-tighter">
+                    <span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span>
+                </h1>
+            </a>
+            
+            <div class="hidden md:flex gap-8 items-center text-xs font-bold uppercase tracking-widest">
+                <a href="index.html" class="text-slate-600 hover:text-blue-600 transition">Kreu</a>
+                <a href="index.html#services" class="text-slate-600 hover:text-blue-600 transition">Shërbimet</a>
+                <a href="index.html#contact" class="bg-slate-900 text-white px-6 py-3 rounded-xl hover:bg-blue-600 transition shadow-md">Na Kontaktoni</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="menu-btn" class="md:hidden text-slate-900 focus:outline-none">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 p-6 flex flex-col gap-4 text-xs font-bold uppercase tracking-widest shadow-xl">
+            <a href="index.html" class="text-slate-600 py-2">Kreu</a>
+            <a href="index.html#services" class="text-slate-600 py-2">Shërbimet</a>
+            <a href="index.html#contact" class="text-blue-600 py-2">Na Kontaktoni</a>
+        </div>
+    </nav>
+
+    <!-- HEADER I FAQES -->
+    <header class="pt-32 pb-20 hero-gradient relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white"></path>
+            </svg>
+        </div>
+        <div class="max-w-4xl mx-auto px-6 relative z-10 text-center">
+            <span class="inline-block bg-blue-500/20 text-blue-300 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-6 border border-blue-500/30">
+                Dokument Zyrtar
+            </span>
+            <h1 class="text-4xl md:text-6xl font-black text-white tracking-tighter leading-tight">
+                Politika e <span class="logo-gradient">Privatësisë</span>
+            </h1>
+            <p class="mt-6 text-slate-400 text-lg max-w-2xl mx-auto font-medium">
+                Si studio e specializuar në GIS, mbrojtja e të dhënave tuaja është pjesë e etikës sonë profesionale.
+            </p>
+        </div>
+    </header>
+
+    <!-- PËRMBAJTJA E POLITIKS -->
+    <main class="max-w-4xl mx-auto px-6 -mt-10 mb-24 relative z-20">
+        <div class="glass-effect rounded-[2.5rem] p-8 md:p-16 shadow-2xl shadow-slate-200/50">
+            
+            <div class="flex items-center gap-4 mb-10 pb-6 border-b border-slate-100">
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Statusi: Aktive</p>
+                    <p class="text-slate-900 font-bold m-0">Përditësuar më: 2 Prill, 2024</p>
+                </div>
+            </div>
+
+            <p>Mirë se vini në <strong>LindiMaps</strong>. Ne ofrojmë zgjidhje të avancuara të inteligjencës hapësinore dhe jemi të përkushtuar të sigurojmë që privatësia juaj të jetë prioriteti ynë kryesor.</p>
+
+            <h2>1. Mbledhja e të Dhënave</h2>
+            <p>LindiMaps mbledh vetëm informacionin e nevojshëm për të ofruar një eksperiencë optimale të navigimit në hartat tona:</p>
+            <ul class="policy-list">
+                <li>Informacione teknike të anonimizuara (IP, lloji i pajisjes).</li>
+                <li>Të dhëna rreth ndërveprimit me shtresat e hartave GIS.</li>
+                <li>Të dhëna vullnetare të dërguara përmes formës së kontaktit (Emër, Email).</li>
+            </ul>
+
+            <h2>2. Teknologjia e Cookies</h2>
+            <p>Ne përdorim një sistem inteligjent të menaxhimit të cookies që ju lejon kontroll të plotë:</p>
+            <ul class="policy-list">
+                <li><strong>Cookies Teknikë:</strong> Janë esencialë për funksionimin e librarive të hartave (si Leaflet) dhe nuk mbledhin të dhëna personale.</li>
+                <li><strong>Google Analytics:</strong> Na ndihmon të përmirësojmë shërbimet tona duke analizuar se cilat pjesë të hartës vizitohen më shumë. Këto aktivizohen vetëm me pëlqimin tuaj.</li>
+            </ul>
+
+            <h2>3. Mbrojtja e të Dhënave Hapësinore</h2>
+            <p>Si ekspertë në GIS, ne sigurohemi që çdo projekt që përfshin të dhëna gjeografike të trajtohet me konfidencialitetin më të lartë, duke ndjekur standardet më të mira të sigurisë kibernetike.</p>
+
+            <h2>4. Na Kontaktoni</h2>
+            <p>Nëse keni pyetje rreth mënyrës se si i trajtojmë të dhënat tuaja, mund të na shkruani direkt:</p>
+            
+            <div class="mt-8 grid md:grid-cols-2 gap-6">
+                <div class="bg-slate-900 p-8 rounded-3xl text-white">
+                    <h4 class="text-blue-400 font-bold text-sm uppercase tracking-widest mb-4">Informacioni i Kontaktit</h4>
+                    <p class="text-white font-bold mb-2">LindiMaps Studio</p>
+                    <p class="text-slate-400 text-sm mb-4">Tiranë, Shqipëri</p>
+                    <a href="mailto:info@lindimaps.com" class="text-blue-400 font-bold hover:underline">info@lindimaps.com</a>
+                </div>
+                <div class="bg-blue-600 p-8 rounded-3xl text-white flex flex-col justify-center">
+                    <p class="font-bold text-lg leading-tight">Ju keni të drejtë të kërkoni fshirjen e të dhënave tuaja në çdo kohë.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-16">
+            <a href="index.html" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-600 font-bold transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kthehu në Faqen Kryesore
+            </a>
+        </div>
+    </main>
+
+    <!-- FOOTER (I ngjashëm me index.html) -->
+    <footer class="bg-white border-t border-slate-100 py-12">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
+            <div>
+                <div class="flex items-center gap-2 mb-2 justify-center md:justify-start">
+                    <span class="text-slate-900 font-black text-sm">LINDI</span><span class="logo-gradient font-black text-sm">MAPS</span>
+                </div>
+                <p class="text-slate-400 text-xs font-medium">© 2024 LindiMaps Studio. Të gjitha të drejtat të rezervuara.</p>
+            </div>
+            <div class="flex gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                <a href="index.html" class="hover:text-blue-600 transition">Kreu</a>
+                <a href="index.html#services" class="hover:text-blue-600 transition">Shërbimet</a>
+                <a href="#" class="text-blue-600">Privatësia</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button id="scroll-to-top" class="fixed bottom-8 right-8 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl hover:bg-blue-600 transition-all z-50">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
+
+    <script>
+        // Menu Mobile
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+
+        // Scroll to Top Logjika (Njëjtë si në index.html)
+        const scrollTopBtn = document.getElementById('scroll-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.add('show');
+            } else {
+                scrollTopBtn.classList.remove('show');
+            }
+        });
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
