@@ -374,48 +374,6 @@
     </button>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        var map = L.map('map', { scrollWheelZoom: false }).setView([41.3275, 19.8187], 13);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
-        L.marker([41.3275, 19.8187]).addTo(map).bindPopup('<b class="text-blue-600 uppercase">LindiMaps Studio</b>');
-
-        const satellite = document.getElementById('satellite-scanner');
-        const mapEl = document.getElementById('map');
-        let angle = 0;
-
-        function animateSatellite() {
-            const rect = mapEl.getBoundingClientRect();
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const radiusX = rect.width * 0.35;
-            const radiusY = rect.height * 0.30;
-            const x = centerX + radiusX * Math.cos(angle);
-            const y = centerY + radiusY * Math.sin(angle);
-            satellite.style.left = `${x}px`;
-            satellite.style.top = `${y}px`;
-            angle += 0.005;
-            requestAnimationFrame(animateSatellite);
-        }
-
-        window.onload = animateSatellite;
-
-        const menuBtn = document.getElementById('menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        menuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
-
-        const scrollTopBtn = document.getElementById('scroll-to-top');
-        window.addEventListener('scroll', () => {
-            const scrollPosition = window.innerHeight + window.pageYOffset;
-            const pageHeight = document.documentElement.scrollHeight;
-            if (scrollPosition > pageHeight - 150) {
-                scrollTopBtn.classList.add('show');
-            } else {
-                scrollTopBtn.classList.remove('show');
-            }
-        });
-        scrollTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
    <!-- 1. STILI (Përshtatur me branding e Lindimaps) -->
 <style>
     #lindimaps-cookie-overlay {
@@ -603,16 +561,32 @@
     </div>
 </div>
 
-<!-- 3. LOGJIKA JAVASCRIPT -->
+<!-- 3. LOGJIKA JAVASCRIPT ME INTEGRIMIN E GOOGLE ANALYTICS -->
 <script>
     (function() {
+        // ZËVENDËSO KËTË ID ME ID-NË TËNDE REALE NGA GOOGLE ANALYTICS
+        const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'; 
         const overlay = document.getElementById('lindimaps-cookie-overlay');
 
+        // Funksioni që ngarkon dhe aktivizon Google Analytics
         function initGA() {
-            // Kontrolloni nëse GA nuk është i ngarkuar tashmë
             if (!window.dataLayer) {
-                console.log("🟢 LindiMaps: Analitika u aktivizua.");
-                // Integrimi i vërtetë i Google Analytics do të shkonte këtu
+                console.log("🟢 LindiMaps: Duke lidhur Google Analytics...");
+                
+                // 1. Krijo tagun e skriptit të jashtëm
+                const script = document.createElement('script');
+                script.async = true;
+                script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+                document.head.appendChild(script);
+
+                // 2. Inicializo gtag
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', GA_MEASUREMENT_ID, {
+                    'anonymize_ip': true, // Rekomandohet për privatësi
+                    'cookie_flags': 'SameSite=None;Secure'
+                });
             }
         }
 
@@ -640,7 +614,6 @@
         };
 
         function closeOverlay() {
-            // Animacion i thjeshtë mbylljeje
             const card = overlay.querySelector('.cookie-card');
             card.style.transform = 'scale(0.95)';
             card.style.opacity = '0';
@@ -652,7 +625,6 @@
             }, 300);
         }
 
-        // Nis kontrollin pas një vonese të vogël për eksperiencë më të mirë
         if (document.readyState === 'complete') {
             setTimeout(checkConsent, 1200);
         } else {
@@ -660,7 +632,6 @@
         }
     })();
 
-    // Mund ta thirrni këtë nga një buton në Footer: <button onclick="resetCookies()">Cilësimet</button>
     function resetCookies() {
         localStorage.removeItem('lindimaps_consent');
         location.reload();
