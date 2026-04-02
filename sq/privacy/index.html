@@ -7,16 +7,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
         .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
         
-        h2 { color: #0f172a; font-weight: 800; font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; letter-spacing: -0.025em; border-left: 4px solid #3b82f6; padding-left: 1rem; }
-        p, li { color: #475569; line-height: 1.7; font-size: 1rem; }
-        .content-card { background: white; border-radius: 2rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #f1f5f9; }
+        h2 { color: #0f172a; font-weight: 800; font-size: 1.25rem; margin-top: 2rem; margin-bottom: 0.75rem; letter-spacing: -0.025em; border-left: 4px solid #3b82f6; padding-left: 0.75rem; }
+        @media (min-width: 768px) { h2 { font-size: 1.5rem; margin-top: 2.5rem; padding-left: 1rem; } }
+        
+        p, li { color: #475569; line-height: 1.6; font-size: 0.95rem; }
+        @media (min-width: 768px) { p, li { line-height: 1.7; font-size: 1rem; } }
+        
+        .content-card { background: white; border-radius: 1.5rem; box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05); border: 1px solid #f1f5f9; }
+        @media (min-width: 768px) { .content-card { border-radius: 2rem; } }
         
         .legal-list { list-style-type: none; padding: 0; }
-        .legal-list li { position: relative; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+        .legal-list li { position: relative; padding-left: 1.25rem; margin-bottom: 0.75rem; }
         .legal-list li::before { content: "•"; position: absolute; left: 0; color: #3b82f6; font-weight: bold; }
 
         /* Animacioni i logos (Pika që pulson) */
@@ -28,95 +33,94 @@
         .animate-dot { animation: pulse-dot 2s infinite ease-in-out; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
+<body class="bg-slate-50 text-slate-900 overflow-x-hidden">
 
     <!-- HEADER MINIMALIST ME LOGO AKTIVE -->
-    <header class="py-16 hero-gradient text-center relative overflow-hidden">
-        <div class="max-w-4xl mx-auto px-6 relative z-10">
-            <div class="flex justify-center mb-8">
-                <div class="h-16 w-16 flex items-center justify-center bg-slate-900 rounded-2xl shadow-2xl border border-white/10 group">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <header class="py-12 md:py-16 hero-gradient text-center relative overflow-hidden">
+        <div class="max-w-4xl mx-auto px-5 relative z-10">
+            <div class="flex justify-center mb-6 md:mb-8">
+                <div class="h-14 w-14 md:h-16 md:w-16 flex items-center justify-center bg-slate-900 rounded-xl md:rounded-2xl shadow-2xl border border-white/10">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="md:w-[36px] md:h-[36px]">
                         <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.1"/>
                         <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
                         <circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
                     </svg>
                 </div>
             </div>
-            <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight">
+            <h1 class="text-2xl md:text-5xl font-black text-white tracking-tight leading-tight">
                 Politika e <span class="logo-gradient">Privatësisë</span>
             </h1>
-            <p class="mt-4 text-slate-400 font-medium tracking-wide uppercase text-xs">LindiMaps Studio • Dokument Zyrtar Gjyqësor</p>
+            <p class="mt-3 text-slate-400 font-medium tracking-wide uppercase text-[10px] md:text-xs">LindiMaps Studio • Dokument Zyrtar Gjyqësor</p>
         </div>
     </header>
 
     <!-- PËRMBAJTJA LIGJORE -->
-    <main class="max-w-4xl mx-auto px-6 -mt-8 mb-20">
-        <div class="content-card p-8 md:p-12">
+    <main class="max-w-4xl mx-auto px-4 md:px-6 -mt-6 md:-mt-8 mb-16 md:mb-20">
+        <div class="content-card p-6 md:p-12">
             
-            <section class="mb-10 text-sm text-slate-500 italic bg-slate-50 p-6 rounded-2xl border-l-4 border-blue-500">
+            <section class="mb-8 text-xs md:text-sm text-slate-500 italic bg-slate-50 p-5 md:p-6 rounded-xl md:rounded-2xl border-l-4 border-blue-500">
                 Ky dokument shpjegon se si LindiMaps ("ne", "jonë") mbledh, përdor dhe mbron të dhënat tuaja personale në përputhje me Ligjin Nr. 9887, datë 10.03.2008 "Për Mbrojtjen e të Dhënave Personale" në Republikën e Shqipërisë dhe Rregulloren e Përgjithshme të Mbrojtjes së të Dhënave (GDPR).
             </section>
 
-            <h2>1. Identiteti i Kontrolluesit të të Dhënave</h2>
+            <h2>1. Identiteti i Kontrolluesit</h2>
             <p>Kontrolluesi i të dhënave tuaja është LindiMaps Studio, me seli në Tiranë, Shqipëri. Ne jemi përgjegjës për sigurimin që të dhënat tuaja të përpunohen në mënyrë të ligjshme, të drejtë dhe transparente.</p>
 
             <h2>2. Të Dhënat që Mbledhim</h2>
             <p>Gjatë përdorimit të shërbimeve tona GIS dhe platformës web, ne mund të mbledhim:</p>
             <ul class="legal-list">
-                <li><strong>Të dhëna identifikimi:</strong> Emri, mbiemri dhe adresa e email-it kur na kontaktoni vullnetarisht.</li>
-                <li><strong>Të dhëna teknike:</strong> Adresa IP, lloji i shfletuesit, sistemit operativ dhe të dhënat e sesionit.</li>
-                <li><strong>Të dhëna gjeohapësinore:</strong> Koordinatat e kërkuara ose të ndërvepruara brenda hartave (në formë të anonimizuara për qëllime statistikore).</li>
+                <li><strong>Të dhëna identifikimi:</strong> Emri dhe email-i kur na kontaktoni.</li>
+                <li><strong>Të dhëna teknike:</strong> Adresa IP, lloji i shfletuesit dhe të dhënat e sesionit.</li>
+                <li><strong>Të dhëna gjeohapësinore:</strong> Koordinatat e kërkuara (të anonimizuara).</li>
             </ul>
 
-            <h2>3. Baza Ligjore për Përpunimin</h2>
+            <h2>3. Baza Ligjore</h2>
             <p>Përpunimi i të dhënave tuaja kryhet bazuar në:</p>
             <ul class="legal-list">
-                <li>Pëlqimin tuaj të shprehur (për marketing ose komunikim).</li>
-                <li>Nevojën për përmbushjen e një kontrate shërbimi (për projektet GIS).</li>
-                <li>Interesin tonë legjitim për të përmirësuar sigurinë dhe funksionalitetin e platformës.</li>
+                <li>Pëlqimin tuaj të shprehur.</li>
+                <li>Nevojën për përmbushjen e një kontrate shërbimi.</li>
+                <li>Interesin tonë legjitim për sigurinë.</li>
             </ul>
 
             <h2>4. Siguria e të Dhënave GIS</h2>
-            <p>Si një studio e specializuar në inteligjencën hapësinore, ne zbatojmë masa teknike dhe organizative të nivelit të lartë, duke përfshirë:</p>
+            <p>Zbatojmë masa teknike të nivelit të lartë, duke përfshirë:</p>
             <ul class="legal-list">
-                <li>Enkriptimin e të dhënave në transit (SSL/TLS).</li>
-                <li>Kufizimin e aksesit në bazat e të dhënave gjeografike vetëm për personelin e autorizuar.</li>
-                <li>Anonimizimin e të dhënave të vendndodhjes kur nuk janë të domosdoshme për shërbimin.</li>
+                <li>Enkriptimin e të dhënave (SSL/TLS).</li>
+                <li>Kufizimin e aksesit në bazat e të dhënave.</li>
+                <li>Anonimizimin e vendndodhjes.</li>
             </ul>
 
-            <h2>5. Të Drejtat tuaja Ligjore</h2>
-            <p>Sipas legjislacionit në fuqi, ju gëzoni të drejtën për:</p>
+            <h2>5. Të Drejtat tuaja</h2>
+            <p>Sipas legjislacionit, ju gëzoni të drejtën për:</p>
             <ul class="legal-list">
-                <li><strong>Akses:</strong> Të kërkoni një kopje të të dhënave që mbajmë për ju.</li>
-                <li><strong>Korrigjim:</strong> Të kërkoni përmirësimin e të dhënave të pasakta.</li>
-                <li><strong>Fshirje:</strong> Të kërkoni fshirjen e të dhënave tuaja nga sistemet tona.</li>
-                <li><strong>Kundërshtim:</strong> Të refuzoni përpunimin e të dhënave për qëllime marketingu.</li>
+                <li><strong>Akses:</strong> Kopje të të dhënave tuaja.</li>
+                <li><strong>Korrigjim:</strong> Përmirësimin e gabimeve.</li>
+                <li><strong>Fshirje:</strong> Heqjen e të dhënave tuaja.</li>
             </ul>
 
             <h2>6. Kohëzgjatja e Ruajtjes</h2>
-            <p>Ne i ruajmë të dhënat tuaja vetëm për aq kohë sa është e nevojshme për qëllimet e përcaktuara në këtë politikë, ose siç kërkohet nga ligji (p.sh. për qëllime tatimore ose arkivimi ligjor).</p>
+            <p>Ne i ruajmë të dhënat tuaja vetëm për aq kohë sa është e nevojshme për qëllimet e përcaktuara ose siç kërkohet nga ligji.</p>
 
-            <div class="mt-12 p-8 bg-blue-50 rounded-3xl border border-blue-100 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-10">
+            <div class="mt-10 p-6 md:p-8 bg-blue-50 rounded-2xl md:rounded-3xl border border-blue-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-5 md:opacity-10">
                     <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-blue-600">
                         <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke-width="2"/>
                         <path d="M12 6V12L16 14" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <h4 class="text-blue-900 font-black mb-3">Pyetje apo Kërkesa?</h4>
-                <p class="text-blue-800 text-sm mb-4">Për çdo ushtrim të të drejtave tuaja, ju lutem na kontaktoni zyrtarisht në adresën tonë elektronike të dedikuar për privatësinë:</p>
-                <a href="mailto:contact.lindimaps@gmail.com" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">privacy@lindimaps.com</a>
+                <h4 class="text-blue-900 font-black mb-3 text-lg md:text-xl">Pyetje apo Kërkesa?</h4>
+                <p class="text-blue-800 text-sm mb-5 leading-relaxed">Për çdo ushtrim të të drejtave tuaja, ju lutem na kontaktoni zyrtarisht në:</p>
+                <a href="mailto:contact.lindimaps@gmail.com" class="inline-block w-full md:w-auto text-center bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 active:scale-[0.98]">privacy@lindimaps.com</a>
             </div>
 
-            <div class="mt-16 pt-8 border-t border-slate-100 text-center">
-                <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em]">© 2024 LindiMaps Studio • Tiranë, Shqipëri</p>
+            <div class="mt-12 pt-8 border-t border-slate-100 text-center">
+                <p class="text-[9px] md:text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] md:tracking-[0.3em]">© 2024 LindiMaps Studio • Tiranë, Shqipëri</p>
             </div>
         </div>
         
-        <div class="mt-10 text-center">
-            <a href="index.html" class="inline-flex items-center gap-3 text-slate-400 hover:text-blue-600 text-sm font-bold transition-all hover:-translate-x-1">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                Kthehu në platformën kryesore
+        <div class="mt-8 text-center px-4">
+            <a href="www.lindimaps.com" class="inline-flex items-center justify-center gap-3 text-slate-500 hover:text-blue-600 text-sm font-bold transition-all py-3 px-6 rounded-full bg-white shadow-sm border border-slate-100 w-full md:w-auto">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kthehu në faqen kryesore
             </a>
         </div>
     </main>
