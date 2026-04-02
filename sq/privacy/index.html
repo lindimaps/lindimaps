@@ -86,148 +86,110 @@
         </div>
     </nav>
 
-        <!-- MOBILE MENU CONTENT -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 px-6 py-8 space-y-6 shadow-2xl">
-            <a href="index.html" class="block text-xl font-black text-blue-600">Kreu</a>
-            <a href="/sq/sherbime/" class="block text-xl font-black text-slate-700">Shërbime</a>
-            <a href="/sq/projekte/" class="block text-xl font-black text-slate-700">Projekte</a>
-            <a href="/sq/rreth_nesh/" class="block text-xl font-black text-slate-700">Rreth Nesh</a>
-            <a href="/sq/kontakte/" class="block text-xl font-black text-slate-700">Kontakte</a>
-            <a href="/sq/akademia/" class="flex items-center gap-3 pt-4 border-t border-slate-100">
-                <div class="h-10 w-10 flex items-center justify-center bg-[#0f172a] rounded-xl">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-                        <circle cx="12" cy="11" r="2.2" fill="#3b82f6" stroke="white" stroke-width="1"/>
-                    </svg>
-                </div>
-                <div class="flex flex-col">
-                    <h1 class="text-xl font-black tracking-tighter leading-none">
-                        <span class="text-slate-900">LINDI</span><span class="academy-maps-text">MAPS</span>
-                    </h1>
-                    <span class="text-[10px] uppercase tracking-[0.3em] font-bold text-slate-400">Academy</span>
-                </div>
-            </a>
-        </div>
-    </nav>
-
     <!-- HEADER I FAQES -->
-    <header class="pt-32 pb-20 hero-gradient relative overflow-hidden">
+    <header class="bg-slate-900 py-20 relative overflow-hidden">
         <div class="absolute inset-0 opacity-10">
-            <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white"></path>
-            </svg>
+            <div class="absolute top-0 left-0 w-full h-full" style="background-image: radial-gradient(#3b82f6 1px, transparent 1px); background-size: 30px 30px;"></div>
         </div>
         <div class="max-w-4xl mx-auto px-6 relative z-10 text-center">
-            <span class="inline-block bg-blue-500/20 text-blue-300 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-6 border border-blue-500/30">
-                Dokument Zyrtar
-            </span>
-            <h1 class="text-4xl md:text-6xl font-black text-white tracking-tighter leading-tight">
-                Politika e <span class="logo-gradient">Privatësisë</span>
-            </h1>
-            <p class="mt-6 text-slate-400 text-lg max-w-2xl mx-auto font-medium">
-                Si studio e specializuar në GIS, mbrojtja e të dhënave tuaja është pjesë e etikës sonë profesionale.
-            </p>
+            <span class="text-blue-400 text-xs font-black uppercase tracking-[0.3em] mb-4 block">Transparenca & Besimi</span>
+            <h1 class="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase mb-6">Politika e <span class="text-blue-500">Privatësisë</span></h1>
+            <p class="text-slate-400 text-lg font-medium">Përditësuar së fundmi: 2 Prill, 2024</p>
         </div>
     </header>
 
-    <!-- PËRMBAJTJA E POLITIKS -->
-    <main class="max-w-4xl mx-auto px-6 -mt-10 mb-24 relative z-20">
-        <div class="glass-effect rounded-[2.5rem] p-8 md:p-16 shadow-2xl shadow-slate-200/50">
-            
-            <div class="flex items-center gap-4 mb-10 pb-6 border-b border-slate-100">
-                <div class="bg-blue-100 p-3 rounded-full">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+    <!-- PERMBAJTJA LIGJORE -->
+    <main class="max-w-4xl mx-auto px-6 py-20 legal-content">
+        
+        <div class="legal-card mb-12">
+            <h2 class="mt-0">1. Hyrje</h2>
+            <p>Mbrojtja e privatësisë suaj është parësore për <strong>LindiMaps</strong>. Kjo Politikë e Privatësisë shpjegon se si mbledhim, përdorim dhe mbrojmë të dhënat tuaja kur vizitoni faqen tonë të internetit dhe kur përdorni shërbimet tona të inteligjencës hapësinore (GIS).</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div class="legal-card">
+                <div class="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-6 text-blue-600">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 </div>
-                <div>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Statusi: Aktive</p>
-                    <p class="text-slate-900 font-bold m-0">Përditësuar më: 2 Prill, 2024</p>
-                </div>
+                <h2 class="text-xl mt-0 mb-4">Mbledhja e të Dhënave</h2>
+                <p class="text-sm">Ne mbledhim informacion që ju na jepni vullnetarisht (emër, email, telefon) kur kërkoni konsulencë ose përdorni formularët tanë të kontaktit.</p>
             </div>
-
-            <p>Mirë se vini në <strong>LindiMaps</strong>. Ne ofrojmë zgjidhje të avancuara të inteligjencës hapësinore dhe jemi të përkushtuar të sigurojmë që privatësia juaj të jetë prioriteti ynë kryesor.</p>
-
-            <h2>1. Mbledhja e të Dhënave</h2>
-            <p>LindiMaps mbledh vetëm informacionin e nevojshëm për të ofruar një eksperiencë optimale të navigimit në hartat tona:</p>
-            <ul class="policy-list">
-                <li>Informacione teknike të anonimizuara (IP, lloji i pajisjes).</li>
-                <li>Të dhëna rreth ndërveprimit me shtresat e hartave GIS.</li>
-                <li>Të dhëna vullnetare të dërguara përmes formës së kontaktit (Emër, Email).</li>
-            </ul>
-
-            <h2>2. Teknologjia e Cookies</h2>
-            <p>Ne përdorim një sistem inteligjent të menaxhimit të cookies që ju lejon kontroll të plotë:</p>
-            <ul class="policy-list">
-                <li><strong>Cookies Teknikë:</strong> Janë esencialë për funksionimin e librarive të hartave (si Leaflet) dhe nuk mbledhin të dhëna personale.</li>
-                <li><strong>Google Analytics:</strong> Na ndihmon të përmirësojmë shërbimet tona duke analizuar se cilat pjesë të hartës vizitohen më shumë. Këto aktivizohen vetëm me pëlqimin tuaj.</li>
-            </ul>
-
-            <h2>3. Mbrojtja e të Dhënave Hapësinore</h2>
-            <p>Si ekspertë në GIS, ne sigurohemi që çdo projekt që përfshin të dhëna gjeografike të trajtohet me konfidencialitetin më të lartë, duke ndjekur standardet më të mira të sigurisë kibernetike.</p>
-
-            <h2>4. Na Kontaktoni</h2>
-            <p>Nëse keni pyetje rreth mënyrës se si i trajtojmë të dhënat tuaja, mund të na shkruani direkt:</p>
-            
-            <div class="mt-8 grid md:grid-cols-2 gap-6">
-                <div class="bg-slate-900 p-8 rounded-3xl text-white">
-                    <h4 class="text-blue-400 font-bold text-sm uppercase tracking-widest mb-4">Informacioni i Kontaktit</h4>
-                    <p class="text-white font-bold mb-2">LindiMaps Studio</p>
-                    <p class="text-slate-400 text-sm mb-4">Tiranë, Shqipëri</p>
-                    <a href="mailto:info@lindimaps.com" class="text-blue-400 font-bold hover:underline">info@lindimaps.com</a>
+            <div class="legal-card">
+                <div class="h-12 w-12 bg-teal-100 rounded-full flex items-center justify-center mb-6 text-teal-600">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                 </div>
-                <div class="bg-blue-600 p-8 rounded-3xl text-white flex flex-col justify-center">
-                    <p class="font-bold text-lg leading-tight">Ju keni të drejtë të kërkoni fshirjen e të dhënave tuaja në çdo kohë.</p>
-                </div>
+                <h2 class="text-xl mt-0 mb-4">Siguria e të Dhënave</h2>
+                <p class="text-sm">Të dhënat tuaja ruhen në serverë të sigurt dhe ne përdorim protokolle enkriptimi (SSL) për të siguruar çdo transferim informacioni.</p>
             </div>
         </div>
 
-        <div class="text-center mt-16">
-            <a href="index.html" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-600 font-bold transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                Kthehu në Faqen Kryesore
-            </a>
+        <div class="legal-card mb-12">
+            <h2>2. Përdorimi i Cookies</h2>
+            <p>LindiMaps përdor "cookies" për të përmirësuar përvojën e përdoruesit në sistemet tona të hartave. Cookies na ndihmojnë:</p>
+            <ul class="list-disc pl-6 space-y-3 text-slate-600 mb-6 font-medium">
+                <li>Të kuptojmë performancën e hartave tona interaktive.</li>
+                <li>Të analizojmë trafikun përmes Google Analytics (nëse e keni pranuar).</li>
+                <li>Të ruajmë preferencat tuaja të gjuhës.</li>
+            </ul>
+            <p>Ju mund të kontrolloni ose të refuzoni cookies në çdo kohë përmes panelit tonë të privatësisë ose cilësimeve të shfletuesit tuaj.</p>
+        </div>
+
+        <div class="legal-card mb-12">
+            <h2>3. Shërbimet e Palëve të Treta</h2>
+            <p>Faqja jonë mund të përmbajë lidhje ose shërbime të integruara (si Leaflet, OpenStreetMap ose Google Maps). Këto palë kanë politikat e tyre të privatësisë dhe ne ju rekomandojmë t'i lexoni ato.</p>
+        </div>
+
+        <div class="bg-blue-600 rounded-[2rem] p-10 text-white text-center">
+            <h3 class="text-2xl font-black uppercase mb-4">Keni Pyetje?</h3>
+            <p class="mb-8 opacity-90">Për çdo paqartësi rreth mënyrës se si i trajtojmë të dhënat tuaja, na kontaktoni drejtpërdrejt.</p>
+            <a href="mailto:info@lindimaps.com" class="inline-block bg-white text-blue-600 px-10 py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-slate-100 transition">Email: info@lindimaps.com</a>
         </div>
     </main>
 
-    <!-- FOOTER (I ngjashëm me index.html) -->
-    <footer class="bg-white border-t border-slate-100 py-12">
-        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
-            <div>
-                <div class="flex items-center gap-2 mb-2 justify-center md:justify-start">
-                    <span class="text-slate-900 font-black text-sm">LINDI</span><span class="logo-gradient font-black text-sm">MAPS</span>
+    <!-- FOOTER (I Njëjtë me Kryesoren) -->
+    <footer class="bg-slate-950 text-white pt-20 pb-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
+                        </div>
+                        <h4 class="text-2xl font-black tracking-tighter uppercase leading-none">LINDI<span class="text-blue-500">MAPS</span></h4>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed max-w-xs">Inteligjenca Hapësinore në shërbimin tuaj.</p>
                 </div>
-                <p class="text-slate-400 text-xs font-medium">© 2024 LindiMaps Studio. Të gjitha të drejtat të rezervuara.</p>
+
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Eksploro</h5>
+                    <ul class="space-y-4 text-sm text-slate-400 font-medium">
+                        <li><a href="index.html" class="hover:text-blue-500 transition">Kreu</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition">Shërbimet</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Ligjore</h5>
+                    <ul class="space-y-4 text-sm text-slate-400 font-medium">
+                        <li><a href="privacy.html" class="text-blue-500">Politika e Privatësisë</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition">Kushtet e Përdorimit</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Kontakte</h5>
+                    <p class="text-slate-400 text-sm">Tiranë, Shqipëri<br>info@lindimaps.com</p>
+                </div>
             </div>
-            <div class="flex gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                <a href="index.html" class="hover:text-blue-600 transition">Kreu</a>
-                <a href="index.html#services" class="hover:text-blue-600 transition">Shërbimet</a>
-                <a href="#" class="text-blue-600">Privatësia</a>
+            <div class="pt-8 border-t border-white/5 text-center">
+                <p class="text-[11px] text-slate-500 font-bold tracking-widest uppercase">© 2024 LindiMaps Studio. Të gjitha të drejtat e rezervuara.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Scroll to Top Button -->
-    <button id="scroll-to-top" class="fixed bottom-8 right-8 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl hover:bg-blue-600 transition-all z-50">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-    </button>
-
     <script>
-        // Menu Mobile
         const menuBtn = document.getElementById('menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        menuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
-
-        // Scroll to Top Logjika (Njëjtë si në index.html)
-        const scrollTopBtn = document.getElementById('scroll-to-top');
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                scrollTopBtn.classList.add('show');
-            } else {
-                scrollTopBtn.classList.remove('show');
-            }
-        });
-        scrollTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+        // Këtu mund të shtoni logjikën e mobile menu nëse është e nevojshme
     </script>
 </body>
 </html>
