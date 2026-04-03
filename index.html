@@ -483,42 +483,55 @@
         </svg>
     </button>
 
-     <!-- COOKIE OVERLAY SI NE FOTO -->
-    <div id="cookie-overlay">
-        <div class="cookie-modal">
+    <!-- COOKIE OVERLAY HTML -->
+    <div id="lindimaps-cookie-overlay">
+        <div class="cookie-card">
             <div class="cookie-header">
-                <h3>Manage Consent</h3>
-                <span class="close-cookie" onclick="closeCookie()">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
-                </span>
+                <!-- LOGOJA E SHTUAR KETU -->
+                <div class="cookie-logo-container">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.2"/>
+                        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                        <circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
+                    </svg>
+                </div>
+                <h2 style="margin:0; font-size: 22px; font-weight: 900; text-transform: uppercase;">
+                    Lindi<span class="cookie-title-gradient">Maps</span> Privacy
+                </h2>
+                <p style="margin:8px 0 0; opacity: 0.6; font-size: 12px;">Kontrolloni të dhënat tuaja.</p>
             </div>
             
-            <div class="cookie-text">
-                Për të ofruar eksperiencat më të mira, ne përdorim teknologji si cookies për të ruajtur dhe/ose aksesuar informacionin e pajisjes. Pëlqimi për këto teknologji do të na lejojë të përpunojmë të dhëna si sjellja e shfletimit ose ID-të unike në këtë faqen tonë.
-            </div>
-
-            <div class="cookie-actions">
-                <button class="btn-cookie btn-accept" onclick="acceptAll()">Accept</button>
-                <button class="btn-cookie btn-secondary" onclick="denyAll()">Deny</button>
-                <button class="btn-cookie btn-secondary" onclick="togglePreferences()">View preferences</button>
-            </div>
-
-            <div id="preferences-panel">
-                <div class="pref-item">
-                    <label>Sistemi Teknik (Essential)</label>
-                    <span class="text-[10px] font-bold text-blue-500">ALWAYS ON</span>
+            <div class="cookie-body">
+                <div class="cookie-option">
+                    <div>
+                        <h4>Sistemi Teknik</h4>
+                        <p>Esenciale për hartat GIS.</p>
+                    </div>
+                    <span style="font-size: 9px; font-weight: 900; color: #64748b; background: #e2e8f0; padding: 4px 10px; border-radius: 30px;">AKTIV</span>
                 </div>
-                <div class="pref-item">
-                    <label>Analitika (Google)</label>
-                    <input type="checkbox" id="pref-ga" checked>
+
+                <div class="cookie-option">
+                    <div>
+                        <h4>Analitika e Vizitave</h4>
+                        <p>Ndihmon në përmirësimin e faqes.</p>
+                    </div>
+                    <label class="switch-c">
+                        <input type="checkbox" id="ga-checkbox" checked>
+                        <span class="slider-c"></span>
+                    </label>
                 </div>
-                <button class="btn-cookie btn-accept mt-2" style="padding: 8px;" onclick="savePreferences()">Save Settings</button>
+                
+                <p style="font-size: 10px; color: #94a3b8; text-align: center; margin-top: 20px;">
+                    Duke pranuar, ju pajtoheni me <a href="/sq/privacy" style="color:#3b82f6; text-decoration: none; font-weight: bold;">Politikën e Privatësisë</a>.
+                </p>
             </div>
 
-            <a href="#" class="cookie-policy-link">Cookie Policy</a>
+            <div class="cookie-footer">
+                <button id="cookie-accept-all" class="btn-cookie-primary">Prano të Gjitha</button>
+                <button id="cookie-save-settings" class="btn-cookie-secondary">Ruaj Zgjedhjen</button>
+            </div>
         </div>
     </div>
-
 
     <!-- SCRIPTS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -664,3 +677,4 @@
     </script>
 </body>
 </html>
+
