@@ -29,13 +29,31 @@
         }
         .animate-dot { animation: pulse-dot 2s infinite ease-in-out; transform-origin: center; }
         
-        /* Advanced Hover & Touch Effect */
+        /* Service Card Base */
         .service-card { 
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.9s ease-out; 
             position: relative;
             overflow: hidden;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        /* Kartat Tek (1, 3, 5) - Vijnë nga e majta */
+        .service-card.slide-left {
+            transform: translateX(-60px);
+        }
+
+        /* Kartat Çift (2, 4, 6) - Vijnë nga e djathta */
+        .service-card.slide-right {
+            transform: translateX(60px);
+        }
+
+        /* Gjendja pas zbulimit gjatë scroll-it */
+        .service-card.reveal {
+            opacity: 1;
+            transform: translateX(0);
         }
         
         .service-image {
@@ -43,7 +61,6 @@
             filter: brightness(0.7);
         }
         
-        /* State for Hover and Touch */
         .service-card:hover .service-image,
         .service-card.active .service-image {
             transform: scale(1.1);
@@ -55,7 +72,6 @@
             transition: all 0.5s ease;
         }
 
-        /* Initial state: Info is pushed down and invisible */
         .info-content {
             max-height: 0;
             opacity: 0;
@@ -63,7 +79,6 @@
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Hover & Active state: Info slides up and becomes visible */
         .service-card:hover .info-content,
         .service-card.active .info-content {
             max-height: 200px;
@@ -177,8 +192,8 @@
         </div>
     </nav>
 
-    <!-- HEADER SEKSIONI -->
-            <header class="relative py-32 bg-slate-900 text-white overflow-hidden">
+    <!-- HEADER -->
+    <header class="relative py-32 bg-slate-900 text-white overflow-hidden">
         <div class="absolute inset-0 opacity-10 pointer-events-none">
             <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <path d="M0 0 L100 0 L100 100 Z" fill="white"></path>
@@ -192,16 +207,6 @@
             <div class="h-1.5 w-24 bg-blue-600 mx-auto rounded-full"></div>
         </div>
     </header>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z6L11QMGQF"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-Z6L11QMGQF');
-</script>
-
 
     <!-- LISTA E SHERBIMEVE -->
     <section class="py-24 max-w-7xl mx-auto px-6">
@@ -252,7 +257,7 @@
                         <h3 class="text-2xl font-black uppercase tracking-tighter">Analizë Territori</h3>
                     </div>
                     <div class="info-content">
-                        <p class="text-slate-200 text-sm leading-relaxed">Studime mbi përdorimin e tokës, monitorimin e zonave urbane dhe vlerësimin e rreziqeve natyrore përmes metodave gjeo-hapësinore.</p>
+                        <p class="text-slate-200 text-sm leading-relaxed">Studime mbi përdorimusin e tokës, monitorimin e zonave urbane dhe vlerësimin e rreziqeve natyrore përmes metodave gjeo-hapësinore.</p>
                     </div>
                 </div>
             </div>
@@ -296,14 +301,13 @@
                 <img src="https://www.openware.com.kw/content/dam/esrisites/en-us/arcgis/products/web-appbuilder/images/banner-screens-web-app-builder.jpg" alt="Web GIS Developer" class="service-image absolute inset-0 w-full h-full object-cover">
                 <div class="service-overlay absolute inset-0"></div>
                 <div class="relative h-full p-10 flex flex-col justify-end text-white">
-                     <!-- IKONA: E ndryshuar në Glob për Web GIS -->
-        <div class="w-14 h-14 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white rounded-2xl flex items-center justify-center mb-6">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.6 9h16.8M3.6 15h16.8"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3a15.3 15.3 0 014.5 9 15.3 15.3 0 01-4.5 9 15.3 15.3 0 01-4.5-9A15.3 15.3 0 0112 3z"></path>
-            </svg>
-        </div>
+                    <div class="w-14 h-14 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.6 9h16.8M3.6 15h16.8"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3a15.3 15.3 0 014.5 9 15.3 15.3 0 01-4.5 9 15.3 15.3 0 01-4.5-9A15.3 15.3 0 0112 3z"></path>
+                        </svg>
+                    </div>
                     <div class="title-content">
                         <h3 class="text-2xl font-black uppercase tracking-tighter">Web GIS Developer</h3>
                     </div>
@@ -315,51 +319,7 @@
         </div>
     </section>
 
-    <!-- METODOLOGJIA -->
-    <section class="py-24 bg-slate-900 text-white">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-                <div class="max-w-xl">
-                    <h3 class="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-4">Si Punojmë Ne</h3>
-                    <div class="h-1.5 w-20 bg-blue-600 rounded-full"></div>
-                </div>
-                <p class="text-slate-400 font-medium">Një proces i saktë garanton rezultate maksimale.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div class="relative p-6 border-l border-slate-800">
-                    <span class="text-6xl font-black text-slate-800 absolute -top-4 -left-4">01</span>
-                    <h4 class="text-xl font-bold mb-4 relative z-10">Mbledhja e të Dhënave</h4>
-                    <p class="text-slate-400 text-sm">Përdorimi i sensorëve dhe burimeve zyrtare për mbledhjen e informacionit bazë.</p>
-                </div>
-                <div class="relative p-6 border-l border-slate-800">
-                    <span class="text-6xl font-black text-slate-800 absolute -top-4 -left-4">02</span>
-                    <h4 class="text-xl font-bold mb-4 relative z-10">Përpunimi & Analiza</h4>
-                    <p class="text-slate-400 text-sm">Përdorimi i algoritmeve GIS për transformimin e të dhënave në inteligjencë.</p>
-                </div>
-                <div class="relative p-6 border-l border-slate-800">
-                    <span class="text-6xl font-black text-slate-800 absolute -top-4 -left-4">03</span>
-                    <h4 class="text-xl font-bold mb-4 relative z-10">Vlerësimi i Cilësisë</h4>
-                    <p class="text-slate-400 text-sm">Kontroll rigoroz teknik për të siguruar saktësinë gjeometrike dhe atributive.</p>
-                </div>
-                <div class="relative p-6 border-l border-slate-800">
-                    <span class="text-6xl font-black text-slate-800 absolute -top-4 -left-4">04</span>
-                    <h4 class="text-xl font-bold mb-4 relative z-10">Dorëzimi i Projektit</h4>
-                    <p class="text-slate-400 text-sm">Prezantimi i zgjedhjes finale përmes hartave interaktive ose raporteve.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-      <!-- CTA FOOTER -->
-    <section class="py-24 bg-blue-600 text-white text-center">
-        <div class="max-w-4xl mx-auto px-6">
-            <h3 class="text-3xl md:text-5xl font-black uppercase mb-8 leading-tight">Gati për të filluar projektin tuaj të radhës?</h3>
-            <a href="https://www.lindimaps.com/sq/kontakte/" class="inline-block bg-slate-900 text-white px-12 py-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-white hover:text-blue-600 transition-all shadow-2xl">Na kontaktoni</a>
-        </div>
-    </section>
-
-          <!-- Professional Footer (The Footprint) -->
+ <!-- Professional Footer (The Footprint) -->
     <footer class="bg-slate-950 text-white border-t border-white/5 pt-20 pb-10">
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
@@ -446,55 +406,62 @@
         </div>
     </footer>
 
-    <!-- SCROLL TO TOP -->
-    <button id="scroll-to-top" class="fixed bottom-8 right-8 bg-blue-600 text-white p-5 rounded-2xl shadow-2xl hover:bg-blue-700 transition-all z-[1100] group">
-        <svg class="w-6 h-6 transform group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path>
-        </svg>
+
+    <button id="scroll-to-top" class="fixed bottom-8 right-8 bg-blue-600 text-white p-5 rounded-2xl shadow-2xl z-[1100]">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg>
     </button>
 
     <script>
+        // Menu Toggle
         const menuBtn = document.getElementById('menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
-        menuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+        menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
 
-        // Logic for Touch and Click on Service Cards
+        // Logic for Touch/Click on Service Cards
         const cards = document.querySelectorAll('.service-card');
-        
         cards.forEach(card => {
             card.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // If the card is already active, close it. Otherwise, close others and open this.
                 const isActive = card.classList.contains('active');
                 cards.forEach(c => c.classList.remove('active'));
-                if (!isActive) {
-                    card.classList.add('active');
-                }
+                if (!isActive) card.classList.add('active');
             });
         });
 
-        // Close cards when clicking anywhere else
-        document.addEventListener('click', () => {
-            cards.forEach(c => c.classList.remove('active'));
+        document.addEventListener('click', () => cards.forEach(c => c.classList.remove('active')));
+
+        // Scroll Reveal Logic (Left & Right)
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -40px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        cards.forEach((card, index) => {
+            // Vendosja e drejtimit fillestar: Tek nga e majta, Cift nga e djathta
+            if (index % 2 === 0) {
+                card.classList.add('slide-left');
+            } else {
+                card.classList.add('slide-right');
+            }
+            observer.observe(card);
         });
 
+        // Scroll to Top
         const scrollTopBtn = document.getElementById('scroll-to-top');
         window.addEventListener('scroll', () => {
-            const scrollPosition = window.innerHeight + window.pageYOffset;
-            const pageHeight = document.documentElement.scrollHeight;
-            if (scrollPosition > pageHeight - 150) {
-                scrollTopBtn.classList.add('show');
-            } else {
-                scrollTopBtn.classList.remove('show');
-            }
+            if (window.pageYOffset > 300) scrollTopBtn.classList.add('show');
+            else scrollTopBtn.classList.remove('show');
         });
-        scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     </script>
 </body>
 </html>
-
-
-
-
-
-
