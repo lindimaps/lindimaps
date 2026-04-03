@@ -448,9 +448,9 @@
                         </li>
                         <li class="flex items-start gap-3">
                          <a href="mailto:contact.lindimaps@gmail.com" class="flex items-start gap-3">
-                             <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                             </svg>
+                            </svg>
                             <span>contact.lindimaps@gmail.com</span>
                          </a>
                         </li>
@@ -487,9 +487,12 @@
     <div id="lindimaps-cookie-overlay">
         <div class="cookie-card">
             <div class="cookie-header">
+                <!-- LOGOJA E SHTUAR KETU -->
                 <div class="cookie-logo-container">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.2"/>
                         <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                        <circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
                     </svg>
                 </div>
                 <h2 style="margin:0; font-size: 22px; font-weight: 900; text-transform: uppercase;">
@@ -533,6 +536,19 @@
     <!-- SCRIPTS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // Menu Toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+        // Scroll to Top
+        const scrollBtn = document.getElementById('scroll-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 500) scrollBtn.classList.add('show');
+            else scrollBtn.classList.remove('show');
+        });
+        scrollBtn.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+
         // --- LOGJIKA E COOKIES ---
         (function() {
             const GA_ID = 'G-Z6L11QMGQF';
@@ -622,7 +638,6 @@
                 if (!isUserControlling) {
                     angle += 0.005; // Shpejtësia
                     const rect = mapEl.getBoundingClientRect();
-                    const containerRect = mapContainer.getBoundingClientRect();
                     
                     // Pozicioni qendror i hartës
                     const centerX = rect.width / 2;
@@ -644,45 +659,21 @@
             // Kur miu lëviz mbi hartë, merr kontrollin përdoruesi
             map.on('mousemove', function(e) {
                 isUserControlling = true;
-                const containerPos = mapContainer.getBoundingClientRect();
-                const mapPos = mapEl.getBoundingClientRect();
-                
-                const x = e.containerPoint.x + (mapPos.left - containerPos.left);
-                const y = e.containerPoint.y + (mapPos.top - containerPos.top);
+                const containerRect = mapContainer.getBoundingClientRect();
+                const x = e.containerPoint.x;
+                const y = e.containerPoint.y;
                 
                 scanner.style.left = x + 'px';
                 scanner.style.top = y + 'px';
+                scanner.style.opacity = "1";
             });
 
-            // Kur miu largohet, kthehet lëvizja automatike
-            mapEl.onmouseleave = () => {
+            map.on('mouseout', function() {
                 isUserControlling = false;
-            };
+            });
 
-            // Nis animacionin
             autoMove();
         }
-
-        // --- INTERAKSIONET UI ---
-        const menuBtn = document.getElementById('menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const scrollToTopBtn = document.getElementById('scroll-to-top');
-
-        menuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 400) {
-                scrollToTopBtn.classList.add('show');
-            } else {
-                scrollToTopBtn.classList.remove('show');
-            }
-        });
-
-        scrollToTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
     </script>
 </body>
 </html>
