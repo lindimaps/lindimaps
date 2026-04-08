@@ -8,20 +8,78 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         .selection\:bg-\[\#ED2939\]::selection { background-color: #ED2939; color: white; }
         @keyframes spin-slow {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
         .animate-spin-slow { animation: spin-slow 8s linear infinite; }
-        
-        /* Smooth transitions for the interactive process section */
         .step-content { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .image-overlay { transition: opacity 0.5s ease; }
+
+        /* Navbar Styles */
+        .nav-scrolled { background-color: white; padding-top: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .nav-default { background-color: transparent; padding-top: 2rem; padding-bottom: 2rem; }
+        .mobile-menu-open { opacity: 1; pointer-events: auto; visibility: visible; transform: translateY(0); }
+        .mobile-menu-closed { opacity: 0; pointer-events: none; visibility: hidden; transform: translateY(-20px); }
+        #mobile-menu { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        #navbar { transition: all 0.4s ease; }
     </style>
 </head>
 <body class="min-h-screen bg-white text-slate-950 selection:bg-[#ED2939] selection:text-white overflow-x-hidden">
+
+    <!-- --- NAVIGIMI (SHTUAR) --- -->
+    <nav id="navbar" class="fixed w-full z-[100] nav-default">
+        <div class="container mx-auto px-6 flex justify-between items-center relative z-[110]">
+            <div onclick="window.location.href='index.html'" class="flex items-center gap-5 group cursor-pointer">
+                <div class="relative w-14 h-14 md:w-16 md:h-16 transition-all duration-500 group-hover:scale-110">
+                    <div id="logo-glow" class="absolute inset-0 rounded-xl blur-2xl transition-opacity duration-700 bg-red-600/30 opacity-60"></div>
+                    <svg viewBox="0 0 100 100" class="w-full h-full relative z-10 drop-shadow-[0_10px_10px_rgba(0,0,0,0.3)]">
+                        <defs>
+                            <linearGradient id="wallGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ED2939" />
+                                <stop offset="100%" stop-color="#991B1B" />
+                            </linearGradient>
+                        </defs>
+                        <path id="logo-hex" d="M50 5 L92 28 L92 72 L50 95 L8 72 L8 28 Z" fill="none" stroke="white" stroke-width="6" />
+                        <path d="M50 25 L80 40 L80 70 L50 85 Z" fill="#A50F1D" />
+                        <path d="M50 25 L20 40 L20 70 L50 85 Z" fill="url(#wallGradient)" />
+                        <path d="M50 25 L80 40 L50 55 L20 40 Z" fill="#EF4444" />
+                        <path d="M20 50 L50 65 L80 50 L80 58 L50 73 L20 58 Z" fill="white" />
+                    </svg>
+                </div>
+                <div class="flex flex-col">
+                    <h1 id="logo-text" class="text-2xl md:text-3xl font-black tracking-[-0.02em] leading-none text-white">SAEG<span class="text-[#ED2939]">.</span></h1>
+                    <div class="flex items-center gap-2 mt-1">
+                        <div class="h-[2px] w-4 bg-[#ED2939]"></div>
+                        <span class="text-[8px] md:text-[10px] font-black tracking-[0.3em] text-[#ED2939] uppercase">AUSTRIA</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden lg:flex items-center gap-10">
+                <a href="index.html#home" class="nav-link text-[11px] font-black uppercase tracking-[0.3em] text-white hover:text-[#ED2939] transition-all relative group">HOME</a>
+                <a href="index.html#leistungen" class="nav-link text-[11px] font-black uppercase tracking-[0.3em] text-white hover:text-[#ED2939] transition-all relative group">LEISTUNGEN</a>
+                <a href="https://www.lindimaps.com/SAEG/projekte/" class="nav-link text-[11px] font-black uppercase tracking-[0.3em] text-white hover:text-[#ED2939] transition-all relative group">PROJEKTE</a>
+                <a href="rrethnesh.html" class="nav-link text-[11px] font-black uppercase tracking-[0.3em] text-[#ED2939] transition-all relative group">ÜBER UNS</a>
+                <a href="https://www.lindimaps.com/SAEG/kontakte/index.html" class="nav-link text-[11px] font-black uppercase tracking-[0.3em] text-white hover:text-[#ED2939] transition-all relative group">KONTAKT</a>
+                <button class="bg-[#ED2939] text-white px-8 py-3 rounded-full font-black hover:bg-[#C8102E] transition-all text-[10px]">JETZT ANFRAGEN</button>
+            </div>
+
+            <button id="menu-toggle" class="lg:hidden p-3 rounded-xl transition-all z-[120] relative bg-white/10 text-white backdrop-blur-md">
+                <i data-lucide="menu" id="menu-icon"></i>
+            </button>
+        </div>
+
+        <div id="mobile-menu" class="fixed inset-0 bg-slate-950 mobile-menu-closed flex flex-col justify-center items-center gap-8 p-10 z-[105]">
+            <a href="index.html#home" class="mobile-link text-4xl font-black text-white uppercase">HOME</a>
+            <a href="index.html#leistungen" class="mobile-link text-4xl font-black text-white uppercase">LEISTUNGEN</a>
+            <a href="https://www.lindimaps.com/SAEG/projekte/" class="mobile-link text-4xl font-black text-white uppercase">PROJEKTE</a>
+            <a href="https://www.lindimaps.com/SAEG/kontakte/index.html" class="mobile-link text-4xl font-black text-white uppercase">KONTAKT</a>
+            <a href="rrethnesh.html" class="mobile-link text-4xl font-black text-red-500 uppercase">UBER UNS</a>
+        </div>
+    </nav>
 
     <!-- --- HERO SECTION --- -->
     <section class="relative h-[80vh] flex items-center justify-center bg-slate-950 overflow-hidden">
@@ -84,9 +142,7 @@
             </div>
 
             <div class="grid lg:grid-cols-12 gap-10">
-                <!-- Step Buttons -->
                 <div class="lg:col-span-5 space-y-4" id="steps-container">
-                    <!-- Step 1 -->
                     <div onclick="setActiveStep(0)" class="step-card group relative p-8 rounded-[2rem] border transition-all duration-500 cursor-pointer overflow-hidden bg-slate-950 border-slate-950 shadow-2xl translate-x-4" data-index="0">
                         <div class="relative z-10 flex items-start gap-6">
                             <div class="step-icon-box p-4 rounded-2xl transition-all bg-red-600 text-white">
@@ -99,7 +155,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Step 2 -->
                     <div onclick="setActiveStep(1)" class="step-card group relative p-8 rounded-[2rem] border transition-all duration-500 cursor-pointer overflow-hidden bg-white border-slate-200 hover:border-red-300" data-index="1">
                         <div class="relative z-10 flex items-start gap-6">
                             <div class="step-icon-box p-4 rounded-2xl transition-all bg-slate-100 text-slate-400">
@@ -112,7 +167,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Step 3 -->
                     <div onclick="setActiveStep(2)" class="step-card group relative p-8 rounded-[2rem] border transition-all duration-500 cursor-pointer overflow-hidden bg-white border-slate-200 hover:border-red-300" data-index="2">
                         <div class="relative z-10 flex items-start gap-6">
                             <div class="step-icon-box p-4 rounded-2xl transition-all bg-slate-100 text-slate-400">
@@ -125,7 +179,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Step 4 -->
                     <div onclick="setActiveStep(3)" class="step-card group relative p-8 rounded-[2rem] border transition-all duration-500 cursor-pointer overflow-hidden bg-white border-slate-200 hover:border-red-300" data-index="3">
                         <div class="relative z-10 flex items-start gap-6">
                             <div class="step-icon-box p-4 rounded-2xl transition-all bg-slate-100 text-slate-400">
@@ -140,21 +193,17 @@
                     </div>
                 </div>
 
-                <!-- Visualizer Display -->
-                <div class="lg:col-span-7 sticky top-10 h-[600px]">
+                <div class="lg:col-span-7 sticky top-24 h-[600px]">
                     <div class="relative h-full rounded-[3rem] overflow-hidden shadow-2xl group">
                         <img id="active-image" src="https://images.unsplash.com/photo-1503387762-592dea58ef23?auto=format&fit=crop&q=80&w=1000" class="w-full h-full object-cover transition-all duration-1000 transform group-hover:scale-110" alt="Vizualizim">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
-                        
                         <div class="absolute bottom-0 left-0 w-full p-12 text-white">
                             <div id="active-tags" class="flex flex-wrap gap-3 mb-8">
                                 <span class="px-5 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest">Studim fizibiliteti</span>
                                 <span class="px-5 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest">Llogaritje buxhetore</span>
                             </div>
                             <div class="flex items-center gap-6">
-                                <div class="p-4 bg-red-600 rounded-2xl">
-                                    <i data-lucide="clock" class="w-8 h-8 text-white"></i>
-                                </div>
+                                <div class="p-4 bg-red-600 rounded-2xl"><i data-lucide="clock" class="w-8 h-8 text-white"></i></div>
                                 <div>
                                     <div class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Garantojmë</div>
                                     <div class="text-2xl font-black uppercase">Efikasitet Austriak</div>
@@ -202,41 +251,23 @@
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- Member 1 -->
                 <div class="group relative">
                     <div class="relative h-[500px] rounded-[3rem] overflow-hidden mb-6">
                         <img src="https://nbqsxonhscsyvyhldqkt.supabase.co/storage/v1/object/public/images/forumi_1775681938919.jpeg" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="EGLI ALLA">
-                        <div class="absolute inset-0 bg-gradient-to-t from-red-600/80 to-transparent opacity-0 group-hover:opacity-100 transition-all flex items-end p-10">
-                            <button class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-black">
-                                <i data-lucide="arrow-right"></i>
-                            </button>
-                        </div>
                     </div>
                     <h4 class="text-2xl font-black uppercase tracking-tight">Ing.EGLI ALLA</h4>
                     <p class="text-red-600 font-black uppercase tracking-[0.2em] text-[10px] mt-2">CEO & Themelues</p>
                 </div>
-                <!-- Member 2 -->
                 <div class="group relative">
                     <div class="relative h-[500px] rounded-[3rem] overflow-hidden mb-6">
                         <img src="https://nbqsxonhscsyvyhldqkt.supabase.co/storage/v1/object/public/images/forumi_1775681849645.jpeg" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Xheni Halili">
-                        <div class="absolute inset-0 bg-gradient-to-t from-red-600/80 to-transparent opacity-0 group-hover:opacity-100 transition-all flex items-end p-10">
-                            <button class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-black">
-                                <i data-lucide="arrow-right"></i>
-                            </button>
-                        </div>
                     </div>
                     <h4 class="text-2xl font-black uppercase tracking-tight">Xheni Halili</h4>
                     <p class="text-red-600 font-black uppercase tracking-[0.2em] text-[10px] mt-2">Software Engineering</p>
                 </div>
-                <!-- Member 3 -->
                 <div class="group relative">
                     <div class="relative h-[500px] rounded-[3rem] overflow-hidden mb-6">
-                        <img src="https://nbqsxonhscsyvyhldqkt.supabase.co/storage/v1/object/public/images/forumi_1775681860054.png" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Markus Bauer">
-                        <div class="absolute inset-0 bg-gradient-to-t from-red-600/80 to-transparent opacity-0 group-hover:opacity-100 transition-all flex items-end p-10">
-                            <button class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-black">
-                                <i data-lucide="arrow-right"></i>
-                            </button>
-                        </div>
+                        <img src="https://nbqsxonhscsyvyhldqkt.supabase.co/storage/v1/object/public/images/forumi_1775681860054.png" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Arlind Alla">
                     </div>
                     <h4 class="text-2xl font-black uppercase tracking-tight">Arlind Alla</h4>
                     <p class="text-red-600 font-black uppercase tracking-[0.2em] text-[10px] mt-2">Menaxher Operativ</p>
@@ -245,48 +276,129 @@
         </div>
     </section>
 
-    <!-- --- CTA FINAL --- -->
-    <section class="py-40 text-center bg-white">
+    <!-- --- FOOTER (SHTUAR) --- -->
+    <footer class="bg-slate-950 text-white py-20 border-t border-white/10">
         <div class="container mx-auto px-6">
-            <i data-lucide="star" class="w-16 h-16 text-red-600 mx-auto mb-10 animate-spin-slow"></i>
-            <h2 class="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-10 max-w-4xl mx-auto">
-                GATI PËR TË NISUR <br />
-                <span class="text-red-600 italic">HAPIN E PARË?</span>
-            </h2>
-            <button class="group relative px-12 py-6 bg-slate-950 text-white font-black rounded-full overflow-hidden transition-all hover:scale-105">
-                <span class="relative z-10 flex items-center gap-4 uppercase tracking-widest text-xs">
-                    Filloni projektin tani <i data-lucide="chevron-right" class="group-hover:translate-x-2 transition-transform"></i>
-                </span>
-                <div class="absolute inset-0 bg-red-600 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-            </button>
+            <div class="grid lg:grid-cols-4 gap-12 mb-20">
+                <div class="lg:col-span-2">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center font-black">S</div>
+                        <h2 class="text-3xl font-black tracking-tighter">SAEG AUSTRIA.</h2>
+                    </div>
+                    <p class="text-slate-400 max-w-sm mb-8">Ne jemi partneri juaj i besuar për ndërtime që i rezistojnë kohës, duke kombinuar teknologjinë austriake me saktësinë profesionale.</p>
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer"><i data-lucide="instagram" size="18"></i></div>
+                        <div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer"><i data-lucide="facebook" size="18"></i></div>
+                        <div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer"><i data-lucide="linkedin" size="18"></i></div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-black uppercase tracking-widest text-xs mb-8">Linke të Shpejta</h4>
+                    <ul class="space-y-4 text-slate-400 text-sm">
+                        <li><a href="index.html" class="hover:text-red-500 transition-colors">Home</a></li>
+                        <li><a href="index.html#leistungen" class="hover:text-red-500 transition-colors">Shërbimet</a></li>
+                        <li><a href="https://www.lindimaps.com/SAEG/projekte/" class="hover:text-red-500 transition-colors">Projektet</a></li>
+                        <li><a href="rrethnesh.html" class="hover:text-red-500 transition-colors">Rreth Nesh</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-black uppercase tracking-widest text-xs mb-8">Zyra në Vjenë</h4>
+                    <ul class="space-y-4 text-slate-400 text-sm">
+                        <li class="flex items-start gap-3"><i data-lucide="map-pin" class="text-red-600" size="18"></i> Vjenë, Austri</li>
+                        <li class="flex items-start gap-3"><i data-lucide="phone" class="text-red-600" size="18"></i> +43 667 7968417</li>
+                        <li class="flex items-start gap-3"><i data-lucide="mail" class="text-red-600" size="18"></i> info@saeg.at</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between text-slate-500 text-[10px] font-black uppercase tracking-widest gap-4">
+                <span>© 2024 SAEG Austria. All Rights Reserved.</span>
+                <div class="flex gap-8">
+                    <a href="#" class="hover:text-white transition-colors">Impressum</a>
+                    <a href="#" class="hover:text-white transition-colors">Datenschutz</a>
+                </div>
+            </div>
         </div>
-    </section>
+    </footer>
 
     <script>
-        // Initialize Lucide Icons
         lucide.createIcons();
 
-        // Data for Interactive Steps
+        // Navbar Logic
+        const navbar = document.getElementById('navbar');
+        const logoHex = document.getElementById('logo-hex');
+        const logoText = document.getElementById('logo-text');
+        const logoGlow = document.getElementById('logo-glow');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+        let isMenuOpen = false;
+
+        function updateNavbarStyles() {
+            if (isMenuOpen) {
+                menuToggle.classList.add('bg-white/10', 'text-white');
+                menuToggle.classList.remove('bg-slate-100', 'text-slate-900');
+                return;
+            }
+            if (window.scrollY > 50) {
+                navbar.classList.add('nav-scrolled');
+                navbar.classList.remove('nav-default');
+                logoHex.setAttribute('stroke', '#0f172a');
+                logoText.classList.add('text-slate-900');
+                logoText.classList.remove('text-white');
+                logoGlow.style.opacity = '0';
+                navLinks.forEach(link => { link.classList.add('text-slate-700'); link.classList.remove('text-white'); });
+                menuToggle.classList.add('bg-slate-100', 'text-slate-900');
+                menuToggle.classList.remove('bg-white/10', 'text-white');
+            } else {
+                navbar.classList.remove('nav-scrolled');
+                navbar.classList.add('nav-default');
+                logoHex.setAttribute('stroke', 'white');
+                logoText.classList.remove('text-slate-900');
+                logoText.classList.add('text-white');
+                logoGlow.style.opacity = '0.6';
+                navLinks.forEach(link => { link.classList.remove('text-slate-700'); link.classList.add('text-white'); });
+                menuToggle.classList.remove('bg-slate-100', 'text-slate-900');
+                menuToggle.classList.add('bg-white/10', 'text-white');
+            }
+        }
+
+        window.addEventListener('scroll', updateNavbarStyles);
+
+        menuToggle.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                mobileMenu.classList.add('mobile-menu-open');
+                mobileMenu.classList.remove('mobile-menu-closed');
+                menuIcon.setAttribute('data-lucide', 'x');
+                document.body.style.overflow = 'hidden';
+            } else {
+                mobileMenu.classList.remove('mobile-menu-open');
+                mobileMenu.classList.add('mobile-menu-closed');
+                menuIcon.setAttribute('data-lucide', 'menu');
+                document.body.style.overflow = '';
+            }
+            lucide.createIcons();
+            updateNavbarStyles();
+        });
+
+        // Interactive Steps Data
         const stepsData = [
             {
                 image: "https://images.unsplash.com/photo-1503387762-592dea58ef23?auto=format&fit=crop&q=80&w=1000",
-                tags: ["Studim fizibiliteti", "Llogaritje buxhetore", "Analizë mjedisore"],
-                description: "Analizojmë terrenin dhe kërkesat teknike sipas standardeve më të larta europiane."
+                tags: ["Studim fizibiliteti", "Llogaritje buxhetore", "Analizë mjedisore"]
             },
             {
                 image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=1000",
-                tags: ["Modelim 3D", "Eficiencë energjetike", "Koordinim strukturor"],
-                description: "Ndërtojmë projektin tuaj në mënyrë digjitale përpara se të gërmohet metri i parë. Asnjë gabim nuk lejohet."
+                tags: ["Modelim 3D", "Eficiencë energjetike", "Koordinim strukturor"]
             },
             {
                 image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80&w=1000",
-                tags: ["Mbikëqyrje 24/7", "Materiale Premium", "Siguri absolute"],
-                description: "Mjeshtëria austriake në terren. Menaxhim kantieri me disiplinë dhe teknologji të fundit."
+                tags: ["Mbikëqyrje 24/7", "Materiale Premium", "Siguri absolute"]
             },
             {
                 image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=1000",
-                tags: ["Certifikim ÖNORM", "Testim strukturor", "Garanci 10 vjeçare"],
-                description: "Marrja e çelësave është vetëm fillimi i marrëdhënies sonë. Garancia dhe mbështetja jonë janë të përjetshme."
+                tags: ["Certifikim ÖNORM", "Testim strukturor", "Garanci 10 vjeçare"]
             }
         ];
 
@@ -302,39 +414,26 @@
                 const desc = card.querySelector('.step-desc');
 
                 if (i === index) {
-                    // Active State
                     card.classList.add('bg-slate-950', 'border-slate-950', 'shadow-2xl', 'translate-x-4');
                     card.classList.remove('bg-white', 'border-slate-200');
                     iconBox.classList.add('bg-red-600', 'text-white');
-                    iconBox.classList.remove('bg-slate-100', 'text-slate-400');
                     label.classList.add('text-red-500');
-                    label.classList.remove('text-slate-400');
                     title.classList.add('text-white');
-                    title.classList.remove('text-slate-900');
-                    desc.classList.add('text-slate-400');
-                    desc.classList.remove('text-slate-500', 'line-clamp-1');
+                    desc.classList.remove('line-clamp-1');
                 } else {
-                    // Inactive State
                     card.classList.remove('bg-slate-950', 'border-slate-950', 'shadow-2xl', 'translate-x-4');
                     card.classList.add('bg-white', 'border-slate-200');
                     iconBox.classList.remove('bg-red-600', 'text-white');
-                    iconBox.classList.add('bg-slate-100', 'text-slate-400');
                     label.classList.remove('text-red-500');
-                    label.classList.add('text-slate-400');
                     title.classList.remove('text-white');
-                    title.classList.add('text-slate-900');
-                    desc.classList.remove('text-slate-400');
-                    desc.classList.add('text-slate-500', 'line-clamp-1');
+                    desc.classList.add('line-clamp-1');
                 }
             });
 
-            // Update Image and Tags
             activeImage.style.opacity = '0';
             setTimeout(() => {
                 activeImage.src = stepsData[index].image;
                 activeImage.style.opacity = '1';
-                
-                // Clear and update tags
                 activeTags.innerHTML = '';
                 stepsData[index].tags.forEach(tag => {
                     const span = document.createElement('span');
