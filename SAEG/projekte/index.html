@@ -459,18 +459,94 @@
                         </div>
                     )}
 
-                    {/* Footer Minimalist */}
-                    <footer className="py-20 border-t border-white/5 bg-black">
-                        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
-                            <div className="text-center md:text-left">
-                                <h4 className="text-2xl font-black uppercase tracking-tighter mb-2">Dëshironi një kryevepër të tillë?</h4>
-                                <p className="text-slate-500 text-sm">Le të ndërtojmë vizionin tuaj të ardhshëm së bashku.</p>
-                            </div>
-                            <button className="px-12 py-5 bg-[#ED2939] text-white font-black rounded-full hover:bg-white hover:text-black transition-all uppercase tracking-widest text-xs">
-                                NA KONTAKTONI
-                            </button>
+   <!-- Professional Footer (Full Version) -->
+    <footer class="bg-slate-950 pt-24 pb-12 text-slate-400 border-t border-white/5">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-20 mb-20">
+                
+                <!-- Brand Column -->
+                <div class="col-span-1">
+                    <div class="flex items-center gap-4 mb-8 group cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                        <svg viewBox="0 0 100 100" class="w-12 h-12 transition-transform duration-500 group-hover:rotate-[360deg]">
+                            <path d="M50 5 L92 28 L92 72 L50 95 L8 72 L8 28 Z" fill="none" stroke="#ED2939" stroke-width="6" />
+                            <path d="M50 25 L80 40 L80 70 L50 85 Z" fill="#ED2939" fill-opacity="0.3" />
+                            <path d="M50 25 L20 40 L20 70 L50 85 Z" fill="#ED2939" />
+                        </svg>
+                        <h2 class="text-2xl font-black text-white tracking-tighter">SAEG<span class="text-[#ED2939]">.</span></h2>
+                    </div>
+                    <p class="text-slate-500 leading-relaxed font-medium mb-8">
+                        Innovation, Verlässlichkeit und Exzellenz im Bauwesen. SAEG Construction GmbH – Ihr Partner für monumentale Projekte in Österreich.
+                    </p>
+                    
+                    <!-- Social Links (Direct SVG) -->
+                    <div class="flex gap-4">
+                        <a href="#" class="social-icon w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:bg-[#ED2939] hover:text-white transition-all transform hover:-translate-y-1">
+                            <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                        </a>
+                        <a href="#" class="social-icon w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:bg-[#ED2939] hover:text-white transition-all transform hover:-translate-y-1">
+                            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        </a>
+                        <a href="#" class="social-icon w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:bg-[#ED2939] hover:text-white transition-all transform hover:-translate-y-1">
+                            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-[0.2em] text-[11px] mb-8 pb-2 border-b border-[#ED2939] w-fit">Navigation</h5>
+                    <ul class="space-y-4 font-bold">
+                        <li><a href="#home" class="hover:text-[#ED2939] transition-colors flex items-center gap-2 text-sm"><i data-lucide="chevron-right" size="14"></i> Home</a></li>
+                        <li><a href="#leistungen" class="hover:text-[#ED2939] transition-colors flex items-center gap-2 text-sm"><i data-lucide="chevron-right" size="14"></i> Leistungen</a></li>
+                        <li><a href="https://www.lindimaps.com/SAEG/projekte/" class="hover:text-[#ED2939] transition-colors flex items-center gap-2 text-sm"><i data-lucide="chevron-right" size="14"></i> Projekte</a></li>
+                        <li><a href="https://www.lindimaps.com/SAEG/rrethnesh/index.html" class="hover:text-[#ED2939] transition-colors flex items-center gap-2 text-sm"><i data-lucide="chevron-right" size="14"></i> Über uns</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-[0.2em] text-[11px] mb-8 pb-2 border-b border-[#ED2939] w-fit">Kontakt</h5>
+                    <ul class="space-y-6">
+                        <li class="flex gap-4">
+                            <div class="text-[#ED2939] mt-1"><i data-lucide="map-pin" size="18"></i></div>
+                            <span class="text-sm font-medium leading-relaxed text-slate-300">Ringstraße 10,<br> 1010 Wien, Austria</span>
+                        </li>
+                        <li class="flex gap-4">
+                            <div class="text-[#ED2939] mt-1"><i data-lucide="phone" size="18"></i></div>
+                            <a href="tel:+43123456789" class="text-sm font-bold hover:text-white transition-colors text-slate-300">+43 1 234 567 89</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Working Hours -->
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-[0.2em] text-[11px] mb-8 pb-2 border-b border-[#ED2939] w-fit">Öffnungszeiten</h5>
+                    <div class="bg-white/5 p-6 rounded-2xl border border-white/5">
+                        <div class="flex justify-between items-center mb-4 text-sm">
+                            <span class="font-medium">Mo - Fr:</span>
+                            <span class="text-white font-bold">08:00 - 17:00</span>
                         </div>
-                    </footer>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="font-medium">Sa - So:</span>
+                            <span class="text-[#ED2939] font-bold italic">Geschlossen</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Credits -->
+            <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-600">
+                    © 2024 SAEG CONSTRUCTION GMBH | MADE IN AUSTRIA
+                </p>
+                <div class="flex gap-8 text-[10px] uppercase font-black tracking-widest">
+                    <a href="#" class="hover:text-[#ED2939] transition-colors">Impressum</a>
+                    <a href="#" class="hover:text-[#ED2939] transition-colors">Datenschutz</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
                 </div>
             );
         };
