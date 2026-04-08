@@ -16,23 +16,29 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #020617;
-            margin: 0;
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; background-color: #020617; margin: 0; }
+        .nav-scrolled { background-color: white; padding-top: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .nav-default { background-color: transparent; padding-top: 2rem; padding-bottom: 2rem; }
+        
+        /* Mobile Menu Transitions */
+        .mobile-menu-open { transform: translateX(0) !important; opacity: 1 !important; pointer-events: auto !important; }
+        .mobile-menu-closed { transform: translateX(100%) !important; opacity: 0 !important; pointer-events: none !important; }
+        
+        @keyframes custom-pulse {
+            0%, 100% { transform: scale(1.1); }
+            50% { transform: scale(1.15); }
         }
+        .animate-hero { animation: custom-pulse 8s infinite ease-in-out; }
+
+        #back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        #back-to-top { opacity: 0; transform: translateY(20px); pointer-events: none; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        .social-icon svg { width: 20px; height: 20px; fill: currentColor; }
 
         /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #ED2939;
-            border-radius: 10px;
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #ED2939; border-radius: 10px; }
 
         .line-clamp-2 {
             display: -webkit-box;
@@ -46,7 +52,88 @@
         .lightbox-enter-active { opacity: 1; transition: opacity 300ms; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900 selection:bg-[#ED2939] selection:text-white overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-[100] transition-all duration-500 nav-default">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <!-- Logo -->
+            <div class="flex items-center gap-5 group cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <div class="relative w-14 h-14 md:w-16 md:h-16 transition-all duration-500 group-hover:scale-110">
+                    <div id="logo-glow" class="absolute inset-0 rounded-xl blur-2xl transition-opacity duration-700 bg-red-600/30 opacity-60"></div>
+                    <svg viewBox="0 0 100 100" class="w-full h-full relative z-10 drop-shadow-[0_10px_10px_rgba(0,0,0,0.3)]">
+                        <defs>
+                            <linearGradient id="wallGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ED2939" />
+                                <stop offset="100%" stop-color="#991B1B" />
+                            </linearGradient>
+                            <linearGradient id="highlightGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="white" stop-opacity="0.4" />
+                                <stop offset="100%" stop-color="white" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <path id="logo-hex" d="M50 5 L92 28 L92 72 L50 95 L8 72 L8 28 Z" fill="none" stroke="white" stroke-width="6" class="transition-colors duration-300" />
+                        <path d="M50 25 L80 40 L80 70 L50 85 Z" fill="#A50F1D" />
+                        <path d="M50 25 L20 40 L20 70 L50 85 Z" fill="url(#wallGradient)" />
+                        <path d="M50 25 L80 40 L50 55 L20 40 Z" fill="#EF4444" />
+                        <path d="M20 50 L50 65 L80 50 L80 58 L50 73 L20 58 Z" fill="white" />
+                        <path d="M50 25 L50 85 M20 40 L80 40 M20 70 L80 70" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" />
+                        <path d="M50 25 L80 40 L50 55 L20 40 Z" fill="url(#highlightGradient)" />
+                    </svg>
+                </div>
+                <div class="flex flex-col">
+                    <h1 id="logo-text" class="text-2xl md:text-3xl font-black tracking-[-0.02em] leading-none transition-colors duration-300 text-white">
+                        SAEG<span class="text-[#ED2939]">.</span>
+                    </h1>
+                    <div class="flex items-center gap-2 mt-1">
+                        <div class="h-[2px] w-4 bg-[#ED2939]"></div>
+                        <span class="text-[8px] md:text-[10px] font-black tracking-[0.3em] text-[#ED2939] uppercase">AUSTRIA</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Nav -->
+            <div class="hidden lg:flex items-center gap-10">
+                <a href="https://www.lindimaps.com/SAEG/" class="nav-link text-[11px] font-black uppercase tracking-[0.3em] text-white hover:text-[#ED2939] transition-all relative group">HOME<span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#ED2939] transition-all group-hover:w-full"></span></a>
+                <a href="https://www.lindimaps.com/SAEG/#leistungen" class="nav-link text-[11px] font-black uppercase tracking-[0.3em] text-white hover:text-[#ED2939] transition-all relative group">LEISTUNGEN<span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#ED2939] transition-all group-hover:w-full"></span></a>
+                <a href="https://www.lindimaps.com/SAEG/projekte/" class="nav-link text-[11px] font-black uppercase tracking-[0.3em] text-[#ED2939] relative group">PROJEKTE<span class="absolute -bottom-1 left-0 w-full h-[2px] bg-[#ED2939]"></span></a>
+                <a href="https://www.lindimaps.com/SAEG/rrethnesh/index.html" class="nav-link text-[11px] font-black uppercase tracking-[0.3em] text-white hover:text-[#ED2939] transition-all relative group">ÜBER UNS<span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#ED2939] transition-all group-hover:w-full"></span></a>
+                <a href="https://www.lindimaps.com/SAEG/kontakte/index.html" class="nav-link text-[11px] font-black uppercase tracking-[0.3em] text-white hover:text-[#ED2939] transition-all relative group">KONTAKT<span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#ED2939] transition-all group-hover:w-full"></span></a>
+                
+                <button class="bg-[#ED2939] text-white px-8 py-3 rounded-full font-black hover:bg-[#C8102E] transition-all shadow-xl shadow-red-600/30 active:scale-95 tracking-widest text-[10px]">
+                    JETZT ANFRAGEN
+                </button>
+            </div>
+
+            <!-- Mobile Toggle -->
+            <button id="menu-toggle" class="lg:hidden p-3 rounded-xl transition-all duration-300 bg-white/10 text-white backdrop-blur-md relative z-[110] border border-white/10">
+                <i data-lucide="menu" id="menu-icon" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <!-- Fullscreen Mobile Menu -->
+        <div id="mobile-menu" class="fixed inset-0 bg-slate-950 transition-all duration-500 ease-in-out mobile-menu-closed flex flex-col justify-center items-center gap-6 p-10 z-[105]">
+            <a href="https://www.lindimaps.com/SAEG/" class="mobile-link text-4xl font-black text-white uppercase tracking-tighter hover:text-[#ED2939]">HOME</a>
+            <a href="https://www.lindimaps.com/SAEG/#leistungen" class="mobile-link text-4xl font-black text-white uppercase tracking-tighter hover:text-[#ED2939]">LEISTUNGEN</a>
+            <a href="https://www.lindimaps.com/SAEG/projekte/" class="mobile-link text-4xl font-black text-[#ED2939] uppercase tracking-tighter">PROJEKTE</a>
+            <a href="https://www.lindimaps.com/SAEG/kontakte/index.html" class="mobile-link text-4xl font-black text-white uppercase tracking-tighter hover:text-[#ED2939]">KONTAKT</a>
+            <a href="https://www.lindimaps.com/SAEG/rrethnesh/index.html" class="mobile-link text-4xl font-black text-white uppercase tracking-tighter hover:text-[#ED2939]">ÜBER UNS</a>
+            
+            <!-- Mobile Social Icons -->
+            <div class="flex gap-4 mt-6">
+                <a href="#" class="social-icon w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white hover:bg-[#ED2939] transition-all">
+                    <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                </a>
+                <a href="#" class="social-icon w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white hover:bg-[#ED2939] transition-all">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                </a>
+                <a href="#" class="social-icon w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white hover:bg-[#ED2939] transition-all">
+                    <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                </a>
+            </div>
+        </div>
+    </nav>
+
     <div id="root"></div>
 
     <script type="text/babel">
@@ -130,6 +217,43 @@
 
             useEffect(() => {
                 setIsLoaded(true);
+                // Navbar Logic
+                const navbar = document.getElementById('navbar');
+                const menuToggle = document.getElementById('menu-toggle');
+                const mobileMenu = document.getElementById('mobile-menu');
+                const logoText = document.getElementById('logo-text');
+                const logoHex = document.getElementById('logo-hex');
+
+                const handleScroll = () => {
+                    if (window.scrollY > 50) {
+                        navbar.classList.add('nav-scrolled');
+                        navbar.classList.remove('nav-default');
+                        logoText.classList.replace('text-white', 'text-slate-900');
+                        logoHex.setAttribute('stroke', '#0f172a');
+                        menuToggle.classList.replace('text-white', 'text-slate-900');
+                        menuToggle.classList.replace('bg-white/10', 'bg-slate-100');
+                    } else {
+                        navbar.classList.add('nav-default');
+                        navbar.classList.remove('nav-scrolled');
+                        logoText.classList.replace('text-slate-900', 'text-white');
+                        logoHex.setAttribute('stroke', 'white');
+                        menuToggle.classList.replace('text-slate-900', 'text-white');
+                        menuToggle.classList.replace('bg-slate-100', 'bg-white/10');
+                    }
+                };
+
+                const toggleMenu = () => {
+                    mobileMenu.classList.toggle('mobile-menu-closed');
+                    mobileMenu.classList.toggle('mobile-menu-open');
+                };
+
+                window.addEventListener('scroll', handleScroll);
+                menuToggle.addEventListener('click', toggleMenu);
+                
+                return () => {
+                    window.removeEventListener('scroll', handleScroll);
+                    menuToggle.removeEventListener('click', toggleMenu);
+                };
             }, []);
 
             const categories = ["Të gjitha", "Rezidencial", "Gewerbebau", "Hotelier", "Sanierung"];
