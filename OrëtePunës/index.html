@@ -1,1 +1,208 @@
-<!DOCTYPE html> <html lang="sq"> <head>     <meta charset="UTF-8">     <meta name="viewport" content="width=device-width, initial-scale=1.0">     <title>Payroll Pro v8 - Full Management</title>     <!-- Tailwind CSS zyrtar -->     <script src="https://cdn.tailwindcss.com"></script>     <style>         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');                  :root { font-family: 'Plus Jakarta Sans', sans-serif; }          @media print {             .no-print { display: none !important; }             body { background: white !important; padding: 0 !important; }             .print-container { width: 100% !important; border: none !important; shadow: none !important; }             table { width: 100% !important; border-collapse: collapse !important; }             th, td { border-bottom: 1px solid #e2e8f0 !important; padding: 12px 8px !important; }         }          /* Stilizimi i scrollbar-it për listat e gjata */         .custom-scroll::-webkit-scrollbar { width: 6px; }         .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }     </style> </head> <body class="bg-[#f8fafc] text-slate-900 min-h-screen">  <div id="loading" class="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">     <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>     <p class="mt-4 text-slate-400 font-bold text-xs uppercase tracking-widest">Duke u lidhur...</p> </div>  <div id="app" class="max-w-7xl mx-auto px-4 py-6 md:py-10 hidden">          <!-- HEADER -->     <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6 no-print">         <div>             <h1 class="text-3xl font-extrabold tracking-tight">Sistemi i Pagave <span class="text-indigo-600">PRO</span></h1>             <div class="flex items-center gap-2 mt-1">                 <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cloud Sync Aktiv</span>             </div>         </div>         <div class="flex flex-wrap gap-3">             <button onclick="window.print()" class="bg-white border border-slate-200 px-5 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm">                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>                 Printo Raportin             </button>             <button onclick="openWorkerModal()" class="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">                 + Shto Punëtor             </button>         </div>     </header>      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">                  <!-- KOLONA MAJTAS: INPUTI DITOR -->         <aside class="lg:col-span-4 no-print">             <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 sticky top-10">                 <div class="flex items-center justify-between mb-8">                     <div>                         <h2 class="font-extrabold text-lg">Ditari i Punës</h2>                         <p class="text-slate-400 text-[10px] font-bold uppercase tracking-tighter">Regjistro orët ditorisht</p>                     </div>                     <input type="date" id="input-date" class="bg-indigo-50 text-indigo-700 font-bold p-2 rounded-xl border-none outline-none focus:ring-2 focus:ring-indigo-200">                 </div>                  <div id="daily-list" class="space-y-3 max-h-[450px] overflow-y-auto pr-2 custom-scroll">                     <!-- Dinamike -->                 </div>                  <button id="btn-save-daily" onclick="saveDaily()" class="w-full mt-8 bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-black transition-all shadow-xl shadow-slate-100 flex items-center justify-center gap-2">                     Ruaj të dhënat                 </button>             </div>         </aside>          <!-- KOLONA DJATHTAS: RAPORTET -->         <main class="lg:col-span-8 print-container">             <div class="bg-white p-6 md:p-10 rounded-[2rem] shadow-sm border border-slate-100 h-full">                                  <!-- Filtrimi -->                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 no-print">                     <h2 class="text-xl font-extrabold tracking-tight">Përmbledhja e Pagave</h2>                     <div class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">                         <input type="date" id="range-start" class="bg-transparent text-[10px] font-black uppercase px-2 py-1 outline-none text-slate-500">                         <span class="text-slate-300 font-bold">—</span>                         <input type="date" id="range-end" class="bg-transparent text-[10px] font-black uppercase px-2 py-1 outline-none text-slate-500">                     </div>                 </div>                  <!-- Print Style Header -->                 <div class="hidden print:block text-center mb-10 border-b pb-8">                     <h1 class="text-3xl font-black">RAPORTI I PAGESAVE</h1>                     <p id="print-range-label" class="text-slate-500 font-bold uppercase text-xs mt-2"></p>                 </div>                  <div class="overflow-x-auto">                     <table class="w-full text-left">                         <thead>                             <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] border-b border-slate-50">                                 <th class="pb-5 pl-2">Punëtori</th>                                 <th class="pb-5 text-center">Paga/h</th>                                 <th class="pb-5 text-center">Totali Orëve</th>                                 <th class="pb-5 text-right">Shuma (€)</th>                                 <th class="pb-5 text-right no-print">Opsione</th>                             </tr>                         </thead>                         <tbody id="report-body" class="divide-y divide-slate-50">                             <!-- Dinamike -->                         </tbody>                     </table>                 </div>                  <!-- Totalet -->                 <div class="mt-10 grid grid-cols-2 gap-4">                     <div class="bg-indigo-600 p-6 rounded-[1.5rem] text-white shadow-2xl shadow-indigo-100">                         <p class="text-[10px] font-bold uppercase opacity-60 tracking-widest mb-1">Totali për Pagesë</p>                         <h3 id="grand-total-money" class="text-3xl font-black">0.00 €</h3>                     </div>                     <div class="bg-slate-900 p-6 rounded-[1.5rem] text-white">                         <p class="text-[10px] font-bold uppercase opacity-60 tracking-widest mb-1">Totali i Orëve</p>                         <h3 id="grand-total-hours" class="text-3xl font-black">0 h</h3>                     </div>                 </div>                  <div class="hidden print:flex mt-20 justify-between items-end">                     <div class="text-center">                         <div class="w-48 border-b border-slate-300 mb-2"></div>                         <p class="text-[10px] font-bold text-slate-400 uppercase">Nënshkrimi i Punëtorit</p>                     </div>                     <div class="text-center">                         <div class="w-48 border-b border-slate-300 mb-2"></div>                         <p class="text-[10px] font-bold text-slate-400 uppercase">Vula e Administratorit</p>                     </div>                 </div>             </div>         </main>     </div> </div>  <!-- MODAL: SHTO/EDITO PUNETOR --> <div id="worker-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[150] hidden items-center justify-center p-4 no-print">     <div class="bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl animate-in">         <div class="flex justify-between items-center mb-8">             <h3 id="modal-title" class="text-2xl font-black">Punëtor i Ri</h3>             <button onclick="closeModal('worker-modal')" class="text-slate-300 hover:text-slate-600 text-3xl transition-colors">×</button>         </div>         <input type="hidden" id="edit-id">         <div class="space-y-6">             <div>                 <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-2 block tracking-widest">Emri i Plotë</label>                 <input type="text" id="worker-name" class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 outline-none focus:ring-4 focus:ring-indigo-50 font-bold transition-all">             </div>             <div>                 <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-2 block tracking-widest">Paga për Orë (€/h)</label>                 <input type="number" step="0.1" id="worker-rate" class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 outline-none focus:ring-4 focus:ring-indigo-50 font-bold transition-all">             </div>             <button onclick="saveWorker()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-extrabold text-lg hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-95">                 Ruaj Ndryshimet             </button>         </div>     </div> </div>  <!-- MODAL: EDITO ORET (DETALET) --> <div id="logs-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[160] hidden items-center justify-center p-4 no-print">     <div class="bg-white w-full max-w-xl rounded-[2.5rem] p-8 shadow-2xl h-[85vh] flex flex-col animate-in">         <div class="flex justify-between items-center mb-6">             <div>                 <h3 id="logs-worker-name" class="text-2xl font-black">Historia e Punës</h3>                 <p id="logs-period" class="text-slate-400 text-xs font-bold uppercase tracking-widest"></p>             </div>             <button onclick="closeModal('logs-modal')" class="text-slate-300 hover:text-slate-600 text-3xl">×</button>         </div>         <div id="logs-list" class="flex-1 overflow-y-auto pr-2 space-y-3 custom-scroll">             <!-- Historia ditor e oreve -->         </div>         <button onclick="closeModal('logs-modal')" class="w-full mt-6 bg-slate-900 text-white py-4 rounded-2xl font-bold">Mbyll Detajet</button>     </div> </div>  <script type="module"> import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"; import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";  // KONFIGURIMI DINAMIK const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {     apiKey: "AIzaSyDGlHCPxysEO4ZxxIPic3u7rRZCo7oZTZ4",     authDomain: "workhours-fb74a.firebaseapp.com",     projectId: "workhours-fb74a",     storageBucket: "workhours-fb74a.firebasestorage.app",     messagingSenderId: "276432513861",     appId: "1:276432513861:web:1ed148fbde29baf4c7ac2c" };  const appId = typeof __app_id !== 'undefined' ? __app_id : 'payroll-pro-v8-full'; const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);  let user, workers = [], logs = [];  // DATA INICIALE const now = new Date(); const today = now.toISOString().slice(0, 10); const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);  document.getElementById('input-date').value = today; document.getElementById('range-start').value = startOfMonth; document.getElementById('range-end').value = today;  // AUTH SINKRONIZIMI const performAuth = async () => {     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {         await signInWithCustomToken(auth, __initial_auth_token);     } else {         await signInAnonymously(auth);     } };  onAuthStateChanged(auth, (u) => {     if (u) {         user = u;         document.getElementById('loading').classList.add('hidden');         document.getElementById('app').classList.remove('hidden');         setupSync();     } else {         performAuth();     } });  function setupSync() {     const base = `artifacts/${appId}/users/${user.uid}`;          // Sinkronizo Punetoret     onSnapshot(collection(db, base, "workers"), snap => {         workers = snap.docs.map(d => ({id: d.id, ...d.data()}));         refreshUI();     });      // Sinkronizo Loget (Oret)     onSnapshot(collection(db, base, "logs"), snap => {         logs = snap.docs.map(d => ({id: d.id, ...d.data()}));         refreshUI();     }); }  function refreshUI() {     renderDailyInputs();     renderReportTable(); }  // FUNKSIONET E MODALIT window.openWorkerModal = () => {     document.getElementById('modal-title').innerText = "Punëtor i Ri";     document.getElementById('edit-id').value = "";     document.getElementById('worker-name').value = "";     document.getElementById('worker-rate').value = "";     document.getElementById('worker-modal').classList.replace('hidden', 'flex'); };  window.closeModal = (id) => {     document.getElementById(id).classList.replace('flex', 'hidden'); };  // PUNETORI (SAVE/EDIT/DELETE) window.saveWorker = async () => {     const id = document.getElementById('edit-id').value || Date.now().toString();     const name = document.getElementById('worker-name').value;     const rate = parseFloat(document.getElementById('worker-rate').value);          if(!name || isNaN(rate)) return;      await setDoc(doc(db, `artifacts/${appId}/users/${user.uid}/workers`, id), { name, rate });     closeModal('worker-modal'); };  window.editWorkerBasic = (id) => {     const w = workers.find(x => x.id === id);     document.getElementById('modal-title').innerText = "Edito Punëtorin";     document.getElementById('edit-id').value = w.id;     document.getElementById('worker-name').value = w.name;     document.getElementById('worker-rate').value = w.rate;     document.getElementById('worker-modal').classList.replace('hidden', 'flex'); };  window.deleteWorker = async (id) => {     if(confirm("Dëshironi ta fshini punëtorin dhe të gjitha orët e tij?")) {         await deleteDoc(doc(db, `artifacts/${appId}/users/${user.uid}/workers`, id));     } };  // ORET (DITARI & EDITIMI INDIVIDUAL) window.saveDaily = async () => {     const date = document.getElementById('input-date').value;     const inputs = document.querySelectorAll('.daily-hour-input');     const btn = document.getElementById('btn-save-daily');          btn.innerText = "Duke ruajtur...";     btn.disabled = true;      for (let i of inputs) {         const wId = i.dataset.id;         const val = parseFloat(i.value) || 0;         const logId = `${date}_${wId}`;         const ref = doc(db, `artifacts/${appId}/users/${user.uid}/logs`, logId);          if(val > 0) await setDoc(ref, { date, workerId: wId, hours: val });         else await deleteDoc(ref);     }      btn.innerText = "Ruaj të dhënat";     btn.disabled = false; };  window.updateSingleLog = async (logId, val) => {     const h = parseFloat(val) || 0;     const ref = doc(db, `artifacts/${appId}/users/${user.uid}/logs`, logId);     if(h > 0) await setDoc(ref, { hours: h }, { merge: true });     else await deleteDoc(ref); };  // RENDERUESIT function renderDailyInputs() {     const date = document.getElementById('input-date').value;     const container = document.getElementById('daily-list');          if(workers.length === 0) {         container.innerHTML = `<div class="p-8 text-center text-slate-400 text-xs italic">Shto punëtorë për të shënuar orët.</div>`;         return;     }      container.innerHTML = workers.map(w => {         const log = logs.find(l => l.date === date && l.workerId === w.id);         return `         <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-transparent focus-within:bg-white focus-within:border-indigo-100 transition-all">             <span class="font-bold text-slate-700 text-sm">${w.name}</span>             <div class="flex items-center gap-2">                 <input type="number" step="0.5" data-id="${w.id}" value="${log ? log.hours : ''}"                         class="daily-hour-input w-20 text-center py-2 rounded-xl border border-slate-200 font-black text-indigo-600 outline-none">                 <span class="text-[10px] font-bold text-slate-300 uppercase">h</span>             </div>         </div>`;     }).join(''); }  function renderReportTable() {     const start = document.getElementById('range-start').value;     const end = document.getElementById('range-end').value;     const tbody = document.getElementById('report-body');     let tH = 0, tM = 0;      document.getElementById('print-range-label').innerText = `Periudha: ${start} deri ${end}`;      tbody.innerHTML = workers.map(w => {         const filteredLogs = logs.filter(l => l.workerId === w.id && l.date >= start && l.date <= end);         const hours = filteredLogs.reduce((a, b) => a + b.hours, 0);         const total = hours * w.rate;         tH += hours; tM += total;          return `         <tr class="hover:bg-slate-50 transition-colors group">             <td class="py-5 pl-2">                 <div class="font-bold text-slate-800">${w.name}</div>             </td>             <td class="py-5 text-center text-xs font-bold text-slate-400">${w.rate.toFixed(2)} €</td>             <td class="py-5 text-center">                 <button onclick="showWorkerDetails('${w.id}')" class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg font-black text-xs hover:bg-indigo-600 hover:text-white transition-all">                     ${hours} h                 </button>             </td>             <td class="py-5 text-right font-black text-slate-900">${total.toFixed(2)} €</td>             <td class="py-5 text-right no-print">                 <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">                     <button onclick="editWorkerBasic('${w.id}')" class="text-indigo-400 hover:text-indigo-600">✎</button>                     <button onclick="deleteWorker('${w.id}')" class="text-red-300 hover:text-red-600">✕</button>                 </div>             </td>         </tr>`;     }).join('');      document.getElementById('grand-total-money').innerText = tM.toFixed(2) + " €";     document.getElementById('grand-total-hours').innerText = tH + " h"; }  window.showWorkerDetails = (wId) => {     const start = document.getElementById('range-start').value;     const end = document.getElementById('range-end').value;     const w = workers.find(x => x.id === wId);     const filtered = logs.filter(l => l.workerId === wId && l.date >= start && l.date <= end)                          .sort((a,b) => b.date.localeCompare(a.date));      document.getElementById('logs-worker-name').innerText = w.name;     document.getElementById('logs-period').innerText = `${start} — ${end}`;          const container = document.getElementById('logs-list');     if(filtered.length === 0) {         container.innerHTML = `<p class="py-20 text-center text-slate-400 italic text-sm">Nuk ka orë të regjistruara.</p>`;     } else {         container.innerHTML = filtered.map(l => `         <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">             <span class="text-xs font-bold text-slate-500 uppercase">${l.date}</span>             <div class="flex items-center gap-3">                 <input type="number" step="0.5" value="${l.hours}"                         onchange="updateSingleLog('${l.id}', this.value)"                        class="w-20 text-center py-2 rounded-xl border-2 border-transparent focus:border-indigo-500 font-black text-indigo-600 outline-none transition-all">                 <span class="text-[10px] font-black text-slate-300">ORË</span>             </div>         </div>`).join('');     }     document.getElementById('logs-modal').classList.replace('hidden', 'flex'); };  // LISTENERS document.getElementById('input-date').onchange = renderDailyInputs; document.getElementById('range-start').onchange = renderReportTable; document.getElementById('range-end').onchange = renderReportTable;  </script> </body> </html> 
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payroll Business</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body class="bg-gray-100">
+
+<div id="app" class="max-w-6xl mx-auto p-6 hidden">
+
+<h1 class="text-2xl font-bold mb-4">Payroll Business</h1>
+
+<!-- USER -->
+<div class="mb-4 flex justify-between">
+<span id="userEmail"></span>
+<button onclick="logout()" class="bg-red-500 text-white px-3 py-1 rounded">Logout</button>
+</div>
+
+<!-- ACTIONS -->
+<div class="flex gap-2 mb-4 flex-wrap">
+<button onclick="exportPDF()" class="bg-indigo-600 text-white px-3 py-2 rounded">PDF</button>
+<button onclick="backupData()" class="bg-green-600 text-white px-3 py-2 rounded">Backup</button>
+<input type="file" onchange="restoreData(event)" class="border p-1">
+<select id="filterWorker" onchange="renderTotals()" class="border p-2">
+<option value="">Të gjithë</option>
+</select>
+</div>
+
+<!-- ADD WORKER -->
+<div class="bg-white p-4 rounded mb-4 flex gap-2">
+<input id="name" placeholder="Emri" class="border p-2 flex-1">
+<input id="rate" type="number" placeholder="€/h" class="border p-2 w-24">
+<button onclick="addWorker()" class="bg-blue-500 text-white px-4">Shto</button>
+</div>
+
+<!-- DAILY -->
+<div class="bg-white p-4 rounded mb-4">
+<input type="date" id="date" class="border p-2 mb-2">
+<div id="daily"></div>
+<button onclick="saveHours()" class="w-full bg-black text-white p-2 mt-2">Ruaj</button>
+</div>
+
+<!-- TOTALS -->
+<div class="bg-white p-4 rounded">
+<input type="date" id="start" class="border p-2">
+<input type="date" id="end" class="border p-2">
+<div id="totals" class="mt-2"></div>
+<div class="font-bold mt-3">
+<span id="money"></span> | <span id="hours"></span>
+</div>
+</div>
+
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="flex items-center justify-center h-screen">
+<div class="bg-white p-6 rounded shadow w-80">
+<h2 class="text-xl font-bold mb-3">Login</h2>
+<input id="email" placeholder="Email" class="border p-2 w-full mb-2">
+<input id="password" type="password" placeholder="Password" class="border p-2 w-full mb-2">
+<button onclick="login()" class="bg-indigo-600 text-white w-full p-2 mb-2">Login</button>
+<button onclick="register()" class="bg-gray-200 w-full p-2">Register</button>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+const firebaseConfig = {
+ apiKey: "AIzaSy...",
+ authDomain: "workhours-fb74a.firebaseapp.com",
+ projectId: "workhours-fb74a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let user, workers=[], logs=[];
+
+// AUTH
+window.login = async ()=>{
+ await signInWithEmailAndPassword(auth,email.value,password.value);
+};
+
+window.register = async ()=>{
+ await createUserWithEmailAndPassword(auth,email.value,password.value);
+};
+
+window.logout = ()=> signOut(auth);
+
+onAuthStateChanged(auth, u=>{
+ if(u){
+  user=u;
+  login.style.display="none";
+  appDiv.style.display="block";
+  userEmail.innerText=u.email;
+  start();
+ }
+});
+
+// START
+function start(){
+ const base=`users/${user.uid}`;
+
+ onSnapshot(collection(db, base+"/workers"), snap=>{
+  workers=snap.docs.map(d=>({id:d.id,...d.data()}));
+  fillFilter();
+  renderDaily();
+  renderTotals();
+ });
+
+ onSnapshot(collection(db, base+"/logs"), snap=>{
+  logs=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderDaily();
+  renderTotals();
+ });
+}
+
+// WORKERS
+window.addWorker = async ()=>{
+ await setDoc(doc(db, `users/${user.uid}/workers`, Date.now().toString()), {
+  name:name.value,
+  rate:parseFloat(rate.value)
+ });
+};
+
+// DAILY
+window.renderDaily = ()=>{
+ const d=date.value;
+ daily.innerHTML = workers.map(w=>{
+  const l=logs.find(x=>x.date===d&&x.workerId===w.id);
+  return `<div class="flex justify-between mb-2">
+  <span>${w.name}</span>
+  <input data-id="${w.id}" value="${l?l.hours:''}" class="border w-20 text-center">
+  </div>`;
+ }).join("");
+};
+
+// SAVE
+window.saveHours = async ()=>{
+ const d=date.value;
+ document.querySelectorAll("#daily input").forEach(async i=>{
+  const h=parseFloat(i.value)||0;
+  const id=i.dataset.id;
+  const ref=doc(db, `users/${user.uid}/logs`, d+"_"+id);
+  if(h>0) await setDoc(ref,{date:d,workerId:id,hours:h});
+  else await deleteDoc(ref);
+ });
+};
+
+// TOTALS
+window.renderTotals = ()=>{
+ let tH=0,tM=0;
+ totals.innerHTML = workers.map(w=>{
+  const h=logs.filter(l=>l.workerId===w.id).reduce((a,b)=>a+b.hours,0);
+  const m=h*w.rate;
+  tH+=h; tM+=m;
+  return `<div class="flex justify-between">${w.name} ${h}h ${m.toFixed(2)}€</div>`;
+ }).join("");
+ hours.innerText=tH+"h";
+ money.innerText=tM.toFixed(2)+"€";
+};
+
+// PDF
+window.exportPDF = ()=>{
+ const { jsPDF } = window.jspdf;
+ const doc = new jsPDF();
+ doc.text("Payroll Report",10,10);
+ let y=20;
+ workers.forEach(w=>{
+  const h=logs.filter(l=>l.workerId===w.id).reduce((a,b)=>a+b.hours,0);
+  doc.text(`${w.name} ${h}h`,10,y);
+  y+=10;
+ });
+ doc.save("report.pdf");
+};
+
+// BACKUP
+window.backupData = ()=>{
+ const blob = new Blob([JSON.stringify({workers,logs})]);
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download="backup.json";
+ a.click();
+};
+
+// RESTORE
+window.restoreData = (e)=>{
+ const file=e.target.files[0];
+ const reader=new FileReader();
+ reader.onload=()=>{
+  const data=JSON.parse(reader.result);
+  alert("Loaded backup (manual upload needed)");
+ };
+ reader.readAsText(file);
+};
+</script>
+
+</body>
+</html>
