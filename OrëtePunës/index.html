@@ -130,7 +130,23 @@ window.registerUser = async ()=>{
  }
 };
 
-window.logout = ()=> signOut(auth);
+window.logout = async ()=>{
+ try {
+  await signOut(auth);
+
+  user = null;
+  workers = [];
+  logs = [];
+
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("login").style.display = "flex";
+
+  document.getElementById("userEmail").innerText = "";
+
+ } catch(e){
+  alert(e.message);
+ }
+};
 
 onAuthStateChanged(auth, u=>{
  if(u){
