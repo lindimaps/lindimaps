@@ -28,7 +28,7 @@
             <input id="password" type="password" placeholder="Password" class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-indigo-500">
             <button onclick="window.loginUser()" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold shadow-lg shadow-indigo-100">Kyçu</button>
             <div class="flex flex-col items-center gap-3 pt-2">
-                <button onclick="window.toggleRegModal(true)" class="text-indigo-600 font-bold text-sm">Krijo llogari (Konfirmim me Email)</button>
+                <button onclick="window.toggleRegModal(true)" class="text-indigo-600 font-bold text-sm">Nuk keni llogari? Regjistrohu</button>
                 <button onclick="window.resetPassword()" class="text-slate-400 text-xs underline">Harruat fjalëkalimin?</button>
             </div>
         </div>
@@ -38,11 +38,11 @@
 <!-- REGISTRATION MODAL -->
 <div id="regModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center px-4">
     <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm space-y-4">
-        <h3 class="text-xl font-bold text-slate-800">Regjistrimi</h3>
-        <p class="text-xs text-slate-500 italic font-medium text-center">Pas regjistrimit, duhet të klikoni linkun që do t'ju vijë në email për të aktivizuar llogarinë.</p>
-        <input id="regEmail" type="email" placeholder="Email i saktë" class="w-full border p-3 rounded-xl outline-none focus:border-emerald-500">
+        <h3 class="text-xl font-bold text-slate-800">Krijo Llogari të Re</h3>
+        <p class="text-sm text-slate-500">Plotësoni të dhënat saktë për regjistrim.</p>
+        <input id="regEmail" type="email" placeholder="Shkruaj Email-in saktë" class="w-full border p-3 rounded-xl outline-none focus:border-emerald-500">
         <input id="regPassword" type="password" placeholder="Password i ri" class="w-full border p-3 rounded-xl outline-none focus:border-emerald-500">
-        <button onclick="window.registerUser()" class="w-full bg-emerald-600 text-white p-4 rounded-xl font-bold">Regjistrohu & Dërgo Email</button>
+        <button onclick="window.registerUser()" class="w-full bg-emerald-600 text-white p-4 rounded-xl font-bold">Regjistrohu Tani</button>
         <button onclick="window.toggleRegModal(false)" class="w-full text-slate-500 font-medium py-2">Mbyll</button>
     </div>
 </div>
@@ -108,7 +108,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { 
  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
- signOut, onAuthStateChanged, sendPasswordResetEmail, sendEmailVerification 
+ signOut, onAuthStateChanged, sendPasswordResetEmail 
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -122,7 +122,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-let currentUserObj, workers = [], logs = [];
+let user, workers = [], logs = [];
 let editId = null;
 
 const validateEmail = (email) => {
@@ -141,19 +141,11 @@ window.loginUser = async ()=>{
   const pass = document.getElementById("password").value;
   if(!email || !validateEmail(email)) return alert("Plotësoni saktë email-in tuaj!");
   if(!pass) return alert("Ju lutem shkruani fjalëkalimin!");
-  
-  const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-  const user = userCredential.user;
-
-  if(!user.emailVerified) {
-      alert("Ju lutem konfirmoni email-in tuaj në inbox për të vazhduar! Ky llogari nuk është aktive pa konfirmim.");
-      await signOut(auth);
-      return;
-  }
+  await signInWithEmailAndPassword(auth, email, pass);
  } catch(e){ 
     if(e.code === 'auth/wrong-password') alert("Keni shkruajtur gabim paswordin!");
     else if(e.code === 'auth/user-not-found') alert("Ky email nuk është i regjistruar!");
-    else alert("Gabim: " + e.message);
+    else alert("Gabim në kyçje. Kontrolloni të dhënat!");
  }
 };
 
@@ -163,14 +155,10 @@ window.registerUser = async ()=>{
   const pass = document.getElementById("regPassword").value;
   if(!email || !validateEmail(email)) return alert("Ju lutem plotësoni saktë email-in!");
   if(!pass || pass.length < 6) return alert("Fjalëkalimi duhet të jetë të paktën 6 karaktere!");
-  
-  const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-  await sendEmailVerification(userCredential.user);
-  
-  alert("U regjistruat me suksese! Një email konfirmimi u dërgua te " + email + ". Ju lutem konfirmoni linkun para se të kyçeni.");
-  await signOut(auth); // Largojme direkt qe te detyrohet te beje login pas konfirmimit
+  await createUserWithEmailAndPassword(auth, email, pass);
+  alert("U regjistruat me suksese");
   window.toggleRegModal(false);
- } catch(e){ alert("Gabim gjatë regjistrimit: " + e.message); }
+ } catch(e){ alert("Gabim: " + e.message); }
 };
 
 window.resetPassword = async ()=>{
@@ -188,8 +176,8 @@ window.logout = async ()=>{
 };
 
 onAuthStateChanged(auth, u=>{
- if(u && u.emailVerified){
-  currentUserObj = u;
+ if(u){
+  user = u;
   document.getElementById("login").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
   document.getElementById("userEmail").innerText = u.email;
@@ -202,7 +190,7 @@ onAuthStateChanged(auth, u=>{
 
 /* --- CORE --- */
 function start(){
- const base = `users/${currentUserObj.uid}`;
+ const base = `users/${user.uid}`;
  onSnapshot(collection(db, base+"/workers"), snap=>{
   workers = snap.docs.map(d=>({id:d.id,...d.data()}));
   renderDaily();
@@ -223,7 +211,7 @@ window.addWorker = async ()=>{
 
  const id = editId || Date.now().toString();
  try {
-    await setDoc(doc(db, `users/${currentUserObj.uid}/workers`, id), { name, rate });
+    await setDoc(doc(db, `users/${user.uid}/workers`, id), { name, rate });
     if(editId) alert("Ndryshimi u ruajt");
     else alert("Punëtori u shtua me sukses");
     window.cancelEdit();
@@ -253,12 +241,17 @@ window.cancelEdit = () => {
     document.getElementById("workerForm").classList.remove("edit-mode");
 };
 
+// FIX I RENDESISHEM: Perdor rrugen absolute te dokumentit
 window.deleteWorker = async (workerId) => {
     if(confirm("A jeni i sigurt që dëshironi ta hiqni këtë punëtor nga lista përgjithmonë?")){
         try {
-            await deleteDoc(doc(db, `users/${currentUserObj.uid}/workers/${workerId}`));
+            const path = `users/${user.uid}/workers/${workerId}`;
+            await deleteDoc(doc(db, path));
             alert("Punëtori u hoq nga lista");
-        } catch(e) { alert("Gabim gjatë fshirjes."); }
+        } catch(e) { 
+            console.error(e);
+            alert("Gabim gjatë fshirjes. Kontrolloni lidhjen."); 
+        }
     }
 };
 
@@ -285,7 +278,7 @@ window.saveHours = async ()=>{
      for (let i of inputs) {
       const h = parseFloat(i.value)||0;
       const id = i.dataset.id;
-      const ref = doc(db, `users/${currentUserObj.uid}/logs`, date+"_"+id);
+      const ref = doc(db, `users/${user.uid}/logs`, date+"_"+id);
       if(h>0) await setDoc(ref,{date,workerId:id,hours:h});
       else await deleteDoc(ref);
      }
@@ -392,4 +385,3 @@ document.getElementById("end").onchange = renderTotals;
 
 </script>
 </body>
-</html>
