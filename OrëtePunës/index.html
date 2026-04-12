@@ -1,1 +1,95 @@
-<!DOCTYPE html> <html lang="sq"> <head>     <meta charset="UTF-8">     <meta name="viewport" content="width=device-width, initial-scale=1.0">     <title>Sistemi i Pagave</title>     <script src="https://cdn.tailwindcss.com"></script>     <style>         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');         body { font-family: 'Plus Jakarta Sans', sans-serif; }         .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #4f46e5; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }         @media print { .no-print { display: none !important; } }     </style> </head> <body class="bg-slate-50 text-slate-900">  <!-- Ekrani i Ngarkimit --> <div id="loading-screen" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">     <div class="spinner mb-4"></div>     <p id="loading-text" class="text-slate-500 font-bold animate-pulse text-xs uppercase tracking-widest">Duke u lidhur...</p> </div>  <div class="max-w-7xl mx-auto p-4 lg:p-10 no-print">     <!-- Header -->     <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">         <div>             <h1 class="text-2xl font-extrabold tracking-tight">Sistemi i Pagave</h1>             <p id="status-badge" class="text-slate-500 text-xs font-bold mt-1 uppercase">Duke u lidhur...</p>         </div>         <div class="flex gap-2 w-full md:w-auto">             <button onclick="toggleWorkerModal()" class="flex-1 md:flex-none px-6 py-2 bg-slate-100 rounded-xl font-bold text-slate-700 hover:bg-slate-200 transition-all">Punëtorët</button>             <button onclick="window.print()" class="flex-1 md:flex-none px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100">Printo</button>         </div>     </header>      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">         <!-- MAJTAS: DITARI -->         <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">             <div class="flex items-center justify-between mb-6">                 <h2 class="text-lg font-bold">Ditari Ditor</h2>                 <input type="date" id="entry-date" onchange="renderDailyEntry()" class="bg-indigo-50 border-none rounded-lg px-3 py-1 font-bold text-indigo-700 outline-none">             </div>             <div id="daily-list" class="space-y-3 mb-6 min-h-[100px]"></div>             <button id="save-btn" onclick="saveDailyHours()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-black transition-all">Ruaj Shënimet</button>         </div>          <!-- DJATHTAS: RAPORTI -->         <div class="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">             <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">                 <h2 class="text-lg font-bold">Llogaritja e Totaleve</h2>                 <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">                     <input type="date" id="filter-start" onchange="renderTotals()" class="bg-transparent text-[10px] font-bold px-1 outline-none">                     <span class="text-slate-400 font-bold text-[10px]">-</span>                     <input type="date" id="filter-end" onchange="renderTotals()" class="bg-transparent text-[10px] font-bold px-1 outline-none">                 </div>             </div>              <div class="grid grid-cols-2 gap-4 mb-6">                 <div class="bg-indigo-600 rounded-2xl p-4 text-white">                     <p class="text-[10px] font-bold uppercase opacity-60">Total Euro</p>                     <h3 id="stat-total-pay" class="text-xl font-black">0.00 €</h3>                 </div>                 <div class="bg-slate-900 rounded-2xl p-4 text-white">                     <p class="text-[10px] font-bold uppercase text-slate-400">Total Orë</p>                     <h3 id="stat-total-hours" class="text-xl font-black text-indigo-400">0 h</h3>                 </div>             </div>              <div class="overflow-x-auto">                 <table class="w-full text-left text-sm">                     <thead>                         <tr class="text-[10px] font-bold uppercase text-slate-400 border-b">                             <th class="pb-3">Punëtori</th>                             <th class="pb-3 text-center">Orë</th>                             <th class="pb-3 text-right">Totali</th>                         </tr>                     </thead>                     <tbody id="totals-list" class="divide-y divide-slate-50"></tbody>                 </table>             </div>         </div>     </div> </div>  <!-- MODAL --> <div id="worker-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden z-[110]">     <div class="bg-white rounded-3xl max-w-md w-full p-8">         <div class="flex justify-between mb-6">             <h3 class="text-xl font-bold">Punëtorët</h3>             <button onclick="toggleWorkerModal()" class="text-slate-400">×</button>         </div>         <div class="flex gap-2 mb-6">             <input type="text" id="new-worker-name" placeholder="Emri" class="flex-1 bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl outline-none">             <input type="number" id="new-worker-rate" placeholder="€/h" class="w-16 bg-slate-50 border border-slate-100 px-2 py-2 rounded-xl text-center outline-none">             <button onclick="addNewWorker()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold">+</button>         </div>         <div id="worker-manage-list" class="space-y-2"></div>     </div> </div>  <script type="module">     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";      // Konfigurimi i sigurt     let db, auth, currentUser;     let workers = [], logs = [];     const appId = "payroll-v6-app";      // Kontrolli i kohës për Cloud     const cloudTimeout = setTimeout(() => {         if (!currentUser) {             console.warn("Cloud lidhja dështoi, po kalojmë në Local Mode.");             document.getElementById('loading-screen').classList.add('hidden');             document.getElementById('status-badge').innerText = "Offline Mode (Local Storage)";             useLocalStorage();         }     }, 6000);      async function init() {         try {             const firebaseConfig = JSON.parse(__firebase_config);             const app = initializeApp(firebaseConfig);             db = getFirestore(app);             auth = getAuth(app);                          onAuthStateChanged(auth, (user) => {                 if (user) {                     clearTimeout(cloudTimeout);                     currentUser = user;                     document.getElementById('loading-screen').classList.add('hidden');                     document.getElementById('status-badge').innerText = "Online - Cloud Sinkronizuar";                     setupCloudSync();                 } else {                     signInAnonymously(auth);                 }             });         } catch (e) {             console.error("Firebase Init Error:", e);         }     }      function setupCloudSync() {         const path = `artifacts/${appId}/users/${currentUser.uid}`;         onSnapshot(collection(db, path, 'workers'), (s) => {             workers = s.docs.map(d => ({id: d.id, ...d.data()}));             refreshUI();         });         onSnapshot(collection(db, path, 'logs'), (s) => {             logs = s.docs.map(d => ({id: d.id, ...d.data()}));             refreshUI();         });     }      // Versioni Local nëse Cloud nuk punon     function useLocalStorage() {         workers = JSON.parse(localStorage.getItem('loc_workers')) || [];         logs = JSON.parse(localStorage.getItem('loc_logs')) || [];         refreshUI();     }      function refreshUI() {         window.renderDailyEntry();         window.renderTotals();         window.renderWorkerManageList();     }      // Lidhja e funksioneve me Window     window.toggleWorkerModal = () => document.getElementById('worker-modal').classList.toggle('hidden');          window.addNewWorker = async () => {         const name = document.getElementById('new-worker-name').value;         const rate = parseFloat(document.getElementById('new-worker-rate').value);         if (!name || isNaN(rate)) return;          const id = Date.now().toString();         if (currentUser) {             await setDoc(doc(db, `artifacts/${appId}/users/${currentUser.uid}/workers`, id), {name, rate});         } else {             workers.push({id, name, rate});             localStorage.setItem('loc_workers', JSON.stringify(workers));             refreshUI();         }         document.getElementById('new-worker-name').value = "";     };      window.saveDailyHours = async () => {         const date = document.getElementById('entry-date').value;         const inputs = document.querySelectorAll('.daily-hour-input');                  for (let input of inputs) {             const wId = input.getAttribute('data-id');             const h = parseFloat(input.value);             const logId = `${date}_${wId}`;              if (currentUser) {                 const ref = doc(db, `artifacts/${appId}/users/${currentUser.uid}/logs`, logId);                 if (h > 0) await setDoc(ref, {date, workerId: wId, hours: h});                 else await deleteDoc(ref);             } else {                 logs = logs.filter(l => l.id !== logId);                 if (h > 0) logs.push({id: logId, date, workerId: wId, hours: h});                 localStorage.setItem('loc_logs', JSON.stringify(logs));             }         }         alert("U ruajt!");         if (!currentUser) refreshUI();     };      window.renderDailyEntry = () => {         const date = document.getElementById('entry-date').value;         const container = document.getElementById('daily-list');         container.innerHTML = workers.map(w => {             const log = logs.find(l => l.date === date && l.workerId === w.id);             return `                 <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">                     <span class="font-bold text-sm">${w.name}</span>                     <input type="number" step="0.5" value="${log ? log.hours : ''}" data-id="${w.id}"                             class="daily-hour-input w-16 text-center border rounded-lg py-1 font-bold text-indigo-600 outline-none">                 </div>             `;         }).join('');     };      window.renderWorkerManageList = () => {         document.getElementById('worker-manage-list').innerHTML = workers.map(w => `             <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl text-sm">                 <span>${w.name} (${w.rate} €)</span>                 <button onclick="deleteWorker('${w.id}')" class="text-red-500 font-bold">X</button>             </div>         `).join('');     };      window.deleteWorker = async (id) => {         if (!confirm("Fshi?")) return;         if (currentUser) await deleteDoc(doc(db, `artifacts/${appId}/users/${currentUser.uid}/workers`, id));         else {             workers = workers.filter(w => w.id !== id);             localStorage.setItem('loc_workers', JSON.stringify(workers));             refreshUI();         }     };      window.renderTotals = () => {         const s = document.getElementById('filter-start').value;         const e = document.getElementById('filter-end').value;         let tH = 0, tP = 0;          document.getElementById('totals-list').innerHTML = workers.map(w => {             const wLogs = logs.filter(l => l.workerId === w.id && l.date >= s && l.date <= e);             const h = wLogs.reduce((acc, l) => acc + l.hours, 0);             const p = h * w.rate;             tH += h; tP += p;             return `<tr><td class="py-3 font-bold">${w.name}</td><td class="text-center">${h} h</td><td class="text-right font-black">${p.toFixed(2)} €</td></tr>`;         }).join('');          document.getElementById('stat-total-pay').innerText = tP.toFixed(2) + " €";         document.getElementById('stat-total-hours').innerText = tH + " h";     };      // Dates     const d = new Date().toISOString().slice(0,10);     document.getElementById('entry-date').value = d;     document.getElementById('filter-start').value = d.slice(0,8) + "01";     document.getElementById('filter-end').value = d;      init(); </script> </body> </html> 
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistemi i Pagave</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body { font-family: Arial; }
+.spinner { border: 3px solid #f3f3f3; border-top: 3px solid #4f46e5; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+</style>
+</head>
+
+<body class="bg-gray-100">
+
+<div id="loading" class="flex justify-center items-center h-screen">
+<div class="spinner"></div>
+</div>
+
+<div class="max-w-4xl mx-auto p-6 hidden" id="app">
+
+<h1 class="text-2xl font-bold mb-4">Sistemi i Pagave</h1>
+
+<input type="text" id="name" placeholder="Emri" class="border p-2">
+<input type="number" id="rate" placeholder="€/h" class="border p-2">
+<button onclick="addWorker()" class="bg-blue-500 text-white px-4 py-2">Shto</button>
+
+<div id="list" class="mt-4"></div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDGlHCPxysEO4ZxxIPic3u7rRZCo7oZTZ4",
+  authDomain: "workhours-fb74a.firebaseapp.com",
+  projectId: "workhours-fb74a",
+  storageBucket: "workhours-fb74a.firebasestorage.app",
+  messagingSenderId: "276432513861",
+  appId: "1:276432513861:web:1ed148fbde29baf4c7ac2c"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let user;
+
+onAuthStateChanged(auth, (u) => {
+  if (u) {
+    user = u;
+    startApp();
+  } else {
+    signInAnonymously(auth);
+  }
+});
+
+function startApp() {
+  document.getElementById("loading").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+
+  const colRef = collection(db, "workers");
+
+  onSnapshot(colRef, (snap) => {
+    const list = document.getElementById("list");
+    list.innerHTML = "";
+
+    snap.forEach(doc => {
+      const d = doc.data();
+      list.innerHTML += `<div class="p-2 bg-white mb-2">${d.name} - ${d.rate}€/h</div>`;
+    });
+  });
+}
+
+window.addWorker = async () => {
+  const name = document.getElementById("name").value;
+  const rate = document.getElementById("rate").value;
+
+  if (!name || !rate) return;
+
+  await addDoc(collection(db, "workers"), {
+    name,
+    rate: parseFloat(rate)
+  });
+};
+</script>
+
+</body>
+</html>
