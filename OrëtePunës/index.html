@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payroll Business</title>
+<title>Payroll System Pro</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -15,8 +15,10 @@
 <div id="login" class="flex items-center justify-center h-screen">
 <div class="bg-white p-6 rounded-2xl shadow w-80 space-y-3">
 <h2 class="text-xl font-bold text-center">Login</h2>
+
 <input id="email" placeholder="Email" class="w-full border p-2 rounded">
 <input id="password" type="password" placeholder="Password" class="w-full border p-2 rounded">
+
 <button onclick="loginUser()" class="w-full bg-indigo-600 text-white p-2 rounded">Login</button>
 <button onclick="registerUser()" class="w-full bg-gray-200 p-2 rounded">Register</button>
 </div>
@@ -25,17 +27,20 @@
 <!-- APP -->
 <div id="app" class="hidden max-w-6xl mx-auto p-6">
 
+<!-- HEADER -->
 <div class="flex justify-between mb-4">
 <span id="userEmail"></span>
 <button onclick="logout()" class="bg-red-500 text-white px-3 py-1 rounded">Logout</button>
 </div>
 
-<div class="flex gap-2 mb-4">
-<button onclick="exportPDF()" class="bg-indigo-600 text-white px-3 py-2 rounded">PDF</button>
+<!-- ACTIONS -->
+<div class="flex flex-wrap gap-2 mb-4">
+<input type="month" id="pdfMonth" class="border p-2 rounded">
+<button onclick="exportPDF()" class="bg-indigo-600 text-white px-3 py-2 rounded">PDF Mujor</button>
 <button onclick="backupData()" class="bg-green-600 text-white px-3 py-2 rounded">Backup</button>
 </div>
 
-<!-- ADD -->
+<!-- ADD WORKER -->
 <div class="bg-white p-4 rounded mb-4 flex gap-2">
 <input id="name" placeholder="Emri" class="border p-2 flex-1">
 <input id="rate" type="number" placeholder="€/h" class="border p-2 w-24">
@@ -49,7 +54,7 @@
 <button onclick="saveHours()" class="w-full bg-black text-white p-2">Ruaj</button>
 </div>
 
-<!-- TOTAL -->
+<!-- TOTALS -->
 <div class="bg-white p-4 rounded">
 <div class="flex gap-2 mb-2">
 <input type="date" id="start" class="border p-2">
@@ -81,53 +86,62 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-let user, workers=[], logs=[];
+let user, workers = [], logs = [];
 
-// AUTH
+/* ---------------- AUTH ---------------- */
+
 window.loginUser = async ()=>{
- await signInWithEmailAndPassword(auth,
-  document.getElementById("email").value,
-  document.getElementById("password").value
- );
+ try{
+  await signInWithEmailAndPassword(
+   auth,
+   document.getElementById("email").value,
+   document.getElementById("password").value
+  );
+ }catch(e){ alert(e.message); }
 };
 
 window.registerUser = async ()=>{
- await createUserWithEmailAndPassword(auth,
-  document.getElementById("email").value,
-  document.getElementById("password").value
- );
+ try{
+  await createUserWithEmailAndPassword(
+   auth,
+   document.getElementById("email").value,
+   document.getElementById("password").value
+  );
+ }catch(e){ alert(e.message); }
 };
 
 window.logout = ()=> signOut(auth);
 
 onAuthStateChanged(auth, u=>{
  if(u){
-  user=u;
+  user = u;
   document.getElementById("login").style.display="none";
   document.getElementById("app").classList.remove("hidden");
-  document.getElementById("userEmail").innerText=u.email;
+  document.getElementById("userEmail").innerText = u.email;
   start();
  }
 });
 
-// START
+/* ---------------- START ---------------- */
+
 function start(){
- const base=`users/${user.uid}`;
+ const base = `users/${user.uid}`;
 
  onSnapshot(collection(db, base+"/workers"), snap=>{
-  workers=snap.docs.map(d=>({id:d.id,...d.data()}));
+  workers = snap.docs.map(d=>({id:d.id,...d.data()}));
   renderDaily();
   renderTotals();
  });
 
  onSnapshot(collection(db, base+"/logs"), snap=>{
-  logs=snap.docs.map(d=>({id:d.id,...d.data()}));
+  logs = snap.docs.map(d=>({id:d.id,...d.data()}));
   renderDaily();
   renderTotals();
  });
 }
 
-// ADD WORKER
+/* ---------------- WORKERS ---------------- */
+
 window.addWorker = async ()=>{
  const name = document.getElementById("name").value;
  const rate = parseFloat(document.getElementById("rate").value);
@@ -135,34 +149,37 @@ window.addWorker = async ()=>{
  if(!name || !rate) return alert("Plotëso fushat");
 
  await setDoc(doc(db, `users/${user.uid}/workers`, Date.now().toString()), {
-  name, rate
+  name,
+  rate
  });
 
  document.getElementById("name").value="";
  document.getElementById("rate").value="";
 };
 
-// DAILY
+/* ---------------- DAILY ---------------- */
+
 window.renderDaily = ()=>{
  const date = document.getElementById("date").value;
 
  document.getElementById("daily").innerHTML = workers.map(w=>{
-  const l=logs.find(x=>x.date===date && x.workerId===w.id);
-  return `<div class="flex justify-between mb-2">
+  const l = logs.find(x=>x.date===date && x.workerId===w.id);
+  return `
+  <div class="flex justify-between mb-2">
    <span>${w.name}</span>
    <input type="number" data-id="${w.id}" value="${l?l.hours:''}" class="border w-20 text-center">
   </div>`;
  }).join("");
 };
 
-// SAVE
 window.saveHours = async ()=>{
  const date = document.getElementById("date").value;
 
  document.querySelectorAll("#daily input").forEach(async i=>{
-  const h=parseFloat(i.value)||0;
-  const id=i.dataset.id;
-  const ref=doc(db, `users/${user.uid}/logs`, date+"_"+id);
+  const h = parseFloat(i.value)||0;
+  const id = i.dataset.id;
+
+  const ref = doc(db, `users/${user.uid}/logs`, date+"_"+id);
 
   if(h>0) await setDoc(ref,{date,workerId:id,hours:h});
   else await deleteDoc(ref);
@@ -171,12 +188,13 @@ window.saveHours = async ()=>{
  alert("Ruajtur!");
 };
 
-// TOTALS (FIXED)
+/* ---------------- TOTALS ---------------- */
+
 window.renderTotals = ()=>{
  const start = document.getElementById("start").value;
  const end = document.getElementById("end").value;
 
- let tH=0,tM=0;
+ let tH=0, tM=0;
 
  document.getElementById("totals").innerHTML = workers.map(w=>{
 
@@ -187,11 +205,11 @@ window.renderTotals = ()=>{
     return true;
   });
 
-  const h=wl.reduce((a,b)=>a+b.hours,0);
-  const m=h*w.rate;
+  const h = wl.reduce((a,b)=>a+b.hours,0);
+  const m = h * w.rate;
 
-  tH+=h;
-  tM+=m;
+  tH += h;
+  tM += m;
 
   return `<div class="flex justify-between">
    <span>${w.name}</span>
@@ -199,47 +217,60 @@ window.renderTotals = ()=>{
   </div>`;
  }).join("");
 
- document.getElementById("totalHours").innerText=tH+"h";
- document.getElementById("totalMoney").innerText=tM.toFixed(2)+"€";
+ document.getElementById("totalHours").innerText = tH+"h";
+ document.getElementById("totalMoney").innerText = tM.toFixed(2)+"€";
 };
 
-// AUTO REFRESH FILTER
+/* auto refresh */
 document.getElementById("start").onchange = renderTotals;
 document.getElementById("end").onchange = renderTotals;
 
-// PDF
+/* ---------------- PDF (MUJOR) ---------------- */
+
 window.exportPDF = ()=>{
  const { jsPDF } = window.jspdf;
  const doc = new jsPDF();
- doc.text("Payroll Report",10,10);
- let y=20;
+
+ const month = document.getElementById("pdfMonth").value;
+
+ doc.text("Payroll Report - " + month, 10, 10);
+
+ let y = 20;
 
  workers.forEach(w=>{
-  const h=logs.filter(l=>l.workerId===w.id).reduce((a,b)=>a+b.hours,0);
-  const m=h*w.rate;
-  doc.text(`${w.name} - ${h}h - ${m.toFixed(2)}€`,10,y);
-  y+=10;
+  const filtered = logs.filter(l =>
+    l.workerId === w.id &&
+    l.date.startsWith(month)
+  );
+
+  const h = filtered.reduce((a,b)=>a+b.hours,0);
+  const m = h * w.rate;
+
+  doc.text(`${w.name} - ${h}h - ${m.toFixed(2)}€`, 10, y);
+  y += 10;
  });
 
- doc.save("report.pdf");
+ doc.save("report-" + month + ".pdf");
 };
 
-// BACKUP
+/* ---------------- BACKUP ---------------- */
+
 window.backupData = ()=>{
  const blob = new Blob([JSON.stringify({workers,logs})]);
- const a=document.createElement("a");
- a.href=URL.createObjectURL(blob);
- a.download="backup.json";
+ const a = document.createElement("a");
+ a.href = URL.createObjectURL(blob);
+ a.download = "backup.json";
  a.click();
 };
 
-// DEFAULT DATE
-const t=new Date().toISOString().slice(0,10);
-document.getElementById("date").value=t;
-document.getElementById("start").value=t.slice(0,8)+"01";
-document.getElementById("end").value=t;
+/* ---------------- DEFAULT DATE ---------------- */
 
-document.getElementById("date").onchange=renderDaily;
+const t = new Date().toISOString().slice(0,10);
+document.getElementById("date").value = t;
+document.getElementById("start").value = t.slice(0,8)+"01";
+document.getElementById("end").value = t;
+
+document.getElementById("date").onchange = renderDaily;
 
 </script>
 
