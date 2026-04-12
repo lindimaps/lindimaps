@@ -101,13 +101,33 @@ window.loginUser = async ()=>{
 };
 
 window.registerUser = async ()=>{
- try{
-  await createUserWithEmailAndPassword(
-   auth,
-   document.getElementById("email").value,
-   document.getElementById("password").value
-  );
- }catch(e){ alert(e.message); }
+ try {
+  const emailEl = document.getElementById("email");
+  const passEl = document.getElementById("password");
+
+  const email = emailEl ? emailEl.value.trim() : "";
+  const password = passEl ? passEl.value : "";
+
+  if(email === ""){
+   alert("Shkruaj email!");
+   return;
+  }
+
+  if(!email.includes("@")){
+   alert("Email nuk është valid!");
+   return;
+  }
+
+  if(password.length < 6){
+   alert("Password duhet minimum 6 karaktere!");
+   return;
+  }
+
+  await createUserWithEmailAndPassword(auth, email, password);
+
+ } catch(e){
+  alert("Firebase error: " + e.message);
+ }
 };
 
 window.logout = ()=> signOut(auth);
