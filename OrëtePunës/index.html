@@ -85,10 +85,15 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, updateDoc
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 const firebaseConfig = {
- apiKey: "AIzaSy...",
- authDomain: "workhours-fb74a.firebaseapp.com",
- projectId: "workhours-fb74a"
+  apiKey: "AIzaSyDGlHCPxysEO4ZxxIPic3u7rRZCo7oZTZ4",
+  authDomain: "workhours-fb74a.firebaseapp.com",
+  projectId: "workhours-fb74a",
+  storageBucket: "workhours-fb74a.firebasestorage.app",
+  messagingSenderId: "276432513861",
+  appId: "1:276432513861:web:1ed148fbde29baf4c7ac2c",
+  measurementId: "G-YZ767HDTQB"
 };
+
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
