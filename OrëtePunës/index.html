@@ -1,207 +1,1 @@
-<!DOCTYPE html>
-<html lang="sq">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistemi i Pagave PRO+</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<style>
-body { font-family: Arial; }
-.spinner { border: 3px solid #eee; border-top: 3px solid #4f46e5; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-@keyframes spin { 100% { transform: rotate(360deg); } }
-</style>
-</head>
-
-<body class="bg-gray-100">
-
-<div id="loading" class="fixed inset-0 flex items-center justify-center bg-white z-50">
-<div class="spinner"></div>
-</div>
-
-<div id="app" class="hidden max-w-6xl mx-auto p-6">
-
-<h1 class="text-2xl font-bold mb-4">Sistemi i Pagave PRO+</h1>
-
-<!-- ACTIONS -->
-<div class="flex flex-wrap gap-2 mb-4">
-<button onclick="exportPDF()" class="bg-indigo-600 text-white px-4 py-2 rounded">Export PDF</button>
-<button onclick="backupData()" class="bg-green-600 text-white px-4 py-2 rounded">Backup</button>
-
-<select id="workerFilter" onchange="renderTotals()" class="border p-2 rounded">
-<option value="">Të gjithë</option>
-</select>
-</div>
-
-<!-- ADD -->
-<div class="bg-white p-4 rounded shadow mb-4 flex gap-2">
-<input id="name" placeholder="Emri" class="border p-2 flex-1">
-<input id="rate" type="number" placeholder="€/h" class="border p-2 w-24">
-<button onclick="addWorker()" class="bg-blue-500 text-white px-4">Shto</button>
-</div>
-
-<!-- DAILY -->
-<div class="bg-white p-4 rounded shadow mb-4">
-<input type="date" id="date" class="border p-2 mb-2">
-<div id="daily"></div>
-<button onclick="saveHours()" class="mt-2 w-full bg-black text-white p-2">Ruaj</button>
-</div>
-
-<!-- TOTALS -->
-<div class="bg-white p-4 rounded shadow">
-<input type="date" id="start" class="border p-2">
-<input type="date" id="end" class="border p-2">
-<div id="totals" class="mt-2"></div>
-<div class="font-bold mt-3">
-Total: <span id="money">0€</span> | <span id="hours">0h</span>
-</div>
-</div>
-
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-const firebaseConfig = {
- apiKey: "AIzaSyDGlHCPxysEO4ZxxIPic3u7rRZCo7oZTZ4",
- authDomain: "workhours-fb74a.firebaseapp.com",
- projectId: "workhours-fb74a"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-let user, workers=[], logs=[];
-
-// AUTH
-onAuthStateChanged(auth, u=>{
- if(u){ user=u; start(); }
- else signInAnonymously(auth);
-});
-
-function start(){
- document.getElementById("loading").classList.add("hidden");
- document.getElementById("app").classList.remove("hidden");
-
- const base=`users/${user.uid}`;
-
- onSnapshot(collection(db, base+"/workers"), snap=>{
-  workers = snap.docs.map(d=>({id:d.id,...d.data()}));
-  fillFilter();
-  renderDaily();
-  renderTotals();
- });
-
- onSnapshot(collection(db, base+"/logs"), snap=>{
-  logs = snap.docs.map(d=>({id:d.id,...d.data()}));
-  renderDaily();
-  renderTotals();
- });
-}
-
-// FILTER
-function fillFilter(){
- const f=document.getElementById("workerFilter");
- f.innerHTML='<option value="">Të gjithë</option>';
- workers.forEach(w=>{
-  f.innerHTML+=`<option value="${w.id}">${w.name}</option>`;
- });
-}
-
-// ADD
-window.addWorker = async ()=>{
- const n=name.value;
- const r=parseFloat(rate.value);
- if(!n||!r) return;
- await setDoc(doc(db, `users/${user.uid}/workers`, Date.now().toString()), {name:n,rate:r});
-};
-
-// DAILY
-window.renderDaily = ()=>{
- const d=date.value;
- daily.innerHTML = workers.map(w=>{
-  const l=logs.find(x=>x.date===d&&x.workerId===w.id);
-  return `<div class="flex justify-between mb-2">
-   <span>${w.name}</span>
-   <input type="number" step="0.5" data-id="${w.id}" value="${l?l.hours:''}" class="border w-20 text-center">
-  </div>`;
- }).join('');
-};
-
-// SAVE
-window.saveHours = async ()=>{
- const d=date.value;
- document.querySelectorAll("#daily input").forEach(async i=>{
-  const h=parseFloat(i.value)||0;
-  const id=i.dataset.id;
-  const ref=doc(db, `users/${user.uid}/logs`, d+"_"+id);
-  if(h>0) await setDoc(ref,{date:d,workerId:id,hours:h});
-  else await deleteDoc(ref);
- });
- alert("Ruajtur!");
-};
-
-// TOTALS
-window.renderTotals = ()=>{
- const s=start.value,e=end.value,f=workerFilter.value;
- let tH=0,tM=0;
-
- totals.innerHTML = workers.filter(w=>!f||w.id===f).map(w=>{
-  const wl=logs.filter(l=>l.workerId===w.id&&l.date>=s&&l.date<=e);
-  const h=wl.reduce((a,b)=>a+b.hours,0);
-  const m=h*w.rate;
-  tH+=h;tM+=m;
-  return `<div class="flex justify-between border-b py-1">
-   <span>${w.name}</span>
-   <span>${h}h | ${m.toFixed(2)}€</span>
-  </div>`;
- }).join('');
-
- hours.innerText=tH+"h";
- money.innerText=tM.toFixed(2)+"€";
-};
-
-// PDF
-window.exportPDF = ()=>{
- const { jsPDF } = window.jspdf;
- const doc = new jsPDF();
- doc.text("Raport Pagash", 10,10);
- let y=20;
-
- workers.forEach(w=>{
-  const h=logs.filter(l=>l.workerId===w.id).reduce((a,b)=>a+b.hours,0);
-  const m=h*w.rate;
-  doc.text(`${w.name} - ${h}h - ${m.toFixed(2)}€`,10,y);
-  y+=10;
- });
-
- doc.save("raport.pdf");
-};
-
-// BACKUP
-window.backupData = ()=>{
- const data = {workers,logs};
- const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
- const a=document.createElement("a");
- a.href=URL.createObjectURL(blob);
- a.download="backup.json";
- a.click();
-};
-
-// DEFAULT DATE
-const t=new Date().toISOString().slice(0,10);
-date.value=t;
-start.value=t.slice(0,8)+"01";
-end.value=t;
-
-date.onchange=renderDaily;
-
-</script>
-
-</body>
-</html>
+<!DOCTYPE html> <html lang="sq"> <head>     <meta charset="UTF-8">     <meta name="viewport" content="width=device-width, initial-scale=1.0">     <title>Sistemi i Pagave PRO</title>     <script src="https://cdn.tailwindcss.com"></script>     <style>         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');         body { font-family: 'Inter', sans-serif; }         .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #4f46e5; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }         @keyframes spin { 100% { transform: rotate(360deg); } }     </style> </head> <body class="bg-gray-50 text-gray-800">  <!-- Loading --> <div id="loading" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">     <div class="spinner mb-4"></div>     <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">Duke u lidhur me Cloud...</p> </div>  <div class="max-w-4xl mx-auto p-4 md:p-10 hidden" id="app">      <!-- HEADER -->     <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">         <div>             <h1 class="text-2xl font-black text-gray-900">Sistemi i Pagave PRO</h1>             <div class="flex items-center gap-2 mt-1">                 <span class="w-2 h-2 bg-green-500 rounded-full"></span>                 <span id="status" class="text-xs font-bold text-gray-500 uppercase tracking-wider">Online</span>             </div>         </div>         <button onclick="window.print()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-xl font-bold text-sm transition-all">Printo</button>     </div>      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">                  <!-- MAJTAS: KONFIGURIMI & DITARI -->         <div class="space-y-6">             <!-- SHTO PUNETOR -->             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">                 <h2 class="font-bold mb-4 text-gray-700">Shto Punëtor të Ri</h2>                 <div class="flex flex-col gap-3">                     <input id="name" placeholder="Emri i punëtorit" class="border border-gray-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all">                     <div class="flex gap-2">                         <input id="rate" type="number" placeholder="Paga €/h" class="border border-gray-200 p-3 w-full rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all">                         <button onclick="addWorker()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 rounded-xl font-bold transition-all">Shto</button>                     </div>                 </div>             </div>              <!-- DITARI -->             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">                 <div class="flex justify-between items-center mb-6">                     <h2 class="font-extrabold text-lg">Ditari Punës</h2>                     <input type="date" id="date" class="bg-indigo-50 text-indigo-700 font-bold p-2 rounded-lg border-none outline-none">                 </div>                 <div id="daily" class="space-y-3 min-h-[50px]"></div>                 <button id="save-btn" onclick="saveHours()" class="mt-6 w-full bg-gray-900 hover:bg-black text-white p-4 rounded-xl font-bold transition-all shadow-lg shadow-gray-200">Ruaj Shënimet</button>             </div>         </div>          <!-- DJATHTAS: RAPORTET -->         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">             <h2 class="font-extrabold text-lg mb-6">Raporti i Pagesave</h2>                          <div class="flex items-center gap-2 mb-6 bg-gray-50 p-2 rounded-xl border border-gray-100">                 <input type="date" id="start" class="bg-transparent text-xs font-bold p-1 w-full outline-none">                 <span class="text-gray-400 font-bold">-</span>                 <input type="date" id="end" class="bg-transparent text-xs font-bold p-1 w-full outline-none">             </div>              <div id="totals" class="space-y-2 border-t border-gray-50 pt-4"></div>              <div class="mt-8 grid grid-cols-2 gap-4">                 <div class="bg-indigo-50 p-4 rounded-2xl">                     <p class="text-[10px] font-bold text-indigo-400 uppercase">Total €</p>                     <span id="totalMoney" class="text-xl font-black text-indigo-700">0.00 €</span>                 </div>                 <div class="bg-gray-50 p-4 rounded-2xl">                     <p class="text-[10px] font-bold text-gray-400 uppercase">Total Orë</p>                     <span id="totalHours" class="text-xl font-black text-gray-700">0 h</span>                 </div>             </div>                          <button onclick="renderTotals()" class="mt-6 w-full border-2 border-gray-100 hover:bg-gray-50 text-gray-600 p-3 rounded-xl font-bold transition-all">Rifresko Raportin</button>         </div>      </div> </div>  <script type="module"> import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"; import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";  // Konfigurimi i Firebase const firebaseConfig = typeof __firebase_config !== 'undefined'      ? JSON.parse(__firebase_config)      : {         apiKey: "AIzaSyDGlHCPxysEO4ZxxIPic3u7rRZCo7oZTZ4",         authDomain: "workhours-fb74a.firebaseapp.com",         projectId: "workhours-fb74a",         storageBucket: "workhours-fb74a.firebasestorage.app",         messagingSenderId: "276432513861",         appId: "1:276432513861:web:1ed148fbde29baf4c7ac2c"     };  const appId = typeof __app_id !== 'undefined' ? __app_id : 'workhours-pro'; const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);  let user, workers = [], logs = [];  // Datave Iniciale const today = new Date().toISOString().slice(0,10); document.getElementById("date").value = today; document.getElementById("start").value = today.slice(0,8)+"01"; document.getElementById("end").value = today;  // AUTH const initAuth = async () => {   if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {     await signInWithCustomToken(auth, __initial_auth_token);   } else {     await signInAnonymously(auth);   } };  onAuthStateChanged(auth, (u) => {     if (u) {         user = u;         start();     } else {         initAuth();     } });  function start() {     document.getElementById("loading").classList.add("hidden");     document.getElementById("app").classList.remove("hidden");          // RREGULLI I RI I FIREBASE PATH     const base = `artifacts/${appId}/users/${user.uid}`;      onSnapshot(collection(db, base, "workers"), snap => {         workers = snap.docs.map(d => ({id: d.id, ...d.data()}));         window.renderDaily();         window.renderTotals();         renderWorkerManageList(); // Optional: to delete workers     });      onSnapshot(collection(db, base, "logs"), snap => {         logs = snap.docs.map(d => ({id: d.id, ...d.data()}));         window.renderDaily();         window.renderTotals();     }); }  // SHTO PUNETOR window.addWorker = async () => {     const nameInput = document.getElementById("name");     const rateInput = document.getElementById("rate");     const name = nameInput.value;     const rate = parseFloat(rateInput.value);          if (!name || !rate || !user) return;      const id = Date.now().toString();     await setDoc(doc(db, `artifacts/${appId}/users/${user.uid}/workers`, id), { name, rate });          nameInput.value = "";     rateInput.value = ""; };  // DITARI window.renderDaily = () => {     const date = document.getElementById("date").value;     const container = document.getElementById("daily");      if (workers.length === 0) {         container.innerHTML = `<p class="text-center text-gray-400 py-4 italic text-sm">Asnjë punëtor i regjistruar.</p>`;         return;     }      container.innerHTML = workers.map(w => {         const log = logs.find(l => l.date === date && l.workerId === w.id);         return `         <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-transparent focus-within:border-indigo-100 transition-all">             <span class="font-bold text-gray-700">${w.name}</span>             <div class="flex items-center gap-2">                 <input type="number" step="0.5" data-id="${w.id}" value="${log ? log.hours : ''}"                         class="border border-gray-200 w-20 text-center py-2 rounded-lg font-black text-indigo-600 outline-none focus:ring-2 focus:ring-indigo-500">                 <span class="text-[10px] font-bold text-gray-400 uppercase">h</span>             </div>         </div>         `;     }).join(""); };  // RUANA ORET window.saveHours = async () => {     const date = document.getElementById("date").value;     const inputs = document.querySelectorAll("#daily input");     const btn = document.getElementById("save-btn");          btn.innerText = "Duke u ruajtur...";     btn.disabled = true;      for (let i of inputs) {         const workerId = i.dataset.id;         const h = parseFloat(i.value) || 0;         const logId = `${date}_${workerId}`;          const ref = doc(db, `artifacts/${appId}/users/${user.uid}/logs`, logId);          if (h > 0) {             await setDoc(ref, { date, workerId, hours: h });         } else {             await deleteDoc(ref);         }     }      btn.innerText = "U ruajt ✓";     btn.classList.replace("bg-gray-900", "bg-green-600");     setTimeout(() => {         btn.innerText = "Ruaj Shënimet";         btn.classList.replace("bg-green-600", "bg-gray-900");         btn.disabled = false;     }, 2000); };  // TOTALET window.renderTotals = () => {     const s = document.getElementById("start").value;     const e = document.getElementById("end").value;      let tH = 0, tM = 0;      document.getElementById("totals").innerHTML = workers.map(w => {         const wl = logs.filter(l => l.workerId === w.id && l.date >= s && l.date <= e);         const h = wl.reduce((a, b) => a + b.hours, 0);         const m = h * w.rate;         tH += h; tM += m;          if (h === 0) return ''; // Mos e shfaq nëse s'ka orë          return `         <div class="flex justify-between items-center py-3 border-b border-gray-50">             <div class="flex flex-col">                 <span class="font-bold text-gray-800">${w.name}</span>                 <span class="text-[10px] text-gray-400 font-bold uppercase">${w.rate} €/h</span>             </div>             <div class="text-right">                 <div class="font-black text-gray-900">${m.toFixed(2)} €</div>                 <div class="text-[10px] font-bold text-indigo-500 uppercase">${h} orë pune</div>             </div>         </div>`;     }).join("") || `<p class="text-center text-gray-400 py-8 italic text-sm">Nuk ka të dhëna për këtë periudhë.</p>`;      document.getElementById("totalHours").innerText = tH + " h";     document.getElementById("totalMoney").innerText = tM.toFixed(2) + " €"; };  // Per fshirje (Optional por e nevojshme) function renderWorkerManageList() {     // Kete mund ta shtoni nese doni nje buton per te fshire punetoret }  document.getElementById("date").onchange = window.renderDaily; document.getElementById("start").onchange = window.renderTotals; document.getElementById("end").onchange = window.renderTotals;  </script>  </body> </html> 
