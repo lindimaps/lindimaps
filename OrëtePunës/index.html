@@ -51,9 +51,13 @@
 
 <!-- TOTAL -->
 <div class="bg-white p-4 rounded">
+<div class="flex gap-2 mb-2">
 <input type="date" id="start" class="border p-2">
 <input type="date" id="end" class="border p-2">
+</div>
+
 <div id="totals"></div>
+
 <div class="font-bold mt-2">
 <span id="totalMoney"></span> | <span id="totalHours"></span>
 </div>
@@ -63,7 +67,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -167,7 +171,7 @@ window.saveHours = async ()=>{
  alert("Ruajtur!");
 };
 
-// TOTALS
+// TOTALS (FIXED)
 window.renderTotals = ()=>{
  const start = document.getElementById("start").value;
  const end = document.getElementById("end").value;
@@ -175,10 +179,19 @@ window.renderTotals = ()=>{
  let tH=0,tM=0;
 
  document.getElementById("totals").innerHTML = workers.map(w=>{
-  const wl=logs.filter(l=>l.workerId===w.id && l.date>=start && l.date<=end);
+
+  const wl = logs.filter(l=>{
+    if(l.workerId !== w.id) return false;
+    if(start && l.date < start) return false;
+    if(end && l.date > end) return false;
+    return true;
+  });
+
   const h=wl.reduce((a,b)=>a+b.hours,0);
   const m=h*w.rate;
-  tH+=h; tM+=m;
+
+  tH+=h;
+  tM+=m;
 
   return `<div class="flex justify-between">
    <span>${w.name}</span>
@@ -189,6 +202,10 @@ window.renderTotals = ()=>{
  document.getElementById("totalHours").innerText=tH+"h";
  document.getElementById("totalMoney").innerText=tM.toFixed(2)+"€";
 };
+
+// AUTO REFRESH FILTER
+document.getElementById("start").onchange = renderTotals;
+document.getElementById("end").onchange = renderTotals;
 
 // PDF
 window.exportPDF = ()=>{
