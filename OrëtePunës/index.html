@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payroll System Pro</title>
+<title>Payroll Pro System</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -14,6 +14,7 @@
 <!-- LOGIN -->
 <div id="login" class="flex items-center justify-center h-screen">
 <div class="bg-white p-6 rounded-2xl shadow w-80 space-y-3">
+
 <h2 class="text-xl font-bold text-center">Login</h2>
 
 <input id="email" placeholder="Email" class="w-full border p-2 rounded">
@@ -21,20 +22,24 @@
 
 <button onclick="loginUser()" class="w-full bg-indigo-600 text-white p-2 rounded">Login</button>
 <button onclick="registerUser()" class="w-full bg-gray-200 p-2 rounded">Register</button>
+
+<button onclick="resetPassword()" class="w-full text-sm text-blue-600 underline">
+Forgot Password?
+</button>
+
 </div>
 </div>
 
 <!-- APP -->
 <div id="app" class="hidden max-w-6xl mx-auto p-6">
 
-<!-- HEADER -->
 <div class="flex justify-between mb-4">
 <span id="userEmail"></span>
 <button onclick="logout()" class="bg-red-500 text-white px-3 py-1 rounded">Logout</button>
 </div>
 
 <!-- ACTIONS -->
-<div class="flex flex-wrap gap-2 mb-4">
+<div class="flex gap-2 mb-4">
 <input type="month" id="pdfMonth" class="border p-2 rounded">
 <button onclick="exportPDF()" class="bg-indigo-600 text-white px-3 py-2 rounded">PDF Mujor</button>
 <button onclick="backupData()" class="bg-green-600 text-white px-3 py-2 rounded">Backup</button>
@@ -73,13 +78,20 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { 
+ getAuth,
+ signInWithEmailAndPassword,
+ createUserWithEmailAndPassword,
+ signOut,
+ onAuthStateChanged,
+ sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDGlHCPxysEO4ZxxIPic3u7rRZCo7oZTZ4",
-  authDomain: "workhours-fb74a.firebaseapp.com",
-  projectId: "workhours-fb74a",
-  storageBucket: "workhours-fb74a.appspot.com"
+ apiKey: "AIzaSyDGlHCPxysEO4ZxxIPic3u7rRZCo7oZTZ4",
+ authDomain: "workhours-fb74a.firebaseapp.com",
+ projectId: "workhours-fb74a",
+ storageBucket: "workhours-fb74a.appspot.com"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -94,67 +106,59 @@ window.loginUser = async ()=>{
  try{
   await signInWithEmailAndPassword(
    auth,
-   document.getElementById("email").value,
+   document.getElementById("email").value.trim(),
    document.getElementById("password").value
   );
- }catch(e){ alert(e.message); }
-};
-
-window.registerUser = async ()=>{
- try {
-  const emailEl = document.getElementById("email");
-  const passEl = document.getElementById("password");
-
-  const email = emailEl ? emailEl.value.trim() : "";
-  const password = passEl ? passEl.value : "";
-
-  if(email === ""){
-   alert("Shkruaj email!");
-   return;
-  }
-
-  if(!email.includes("@")){
-   alert("Email nuk është valid!");
-   return;
-  }
-
-  if(password.length < 6){
-   alert("Password duhet minimum 6 karaktere!");
-   return;
-  }
-
-  await createUserWithEmailAndPassword(auth, email, password);
-
- } catch(e){
-  alert("Firebase error: " + e.message);
- }
-};
-
-window.logout = async ()=>{
- try {
-  await signOut(auth);
-
-  user = null;
-  workers = [];
-  logs = [];
-
-  document.getElementById("app").classList.add("hidden");
-  document.getElementById("login").style.display = "flex";
-
-  document.getElementById("userEmail").innerText = "";
-
  } catch(e){
   alert(e.message);
  }
 };
 
+window.registerUser = async ()=>{
+ try{
+  await createUserWithEmailAndPassword(
+   auth,
+   document.getElementById("email").value.trim(),
+   document.getElementById("password").value
+  );
+ } catch(e){
+  alert(e.message);
+ }
+};
+
+window.resetPassword = async ()=>{
+ try{
+  const email = document.getElementById("email").value.trim();
+  if(!email) return alert("Shkruaj email-in!");
+
+  await sendPasswordResetEmail(auth, email);
+  alert("Link për reset password u dërgua në email!");
+ } catch(e){
+  alert(e.message);
+ }
+};
+
+window.logout = async ()=>{
+ await signOut(auth);
+
+ user = null;
+ workers = [];
+ logs = [];
+
+ document.getElementById("app").classList.add("hidden");
+ document.getElementById("login").style.display = "flex";
+};
+
 onAuthStateChanged(auth, u=>{
  if(u){
   user = u;
-  document.getElementById("login").style.display="none";
+  document.getElementById("login").style.display = "none";
   document.getElementById("app").classList.remove("hidden");
   document.getElementById("userEmail").innerText = u.email;
   start();
+ } else {
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("login").style.display = "flex";
  }
 });
 
@@ -185,12 +189,11 @@ window.addWorker = async ()=>{
  if(!name || !rate) return alert("Plotëso fushat");
 
  await setDoc(doc(db, `users/${user.uid}/workers`, Date.now().toString()), {
-  name,
-  rate
+  name, rate
  });
 
- document.getElementById("name").value="";
- document.getElementById("rate").value="";
+ document.getElementById("name").value = "";
+ document.getElementById("rate").value = "";
 };
 
 /* ---------------- DAILY ---------------- */
@@ -200,6 +203,7 @@ window.renderDaily = ()=>{
 
  document.getElementById("daily").innerHTML = workers.map(w=>{
   const l = logs.find(x=>x.date===date && x.workerId===w.id);
+
   return `
   <div class="flex justify-between mb-2">
    <span>${w.name}</span>
@@ -235,10 +239,10 @@ window.renderTotals = ()=>{
  document.getElementById("totals").innerHTML = workers.map(w=>{
 
   const wl = logs.filter(l=>{
-    if(l.workerId !== w.id) return false;
-    if(start && l.date < start) return false;
-    if(end && l.date > end) return false;
-    return true;
+   if(l.workerId !== w.id) return false;
+   if(start && l.date < start) return false;
+   if(end && l.date > end) return false;
+   return true;
   });
 
   const h = wl.reduce((a,b)=>a+b.hours,0);
@@ -261,7 +265,7 @@ window.renderTotals = ()=>{
 document.getElementById("start").onchange = renderTotals;
 document.getElementById("end").onchange = renderTotals;
 
-/* ---------------- PDF (MUJOR) ---------------- */
+/* ---------------- PDF MUJOR ---------------- */
 
 window.exportPDF = ()=>{
  const { jsPDF } = window.jspdf;
@@ -275,8 +279,8 @@ window.exportPDF = ()=>{
 
  workers.forEach(w=>{
   const filtered = logs.filter(l =>
-    l.workerId === w.id &&
-    l.date.startsWith(month)
+   l.workerId === w.id &&
+   l.date.startsWith(month)
   );
 
   const h = filtered.reduce((a,b)=>a+b.hours,0);
@@ -299,7 +303,7 @@ window.backupData = ()=>{
  a.click();
 };
 
-/* ---------------- DEFAULT DATE ---------------- */
+/* ---------------- DEFAULT ---------------- */
 
 const t = new Date().toISOString().slice(0,10);
 document.getElementById("date").value = t;
