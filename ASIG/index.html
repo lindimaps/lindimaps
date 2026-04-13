@@ -212,7 +212,6 @@
     const db = getFirestore(app);
     const appId = "sistemi-aktiviteteve-v1";
 
-    // Ekspozojmë globalisht për akses nga onclick
     window.db = db;
     window.doc = doc;
     window.deleteDoc = deleteDoc;
@@ -230,7 +229,6 @@
     };
     window.closeAlert = () => document.getElementById('custom-alert').classList.add('hidden');
 
-    // Funksioni i Konfirmimit
     window.askConfirm = (msg, onConfirm) => {
         document.getElementById('confirm-message').innerText = msg;
         deleteCallback = onConfirm;
@@ -549,33 +547,37 @@
         const start = document.getElementById('rep-start').value || "Fillimi";
         const end = document.getElementById('rep-end').value || "Sot";
         const op = document.getElementById('rep-op-select').value || "Të gjithë";
-        const act = document.getElementById('rep-act-select').options[document.getElementById('rep-act-select').selectedIndex].text;
+        const actDropdownText = document.getElementById('rep-act-select').options[document.getElementById('rep-act-select').selectedIndex].text;
 
+        // Titulli dhe Info
         docPDF.setFontSize(16);
         docPDF.text("Raporti LindiMaps Cloud", 14, 15);
         docPDF.setFontSize(10);
         docPDF.text(`Periudha: ${start} deri ${end}`, 14, 22);
         docPDF.text(`Eksperti: ${op}`, 14, 27);
-        docPDF.text(`Aktiviteti: ${act}`, 14, 32);
+        docPDF.text(`Aktiviteti: ${actDropdownText}`, 14, 32);
 
-        let processLabels = [];
-        filtered.forEach(log => {
-            log.processes.forEach(p => {
-                if(!processLabels.includes(p.label)) processLabels.push(p.label);
+        // Përcaktimi i të gjitha etiketave të proçeseve sipas radhës së konfigurimit
+        // Kjo siguron që kolonat të jenë gjithmonë në radhën e duhur
+        let orderedLabels = [];
+        configData.forEach(conf => {
+            conf.processes.forEach(p => {
+                if(!orderedLabels.includes(p.label)) orderedLabels.push(p.label);
             });
         });
 
-        const headers = [['Data', 'Aktiviteti', 'Eksperti', 'Ore', ...processLabels]];
+        const headers = [['Data', 'Aktiviteti', 'Eksperti', 'Ore', ...orderedLabels]];
         
         const bodyData = filtered.map(f => {
             const row = [f.date, f.actName, f.operator, f.hours];
-            processLabels.forEach(label => {
+            orderedLabels.forEach(label => {
                 const p = f.processes.find(item => item.label === label);
                 row.push(p ? p.value : "-");
             });
             return row;
         });
 
+        // Tabela kryesore
         docPDF.autoTable({ 
             startY: 40, 
             head: headers, 
@@ -583,6 +585,27 @@
             theme: 'striped',
             headStyles: { fillColor: [79, 70, 229] },
             styles: { fontSize: 8, cellPadding: 2 }
+        });
+
+        // Llogaritja e Totaleve
+        const totalHours = filtered.reduce((sum, log) => sum + (log.hours || 0), 0);
+        const totalActs = filtered.length;
+        const uniqueDates = [...new Set(filtered.map(log => log.date))].length;
+
+        // Tabela e Totaleve në fund
+        const finalY = docPDF.lastAutoTable.finalY + 10;
+        docPDF.autoTable({
+            startY: finalY,
+            head: [['Përmbledhja e Raportit', 'Vlera']],
+            body: [
+                ['Total ditë pune', uniqueDates.toString()],
+                ['Total aktivitete të regjistruara', totalActs.toString()],
+                ['Total orë pune', totalHours.toFixed(1)]
+            ],
+            theme: 'grid',
+            headStyles: { fillColor: [30, 41, 59] },
+            styles: { fontSize: 9, cellPadding: 3, fontStyle: 'bold' },
+            columnStyles: { 0: { cellWidth: 60 } }
         });
 
         docPDF.save(`Raport_LindiMaps_${start}_${end}.pdf`);
