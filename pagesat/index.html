@@ -110,11 +110,11 @@
                 <div class="flex gap-2">
                     <div class="flex-1">
                         <label class="text-[8px] font-bold text-slate-400 uppercase ml-1">Nga</label>
-                        <input type="date" id="start" class="w-full border p-2 rounded-lg text-xs font-bold outline-none bg-slate-50">
+                        <input type="date" id="start" onchange="window.validateDateRange('start')" class="w-full border p-2 rounded-lg text-xs font-bold outline-none bg-slate-50">
                     </div>
                     <div class="flex-1">
                         <label class="text-[8px] font-bold text-slate-400 uppercase ml-1">Deri më</label>
-                        <input type="date" id="end" class="w-full border p-2 rounded-lg text-xs font-bold outline-none bg-slate-50">
+                        <input type="date" id="end" onchange="window.validateDateRange('end')" class="w-full border p-2 rounded-lg text-xs font-bold outline-none bg-slate-50">
                     </div>
                 </div>
             </div>
@@ -312,6 +312,22 @@ function updateWorkerSelects() {
         listSelect.innerHTML += `<option value="${w.id}">${w.name}</option>`;
     });
 }
+
+window.validateDateRange = (changedInput) => {
+    const startInput = document.getElementById("start");
+    const endInput = document.getElementById("end");
+    
+    if (startInput.value && endInput.value) {
+        if (startInput.value > endInput.value) {
+            if (changedInput === 'start') {
+                endInput.value = startInput.value;
+            } else {
+                startInput.value = endInput.value;
+            }
+        }
+    }
+    window.renderTotals();
+};
 
 window.calculateTotal = (idSuffix) => {
     const startInput = document.getElementById(`start-${idSuffix}`);
@@ -652,8 +668,6 @@ document.getElementById("start").value = t.slice(0,8)+"01";
 document.getElementById("end").value = t;
 document.getElementById("pdfMonth").value = t.slice(0,7);
 document.getElementById("date").onchange = renderDaily;
-document.getElementById("start").onchange = renderTotals;
-document.getElementById("end").onchange = renderTotals;
 
 </script>
 </body>
