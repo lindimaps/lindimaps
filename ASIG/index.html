@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LindiMaps Workflow Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
+        .tab-active { color: #4f46e5; border-bottom: 3px solid #4f46e5; }
+        input, select, textarea { transition: all 0.2s; }
+        input:focus, select:focus { border-color: #4f46e5; ring: 2px; ring-color: rgba(79, 70, 229, 0.1); }
+    </style>
+</head>
+<body class="bg-[#f8fafc] min-h-screen pb-24 text-slate-900">
+
+<!-- AUTH UI -->
+<div id="auth-view" class="fixed inset-0 z-[100] bg-white flex items-center justify-center p-6">
+    <div class="w-full max-w-md space-y-8 text-center">
+        <div>
+            <h1 class="text-4xl font-extrabold text-indigo-600">LindiMaps</h1>
+            <p class="text-slate-500 mt-2 font-medium">Sistemi i Menaxhimit të Aktiviteteve</p>
+        </div>
+        <div class="bg-white p-8 rounded-[2rem] shadow-2xl shadow-indigo-100 border border-slate-100 space-y-4">
+            <input id="email" type="email" placeholder="Email" class="w-full p-4 rounded-xl bg-slate-50 border-none outline-none focus:ring-2 ring-indigo-500/20">
+            <input id="password" type="password" placeholder="Fjalëkalimi" class="w-full p-4 rounded-xl bg-slate-50 border-none outline-none focus:ring-2 ring-indigo-500/20">
+            <button id="login-btn" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold hover:bg-indigo-700 transition">Hyr në Sistem</button>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-view" class="hidden">
+    <header class="glass-card sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xl">L</div>
+            <span class="font-extrabold text-lg tracking-tight">LindiMaps <span class="text-indigo-600">Pro</span></span>
+        </div>
+        <button id="logout-btn" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Dil</button>
+    </header>
+
+    <nav class="bg-white border-b border-slate-100 flex overflow-x-auto">
+        <button onclick="switchTab('log')" id="tab-log" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest tab-active">Regjistrim Ditor</button>
+        <button onclick="switchTab('config')" id="tab-config" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest text-slate-400">Struktura</button>
+        <button onclick="switchTab('reports')" id="tab-reports" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest text-slate-400">Raporte</button>
+    </nav>
+
+    <main class="max-w-3xl mx-auto p-4 md:p-8 space-y-8">
+
+        <!-- VIEW: LOG (DATA ENTRY) -->
+        <div id="view-log" class="space-y-6">
+            <div class="glass-card rounded-[2rem] p-6 shadow-xl shadow-slate-200/50 space-y-6 border border-white">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Data e Kryerjes</label>
+                        <input id="log-date" type="date" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Operatori</label>
+                        <input id="log-operator" type="text" placeholder="Emri juaj" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Zgjidh Aktivitetin</label>
+                    <select id="log-act-select" onchange="generateProcessFields()" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold appearance-none"></select>
+                </div>
+
+                <div id="dynamic-fields-container" class="space-y-4 pt-4 border-t border-slate-50">
+                    <!-- Fields generated dynamically -->
+                </div>
+
+                <div class="pt-4 border-t border-slate-50">
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Orët e Punës për këtë aktivitet</label>
+                        <input id="log-hours" type="number" step="0.1" placeholder="0.0" class="w-full p-4 rounded-2xl bg-indigo-50 text-indigo-600 font-black text-xl border-none">
+                    </div>
+                </div>
+
+                <button id="save-log-btn" class="w-full bg-slate-900 text-white p-5 rounded-[1.5rem] font-bold shadow-lg hover:bg-black transition-all transform active:scale-95">
+                    Ruaj Aktivitetin
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW: CONFIG (STRUCTURE CREATION) -->
+        <div id="view-config" class="hidden space-y-6">
+            <div class="glass-card rounded-[2rem] p-8 space-y-6">
+                <h2 class="text-xl font-extrabold">Krijo Aktivitet & Procese</h2>
+                
+                <div class="space-y-4">
+                    <input id="new-act-name" type="text" placeholder="Emri i Aktivitetit (psh: Editim Ndërtesash)" class="w-full p-4 rounded-xl bg-slate-50 border-none font-bold">
+                    
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase">Shto Proceset (Një për rresht)</label>
+                        <p class="text-[10px] text-indigo-500 font-medium italic">Format: Emri:numër ose Emri:tekst</p>
+                        <textarea id="new-act-processes" placeholder="Nr Fillestar:numër&#10;Fshirje:numër&#10;Shtim:numër&#10;Informacion:tekst" class="w-full p-4 rounded-xl bg-slate-50 border-none h-32 font-medium"></textarea>
+                    </div>
+
+                    <div class="flex items-center gap-2 bg-indigo-50 p-3 rounded-lg text-indigo-700">
+                        <input type="checkbox" id="auto-calc" class="w-5 h-5 accent-indigo-600">
+                        <label for="auto-calc" class="text-xs font-bold">Llogarit automatikisht bilancin (Vetëm për numrat)</label>
+                    </div>
+
+                    <button id="add-act-btn" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold">Krijo Strukturën</button>
+                </div>
+            </div>
+
+            <div id="config-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Configured activities list -->
+            </div>
+        </div>
+
+        <!-- VIEW: REPORTS -->
+        <div id="view-reports" class="hidden space-y-6">
+            <div class="glass-card rounded-[2rem] p-6 space-y-4">
+                <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Gjenero Raportin</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <input id="rep-start" type="date" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-sm">
+                    <input id="rep-end" type="date" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="renderReportList()" class="bg-slate-900 text-white p-4 rounded-xl font-bold text-xs uppercase">Shfaq Raportin</button>
+                    <button onclick="exportToPDF()" class="bg-indigo-600 text-white p-4 rounded-xl font-bold text-xs uppercase">Shkarko PDF</button>
+                </div>
+            </div>
+
+            <div id="report-results" class="space-y-4">
+                <!-- Report items -->
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Loading -->
+<div id="loading" class="hidden fixed inset-0 bg-white/90 z-[200] flex items-center justify-center">
+    <div class="flex flex-col items-center gap-4">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut, signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+    const firebaseConfig = JSON.parse(__firebase_config);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'lindimaps-v4';
+
+    let user = null;
+    let configData = [];
+    let logData = [];
+
+    window.switchTab = (tab) => {
+        ['view-log', 'view-config', 'view-reports'].forEach(v => document.getElementById(v).classList.add('hidden'));
+        ['tab-log', 'tab-config', 'tab-reports'].forEach(t => {
+            const el = document.getElementById(t);
+            el.classList.remove('tab-active', 'text-indigo-600');
+            el.classList.add('text-slate-400');
+        });
+        document.getElementById(`view-${tab}`).classList.remove('hidden');
+        document.getElementById(`tab-${tab}`).classList.add('tab-active', 'text-indigo-600');
+        document.getElementById(`tab-${tab}`).classList.remove('text-slate-400');
+    };
+
+    const initAuth = async () => {
+        document.getElementById('loading').classList.remove('hidden');
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+            await signInAnonymously(auth);
+        }
+    };
+
+    onAuthStateChanged(auth, u => {
+        document.getElementById('loading').classList.add('hidden');
+        if (u) {
+            user = u;
+            document.getElementById('auth-view').classList.add('hidden');
+            document.getElementById('app-view').classList.remove('hidden');
+            startListening();
+        } else {
+            document.getElementById('auth-view').classList.remove('hidden');
+            document.getElementById('app-view').classList.add('hidden');
+        }
+    });
+
+    function startListening() {
+        onSnapshot(collection(db, `artifacts/${appId}/users/${user.uid}/config`), snap => {
+            configData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            updateActSelect();
+            renderConfigList();
+        });
+        onSnapshot(collection(db, `artifacts/${appId}/users/${user.uid}/logs`), snap => {
+            logData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderReportList();
+        });
+    }
+
+    document.getElementById('add-act-btn').onclick = async () => {
+        const name = document.getElementById('new-act-name').value.trim();
+        const procRaw = document.getElementById('new-act-processes').value.trim();
+        const autoCalc = document.getElementById('auto-calc').checked;
+        
+        if(!name || !procRaw) return alert("Plotësoni të gjitha!");
+
+        const processes = procRaw.split('\n').map(line => {
+            const parts = line.split(':');
+            const label = parts[0]?.trim();
+            let type = 'number'; // default
+            
+            if (parts.length > 1) {
+                const typeHint = parts[1].trim().toLowerCase();
+                if (typeHint === 'tekst' || typeHint === 'text') {
+                    type = 'text';
+                }
+            }
+            return { label, type };
+        }).filter(p => p.label);
+
+        const id = Date.now().toString();
+        await setDoc(doc(db, `artifacts/${appId}/users/${user.uid}/config`, id), { name, processes, autoCalc });
+        document.getElementById('new-act-name').value = "";
+        document.getElementById('new-act-processes').value = "";
+    };
+
+    function renderConfigList() {
+        const list = document.getElementById('config-list');
+        list.innerHTML = configData.map(c => `
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative group">
+                <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
+                    <button onclick="deleteAct('${c.id}')" class="text-red-400 bg-red-50 p-2 rounded-lg">Fshij</button>
+                </div>
+                <h4 class="font-bold">${c.name}</h4>
+                <div class="mt-2 flex flex-wrap gap-1">
+                    ${c.processes.map(p => `<span class="text-[8px] bg-slate-50 p-1 rounded font-bold text-slate-400 uppercase">${p.label}:${p.type}</span>`).join("")}
+                </div>
+            </div>
+        `).join("");
+    }
+
+    window.deleteAct = async (id) => {
+        if(confirm("Dëshironi ta fshini?")) await deleteDoc(doc(db, `artifacts/${appId}/users/${user.uid}/config`, id));
+    };
+
+    function updateActSelect() {
+        const select = document.getElementById('log-act-select');
+        select.innerHTML = `<option value="">-- Zgjidh Strukturën --</option>` + configData.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+    }
+
+    window.generateProcessFields = () => {
+        const actId = document.getElementById('log-act-select').value;
+        const container = document.getElementById('dynamic-fields-container');
+        container.innerHTML = "";
+        if(!actId) return;
+        
+        const act = configData.find(c => c.id === actId);
+        act.processes.forEach(p => {
+            const div = document.createElement('div');
+            div.className = "space-y-1";
+            div.innerHTML = `
+                <label class="text-[10px] font-extrabold text-slate-500 uppercase">${p.label}</label>
+                <input type="${p.type === 'number' ? 'number' : 'text'}" 
+                       data-label="${p.label}" 
+                       data-type="${p.type}" 
+                       class="process-input w-full p-3 rounded-xl bg-white border border-slate-100 font-bold text-sm outline-none"
+                       oninput="${act.autoCalc ? 'calculateAutoBalance()' : ''}">
+            `;
+            container.appendChild(div);
+        });
+
+        if(act.autoCalc) {
+            const calcDiv = document.createElement('div');
+            calcDiv.id = "calc-preview";
+            calcDiv.className = "bg-indigo-600 text-white p-4 rounded-xl text-center font-black";
+            calcDiv.innerHTML = "0";
+            container.appendChild(calcDiv);
+        }
+    };
+
+    window.calculateAutoBalance = () => {
+        const inputs = document.querySelectorAll('.process-input[data-type="number"]');
+        let total = 0;
+        let first = true;
+        inputs.forEach(input => {
+            const val = parseFloat(input.value) || 0;
+            if(first) { total = val; first = false; }
+            else { if(input.dataset.label.toLowerCase().includes('fshir')) total -= val; else total += val; }
+        });
+        const preview = document.getElementById('calc-preview');
+        if(preview) preview.innerText = `Bilanci: ${total}`;
+    };
+
+    document.getElementById('save-log-btn').onclick = async () => {
+        const actId = document.getElementById('log-act-select').value;
+        const date = document.getElementById('log-date').value;
+        const hours = document.getElementById('log-hours').value;
+        const operator = document.getElementById('log-operator').value;
+        if(!actId || !date || !hours || !operator) return alert("Plotësoni të gjitha!");
+
+        const act = configData.find(c => c.id === actId);
+        const dataValues = [];
+        document.querySelectorAll('.process-input').forEach(i => {
+            dataValues.push({ label: i.dataset.label, value: i.value || (i.dataset.type === 'number' ? "0" : ""), type: i.dataset.type });
+        });
+
+        await setDoc(doc(db, `artifacts/${appId}/users/${user.uid}/logs`, `${date}_${Date.now()}`), {
+            actName: act.name, date, hours: parseFloat(hours), operator, processes: dataValues
+        });
+        alert("Ruajtur!");
+    };
+
+    window.renderReportList = () => {
+        const start = document.getElementById('rep-start').value;
+        const end = document.getElementById('rep-end').value;
+        const results = document.getElementById('report-results');
+        let filtered = [...logData].sort((a,b) => b.date.localeCompare(a.date));
+        if(start) filtered = filtered.filter(f => f.date >= start);
+        if(end) filtered = filtered.filter(f => f.date <= end);
+
+        results.innerHTML = filtered.map(log => `
+            <div class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-sm space-y-3">
+                <div class="flex justify-between">
+                    <div>
+                        <span class="text-[9px] font-black bg-indigo-50 text-indigo-600 px-2 py-1 rounded uppercase">${log.actName}</span>
+                        <h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator} | ${log.date.split('-').reverse().join('.')}</h4>
+                    </div>
+                    <span class="text-xs font-bold text-indigo-500">${log.hours}h</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-50">
+                    ${log.processes.map(p => `<div class="bg-slate-50 p-2 rounded-lg text-[10px]"><b class="text-slate-400 uppercase">${p.label}:</b> <span class="text-slate-700">${p.value}</span></div>`).join("")}
+                </div>
+            </div>
+        `).join("");
+    };
+
+    window.exportToPDF = () => {
+        const { jsPDF } = window.jspdf;
+        const docPDF = new jsPDF();
+        let filtered = [...logData].sort((a,b) => a.date.localeCompare(b.date));
+        if(document.getElementById('rep-start').value) filtered = filtered.filter(f => f.date >= document.getElementById('rep-start').value);
+        if(document.getElementById('rep-end').value) filtered = filtered.filter(f => f.date <= document.getElementById('rep-end').value);
+
+        const tableData = filtered.map(f => [f.date, f.actName, f.operator, f.hours, f.processes.map(p => `${p.label}: ${p.value}`).join('\n')]);
+        docPDF.text("Raporti i Aktivitetit", 14, 20);
+        docPDF.autoTable({ startY: 25, head: [['Data', 'Aktiviteti', 'Operatori', 'Ore', 'Detaje']], body: tableData });
+        docPDF.save(`Raport_${Date.now()}.pdf`);
+    };
+
+    initAuth();
+</script>
+</body>
+</html>
