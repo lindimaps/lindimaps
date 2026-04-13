@@ -573,18 +573,16 @@
 
         const start = document.getElementById('rep-start').value || "Fillimi";
         const end = document.getElementById('rep-end').value || "Sot";
-        const op = document.getElementById('rep-op-select').value || "Të gjithë";
-        const actDropdownText = document.getElementById('rep-act-select').options[document.getElementById('rep-act-select').selectedIndex].text.replace("Aktiviteti: ", "");
+        const opName = document.getElementById('rep-op-select').value || "Të gjithë";
+        const actSelect = document.getElementById('rep-act-select');
+        const actId = actSelect.value;
+        const actText = actSelect.options[actSelect.selectedIndex].text.replace("Aktiviteti: ", "");
 
-        // --- BRAND LOGO NE PDF (ME PIKEN BLU) ---
-        docPDF.setFillColor(59, 130, 246); // Blue 500
+        // --- BRAND LOGO ---
+        docPDF.setFillColor(59, 130, 246);
         docPDF.roundedRect(14, 10, 10, 10, 2, 2, 'F');
-        
-        // Trekëndëshi i bardhë
         docPDF.setFillColor(255, 255, 255);
         docPDF.triangle(19, 12, 16.5, 18, 21.5, 18, 'F');
-
-        // Pika blu qendrore
         docPDF.setFillColor(59, 130, 246);
         docPDF.circle(19, 14.8, 1, 'F');
         docPDF.setDrawColor(255, 255, 255);
@@ -592,32 +590,35 @@
         docPDF.circle(19, 14.8, 1, 'S');
 
         docPDF.setFontSize(16);
-        docPDF.setTextColor(15, 23, 42); // Slate 900
+        docPDF.setTextColor(15, 23, 42);
         docPDF.setFont("helvetica", "bold");
         docPDF.text("LINDI", 28, 15);
-        
         const lindiWidth = docPDF.getTextWidth("LINDI ");
         docPDF.setTextColor(59, 130, 246);
         docPDF.text("MAPS", 28 + lindiWidth, 15);
-
         docPDF.setFontSize(8);
         docPDF.setTextColor(100, 116, 139);
         docPDF.text("SYSTEMS", 28, 19);
 
-        // --- HEADER I RAPORTIT ---
+        // --- HEADER ---
         docPDF.setFontSize(10);
         docPDF.setTextColor(0, 0, 0);
         docPDF.setFont("helvetica", "normal");
         docPDF.text(`Periudha: ${start} deri ${end}`, 14, 28);
-        docPDF.text(`Eksperti: ${op}`, 14, 33);
-        docPDF.text(`Aktiviteti: ${actDropdownText}`, 14, 38);
+        docPDF.text(`Eksperti: ${opName}`, 14, 33);
+        docPDF.text(`Aktiviteti: ${actText}`, 14, 38);
 
         let orderedLabels = [];
-        configData.forEach(conf => {
-            conf.processes.forEach(p => {
-                if(!orderedLabels.includes(p.label)) orderedLabels.push(p.label);
+        if (actId) {
+            const currentConf = configData.find(c => c.id === actId);
+            if (currentConf) orderedLabels = currentConf.processes.map(p => p.label);
+        } else {
+            configData.forEach(conf => {
+                conf.processes.forEach(p => {
+                    if(!orderedLabels.includes(p.label)) orderedLabels.push(p.label);
+                });
             });
-        });
+        }
 
         const headers = [['Data', 'Aktiviteti', 'Eksperti', 'Ore', ...orderedLabels]];
         const bodyData = filtered.map(f => {
@@ -638,26 +639,64 @@
             styles: { fontSize: 8, cellPadding: 2 }
         });
 
-        const totalHours = filtered.reduce((sum, log) => sum + (log.hours || 0), 0);
-        const uniqueDates = [...new Set(filtered.map(log => log.date))].length;
-        const uniqueActs = [...new Set(filtered.map(log => log.actName))].length;
-
+        // --- STATISTIKAT E AVANCUARA ---
         const finalY = docPDF.lastAutoTable.finalY + 10;
+        const statsBody = [];
+        
+        const totalHours = filtered.reduce((sum, log) => sum + (log.hours || 0), 0);
+        const totalReports = filtered.length;
+
+        // Llogaritja e aktiviteteve unikë sipas kolonës Aktiviteti (actName)
+        const uniqueActs = new Set();
+        const processSums = {};
+        orderedLabels.forEach(label => processSums[label] = 0);
+
+        filtered.forEach(log => {
+            // Shtojmë emrin e aktivitetit në Set për t'i pasur unikë
+            if (log.actName) uniqueActs.add(log.actName);
+            
+            // Mbledhim totalet numerike
+            log.processes.forEach(p => {
+                const val = parseFloat(p.value);
+                if (!isNaN(val)) processSums[p.label] += val;
+            });
+        });
+
+        // Statistikave i shtojmë kërkesën: Total aktivitete (unikë nga kolona Aktiviteti)
+        statsBody.push(['Total Aktivitete (Emra Unikë)', uniqueActs.size.toString()]);
+        statsBody.push(['Total Raporte të dërguara', totalReports.toString()]);
+        
+        // Shtojmë totalet për çdo proces numerik
+        orderedLabels.forEach(label => {
+            if (processSums[label] > 0) {
+                statsBody.push([`Total ${label}`, processSums[label].toLocaleString()]);
+            }
+        });
+
+        // Llogaritja e balancës automatike nëse është e nevojshme (p.sh. për ndërtesat)
+        const s = processSums;
+        const fillestare = s["Fillestare"] || s["Ndërtesa fillestare"] || 0;
+        const shtuar = s["Shtuar"] || s["Ndërtesa të shtuara"] || 0;
+        const fshire = s["Fshirë"] || s["Fshire"] || s["Ndërtesa të fshira"] || 0;
+        
+        if (fillestare > 0 || shtuar > 0 || fshire > 0) {
+            const aktuale = fillestare + shtuar - fshire;
+            statsBody.push(['TOTALI AKTUAL (Fillestare + Shtuar - Fshirë)', aktuale.toLocaleString()]);
+        }
+
+        statsBody.push(['Total orë pune', totalHours.toFixed(1) + " Orë"]);
+
         docPDF.autoTable({
             startY: finalY,
-            head: [['Përmbledhja e Raportit', 'Vlera']],
-            body: [
-                ['Total ditë pune unike', uniqueDates.toString() + " Ditë"],
-                ['Total lloje aktivitetesh', uniqueActs.toString() + " Lloje"],
-                ['Total orë pune', totalHours.toFixed(1) + " Orë"]
-            ],
+            head: [['Përmbledhja e Raportit', 'Vlera Finale']],
+            body: statsBody,
             theme: 'grid',
             headStyles: { fillColor: [15, 23, 42] },
             styles: { fontSize: 9, cellPadding: 3, fontStyle: 'bold' },
-            columnStyles: { 0: { cellWidth: 70 } }
+            columnStyles: { 0: { cellWidth: 100 } }
         });
 
-        docPDF.save(`Raport_LindiMaps_${new Date().toLocaleDateString()}.pdf`);
+        docPDF.save(`Raport_LindiMaps_${actText.replace(/\s+/g, '_')}_${new Date().toLocaleDateString()}.pdf`);
     };
 
     const today = new Date().toISOString().split('T')[0];
