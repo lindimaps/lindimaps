@@ -343,7 +343,7 @@
         list.innerHTML = operatorData.map(o => `
             <div class="bg-indigo-50 px-4 py-2 rounded-xl flex items-center gap-3">
                 <span class="text-xs font-bold text-indigo-700">${o.name}</span>
-                <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/operators', '${o.id}'))" class="text-red-400 font-bold">&times;</button>
+                <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/operators', '${o.id}'))" class="text-red-400 font-bold hover:text-red-600 transition">&times;</button>
             </div>
         `).join("");
     }
@@ -402,7 +402,7 @@
         document.querySelectorAll('.process-input').forEach(i => i.value = "");
     };
 
-    window.renderReportList = () => {
+    window.getFilteredLogs = () => {
         const start = document.getElementById('rep-start').value;
         const end = document.getElementById('rep-end').value;
         const selOp = document.getElementById('rep-op-select').value;
@@ -412,7 +412,11 @@
         if(end) filtered = filtered.filter(f => f.date <= end);
         if(selOp) filtered = filtered.filter(f => f.operator === selOp);
         if(selAct) filtered = filtered.filter(f => f.actId === selAct);
-        
+        return filtered;
+    };
+
+    window.renderReportList = () => {
+        const filtered = getFilteredLogs();
         document.getElementById('report-results').innerHTML = filtered.map(log => `
             <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
                 <div class="flex justify-between items-start">
@@ -420,7 +424,7 @@
                         <span class="text-[9px] font-black bg-indigo-50 text-indigo-600 px-2 py-1 rounded uppercase">${log.actName}</span>
                         <h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator} | ${log.date}</h4>
                     </div>
-                    <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/logs', '${log.id}'))" class="text-red-300 font-bold hover:text-red-500">&times;</button>
+                    <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/logs', '${log.id}'))" class="text-red-300 font-bold hover:text-red-500 transition-colors">&times;</button>
                 </div>
                 <div class="grid grid-cols-2 gap-2 border-t pt-2">${log.processes.map(p => `<div class="text-[10px]"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
                 <div class="text-[10px] text-right font-bold text-indigo-600">Ore: ${log.hours}</div>
@@ -430,12 +434,53 @@
 
     window.exportToPDF = () => {
         const { jsPDF } = window.jspdf;
-        const docPDF = new jsPDF();
-        let filtered = [...logData].sort((a,b) => a.date.localeCompare(b.date));
-        const tableData = filtered.map(f => [f.date, f.actName, f.operator, f.hours, f.processes.map(p => `${p.label}:${p.value}`).join(', ')]);
-        docPDF.text("Raporti LindiMaps", 14, 15);
-        docPDF.autoTable({ startY: 20, head: [['Data', 'Aktiviteti', 'Eksperti', 'Ore', 'Proceset']], body: tableData });
-        docPDF.save(`Raport_${Date.now()}.pdf`);
+        const docPDF = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape mode to fit columns
+        const filtered = getFilteredLogs();
+
+        const start = document.getElementById('rep-start').value || "Fillimi";
+        const end = document.getElementById('rep-end').value || "Sot";
+        const op = document.getElementById('rep-op-select').value || "Të gjithë";
+        const act = document.getElementById('rep-act-select').options[document.getElementById('rep-act-select').selectedIndex].text;
+
+        // Header Info
+        docPDF.setFontSize(16);
+        docPDF.text("Raporti LindiMaps Cloud", 14, 15);
+        docPDF.setFontSize(10);
+        docPDF.text(`Periudha: ${start} deri ${end}`, 14, 22);
+        docPDF.text(`Eksperti: ${op}`, 14, 27);
+        docPDF.text(`Aktiviteti: ${act}`, 14, 32);
+
+        // Dynamic Columns for Processes
+        // We first identify all unique process labels in the filtered data to create headers
+        let processLabels = [];
+        filtered.forEach(log => {
+            log.processes.forEach(p => {
+                if(!processLabels.includes(p.label)) processLabels.push(p.label);
+            });
+        });
+
+        const headers = [['Data', 'Aktiviteti', 'Eksperti', 'Ore', ...processLabels]];
+        
+        const bodyData = filtered.map(f => {
+            const row = [f.date, f.actName, f.operator, f.hours];
+            // Fill columns for processes based on headers
+            processLabels.forEach(label => {
+                const p = f.processes.find(item => item.label === label);
+                row.push(p ? p.value : "-");
+            });
+            return row;
+        });
+
+        docPDF.autoTable({ 
+            startY: 40, 
+            head: headers, 
+            body: bodyData,
+            theme: 'striped',
+            headStyles: { fillColor: [79, 70, 229] },
+            styles: { fontSize: 8, cellPadding: 2 }
+        });
+
+        docPDF.save(`Raport_LindiMaps_${start}_${end}.pdf`);
     };
 
     const today = new Date().toISOString().split('T')[0];
