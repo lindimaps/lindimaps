@@ -22,7 +22,7 @@
 
 <!-- LOGIN SECTION -->
 <div id="login" class="flex items-center justify-center min-h-screen px-4">
-    <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-sm space-y-5 border border-slate-200">
+    <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-sm:max-w-xs space-y-5 border border-slate-200">
         <h2 class="text-2xl font-black text-center text-slate-800">LindiMaps</h2>
         <div class="space-y-4">
             <input id="email" type="email" placeholder="Email" class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-indigo-500">
@@ -110,11 +110,11 @@
                 <div class="flex gap-2">
                     <div class="flex-1">
                         <label class="text-[8px] font-bold text-slate-400 uppercase ml-1">Nga</label>
-                        <input type="date" id="start" class="w-full border p-2 rounded-lg text-xs font-bold outline-none bg-slate-50">
+                        <input type="date" id="start" onchange="window.validateDateRange('start')" class="w-full border p-2 rounded-lg text-xs font-bold outline-none bg-slate-50">
                     </div>
                     <div class="flex-1">
                         <label class="text-[8px] font-bold text-slate-400 uppercase ml-1">Deri më</label>
-                        <input type="date" id="end" class="w-full border p-2 rounded-lg text-xs font-bold outline-none bg-slate-50">
+                        <input type="date" id="end" onchange="window.validateDateRange('end')" class="w-full border p-2 rounded-lg text-xs font-bold outline-none bg-slate-50">
                     </div>
                 </div>
             </div>
@@ -146,6 +146,10 @@
             <div class="flex flex-col gap-2">
                 <button id="addBtn" onclick="window.addWorker()" class="bg-indigo-600 text-white p-3 rounded-xl font-bold">Ruaj Punëtorin</button>
                 <button id="cancelBtn" onclick="window.cancelEdit()" class="hidden bg-slate-200 text-slate-700 p-3 rounded-xl font-bold">Anulo Editimin</button>
+            </div>
+            <div class="pt-4 border-t">
+                 <h4 class="text-xs font-black text-slate-400 uppercase mb-3">Lista e Punëtorëve</h4>
+                 <div id="workerList" class="space-y-2"></div>
             </div>
         </div>
     </div>
@@ -282,6 +286,7 @@ function start(){
   updateWorkerSelects();
   renderDaily();
   renderTotals();
+  renderWorkerManagement();
  });
  onSnapshot(collection(db, base+"/logs"), snap=>{
   logs = snap.docs.map(d=>({id:d.id,...d.data()}));
@@ -307,6 +312,22 @@ function updateWorkerSelects() {
         listSelect.innerHTML += `<option value="${w.id}">${w.name}</option>`;
     });
 }
+
+window.validateDateRange = (changedInput) => {
+    const startInput = document.getElementById("start");
+    const endInput = document.getElementById("end");
+    
+    if (startInput.value && endInput.value) {
+        if (startInput.value > endInput.value) {
+            if (changedInput === 'start') {
+                endInput.value = startInput.value;
+            } else {
+                startInput.value = endInput.value;
+            }
+        }
+    }
+    window.renderTotals();
+};
 
 window.calculateTotal = (idSuffix) => {
     const startInput = document.getElementById(`start-${idSuffix}`);
@@ -344,7 +365,6 @@ window.addWorker = async ()=>{
  const id = editId || Date.now().toString();
  await setDoc(doc(db, `users/${user.uid}/workers`, id), { name, rate });
  window.cancelEdit();
- window.switchTab('work');
 };
 
 window.editWorker = (id) => {
@@ -372,6 +392,21 @@ window.deleteWorker = async (id) => {
         await deleteDoc(doc(db, `users/${user.uid}/workers/${id}`));
     }
 };
+
+function renderWorkerManagement() {
+    document.getElementById("workerList").innerHTML = workers.map(w => `
+        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+            <div class="flex flex-col">
+                <span class="font-bold text-sm text-slate-700">${w.name}</span>
+                <span class="text-[10px] text-slate-400 font-bold">${w.rate}€/h</span>
+            </div>
+            <div class="flex gap-2">
+                 <button onclick="window.editWorker('${w.id}')" class="text-xs text-blue-500 font-black">EDITO</button>
+                 <button onclick="window.deleteWorker('${w.id}')" class="text-xs text-red-500 font-black">FSHI</button>
+            </div>
+        </div>
+    `).join("");
+}
 
 window.renderDaily = ()=>{
  const date = document.getElementById("date").value;
@@ -407,13 +442,15 @@ window.saveHours = async ()=>{
  const filterId = document.getElementById("workerLogFilter").value;
  const workersToSave = filterId === "all" ? workers : workers.filter(w => w.id === filterId);
  try {
-     for (let w of workersToSave) {
-      const h = parseFloat(document.getElementById(`total-${w.id}`).value)||0;
-      const startT = document.getElementById(`start-${w.id}`).value;
-      const endT = document.getElementById(`end-${w.id}`).value;
-      const ref = doc(db, `users/${user.uid}/logs`, date+"_"+w.id);
-      if(h>0) await setDoc(ref,{date,workerId:w.id,hours:h,start:startT,end:endT}); else await deleteDoc(ref);
-     }
+     const promises = workersToSave.map(w => {
+        const h = parseFloat(document.getElementById(`total-${w.id}`).value)||0;
+        const startT = document.getElementById(`start-${w.id}`).value;
+        const endT = document.getElementById(`end-${w.id}`).value;
+        const ref = doc(db, `users/${user.uid}/logs`, date+"_"+w.id);
+        if(h>0) return setDoc(ref,{date,workerId:w.id,hours:h,start:startT,end:endT}); 
+        else return deleteDoc(ref);
+     });
+     await Promise.all(promises);
      alert("Orët u ruajtën!");
  } catch(e) { alert("Gabim!"); }
 };
@@ -460,7 +497,6 @@ window.renderTotals = ()=>{
       </div>`;
     }).join("");
  } else {
-    // Punëtori i vetëm - shfaq historikun ditor
     const w = workers.find(x => x.id === filterId);
     const wl = logs.filter(l=>{
        if(l.workerId !== filterId) return false;
@@ -507,7 +543,7 @@ window.saveListChanges = async () => {
     if(rows.length === 0) return;
     
     try {
-        for(let row of rows) {
+        const promises = Array.from(rows).map(row => {
             const date = row.getAttribute('data-log-date');
             const workerId = row.getAttribute('data-log-worker');
             const rowId = `row-${date}-${workerId}`;
@@ -518,15 +554,17 @@ window.saveListChanges = async () => {
             
             const ref = doc(db, `users/${user.uid}/logs`, date + "_" + workerId);
             if(hours > 0) {
-                await setDoc(ref, { date, workerId, hours, start: startT, end: endT });
+                return setDoc(ref, { date, workerId, hours, start: startT, end: endT });
             } else {
-                await deleteDoc(ref);
+                return deleteDoc(ref);
             }
-        }
-        alert("Ndryshimet u ruajtën me sukses!");
+        });
+
+        await Promise.all(promises);
+        alert("Të gjitha ndryshimet u ruajtën!");
         window.renderTotals();
     } catch(e) {
-        alert("Ndodhi një gabim gjatë ruajtjes!");
+        alert("Ndodhi një gabim gjatë ruajtjes së listës!");
     }
 };
 
@@ -630,8 +668,6 @@ document.getElementById("start").value = t.slice(0,8)+"01";
 document.getElementById("end").value = t;
 document.getElementById("pdfMonth").value = t.slice(0,7);
 document.getElementById("date").onchange = renderDaily;
-document.getElementById("start").onchange = renderTotals;
-document.getElementById("end").onchange = renderTotals;
 
 </script>
 </body>
