@@ -10,10 +10,9 @@
 <style>
     body { font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
     .worker-row { border-bottom: 1px solid #f1f5f9; padding: 12px 0; }
-    .edit-mode { background-color: #fffbeb; border: 2px solid #f59e0b !important; border-radius: 12px; }
     button:active { transform: scale(0.96); opacity: 0.9; }
     input { font-size: 16px !important; }
-    .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; }
     .tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; }
     .time-input { padding: 4px 8px !important; height: 32px; font-size: 13px !important; }
 </style>
@@ -31,7 +30,7 @@
             <button onclick="window.loginUser()" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold shadow-lg shadow-indigo-100">Kyçu</button>
             <div class="flex flex-col items-center gap-3 pt-2">
                 <button onclick="window.toggleRegModal(true)" class="text-indigo-600 font-bold text-sm">Nuk keni llogari? Regjistrohu</button>
-                <button onclick="window.resetPassword()" class="text-slate-400 text-xs underline">Harruat fjalëkalimin?</button>
+                <button onclick="window.toggleForgotModal(true)" class="text-slate-400 text-xs underline">Harruat fjalëkalimin?</button>
             </div>
         </div>
     </div>
@@ -41,11 +40,22 @@
 <div id="regModal" class="hidden modal-overlay">
     <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm space-y-4">
         <h3 class="text-xl font-bold text-slate-800">Krijo Llogari të Re</h3>
-        <p class="text-sm text-slate-500">Plotësoni të dhënat saktë për regjistrim.</p>
-        <input id="regEmail" type="email" placeholder="Shkruaj Email-in saktë" class="w-full border p-3 rounded-xl outline-none focus:border-emerald-500">
+        <p class="text-sm text-slate-500">Plotësoni të dhënat për regjistrim.</p>
+        <input id="regEmail" type="email" placeholder="Email" class="w-full border p-3 rounded-xl outline-none focus:border-emerald-500">
         <input id="regPassword" type="password" placeholder="Password i ri" class="w-full border p-3 rounded-xl outline-none focus:border-emerald-500">
-        <button onclick="window.registerUser()" class="w-full bg-emerald-600 text-white p-4 rounded-xl font-bold">Regjistrohu Tani</button>
-        <button onclick="window.toggleRegModal(false)" class="w-full text-slate-500 font-medium py-2">Mbyll</button>
+        <button onclick="window.registerUser()" class="w-full bg-emerald-600 text-white p-4 rounded-xl font-bold">Regjistrohu</button>
+        <button onclick="window.toggleRegModal(false)" class="w-full text-slate-500 font-medium py-2">Anulo</button>
+    </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div id="forgotModal" class="hidden modal-overlay">
+    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm space-y-4">
+        <h3 class="text-xl font-bold text-slate-800">Rivendos Fjalëkalimin</h3>
+        <p class="text-sm text-slate-500">Shkruani email-in tuaj për të marrë linkun e rivendosjes.</p>
+        <input id="forgotEmail" type="email" placeholder="Email-i juaj" class="w-full border p-3 rounded-xl outline-none focus:border-indigo-500">
+        <button onclick="window.resetPassword()" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold">Dërgo Email-in</button>
+        <button onclick="window.toggleForgotModal(false)" class="w-full text-slate-500 font-medium py-2">Anulo</button>
     </div>
 </div>
 
@@ -178,6 +188,61 @@ const validateEmail = (email) => {
     return String(email).toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
 };
 
+/* --- AUTH ACTIONS --- */
+window.toggleRegModal = (show) => {
+    document.getElementById("regModal").classList.toggle("hidden", !show);
+};
+
+window.toggleForgotModal = (show) => {
+    document.getElementById("forgotModal").classList.toggle("hidden", !show);
+};
+
+window.loginUser = async ()=>{
+ try {
+  const email = document.getElementById("email").value.trim();
+  const pass = document.getElementById("password").value;
+  if(!email || !validateEmail(email)) return alert("Shkruani email saktë!");
+  if(!pass) return alert("Shkruani password!");
+  await signInWithEmailAndPassword(auth, email, pass);
+ } catch(e){ alert("Email ose Password i gabuar!"); }
+};
+
+window.registerUser = async ()=>{
+ try {
+  const email = document.getElementById("regEmail").value.trim();
+  const pass = document.getElementById("regPassword").value;
+  if(!email || !validateEmail(email)) return alert("Email jo i vlefshëm!");
+  if(!pass || pass.length < 6) return alert("Password duhet të paktën 6 karaktere!");
+  await createUserWithEmailAndPassword(auth, email, pass);
+  window.toggleRegModal(false);
+ } catch(e){ alert("Regjistrimi dështoi! Email mund të jetë në përdorim."); }
+};
+
+window.resetPassword = async ()=>{
+ try {
+  const email = document.getElementById("forgotEmail").value.trim();
+  if(!email || !validateEmail(email)) return alert("Shkruani email-in tuaj!");
+  await sendPasswordResetEmail(auth, email);
+  alert("Emaili për rivendosje u dërgua! Kontrolloni inbox-in tuaj.");
+  window.toggleForgotModal(false);
+ } catch(e){ alert("Gabim! Sigurohuni që email-i është i saktë."); }
+};
+
+window.logout = async ()=>{ await signOut(auth); location.reload(); };
+
+onAuthStateChanged(auth, u=>{
+ if(u){
+  user = u;
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("userEmail").innerText = u.email;
+  start();
+ } else {
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("login").classList.remove("hidden");
+ }
+});
+
 /* --- NAVIGATION --- */
 window.switchTab = (tab) => {
     document.getElementById('viewWork').classList.add('hidden');
@@ -200,52 +265,7 @@ window.switchTab = (tab) => {
     }
 };
 
-/* --- AUTH --- */
-window.loginUser = async ()=>{
- try {
-  const email = document.getElementById("email").value.trim();
-  const pass = document.getElementById("password").value;
-  if(!email || !validateEmail(email)) return alert("Plotësoni saktë email-in!");
-  if(!pass) return alert("Shkruani fjalëkalimin!");
-  await signInWithEmailAndPassword(auth, email, pass);
- } catch(e){ alert("Gabim në kyçje!"); }
-};
-
-window.registerUser = async ()=>{
- try {
-  const email = document.getElementById("regEmail").value.trim();
-  const pass = document.getElementById("regPassword").value;
-  if(!email || !validateEmail(email)) return alert("Plotësoni saktë email-in!");
-  if(!pass || pass.length < 6) return alert("Fjalëkalimi të paktën 6 karaktere!");
-  await createUserWithEmailAndPassword(auth, email, pass);
- } catch(e){ alert("Gabim!"); }
-};
-
-window.resetPassword = async ()=>{
- try {
-  const email = document.getElementById("email").value.trim();
-  if(!email || !validateEmail(email)) return alert("Shkruani email-in!");
-  await sendPasswordResetEmail(auth, email);
-  alert("Emaili u dërgua!");
- } catch(e){ alert("Gabim!"); }
-};
-
-window.logout = async ()=>{ await signOut(auth); location.reload(); };
-
-onAuthStateChanged(auth, u=>{
- if(u){
-  user = u;
-  document.getElementById("login").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
-  document.getElementById("userEmail").innerText = u.email;
-  start();
- } else {
-  document.getElementById("app").classList.add("hidden");
-  document.getElementById("login").classList.remove("hidden");
- }
-});
-
-/* --- CORE --- */
+/* --- CORE APP LOGIC --- */
 function start(){
  const base = `users/${user.uid}`;
  onSnapshot(collection(db, base+"/workers"), snap=>{
@@ -271,7 +291,6 @@ function updateWorkerSelect() {
     workers.forEach(w => { select.innerHTML += `<option value="${w.id}">${w.name}</option>`; });
 }
 
-/* --- CALCULATE HOURS --- */
 window.calculateTotal = (workerId) => {
     const startInput = document.getElementById(`start-${workerId}`);
     const endInput = document.getElementById(`end-${workerId}`);
@@ -280,16 +299,12 @@ window.calculateTotal = (workerId) => {
     if (startInput.value && endInput.value) {
         const [h1, m1] = startInput.value.split(':').map(Number);
         const [h2, m2] = endInput.value.split(':').map(Number);
-        
         let diff = (h2 * 60 + m2) - (h1 * 60 + m1);
         if (diff < 0) diff += 24 * 60; 
-        
-        const hours = (diff / 60).toFixed(2);
-        totalDisplay.value = hours;
+        totalDisplay.value = (diff / 60).toFixed(2);
     }
 };
 
-/* --- NOTES & WORKERS --- */
 window.openNote = (workerId) => {
     activeNoteWorkerId = workerId;
     const n = notes.find(x => x.id === workerId);
@@ -342,7 +357,6 @@ window.deleteWorker = async (id) => {
     }
 };
 
-/* --- DAILY LOGS --- */
 window.renderDaily = ()=>{
  const date = document.getElementById("date").value;
  document.getElementById("daily").innerHTML = workers.map(w=>{
@@ -384,7 +398,6 @@ window.saveHours = async ()=>{
  } catch(e) { alert("Gabim!"); }
 };
 
-/* --- TOTALS & PDF --- */
 window.renderTotals = ()=>{
  const start = document.getElementById("start").value;
  const end = document.getElementById("end").value;
@@ -438,11 +451,9 @@ window.exportPDF = ()=>{
  docPDF.setFont("helvetica", "normal");
  docPDF.setFontSize(11);
  docPDF.text(`Periudha: ${monthName} ${year}`, 15, 35);
-
  let y = 55;
 
  if(workerFilterId === 'all') {
-    // RAPORTI PËRMBLEDHËS (Si në foto)
     docPDF.setFont("helvetica", "bold");
     docPDF.text("Emri Mbiemri", 15, y); 
     docPDF.text("Orët", 110, y); 
@@ -450,14 +461,12 @@ window.exportPDF = ()=>{
     docPDF.text("Total", 175, y);
     docPDF.line(15, y+2, 195, y+2);
     y += 10;
-    
     let totalAll = 0;
     workers.forEach(w => {
         const filteredLogs = logs.filter(l => l.workerId === w.id && l.date.startsWith(monthInput));
         const h = filteredLogs.reduce((a,b) => a + b.hours, 0);
         const m = h * w.rate;
         const n = notes.find(x => x.id === w.id);
-        
         if(h > 0) {
             totalAll += m;
             docPDF.setFont("helvetica", "bold");
@@ -471,9 +480,7 @@ window.exportPDF = ()=>{
                 docPDF.setFontSize(9);
                 docPDF.setTextColor(100);
                 docPDF.text(`Shënim: ${n.text}`, 20, y);
-                docPDF.setTextColor(0);
-                docPDF.setFontSize(11);
-                y += 6;
+                docPDF.setTextColor(0); y += 6;
             }
             y += 4;
         }
@@ -482,33 +489,23 @@ window.exportPDF = ()=>{
     docPDF.setFont("helvetica", "bold");
     docPDF.text(`TOTALI: ${totalAll.toFixed(2)} €`, 150, y+10);
  } else {
-    // RAPORTI INDIVIDUAL (Ditë për ditë)
     const w = workers.find(x => x.id === workerFilterId);
     docPDF.setFont("helvetica", "bold");
-    docPDF.setFontSize(14);
     docPDF.text(`Punëtori: ${w.name}`, 15, 45);
-    
-    docPDF.setFontSize(11);
     docPDF.text("Data", 15, y); 
     docPDF.text("Oraret", 70, y); 
     docPDF.text("Orët", 130, y); 
     docPDF.text("Vlera", 170, y);
     docPDF.line(15, y+2, 195, y+2);
     y += 10;
-
     const filteredLogs = logs.filter(l => l.workerId === workerFilterId && l.date.startsWith(monthInput)).sort((a,b) => a.date.localeCompare(b.date));
-    let totalH = 0;
-    let totalM = 0;
-
+    let totalH = 0; let totalM = 0;
     filteredLogs.forEach(l => {
         const dateParts = l.date.split("-");
         const formattedDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
         const orari = (l.start && l.end) ? `${l.start}-${l.end}` : "Manual";
         const vlera = l.hours * w.rate;
-        
-        totalH += l.hours;
-        totalM += vlera;
-
+        totalH += l.hours; totalM += vlera;
         docPDF.setFont("helvetica", "normal");
         docPDF.text(formattedDate, 15, y);
         docPDF.text(orari, 70, y);
@@ -516,15 +513,11 @@ window.exportPDF = ()=>{
         docPDF.text(vlera.toFixed(2) + " €", 170, y);
         y += 8;
     });
-
     docPDF.line(15, y, 195, y);
     docPDF.setFont("helvetica", "bold");
-    docPDF.text("TOTALI MUJOR:", 15, y+10);
-    docPDF.text(`${totalH.toFixed(2)} orë`, 130, y+10);
-    docPDF.text(`${totalM.toFixed(2)} €`, 170, y+10);
+    docPDF.text(`TOTALI MUJOR: ${totalH.toFixed(2)} orë | ${totalM.toFixed(2)} €`, 15, y+10);
  }
-
- docPDF.save(`Raporti-${monthName}-${workerFilterId === 'all' ? 'Gjithe' : 'Individual'}.pdf`);
+ docPDF.save(`Raporti-${monthName}.pdf`);
 };
 
 window.backupData = ()=>{
