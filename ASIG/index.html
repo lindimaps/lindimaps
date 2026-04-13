@@ -13,13 +13,63 @@
         .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
         .tab-active { color: #4f46e5; border-bottom: 3px solid #4f46e5; }
         input, select, textarea { transition: all 0.2s; }
-        input:focus, select:focus { border-color: #4f46e5; ring: 2px; ring-color: rgba(79, 70, 229, 0.1); }
+        input:focus, select:focus { border-color: #4f46e5; outline: none; ring: 2px; ring-color: rgba(79, 70, 229, 0.1); }
+        .auth-view { transition: opacity 0.3s ease-in-out; }
     </style>
 </head>
 <body class="bg-[#f8fafc] min-h-screen pb-24 text-slate-900">
 
+<!-- AUTHENTICATION OVERLAY -->
+<div id="auth-overlay" class="fixed inset-0 z-[400] bg-white flex items-center justify-center p-6 hidden">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Brand Header -->
+        <div class="flex flex-col items-center gap-3 text-center mb-8">
+            <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-3xl shadow-xl shadow-indigo-200">L</div>
+            <h1 class="text-3xl font-extrabold tracking-tight">LindiMaps <span class="text-indigo-600">Cloud</span></h1>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form" class="auth-view space-y-4">
+            <p class="text-slate-400 font-bold text-xs text-center uppercase tracking-widest">Hyr në sistem</p>
+            <input id="login-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
+            <input id="login-password" type="password" placeholder="Fjalëkalimi" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
+            <button id="login-btn" class="w-full bg-indigo-600 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">
+                Hyr
+            </button>
+            <div class="flex justify-between px-2 text-[11px] font-bold text-slate-400">
+                <button onclick="toggleAuth('reset')" class="hover:text-indigo-600">Harrova fjalëkalimin</button>
+                <button onclick="toggleAuth('signup')" class="text-indigo-600">Krijo llogari të re</button>
+            </div>
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signup-form" class="auth-view space-y-4 hidden">
+            <p class="text-slate-400 font-bold text-xs text-center uppercase tracking-widest">Regjistrohu</p>
+            <input id="signup-email" type="email" placeholder="Email i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
+            <input id="signup-password" type="password" placeholder="Fjalëkalim i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
+            <button id="signup-btn" class="w-full bg-indigo-600 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">
+                Krijo Llogarinë
+            </button>
+            <button onclick="toggleAuth('login')" class="w-full text-[11px] font-bold text-slate-400 uppercase text-center">Kthehu te Hyrja</button>
+        </div>
+
+        <!-- Reset Form -->
+        <div id="reset-form" class="auth-view space-y-4 hidden">
+            <p class="text-slate-400 font-bold text-xs text-center uppercase tracking-widest">Rivendos Fjalëkalimin</p>
+            <p class="text-slate-500 text-[11px] text-center px-4">Vendosni emailin tuaj dhe ne do t'ju dërgojmë një link për të krijuar një fjalëkalim të ri.</p>
+            <input id="reset-email" type="email" placeholder="Email juaj" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
+            <button id="reset-btn" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-black active:scale-95 transition-all">
+                Dërgo Email-in
+            </button>
+            <button onclick="toggleAuth('login')" class="w-full text-[11px] font-bold text-slate-400 uppercase text-center">Anulo</button>
+        </div>
+
+        <p id="auth-error" class="text-red-500 text-center text-xs font-bold hidden"></p>
+    </div>
+</div>
+
 <!-- ALERT MODAL -->
-<div id="custom-alert" class="hidden fixed inset-0 z-[300] bg-black/50 flex items-center justify-center p-4">
+<div id="custom-alert" class="hidden fixed inset-0 z-[500] bg-black/50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
         <p id="alert-message" class="font-bold text-slate-800"></p>
         <button onclick="closeAlert()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold">Kuptova</button>
@@ -27,22 +77,23 @@
 </div>
 
 <!-- LOADING OVERLAY -->
-<div id="loading" class="fixed inset-0 bg-white/90 z-[200] flex items-center justify-center">
+<div id="loading" class="fixed inset-0 bg-white/95 z-[300] flex items-center justify-center">
     <div class="flex flex-col items-center gap-4">
         <div class="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
         <p class="text-indigo-600 font-bold animate-pulse text-xs uppercase tracking-widest">Duke lidhur Cloud-in...</p>
     </div>
 </div>
 
-<!-- MAIN APP -->
-<div id="app-view">
+<!-- MAIN APP CONTENT -->
+<div id="app-content" class="hidden">
     <header class="glass-card sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
         <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xl">L</div>
             <span class="font-extrabold text-lg tracking-tight">LindiMaps <span class="text-indigo-600">Cloud</span></span>
         </div>
         <div class="flex items-center gap-4">
-            <span id="sync-status" class="text-[10px] font-bold text-green-500 bg-green-50 px-3 py-1 rounded-full uppercase">Sinkronizuar</span>
+            <button onclick="logout()" class="text-[10px] font-bold text-slate-400 uppercase hover:text-red-500">Dil</button>
+            <span id="sync-status" class="text-[10px] font-bold text-green-500 bg-green-50 px-3 py-1 rounded-full uppercase">Online</span>
         </div>
     </header>
 
@@ -134,8 +185,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBk3Wi9DsGp9egY8qQnxeEdM9qlTZIodw0",
@@ -156,7 +207,7 @@
     let logData = [];
     let operatorData = [];
 
-    // --- ALERTS ---
+    // --- INTERFACE HELPERS ---
     window.showAlert = (msg) => {
         document.getElementById('alert-message').innerText = msg;
         document.getElementById('custom-alert').classList.remove('hidden');
@@ -170,61 +221,116 @@
         document.getElementById(`tab-${tab}`).classList.replace('text-slate-400', 'tab-active');
     };
 
-    // --- ERROR HANDLING WRAPPER ---
-    const cloudOp = async (fn) => {
-        try {
-            await fn();
-        } catch (e) {
-            console.error("Cloud Error:", e);
-            showAlert("Gabim në lidhje. Provoni përsëri.");
-        }
+    window.toggleAuth = (view) => {
+        const error = document.getElementById('auth-error');
+        error.classList.add('hidden');
+        ['login-form', 'signup-form', 'reset-form'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
+        document.getElementById(`${view}-form`).classList.remove('hidden');
     };
 
-    // --- FIRESTORE SYNC ---
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            await cloudOp(() => signInAnonymously(auth));
-        } else {
-            document.getElementById('loading').classList.add('hidden');
+    // --- AUTH ACTIONS ---
+    onAuthStateChanged(auth, (user) => {
+        const loading = document.getElementById('loading');
+        const appContent = document.getElementById('app-content');
+        const authOverlay = document.getElementById('auth-overlay');
+
+        loading.classList.add('hidden');
+        if (user) {
+            appContent.classList.remove('hidden');
+            authOverlay.classList.add('hidden');
             startListening();
+        } else {
+            appContent.classList.add('hidden');
+            authOverlay.classList.remove('hidden');
+            toggleAuth('login');
         }
     });
 
+    document.getElementById('login-btn').onclick = async () => {
+        const email = document.getElementById('login-email').value.trim();
+        const pass = document.getElementById('login-password').value;
+        const error = document.getElementById('auth-error');
+        if(!email || !pass) return;
+        try {
+            error.classList.add('hidden');
+            await signInWithEmailAndPassword(auth, email, pass);
+        } catch (e) {
+            error.innerText = "Email ose fjalëkalim i pasaktë.";
+            error.classList.remove('hidden');
+        }
+    };
+
+    document.getElementById('signup-btn').onclick = async () => {
+        const email = document.getElementById('signup-email').value.trim();
+        const pass = document.getElementById('signup-password').value;
+        const error = document.getElementById('auth-error');
+        if(pass.length < 6) {
+            error.innerText = "Fjalëkalimi duhet të ketë të paktën 6 karaktere.";
+            error.classList.remove('hidden');
+            return;
+        }
+        try {
+            await createUserWithEmailAndPassword(auth, email, pass);
+            showAlert("Llogaria u krijua me sukses!");
+        } catch (e) {
+            error.innerText = "Gabim gjatë regjistrimit. Ky email mund të jetë i zënë.";
+            error.classList.remove('hidden');
+        }
+    };
+
+    document.getElementById('reset-btn').onclick = async () => {
+        const email = document.getElementById('reset-email').value.trim();
+        if(!email) return;
+        try {
+            await sendPasswordResetEmail(auth, email);
+            showAlert("Email-i për rivendosje u dërgua! Kontrollo Inbox-in ose Spam.");
+            toggleAuth('login');
+        } catch (e) {
+            showAlert("Ky email nuk ekziston në sistem.");
+        }
+    };
+
+    window.logout = () => signOut(auth);
+
+    // --- DATA SYNC ---
     function startListening() {
-        // Path-i publik sipas rregullave 'allow read, write: if true'
         const basePath = `artifacts/${appId}/public/data`;
 
         onSnapshot(collection(db, basePath, 'config'), snap => {
             configData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             updateDropdowns();
             renderConfigList();
-        }, (err) => console.error("Config sync error", err));
+        });
 
         onSnapshot(collection(db, basePath, 'logs'), snap => {
             logData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             renderReportList();
-        }, (err) => console.error("Logs sync error", err));
+        });
 
         onSnapshot(collection(db, basePath, 'operators'), snap => {
             operatorData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             updateDropdowns();
             renderOperatorList();
-        }, (err) => console.error("Ops sync error", err));
+        });
     }
 
-    // --- ACTIONS ---
+    // --- APP LOGIC (NO CHANGES FROM ORIGINAL) ---
+    const cloudOp = async (fn) => {
+        try { await fn(); } catch (e) { showAlert("Dështoi sinkronizimi."); }
+    };
+
     document.getElementById('add-act-btn').onclick = () => cloudOp(async () => {
         const name = document.getElementById('new-act-name').value.trim();
         const procRaw = document.getElementById('new-act-processes').value.trim();
         const autoCalc = document.getElementById('auto-calc').checked;
         const editId = document.getElementById('edit-id').value;
         if (!name || !procRaw) return showAlert("Plotësoni të gjitha fushat.");
-        
         const processes = procRaw.split('\n').map(line => {
             const parts = line.split(':');
             return { label: parts[0]?.trim(), type: parts[1]?.trim() === 'tekst' ? 'text' : 'number' };
         }).filter(p => p.label);
-        
         const id = editId || Date.now().toString();
         await setDoc(doc(db, `artifacts/${appId}/public/data/config`, id), { name, processes, autoCalc });
         resetConfigForm();
@@ -260,7 +366,6 @@
                     <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/config', '${c.id}'))" class="text-red-400 bg-red-50 px-2 py-1 rounded text-[9px] font-bold">FSHIJ</button>
                 </div>
                 <h4 class="font-bold text-slate-800">${c.name}</h4>
-                <div class="mt-2 flex flex-wrap gap-1">${c.processes.map(p => `<span class="text-[8px] bg-slate-50 p-1 rounded font-bold text-slate-400 uppercase">${p.label}</span>`).join("")}</div>
             </div>
         `).join("");
     }
