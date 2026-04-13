@@ -641,9 +641,10 @@ window.exportPDF = ()=>{
     docPDF.setFont("helvetica", "bold");
     docPDF.text(`Punëtori: ${w.name}`, 15, 45);
     docPDF.text("Data", 15, y); 
-    docPDF.text("Oraret", 70, y); 
-    docPDF.text("Orët", 130, y); 
-    docPDF.text("Vlera", 170, y);
+    docPDF.text("Oraret", 65, y); 
+    docPDF.text("€/h", 110, y);
+    docPDF.text("Orët", 145, y); 
+    docPDF.text("Vlera", 175, y);
     docPDF.line(15, y+2, 195, y+2);
     y += 10;
     const filteredLogs = logs.filter(l => l.workerId === workerFilterId && l.date.startsWith(monthInput)).sort((a,b) => a.date.localeCompare(b.date));
@@ -656,9 +657,10 @@ window.exportPDF = ()=>{
         totalH += l.hours; totalM += vlera;
         docPDF.setFont("helvetica", "normal");
         docPDF.text(formattedDate, 15, y);
-        docPDF.text(orari, 70, y);
-        docPDF.text(l.hours.toFixed(2), 130, y);
-        docPDF.text(vlera.toFixed(2) + " €", 170, y);
+        docPDF.text(orari, 65, y);
+        docPDF.text(w.rate.toFixed(2), 110, y);
+        docPDF.text(l.hours.toFixed(2), 145, y);
+        docPDF.text(vlera.toFixed(2) + " €", 175, y);
         y += 8;
     });
     docPDF.line(15, y, 195, y);
