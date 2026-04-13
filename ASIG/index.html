@@ -1,660 +1,374 @@
 <!DOCTYPE html>
 <html lang="sq">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LindiMaps Pagesat</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<style>
-    body { font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
-    .worker-row { border-bottom: 1px solid #f1f5f9; padding: 12px 0; }
-    button:active { transform: scale(0.96); opacity: 0.9; }
-    input { font-size: 16px !important; }
-    .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; }
-    .tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; }
-    .time-input { padding: 4px 8px !important; height: 32px; font-size: 13px !important; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LindiMaps Workflow Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
+        .tab-active { color: #4f46e5; border-bottom: 3px solid #4f46e5; }
+        input, select, textarea { transition: all 0.2s; }
+        input:focus, select:focus { border-color: #4f46e5; ring: 2px; ring-color: rgba(79, 70, 229, 0.1); }
+    </style>
 </head>
+<body class="bg-[#f8fafc] min-h-screen pb-24 text-slate-900">
 
-<body class="bg-slate-100 pb-20">
+<!-- ALERT MODAL -->
+<div id="custom-alert" class="hidden fixed inset-0 z-[300] bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
+        <p id="alert-message" class="font-bold text-slate-800"></p>
+        <button onclick="closeAlert()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold">Kuptova</button>
+    </div>
+</div>
 
-<!-- LOGIN SECTION -->
-<div id="login" class="flex items-center justify-center min-h-screen px-4">
-    <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-sm:max-w-xs space-y-5 border border-slate-200">
-        <h2 class="text-2xl font-black text-center text-slate-800">LindiMaps</h2>
-        <div class="space-y-4">
-            <input id="email" type="email" placeholder="Email" class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-indigo-500">
-            <input id="password" type="password" placeholder="Password" class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-indigo-500">
-            <button onclick="window.loginUser()" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold shadow-lg shadow-indigo-100">Kyçu</button>
-            <div class="flex flex-col items-center gap-3 pt-2">
-                <button onclick="window.toggleRegModal(true)" class="text-indigo-600 font-bold text-sm">Nuk keni llogari? Regjistrohu</button>
-                <button onclick="window.toggleForgotModal(true)" class="text-slate-400 text-xs underline">Harruat fjalëkalimin?</button>
+<!-- LOADING OVERLAY -->
+<div id="loading" class="fixed inset-0 bg-white/90 z-[200] flex items-center justify-center">
+    <div class="flex flex-col items-center gap-4">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
+        <p class="text-indigo-600 font-bold animate-pulse text-xs uppercase tracking-widest">Duke lidhur Cloud-in...</p>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-view">
+    <header class="glass-card sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xl">L</div>
+            <span class="font-extrabold text-lg tracking-tight">LindiMaps <span class="text-indigo-600">Cloud</span></span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span id="sync-status" class="text-[10px] font-bold text-green-500 bg-green-50 px-3 py-1 rounded-full uppercase">Sinkronizuar</span>
+        </div>
+    </header>
+
+    <nav class="bg-white border-b border-slate-100 flex overflow-x-auto">
+        <button onclick="switchTab('log')" id="tab-log" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest tab-active">Regjistrim Ditor</button>
+        <button onclick="switchTab('config')" id="tab-config" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest text-slate-400">Struktura</button>
+        <button onclick="switchTab('reports')" id="tab-reports" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest text-slate-400">Raporte</button>
+    </nav>
+
+    <main class="max-w-3xl mx-auto p-4 md:p-8 space-y-8">
+        <!-- VIEW: LOG -->
+        <div id="view-log" class="space-y-6">
+            <div class="glass-card rounded-[2rem] p-6 shadow-xl shadow-slate-200/50 space-y-6 border border-white">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Data</label>
+                        <input id="log-date" type="date" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Zgjidh Ekspertin</label>
+                        <select id="log-operator-select" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold appearance-none"></select>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Zgjidh Aktivitetin</label>
+                    <select id="log-act-select" onchange="generateProcessFields()" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold appearance-none"></select>
+                </div>
+                <div id="dynamic-fields-container" class="space-y-4 pt-4 border-t border-slate-50"></div>
+                <div class="pt-4 border-t border-slate-50">
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Orët e Punës</label>
+                        <input id="log-hours" type="number" step="0.1" placeholder="0.0" class="w-full p-4 rounded-2xl bg-indigo-50 text-indigo-600 font-black text-xl border-none">
+                    </div>
+                </div>
+                <button id="save-log-btn" class="w-full bg-slate-900 text-white p-5 rounded-[1.5rem] font-bold shadow-lg hover:bg-black transition-all transform active:scale-95">
+                    Ruaj në Cloud
+                </button>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- REGISTRATION MODAL -->
-<div id="regModal" class="hidden modal-overlay">
-    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm space-y-4">
-        <h3 class="text-xl font-bold text-slate-800">Krijo Llogari të Re</h3>
-        <p class="text-sm text-slate-500">Plotësoni të dhënat për regjistrim.</p>
-        <input id="regEmail" type="email" placeholder="Email" class="w-full border p-3 rounded-xl outline-none focus:border-emerald-500">
-        <input id="regPassword" type="password" placeholder="Password i ri" class="w-full border p-3 rounded-xl outline-none focus:border-emerald-500">
-        <button onclick="window.registerUser()" class="w-full bg-emerald-600 text-white p-4 rounded-xl font-bold">Regjistrohu</button>
-        <button onclick="window.toggleRegModal(false)" class="w-full text-slate-500 font-medium py-2">Anulo</button>
-    </div>
-</div>
-
-<!-- FORGOT PASSWORD MODAL -->
-<div id="forgotModal" class="hidden modal-overlay">
-    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm space-y-4">
-        <h3 class="text-xl font-bold text-slate-800">Rivendos Fjalëkalimin</h3>
-        <p class="text-sm text-slate-500">Shkruani email-in tuaj për të marrë linkun e rivendosjes.</p>
-        <input id="forgotEmail" type="email" placeholder="Email-i juaj" class="w-full border p-3 rounded-xl outline-none focus:border-indigo-500">
-        <button onclick="window.resetPassword()" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold">Dërgo Email-in</button>
-        <button onclick="window.toggleForgotModal(false)" class="w-full text-slate-500 font-medium py-2">Anulo</button>
-    </div>
-</div>
-
-<!-- NOTE MODAL -->
-<div id="noteModal" class="hidden modal-overlay">
-    <div class="bg-white p-6 rounded-3xl shadow-2xl w-full max-w-sm space-y-4">
-        <h3 id="noteTitle" class="text-lg font-bold text-slate-800">Shënim për Punëtorin</h3>
-        <textarea id="noteText" placeholder="Shkruani shënimin këtu..." class="w-full border border-slate-200 p-3 rounded-xl h-32 outline-none focus:border-indigo-500 bg-slate-50"></textarea>
-        <div class="flex gap-2">
-            <button onclick="window.saveNote()" class="flex-1 bg-indigo-600 text-white p-3 rounded-xl font-bold">Ruaj</button>
-            <button onclick="window.closeNoteModal()" class="flex-1 bg-slate-200 text-slate-700 p-3 rounded-xl font-bold">Mbyll</button>
-        </div>
-    </div>
-</div>
-
-<!-- APP MAIN -->
-<div id="app" class="hidden max-w-lg mx-auto p-4 space-y-6">
-    <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-        <span id="userEmail" class="font-bold text-slate-700 text-sm truncate max-w-[150px]"></span>
-        <button onclick="window.logout()" class="bg-red-500 text-white px-4 py-2 rounded-xl text-xs font-bold">Dil</button>
-    </div>
-
-    <!-- TABS -->
-    <div class="flex border-b border-slate-200 bg-white rounded-t-2xl overflow-hidden">
-        <button id="tabWork" onclick="window.switchTab('work')" class="flex-1 py-4 font-bold text-sm tab-active">Punët Ditore</button>
-        <button id="tabManage" onclick="window.switchTab('manage')" class="flex-1 py-4 font-bold text-sm text-slate-400">Shto Punëtor</button>
-        <button id="tabReports" onclick="window.switchTab('reports')" class="flex-1 py-4 font-bold text-sm text-slate-400">Raporte</button>
-    </div>
-
-    <!-- TAB 1: DAILY LOGS & ACTIVE LIST -->
-    <div id="viewWork" class="space-y-4">
-        <div class="bg-white p-5 rounded-b-2xl shadow-sm border border-slate-200 border-t-0 space-y-4">
-            <div class="flex justify-between items-center gap-2">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Regjistrimi</h3>
-                <select id="workerLogFilter" onchange="window.renderDaily()" class="flex-1 border-none bg-slate-100 text-slate-700 font-bold p-1 rounded-lg text-[11px] outline-none">
-                    <option value="all">Të Gjithë Punëtorët</option>
-                </select>
-                <input type="date" id="date" class="border-none bg-indigo-50 text-indigo-700 font-bold p-1 rounded-lg text-sm">
-            </div>
-            <div id="daily" class="space-y-3"></div>
-            <button onclick="window.saveHours()" class="w-full bg-black text-white p-4 rounded-2xl font-bold shadow-lg mt-4">Ruaj Orët Ditore</button>
-        </div>
-        
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-            <div class="flex flex-col space-y-4 mb-4">
+        <!-- VIEW: CONFIG -->
+        <div id="view-config" class="hidden space-y-8">
+            <div class="glass-card rounded-[2rem] p-8 space-y-6">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Filtri & Lista Aktive</h3>
-                    <select id="workerListFilter" onchange="window.renderTotals()" class="border-none bg-slate-100 text-slate-700 font-bold p-1 rounded-lg text-[10px] outline-none">
-                        <option value="all">Të Gjithë</option>
-                    </select>
+                    <h2 id="config-title" class="text-xl font-extrabold text-slate-800">Konfigurimi</h2>
+                    <button id="cancel-edit-btn" class="hidden text-xs font-bold text-slate-400 uppercase" onclick="resetConfigForm()">Anulo</button>
                 </div>
+                <div class="space-y-4">
+                    <input id="edit-id" type="hidden">
+                    <input id="new-act-name" type="text" placeholder="Emri i Aktivitetit" class="w-full p-4 rounded-xl bg-slate-50 border-none font-bold">
+                    <textarea id="new-act-processes" placeholder="Proceset (Emri:numër)" class="w-full p-4 rounded-xl bg-slate-50 border-none h-32 font-medium"></textarea>
+                    <div class="flex items-center gap-2 bg-indigo-50 p-3 rounded-lg text-indigo-700">
+                        <input type="checkbox" id="auto-calc" class="w-5 h-5 accent-indigo-600">
+                        <label for="auto-calc" class="text-xs font-bold">Llogarit bilancin automatik</label>
+                    </div>
+                    <button id="add-act-btn" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold">Ruaj Strukturën</button>
+                </div>
+            </div>
+            <div id="config-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            <div class="glass-card rounded-[2rem] p-8 space-y-6 border-t-4 border-indigo-600">
+                <h2 class="text-xl font-extrabold text-slate-800">Menaxho Ekspertët</h2>
                 <div class="flex gap-2">
-                    <div class="flex-1">
-                        <label class="text-[8px] font-bold text-slate-400 uppercase ml-1">Nga</label>
-                        <input type="date" id="start" class="w-full border p-2 rounded-lg text-xs font-bold outline-none bg-slate-50">
-                    </div>
-                    <div class="flex-1">
-                        <label class="text-[8px] font-bold text-slate-400 uppercase ml-1">Deri më</label>
-                        <input type="date" id="end" class="w-full border p-2 rounded-lg text-xs font-bold outline-none bg-slate-50">
-                    </div>
+                    <input id="new-op-name" type="text" placeholder="Emri i Ekspertit" class="flex-1 p-4 rounded-xl bg-slate-50 border-none font-bold">
+                    <button id="add-op-btn" class="bg-slate-900 text-white px-6 rounded-xl font-bold">Shto</button>
                 </div>
-            </div>
-            
-            <div id="totals" class="divide-y divide-slate-100"></div>
-            <button id="saveListChangesBtn" onclick="window.saveListChanges()" class="hidden w-full bg-indigo-600 text-white p-3 rounded-xl font-bold mt-4 shadow-md text-sm">Ruaj Ndryshimet e Listës</button>
-            
-            <div class="grid grid-cols-2 gap-3 mt-6 border-t pt-5">
-                <div class="bg-indigo-50 p-4 rounded-2xl text-center">
-                    <p class="text-[9px] font-black text-indigo-400 uppercase">Totali €</p>
-                    <span id="totalMoney" class="font-black text-xl text-indigo-700">0.00€</span>
-                </div>
-                <div class="bg-slate-50 p-4 rounded-2xl text-center">
-                    <p class="text-[9px] font-black text-slate-400 uppercase">Totali Orë</p>
-                    <span id="totalHours" class="font-black text-xl text-slate-700">0h</span>
-                </div>
+                <div id="operator-list" class="flex flex-wrap gap-2 pt-2"></div>
             </div>
         </div>
-    </div>
 
-    <!-- TAB 2: MANAGE WORKERS -->
-    <div id="viewManage" class="hidden space-y-4">
-        <div id="workerForm" class="bg-white p-6 rounded-b-2xl shadow-sm border border-slate-200 border-t-0 space-y-4">
-            <h3 id="formTitle" class="text-lg font-bold text-slate-800">Shto Punëtor të Ri</h3>
-            <div class="space-y-3">
-                <input id="name" placeholder="Emri Mbiemri" class="border border-slate-200 p-3 rounded-xl w-full bg-slate-50 outline-none focus:border-indigo-500">
-                <input id="rate" type="number" step="0.01" placeholder="Pagesa për orë (€/h)" class="border border-slate-200 p-3 rounded-xl w-full bg-slate-50 outline-none focus:border-indigo-500">
-            </div>
-            <div class="flex flex-col gap-2">
-                <button id="addBtn" onclick="window.addWorker()" class="bg-indigo-600 text-white p-3 rounded-xl font-bold">Ruaj Punëtorin</button>
-                <button id="cancelBtn" onclick="window.cancelEdit()" class="hidden bg-slate-200 text-slate-700 p-3 rounded-xl font-bold">Anulo Editimin</button>
-            </div>
-            <div class="pt-4 border-t">
-                 <h4 class="text-xs font-black text-slate-400 uppercase mb-3">Lista e Punëtorëve</h4>
-                 <div id="workerList" class="space-y-2"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB 3: REPORTS -->
-    <div id="viewReports" class="hidden space-y-4">
-        <div class="bg-white p-5 rounded-b-2xl shadow-sm border border-slate-200 border-t-0 space-y-3">
-            <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Eksportimi në PDF</h3>
-            <div class="space-y-3">
+        <!-- VIEW: REPORTS -->
+        <div id="view-reports" class="hidden space-y-6">
+            <div class="glass-card rounded-[2rem] p-6 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input id="rep-start" type="date" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-xs">
+                        <input id="rep-end" type="date" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-xs">
+                    </div>
+                    <select id="rep-op-select" class="w-full p-3 rounded-xl bg-slate-50 border-none font-bold text-xs"></select>
+                </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <input type="month" id="pdfMonth" class="border border-slate-200 p-3 rounded-xl w-full bg-slate-50 text-sm">
-                    <select id="pdfWorkerSelect" class="border border-slate-200 p-3 rounded-xl w-full bg-slate-50 text-sm font-medium">
-                        <option value="all">Të Gjithë Punëtorët</option>
-                    </select>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="window.exportPDF()" class="bg-indigo-600 text-white p-3 rounded-xl font-bold text-sm">Gjenero PDF</button>
-                    <button onclick="window.backupData()" class="bg-slate-800 text-white p-3 rounded-xl font-bold text-sm">Backup</button>
+                    <button onclick="renderReportList()" class="bg-slate-900 text-white p-4 rounded-xl font-bold text-xs uppercase">Filtro</button>
+                    <button onclick="exportToPDF()" class="bg-indigo-600 text-white p-4 rounded-xl font-bold text-xs uppercase">PDF</button>
                 </div>
             </div>
+            <div id="report-results" class="space-y-4"></div>
         </div>
-    </div>
+    </main>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { 
- getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
- signOut, onAuthStateChanged, sendPasswordResetEmail 
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-const firebaseConfig = {
- apiKey: "AIzaSyDGlHCPxysEO4ZxxIPic3u7rRZCo7oZTZ4",
- authDomain: "workhours-fb74a.firebaseapp.com",
- projectId: "workhours-fb74a",
- storageBucket: "workhours-fb74a.appspot.com"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyBk3Wi9DsGp9egY8qQnxeEdM9qlTZIodw0",
+      authDomain: "sistemi-aktiviteteve.firebaseapp.com",
+      projectId: "sistemi-aktiviteteve",
+      storageBucket: "sistemi-aktiviteteve.firebasestorage.app",
+      messagingSenderId: "289905439492",
+      appId: "1:289905439492:web:4e7e52e13a8379a74b9651",
+      measurementId: "G-W2F0WT24XJ"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const appId = "sistemi-aktiviteteve-v1";
 
-let user, workers = [], logs = [], notes = [];
-let editId = null;
-let activeNoteWorkerId = null;
+    let configData = [];
+    let logData = [];
+    let operatorData = [];
 
-const validateEmail = (email) => {
-    return String(email).toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
-};
+    // --- ALERTS ---
+    window.showAlert = (msg) => {
+        document.getElementById('alert-message').innerText = msg;
+        document.getElementById('custom-alert').classList.remove('hidden');
+    };
+    window.closeAlert = () => document.getElementById('custom-alert').classList.add('hidden');
 
-/* --- AUTH ACTIONS --- */
-window.toggleRegModal = (show) => {
-    document.getElementById("regModal").classList.toggle("hidden", !show);
-};
+    window.switchTab = (tab) => {
+        ['view-log', 'view-config', 'view-reports'].forEach(v => document.getElementById(v).classList.add('hidden'));
+        ['tab-log', 'tab-config', 'tab-reports'].forEach(t => document.getElementById(t).classList.replace('tab-active', 'text-slate-400'));
+        document.getElementById(`view-${tab}`).classList.remove('hidden');
+        document.getElementById(`tab-${tab}`).classList.replace('text-slate-400', 'tab-active');
+    };
 
-window.toggleForgotModal = (show) => {
-    document.getElementById("forgotModal").classList.toggle("hidden", !show);
-};
+    // --- ERROR HANDLING WRAPPER ---
+    const cloudOp = async (fn) => {
+        try {
+            await fn();
+        } catch (e) {
+            console.error("Cloud Error:", e);
+            showAlert("Gabim në lidhje. Provoni përsëri.");
+        }
+    };
 
-window.loginUser = async ()=>{
- try {
-  const email = document.getElementById("email").value.trim();
-  const pass = document.getElementById("password").value;
-  if(!email || !validateEmail(email)) return alert("Shkruani email saktë!");
-  if(!pass) return alert("Shkruani password!");
-  await signInWithEmailAndPassword(auth, email, pass);
- } catch(e){ alert("Email ose Password i gabuar!"); }
-};
-
-window.registerUser = async ()=>{
- try {
-  const email = document.getElementById("regEmail").value.trim();
-  const pass = document.getElementById("regPassword").value;
-  if(!email || !validateEmail(email)) return alert("Email jo i vlefshëm!");
-  if(!pass || pass.length < 6) return alert("Password duhet të paktën 6 karaktere!");
-  await createUserWithEmailAndPassword(auth, email, pass);
-  window.toggleRegModal(false);
- } catch(e){ alert("Regjistrimi dështoi! Email mund të jetë në përdorim."); }
-};
-
-window.resetPassword = async ()=>{
- try {
-  const email = document.getElementById("forgotEmail").value.trim();
-  if(!email || !validateEmail(email)) return alert("Shkruani email-in tuaj!");
-  await sendPasswordResetEmail(auth, email);
-  alert("Emaili për rivendosje u dërgua! Kontrolloni inbox-in tuaj.");
-  window.toggleForgotModal(false);
- } catch(e){ alert("Gabim! Sigurohuni që email-i është i saktë."); }
-};
-
-window.logout = async ()=>{ await signOut(auth); location.reload(); };
-
-onAuthStateChanged(auth, u=>{
- if(u){
-  user = u;
-  document.getElementById("login").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
-  document.getElementById("userEmail").innerText = u.email;
-  start();
- } else {
-  document.getElementById("app").classList.add("hidden");
-  document.getElementById("login").classList.remove("hidden");
- }
-});
-
-/* --- NAVIGATION --- */
-window.switchTab = (tab) => {
-    document.getElementById('viewWork').classList.add('hidden');
-    document.getElementById('viewManage').classList.add('hidden');
-    document.getElementById('viewReports').classList.add('hidden');
-    
-    document.getElementById('tabWork').classList.remove('tab-active', 'text-indigo-600');
-    document.getElementById('tabManage').classList.remove('tab-active', 'text-indigo-600');
-    document.getElementById('tabReports').classList.remove('tab-active', 'text-indigo-600');
-
-    if (tab === 'work') {
-        document.getElementById('viewWork').classList.remove('hidden');
-        document.getElementById('tabWork').classList.add('tab-active', 'text-indigo-600');
-    } else if (tab === 'manage') {
-        document.getElementById('viewManage').classList.remove('hidden');
-        document.getElementById('tabManage').classList.add('tab-active', 'text-indigo-600');
-    } else {
-        document.getElementById('viewReports').classList.remove('hidden');
-        document.getElementById('tabReports').classList.add('tab-active', 'text-indigo-600');
-    }
-};
-
-/* --- CORE APP LOGIC --- */
-function start(){
- const base = `users/${user.uid}`;
- onSnapshot(collection(db, base+"/workers"), snap=>{
-  workers = snap.docs.map(d=>({id:d.id,...d.data()}));
-  updateWorkerSelects();
-  renderDaily();
-  renderTotals();
-  renderWorkerManagement();
- });
- onSnapshot(collection(db, base+"/logs"), snap=>{
-  logs = snap.docs.map(d=>({id:d.id,...d.data()}));
-  renderDaily();
-  renderTotals();
- });
- onSnapshot(collection(db, base+"/notes"), snap=>{
-  notes = snap.docs.map(d=>({id:d.id,...d.data()}));
-  renderTotals();
- });
-}
-
-function updateWorkerSelects() {
-    const pdfSelect = document.getElementById("pdfWorkerSelect");
-    pdfSelect.innerHTML = '<option value="all">Të Gjithë Punëtorët</option>';
-    const logSelect = document.getElementById("workerLogFilter");
-    logSelect.innerHTML = '<option value="all">Të Gjithë Punëtorët</option>';
-    const listSelect = document.getElementById("workerListFilter");
-    listSelect.innerHTML = '<option value="all">Të Gjithë</option>';
-    workers.forEach(w => { 
-        pdfSelect.innerHTML += `<option value="${w.id}">${w.name}</option>`; 
-        logSelect.innerHTML += `<option value="${w.id}">${w.name}</option>`;
-        listSelect.innerHTML += `<option value="${w.id}">${w.name}</option>`;
-    });
-}
-
-window.calculateTotal = (idSuffix) => {
-    const startInput = document.getElementById(`start-${idSuffix}`);
-    const endInput = document.getElementById(`end-${idSuffix}`);
-    const totalDisplay = document.getElementById(`total-${idSuffix}`);
-    if (startInput.value && endInput.value) {
-        const [h1, m1] = startInput.value.split(':').map(Number);
-        const [h2, m2] = endInput.value.split(':').map(Number);
-        let diff = (h2 * 60 + m2) - (h1 * 60 + m1);
-        if (diff < 0) diff += 24 * 60; 
-        totalDisplay.value = (diff / 60).toFixed(2);
-    }
-};
-
-window.openNote = (workerId) => {
-    activeNoteWorkerId = workerId;
-    const n = notes.find(x => x.id === workerId);
-    document.getElementById("noteText").value = n ? n.text : "";
-    document.getElementById("noteModal").classList.remove("hidden");
-};
-
-window.closeNoteModal = () => document.getElementById("noteModal").classList.add("hidden");
-
-window.saveNote = async () => {
-    const text = document.getElementById("noteText").value.trim();
-    const ref = doc(db, `users/${user.uid}/notes`, activeNoteWorkerId);
-    if(text) await setDoc(ref, { text }); else await deleteDoc(ref);
-    window.closeNoteModal();
-};
-
-window.addWorker = async ()=>{
- const name = document.getElementById("name").value.trim();
- const rate = parseFloat(document.getElementById("rate").value);
- if(!name || isNaN(rate)) return alert("Plotësoni të dhënat!");
- const id = editId || Date.now().toString();
- await setDoc(doc(db, `users/${user.uid}/workers`, id), { name, rate });
- window.cancelEdit();
-};
-
-window.editWorker = (id) => {
-    const w = workers.find(x => x.id === id);
-    editId = id;
-    document.getElementById("name").value = w.name;
-    document.getElementById("rate").value = w.rate;
-    document.getElementById("addBtn").innerText = "Ruaj Ndryshimet";
-    document.getElementById("formTitle").innerText = "Edito Punëtorin";
-    document.getElementById("cancelBtn").classList.remove("hidden");
-    window.switchTab('manage');
-};
-
-window.cancelEdit = () => {
-    editId = null;
-    document.getElementById("name").value = "";
-    document.getElementById("rate").value = "";
-    document.getElementById("addBtn").innerText = "Ruaj Punëtorin";
-    document.getElementById("formTitle").innerText = "Shto Punëtor të Ri";
-    document.getElementById("cancelBtn").classList.add("hidden");
-};
-
-window.deleteWorker = async (id) => {
-    if(confirm("Fshije përgjithmonë?")){
-        await deleteDoc(doc(db, `users/${user.uid}/workers/${id}`));
-    }
-};
-
-function renderWorkerManagement() {
-    document.getElementById("workerList").innerHTML = workers.map(w => `
-        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
-            <div class="flex flex-col">
-                <span class="font-bold text-sm text-slate-700">${w.name}</span>
-                <span class="text-[10px] text-slate-400 font-bold">${w.rate}€/h</span>
-            </div>
-            <div class="flex gap-2">
-                 <button onclick="window.editWorker('${w.id}')" class="text-xs text-blue-500 font-black">EDITO</button>
-                 <button onclick="window.deleteWorker('${w.id}')" class="text-xs text-red-500 font-black">FSHI</button>
-            </div>
-        </div>
-    `).join("");
-}
-
-window.renderDaily = ()=>{
- const date = document.getElementById("date").value;
- const filterId = document.getElementById("workerLogFilter").value;
- const filteredWorkers = filterId === "all" ? workers : workers.filter(w => w.id === filterId);
- document.getElementById("daily").innerHTML = filteredWorkers.map(w=>{
-  const l = logs.find(x=>x.date===date && x.workerId===w.id);
-  return `
-  <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
-    <div class="flex justify-between items-center">
-        <span class="font-black text-slate-800 text-sm uppercase tracking-tighter">${w.name}</span>
-        <div class="flex items-center gap-1 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-sm">
-            <input type="number" step="0.01" id="total-${w.id}" value="${l?l.hours:''}" class="w-16 text-center font-black text-indigo-600 bg-transparent outline-none text-xl">
-            <span class="text-[10px] font-black text-slate-400">ORË</span>
-        </div>
-    </div>
-    <div class="flex items-center gap-4 pt-1">
-        <div class="flex-1 flex items-center gap-2">
-            <label class="text-[9px] font-black text-slate-400 uppercase">Fillim</label>
-            <input type="time" id="start-${w.id}" value="${l?.start||''}" onchange="window.calculateTotal('${w.id}')" class="time-input w-full rounded-lg border border-slate-200 font-bold outline-none bg-white">
-        </div>
-        <div class="flex-1 flex items-center gap-2">
-            <label class="text-[9px] font-black text-slate-400 uppercase">Fund</label>
-            <input type="time" id="end-${w.id}" value="${l?.end||''}" onchange="window.calculateTotal('${w.id}')" class="time-input w-full rounded-lg border border-slate-200 font-bold outline-none bg-white">
-        </div>
-    </div>
-  </div>`;
- }).join("");
-};
-
-window.saveHours = async ()=>{
- const date = document.getElementById("date").value;
- const filterId = document.getElementById("workerLogFilter").value;
- const workersToSave = filterId === "all" ? workers : workers.filter(w => w.id === filterId);
- try {
-     const promises = workersToSave.map(w => {
-        const h = parseFloat(document.getElementById(`total-${w.id}`).value)||0;
-        const startT = document.getElementById(`start-${w.id}`).value;
-        const endT = document.getElementById(`end-${w.id}`).value;
-        const ref = doc(db, `users/${user.uid}/logs`, date+"_"+w.id);
-        if(h>0) return setDoc(ref,{date,workerId:w.id,hours:h,start:startT,end:endT}); 
-        else return deleteDoc(ref);
-     });
-     await Promise.all(promises);
-     alert("Orët u ruajtën!");
- } catch(e) { alert("Gabim!"); }
-};
-
-window.renderTotals = ()=>{
- const start = document.getElementById("start").value;
- const end = document.getElementById("end").value;
- const filterId = document.getElementById("workerListFilter").value;
- let tH=0, tM=0;
-
- const listBtn = document.getElementById("saveListChangesBtn");
- if(filterId !== "all") {
-     listBtn.classList.remove("hidden");
- } else {
-     listBtn.classList.add("hidden");
- }
-
- if (filterId === "all") {
-    document.getElementById("totals").innerHTML = workers.map(w=>{
-      const wl = logs.filter(l=>{
-       if(l.workerId !== w.id) return false;
-       if(start && l.date < start) return false;
-       if(end && l.date > end) return false;
-       return true;
-      });
-      const n = notes.find(x => x.id === w.id);
-      const h = wl.reduce((a,b)=>a+b.hours,0);
-      const m = h * w.rate;
-      tH += h; tM += m;
-      return `
-      <div class="worker-row flex flex-col gap-2">
-       <div class="flex justify-between items-center">
-        <div class="flex items-center gap-2">
-            <span class="font-bold text-sm text-slate-800">${w.name}</span>
-            <button onclick="window.openNote('${w.id}')" class="w-6 h-6 flex items-center justify-center rounded-full ${n ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'} text-xs font-bold">+</button>
-        </div>
-        <span class="text-sm font-black text-indigo-600">${h.toFixed(1)}h | ${m.toFixed(2)}€</span>
-       </div>
-       <div class="flex gap-4 items-center">
-        <button onclick="window.editWorker('${w.id}')" class="text-[10px] text-blue-500 font-black uppercase tracking-widest">Edito</button>
-        <button onclick="window.deleteWorker('${w.id}')" class="text-[10px] text-red-500 font-black uppercase tracking-widest">Fshi</button>
-        ${n ? `<span class="text-[10px] text-slate-400 italic truncate max-w-[140px]">"${n.text}"</span>` : ''}
-       </div>
-      </div>`;
-    }).join("");
- } else {
-    const w = workers.find(x => x.id === filterId);
-    const wl = logs.filter(l=>{
-       if(l.workerId !== filterId) return false;
-       if(start && l.date < start) return false;
-       if(end && l.date > end) return false;
-       return true;
-    }).sort((a,b) => b.date.localeCompare(a.date));
-
-    tH = wl.reduce((a,b)=>a+b.hours,0);
-    tM = tH * w.rate;
-
-    document.getElementById("totals").innerHTML = wl.length > 0 ? wl.map(l => {
-        const rowId = `row-${l.date}-${l.workerId}`;
-        return `
-        <div class="worker-row py-4 space-y-3" data-log-date="${l.date}" data-log-worker="${l.workerId}">
-            <div class="flex justify-between items-center">
-                <span class="text-xs font-black text-slate-500">${l.date.split('-').reverse().join('.')}</span>
-                <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-slate-200">
-                    <input type="number" step="0.01" id="total-${rowId}" value="${l.hours}" class="w-12 text-center font-bold text-indigo-600 outline-none text-sm bg-transparent">
-                    <span class="text-[8px] font-bold text-slate-400">H</span>
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <div class="flex-1 flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                    <label class="text-[8px] font-black text-slate-400 uppercase">In</label>
-                    <input type="time" id="start-${rowId}" value="${l.start||''}" onchange="window.calculateTotal('${rowId}')" class="w-full text-xs font-bold outline-none bg-transparent">
-                </div>
-                <div class="flex-1 flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                    <label class="text-[8px] font-black text-slate-400 uppercase">Out</label>
-                    <input type="time" id="end-${rowId}" value="${l.end||''}" onchange="window.calculateTotal('${rowId}')" class="w-full text-xs font-bold outline-none bg-transparent">
-                </div>
-            </div>
-        </div>`;
-    }).join("") : `<p class="text-center py-10 text-slate-400 text-xs font-bold">Asnjë e dhënë për këtë periudhë.</p>`;
- }
-
- document.getElementById("totalHours").innerText = tH.toFixed(1)+"h";
- document.getElementById("totalMoney").innerText = tM.toFixed(2)+"€";
-};
-
-window.saveListChanges = async () => {
-    const listContainer = document.getElementById("totals");
-    const rows = listContainer.querySelectorAll('[data-log-date]');
-    if(rows.length === 0) return;
-    
-    try {
-        const promises = Array.from(rows).map(row => {
-            const date = row.getAttribute('data-log-date');
-            const workerId = row.getAttribute('data-log-worker');
-            const rowId = `row-${date}-${workerId}`;
-            
-            const hours = parseFloat(document.getElementById(`total-${rowId}`).value) || 0;
-            const startT = document.getElementById(`start-${rowId}`).value;
-            const endT = document.getElementById(`end-${rowId}`).value;
-            
-            const ref = doc(db, `users/${user.uid}/logs`, date + "_" + workerId);
-            if(hours > 0) {
-                return setDoc(ref, { date, workerId, hours, start: startT, end: endT });
-            } else {
-                return deleteDoc(ref);
-            }
-        });
-
-        await Promise.all(promises);
-        alert("Të gjitha ndryshimet u ruajtën!");
-        window.renderTotals();
-    } catch(e) {
-        alert("Ndodhi një gabim gjatë ruajtjes së listës!");
-    }
-};
-
-window.exportPDF = ()=>{
- const { jsPDF } = window.jspdf;
- const docPDF = new jsPDF();
- const monthInput = document.getElementById("pdfMonth").value;
- const workerFilterId = document.getElementById("pdfWorkerSelect").value;
- if(!monthInput) return alert("Zgjidhni muajin!");
- const [year, month] = monthInput.split("-");
- const muajShqip = ["Janar", "Shkurt", "Mars", "Prill", "Maj", "Qershor", "Korrik", "Gusht", "Shtator", "Tetor", "Nëntor", "Dhjetor"];
- const monthName = muajShqip[parseInt(month)-1];
-
- docPDF.setFont("helvetica", "bold");
- docPDF.setFontSize(22);
- docPDF.text("LindiMaps Pagesat", 15, 25);
- docPDF.setFont("helvetica", "normal");
- docPDF.setFontSize(11);
- docPDF.text(`Periudha: ${monthName} ${year}`, 15, 35);
- let y = 55;
-
- if(workerFilterId === 'all') {
-    docPDF.setFont("helvetica", "bold");
-    docPDF.text("Emri Mbiemri", 15, y); 
-    docPDF.text("Orët", 110, y); 
-    docPDF.text("€/h", 145, y); 
-    docPDF.text("Total", 175, y);
-    docPDF.line(15, y+2, 195, y+2);
-    y += 10;
-    let totalAll = 0;
-    workers.forEach(w => {
-        const filteredLogs = logs.filter(l => l.workerId === w.id && l.date.startsWith(monthInput));
-        const h = filteredLogs.reduce((a,b) => a + b.hours, 0);
-        const m = h * w.rate;
-        const n = notes.find(x => x.id === w.id);
-        if(h > 0) {
-            totalAll += m;
-            docPDF.setFont("helvetica", "bold");
-            docPDF.text(w.name, 15, y);
-            docPDF.setFont("helvetica", "normal");
-            docPDF.text(h.toFixed(1), 110, y);
-            docPDF.text(w.rate.toFixed(2), 145, y);
-            docPDF.text(m.toFixed(2) + " €", 175, y);
-            y += 6;
-            if(n && n.text) {
-                docPDF.setFontSize(9);
-                docPDF.setTextColor(100);
-                docPDF.text(`Shënim: ${n.text}`, 20, y);
-                docPDF.setTextColor(0); y += 6;
-            }
-            y += 4;
+    // --- FIRESTORE SYNC ---
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            await cloudOp(() => signInAnonymously(auth));
+        } else {
+            document.getElementById('loading').classList.add('hidden');
+            startListening();
         }
     });
-    docPDF.line(15, y, 195, y);
-    docPDF.setFont("helvetica", "bold");
-    docPDF.text(`TOTALI: ${totalAll.toFixed(2)} €`, 150, y+10);
- } else {
-    const w = workers.find(x => x.id === workerFilterId);
-    docPDF.setFont("helvetica", "bold");
-    docPDF.text(`Punëtori: ${w.name}`, 15, 45);
-    docPDF.text("Data", 15, y); 
-    docPDF.text("Oraret", 70, y); 
-    docPDF.text("Orët", 130, y); 
-    docPDF.text("Vlera", 170, y);
-    docPDF.line(15, y+2, 195, y+2);
-    y += 10;
-    const filteredLogs = logs.filter(l => l.workerId === workerFilterId && l.date.startsWith(monthInput)).sort((a,b) => a.date.localeCompare(b.date));
-    let totalH = 0; let totalM = 0;
-    filteredLogs.forEach(l => {
-        const dateParts = l.date.split("-");
-        const formattedDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
-        const orari = (l.start && l.end) ? `${l.start}-${l.end}` : "Manual";
-        const vlera = l.hours * w.rate;
-        totalH += l.hours; totalM += vlera;
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text(formattedDate, 15, y);
-        docPDF.text(orari, 70, y);
-        docPDF.text(l.hours.toFixed(2), 130, y);
-        docPDF.text(vlera.toFixed(2) + " €", 170, y);
-        y += 8;
+
+    function startListening() {
+        // Path-i publik sipas rregullave 'allow read, write: if true'
+        const basePath = `artifacts/${appId}/public/data`;
+
+        onSnapshot(collection(db, basePath, 'config'), snap => {
+            configData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            updateDropdowns();
+            renderConfigList();
+        }, (err) => console.error("Config sync error", err));
+
+        onSnapshot(collection(db, basePath, 'logs'), snap => {
+            logData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderReportList();
+        }, (err) => console.error("Logs sync error", err));
+
+        onSnapshot(collection(db, basePath, 'operators'), snap => {
+            operatorData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            updateDropdowns();
+            renderOperatorList();
+        }, (err) => console.error("Ops sync error", err));
+    }
+
+    // --- ACTIONS ---
+    document.getElementById('add-act-btn').onclick = () => cloudOp(async () => {
+        const name = document.getElementById('new-act-name').value.trim();
+        const procRaw = document.getElementById('new-act-processes').value.trim();
+        const autoCalc = document.getElementById('auto-calc').checked;
+        const editId = document.getElementById('edit-id').value;
+        if (!name || !procRaw) return showAlert("Plotësoni të gjitha fushat.");
+        
+        const processes = procRaw.split('\n').map(line => {
+            const parts = line.split(':');
+            return { label: parts[0]?.trim(), type: parts[1]?.trim() === 'tekst' ? 'text' : 'number' };
+        }).filter(p => p.label);
+        
+        const id = editId || Date.now().toString();
+        await setDoc(doc(db, `artifacts/${appId}/public/data/config`, id), { name, processes, autoCalc });
+        resetConfigForm();
     });
-    docPDF.line(15, y, 195, y);
-    docPDF.setFont("helvetica", "bold");
-    docPDF.text(`TOTALI MUJOR: ${totalH.toFixed(2)} orë | ${totalM.toFixed(2)} €`, 15, y+10);
- }
- docPDF.save(`Raporti-${monthName}.pdf`);
-};
 
-window.backupData = ()=>{
- const dataStr = JSON.stringify({workers,logs,notes});
- const blob = new Blob([dataStr], {type: "application/json"});
- const a = document.createElement("a");
- a.href = URL.createObjectURL(blob);
- a.download = `Backup-LindiMaps.json`;
- a.click();
-};
+    window.editAct = (id) => {
+        const act = configData.find(c => c.id === id);
+        if(!act) return;
+        document.getElementById('edit-id').value = id;
+        document.getElementById('new-act-name').value = act.name;
+        document.getElementById('new-act-processes').value = act.processes.map(p => `${p.label}:${p.type}`).join('\n');
+        document.getElementById('auto-calc').checked = act.autoCalc;
+        document.getElementById('config-title').innerText = "Edito Strukturën";
+        document.getElementById('cancel-edit-btn').classList.remove('hidden');
+        switchTab('config');
+    };
 
-const t = new Date().toISOString().slice(0,10);
-document.getElementById("date").value = t;
-document.getElementById("start").value = t.slice(0,8)+"01";
-document.getElementById("end").value = t;
-document.getElementById("pdfMonth").value = t.slice(0,7);
-document.getElementById("date").onchange = renderDaily;
-document.getElementById("start").onchange = renderTotals;
-document.getElementById("end").onchange = renderTotals;
+    window.resetConfigForm = () => {
+        document.getElementById('edit-id').value = "";
+        document.getElementById('new-act-name').value = "";
+        document.getElementById('new-act-processes').value = "";
+        document.getElementById('auto-calc').checked = false;
+        document.getElementById('config-title').innerText = "Konfigurimi";
+        document.getElementById('cancel-edit-btn').classList.add('hidden');
+    };
 
+    function renderConfigList() {
+        const list = document.getElementById('config-list');
+        list.innerHTML = configData.map(c => `
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative group">
+                <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                    <button onclick="editAct('${c.id}')" class="text-indigo-500 bg-indigo-50 px-2 py-1 rounded text-[9px] font-bold">EDITO</button>
+                    <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/config', '${c.id}'))" class="text-red-400 bg-red-50 px-2 py-1 rounded text-[9px] font-bold">FSHIJ</button>
+                </div>
+                <h4 class="font-bold text-slate-800">${c.name}</h4>
+                <div class="mt-2 flex flex-wrap gap-1">${c.processes.map(p => `<span class="text-[8px] bg-slate-50 p-1 rounded font-bold text-slate-400 uppercase">${p.label}</span>`).join("")}</div>
+            </div>
+        `).join("");
+    }
+
+    document.getElementById('add-op-btn').onclick = () => cloudOp(async () => {
+        const name = document.getElementById('new-op-name').value.trim();
+        if(!name) return;
+        await setDoc(doc(db, `artifacts/${appId}/public/data/operators`, Date.now().toString()), { name });
+        document.getElementById('new-op-name').value = "";
+    });
+
+    function renderOperatorList() {
+        const list = document.getElementById('operator-list');
+        list.innerHTML = operatorData.map(o => `
+            <div class="bg-indigo-50 px-4 py-2 rounded-xl flex items-center gap-3">
+                <span class="text-xs font-bold text-indigo-700">${o.name}</span>
+                <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/operators', '${o.id}'))" class="text-red-400 font-bold">&times;</button>
+            </div>
+        `).join("");
+    }
+
+    function updateDropdowns() {
+        const acts = configData.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+        const ops = operatorData.map(o => `<option value="${o.name}">${o.name}</option>`).join("");
+        document.getElementById('log-act-select').innerHTML = `<option value="">-- Zgjidh Aktivitetin --</option>` + acts;
+        document.getElementById('log-operator-select').innerHTML = `<option value="">-- Zgjidh Ekspertin --</option>` + ops;
+        document.getElementById('rep-op-select').innerHTML = `<option value="">-- Të gjithë Ekspertët --</option>` + ops;
+    }
+
+    window.generateProcessFields = () => {
+        const actId = document.getElementById('log-act-select').value;
+        const container = document.getElementById('dynamic-fields-container');
+        container.innerHTML = "";
+        if(!actId) return;
+        const act = configData.find(c => c.id === actId);
+        act.processes.forEach(p => {
+            const div = document.createElement('div');
+            div.className = "space-y-1";
+            div.innerHTML = `<label class="text-[10px] font-extrabold text-slate-500 uppercase">${p.label}</label>
+                <input type="${p.type}" data-label="${p.label}" class="process-input w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm" oninput="calculateBalance()">`;
+            container.appendChild(div);
+        });
+        if(act.autoCalc) container.innerHTML += `<div id="calc-preview" class="bg-indigo-600 text-white p-5 rounded-2xl text-center font-black">0</div>`;
+    };
+
+    window.calculateBalance = () => {
+        const act = configData.find(c => c.id === document.getElementById('log-act-select').value);
+        if(!act || !act.autoCalc) return;
+        const inputs = document.querySelectorAll('.process-input');
+        let total = 0; let first = true;
+        inputs.forEach(i => {
+            const v = parseFloat(i.value) || 0;
+            if(first) { total = v; first = false; }
+            else { if(i.dataset.label.toLowerCase().includes('fshir')) total -= v; else total += v; }
+        });
+        document.getElementById('calc-preview').innerText = `Llogaritja: ${total}`;
+    };
+
+    document.getElementById('save-log-btn').onclick = () => cloudOp(async () => {
+        const actId = document.getElementById('log-act-select').value;
+        const date = document.getElementById('log-date').value;
+        const operator = document.getElementById('log-operator-select').value;
+        const hours = document.getElementById('log-hours').value;
+        if(!actId || !date || !operator || !hours) return showAlert("Plotësoni të gjitha fushat.");
+        const processes = Array.from(document.querySelectorAll('.process-input')).map(i => ({
+            label: i.dataset.label, value: i.value
+        }));
+        await setDoc(doc(db, `artifacts/${appId}/public/data/logs`, Date.now().toString()), {
+            actName: configData.find(c => c.id === actId).name, date, operator, hours: parseFloat(hours), processes
+        });
+        showAlert("U ruajt në Cloud!");
+        document.getElementById('log-hours').value = "";
+        document.querySelectorAll('.process-input').forEach(i => i.value = "");
+    });
+
+    window.renderReportList = () => {
+        const start = document.getElementById('rep-start').value;
+        const end = document.getElementById('rep-end').value;
+        const selOp = document.getElementById('rep-op-select').value;
+        let filtered = [...logData].sort((a,b) => b.date.localeCompare(a.date));
+        if(start) filtered = filtered.filter(f => f.date >= start);
+        if(end) filtered = filtered.filter(f => f.date <= end);
+        if(selOp) filtered = filtered.filter(f => f.operator === selOp);
+        document.getElementById('report-results').innerHTML = filtered.map(log => `
+            <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
+                <div class="flex justify-between">
+                    <div><span class="text-[9px] font-black bg-indigo-50 text-indigo-600 px-2 py-1 rounded uppercase">${log.actName}</span>
+                    <h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator} | ${log.date}</h4></div>
+                    <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/logs', '${log.id}'))" class="text-red-300 font-bold">&times;</button>
+                </div>
+                <div class="grid grid-cols-2 gap-2 border-t pt-2">${log.processes.map(p => `<div class="text-[10px]"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
+            </div>
+        `).join("");
+    };
+
+    window.exportToPDF = () => {
+        const { jsPDF } = window.jspdf;
+        const docPDF = new jsPDF();
+        let filtered = [...logData].sort((a,b) => a.date.localeCompare(b.date));
+        const tableData = filtered.map(f => [f.date, f.actName, f.operator, f.hours, f.processes.map(p => `${p.label}:${p.value}`).join(', ')]);
+        docPDF.text("Raporti LindiMaps", 14, 15);
+        docPDF.autoTable({ startY: 20, head: [['Data', 'Aktiviteti', 'Eksperti', 'Ore', 'Proceset']], body: tableData });
+        docPDF.save(`Raport_${Date.now()}.pdf`);
+    };
+
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('log-date').value = today;
+    document.getElementById('rep-end').value = today;
 </script>
 </body>
 </html>
