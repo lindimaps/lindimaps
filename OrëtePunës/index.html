@@ -22,7 +22,7 @@
 
 <!-- LOGIN SECTION -->
 <div id="login" class="flex items-center justify-center min-h-screen px-4">
-    <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-sm space-y-5 border border-slate-200">
+    <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-sm space-y-5 border border-slate-200">
         <h2 class="text-2xl font-black text-center text-slate-800">LindiMaps</h2>
         <div class="space-y-4">
             <input id="email" type="email" placeholder="Email" class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-indigo-500">
@@ -120,6 +120,7 @@
             </div>
             
             <div id="totals" class="divide-y divide-slate-100"></div>
+            <button id="saveListChangesBtn" onclick="window.saveListChanges()" class="hidden w-full bg-indigo-600 text-white p-3 rounded-xl font-bold mt-4 shadow-md text-sm">Ruaj Ndryshimet e Listës</button>
             
             <div class="grid grid-cols-2 gap-3 mt-6 border-t pt-5">
                 <div class="bg-indigo-50 p-4 rounded-2xl text-center">
@@ -294,18 +295,12 @@ function start(){
 }
 
 function updateWorkerSelects() {
-    // PDF Select
     const pdfSelect = document.getElementById("pdfWorkerSelect");
     pdfSelect.innerHTML = '<option value="all">Të Gjithë Punëtorët</option>';
-    
-    // Log Filter Select
     const logSelect = document.getElementById("workerLogFilter");
     logSelect.innerHTML = '<option value="all">Të Gjithë Punëtorët</option>';
-    
-    // List Filter Select
     const listSelect = document.getElementById("workerListFilter");
     listSelect.innerHTML = '<option value="all">Të Gjithë</option>';
-
     workers.forEach(w => { 
         pdfSelect.innerHTML += `<option value="${w.id}">${w.name}</option>`; 
         logSelect.innerHTML += `<option value="${w.id}">${w.name}</option>`;
@@ -313,11 +308,10 @@ function updateWorkerSelects() {
     });
 }
 
-window.calculateTotal = (workerId) => {
-    const startInput = document.getElementById(`start-${workerId}`);
-    const endInput = document.getElementById(`end-${workerId}`);
-    const totalDisplay = document.getElementById(`total-${workerId}`);
-    
+window.calculateTotal = (idSuffix) => {
+    const startInput = document.getElementById(`start-${idSuffix}`);
+    const endInput = document.getElementById(`end-${idSuffix}`);
+    const totalDisplay = document.getElementById(`total-${idSuffix}`);
     if (startInput.value && endInput.value) {
         const [h1, m1] = startInput.value.split(':').map(Number);
         const [h2, m2] = endInput.value.split(':').map(Number);
@@ -382,9 +376,7 @@ window.deleteWorker = async (id) => {
 window.renderDaily = ()=>{
  const date = document.getElementById("date").value;
  const filterId = document.getElementById("workerLogFilter").value;
- 
  const filteredWorkers = filterId === "all" ? workers : workers.filter(w => w.id === filterId);
-
  document.getElementById("daily").innerHTML = filteredWorkers.map(w=>{
   const l = logs.find(x=>x.date===date && x.workerId===w.id);
   return `
@@ -414,7 +406,6 @@ window.saveHours = async ()=>{
  const date = document.getElementById("date").value;
  const filterId = document.getElementById("workerLogFilter").value;
  const workersToSave = filterId === "all" ? workers : workers.filter(w => w.id === filterId);
-
  try {
      for (let w of workersToSave) {
       const h = parseFloat(document.getElementById(`total-${w.id}`).value)||0;
@@ -433,38 +424,110 @@ window.renderTotals = ()=>{
  const filterId = document.getElementById("workerListFilter").value;
  let tH=0, tM=0;
 
- const filteredWorkers = filterId === "all" ? workers : workers.filter(w => w.id === filterId);
+ const listBtn = document.getElementById("saveListChangesBtn");
+ if(filterId !== "all") {
+     listBtn.classList.remove("hidden");
+ } else {
+     listBtn.classList.add("hidden");
+ }
 
- document.getElementById("totals").innerHTML = filteredWorkers.map(w=>{
-  const wl = logs.filter(l=>{
-   if(l.workerId !== w.id) return false;
-   if(start && l.date < start) return false;
-   if(end && l.date > end) return false;
-   return true;
-  });
-  const n = notes.find(x => x.id === w.id);
-  const h = wl.reduce((a,b)=>a+b.hours,0);
-  const m = h * w.rate;
-  tH += h; tM += m;
-  return `
-  <div class="worker-row flex flex-col gap-2">
-   <div class="flex justify-between items-center">
-    <div class="flex items-center gap-2">
-        <span class="font-bold text-sm text-slate-800">${w.name}</span>
-        <button onclick="window.openNote('${w.id}')" class="w-6 h-6 flex items-center justify-center rounded-full ${n ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'} text-xs font-bold">+</button>
-    </div>
-    <span class="text-sm font-black text-indigo-600">${h.toFixed(1)}h | ${m.toFixed(2)}€</span>
-   </div>
-   <div class="flex gap-4 items-center">
-    <button onclick="window.editWorker('${w.id}')" class="text-[10px] text-blue-500 font-black uppercase tracking-widest">Edito</button>
-    <button onclick="window.deleteWorker('${w.id}')" class="text-[10px] text-red-500 font-black uppercase tracking-widest">Fshi</button>
-    ${n ? `<span class="text-[10px] text-slate-400 italic truncate max-w-[140px]">"${n.text}"</span>` : ''}
-   </div>
-  </div>`;
- }).join("");
+ if (filterId === "all") {
+    document.getElementById("totals").innerHTML = workers.map(w=>{
+      const wl = logs.filter(l=>{
+       if(l.workerId !== w.id) return false;
+       if(start && l.date < start) return false;
+       if(end && l.date > end) return false;
+       return true;
+      });
+      const n = notes.find(x => x.id === w.id);
+      const h = wl.reduce((a,b)=>a+b.hours,0);
+      const m = h * w.rate;
+      tH += h; tM += m;
+      return `
+      <div class="worker-row flex flex-col gap-2">
+       <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="font-bold text-sm text-slate-800">${w.name}</span>
+            <button onclick="window.openNote('${w.id}')" class="w-6 h-6 flex items-center justify-center rounded-full ${n ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'} text-xs font-bold">+</button>
+        </div>
+        <span class="text-sm font-black text-indigo-600">${h.toFixed(1)}h | ${m.toFixed(2)}€</span>
+       </div>
+       <div class="flex gap-4 items-center">
+        <button onclick="window.editWorker('${w.id}')" class="text-[10px] text-blue-500 font-black uppercase tracking-widest">Edito</button>
+        <button onclick="window.deleteWorker('${w.id}')" class="text-[10px] text-red-500 font-black uppercase tracking-widest">Fshi</button>
+        ${n ? `<span class="text-[10px] text-slate-400 italic truncate max-w-[140px]">"${n.text}"</span>` : ''}
+       </div>
+      </div>`;
+    }).join("");
+ } else {
+    // Punëtori i vetëm - shfaq historikun ditor
+    const w = workers.find(x => x.id === filterId);
+    const wl = logs.filter(l=>{
+       if(l.workerId !== filterId) return false;
+       if(start && l.date < start) return false;
+       if(end && l.date > end) return false;
+       return true;
+    }).sort((a,b) => b.date.localeCompare(a.date));
+
+    tH = wl.reduce((a,b)=>a+b.hours,0);
+    tM = tH * w.rate;
+
+    document.getElementById("totals").innerHTML = wl.length > 0 ? wl.map(l => {
+        const rowId = `row-${l.date}-${l.workerId}`;
+        return `
+        <div class="worker-row py-4 space-y-3" data-log-date="${l.date}" data-log-worker="${l.workerId}">
+            <div class="flex justify-between items-center">
+                <span class="text-xs font-black text-slate-500">${l.date.split('-').reverse().join('.')}</span>
+                <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-slate-200">
+                    <input type="number" step="0.01" id="total-${rowId}" value="${l.hours}" class="w-12 text-center font-bold text-indigo-600 outline-none text-sm bg-transparent">
+                    <span class="text-[8px] font-bold text-slate-400">H</span>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <div class="flex-1 flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                    <label class="text-[8px] font-black text-slate-400 uppercase">In</label>
+                    <input type="time" id="start-${rowId}" value="${l.start||''}" onchange="window.calculateTotal('${rowId}')" class="w-full text-xs font-bold outline-none bg-transparent">
+                </div>
+                <div class="flex-1 flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                    <label class="text-[8px] font-black text-slate-400 uppercase">Out</label>
+                    <input type="time" id="end-${rowId}" value="${l.end||''}" onchange="window.calculateTotal('${rowId}')" class="w-full text-xs font-bold outline-none bg-transparent">
+                </div>
+            </div>
+        </div>`;
+    }).join("") : `<p class="text-center py-10 text-slate-400 text-xs font-bold">Asnjë e dhënë për këtë periudhë.</p>`;
+ }
 
  document.getElementById("totalHours").innerText = tH.toFixed(1)+"h";
  document.getElementById("totalMoney").innerText = tM.toFixed(2)+"€";
+};
+
+window.saveListChanges = async () => {
+    const listContainer = document.getElementById("totals");
+    const rows = listContainer.querySelectorAll('[data-log-date]');
+    if(rows.length === 0) return;
+    
+    try {
+        for(let row of rows) {
+            const date = row.getAttribute('data-log-date');
+            const workerId = row.getAttribute('data-log-worker');
+            const rowId = `row-${date}-${workerId}`;
+            
+            const hours = parseFloat(document.getElementById(`total-${rowId}`).value) || 0;
+            const startT = document.getElementById(`start-${rowId}`).value;
+            const endT = document.getElementById(`end-${rowId}`).value;
+            
+            const ref = doc(db, `users/${user.uid}/logs`, date + "_" + workerId);
+            if(hours > 0) {
+                await setDoc(ref, { date, workerId, hours, start: startT, end: endT });
+            } else {
+                await deleteDoc(ref);
+            }
+        }
+        alert("Ndryshimet u ruajtën me sukses!");
+        window.renderTotals();
+    } catch(e) {
+        alert("Ndodhi një gabim gjatë ruajtjes!");
+    }
 };
 
 window.exportPDF = ()=>{
