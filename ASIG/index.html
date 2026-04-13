@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LindiMaps Workflow Engine</title>
+    <title>LindiMaps Systems</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -11,42 +11,67 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
-        .tab-active { color: #4f46e5; border-bottom: 3px solid #4f46e5; }
-        input, select, textarea { transition: all 0.2s; }
-        input:focus, select:focus { border-color: #4f46e5; outline: none; ring: 2px; ring-color: rgba(79, 70, 229, 0.1); }
+        .tab-active { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
+        
+        .logo-gradient {
+            background: linear-gradient(to right, #3b82f6, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        @keyframes pulse-dot {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-dot {
+            animation: pulse-dot 2s infinite ease-in-out;
+            transform-origin: center;
+        }
+        .logo-bg { transition: background-color 0.3s ease; }
+        .logo-container:hover .logo-bg { background-color: #2563eb; }
     </style>
 </head>
 <body class="bg-[#f8fafc] min-h-screen pb-24 text-slate-900">
 
 <!-- AUTHENTICATION OVERLAY -->
 <div id="auth-overlay" class="fixed inset-0 z-[400] bg-white flex items-center justify-center p-6 hidden">
-    <div class="max-w-md w-full space-y-8">
-        <div class="flex flex-col items-center gap-3 text-center mb-8">
-            <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-3xl shadow-xl shadow-indigo-200">L</div>
-            <h1 class="text-3xl font-extrabold tracking-tight">LindiMaps <span class="text-indigo-600">Cloud</span></h1>
+    <div class="max-w-md w-full space-y-12">
+        <div class="flex items-center gap-3 logo-container justify-center">
+            <div class="logo-bg h-14 w-14 flex items-center justify-center bg-slate-900 rounded-2xl shadow-xl">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.15"/>
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                    <circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-3xl font-black tracking-tighter leading-none">
+                    <span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span>
+                </h1>
+                <span class="text-[10px] uppercase tracking-[0.4em] font-bold text-slate-400 mt-1">
+                    Systems
+                </span>
+            </div>
         </div>
 
         <div id="login-form" class="space-y-4">
-            <p class="text-slate-400 font-bold text-xs text-center uppercase tracking-widest">Hyr në sistem</p>
             <input id="login-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
             <input id="login-password" type="password" placeholder="Fjalëkalimi" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
-            <button id="login-btn" class="w-full bg-indigo-600 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">Hyr</button>
+            <button id="login-btn" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">Hyr në Sistem</button>
             <div class="flex justify-between px-2 text-[11px] font-bold text-slate-400">
-                <button onclick="toggleAuth('reset')" class="hover:text-indigo-600">Harrova fjalëkalimin</button>
-                <button onclick="toggleAuth('signup')" class="text-indigo-600">Krijo llogari</button>
+                <button onclick="toggleAuth('reset')" class="hover:text-blue-600">Harrova fjalëkalimin</button>
+                <button onclick="toggleAuth('signup')" class="text-blue-600">Krijo llogari</button>
             </div>
         </div>
 
         <div id="signup-form" class="space-y-4 hidden">
-            <p class="text-slate-400 font-bold text-xs text-center uppercase tracking-widest">Regjistrohu</p>
             <input id="signup-email" type="email" placeholder="Email i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
             <input id="signup-password" type="password" placeholder="Fjalëkalim (min. 6 karaktere)" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
-            <button id="signup-btn" class="w-full bg-indigo-600 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">Krijo Llogarinë</button>
+            <button id="signup-btn" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-blue-700 active:scale-95 transition-all">Regjistrohu</button>
             <button onclick="toggleAuth('login')" class="w-full text-[11px] font-bold text-slate-400 uppercase text-center">Anulo</button>
         </div>
 
         <div id="reset-form" class="space-y-4 hidden">
-            <p class="text-slate-400 font-bold text-xs text-center uppercase tracking-widest">Rivendos Fjalëkalimin</p>
             <input id="reset-email" type="email" placeholder="Email juaj" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
             <button id="reset-btn" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-black active:scale-95 transition-all">Dërgo Linkun</button>
             <button onclick="toggleAuth('login')" class="w-full text-[11px] font-bold text-slate-400 uppercase text-center">Kthehu pas</button>
@@ -55,15 +80,13 @@
     </div>
 </div>
 
-<!-- ALERT MODAL -->
 <div id="custom-alert" class="hidden fixed inset-0 z-[500] bg-black/50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
         <p id="alert-message" class="font-bold text-slate-800"></p>
-        <button onclick="closeAlert()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold">Kuptova</button>
+        <button onclick="closeAlert()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold">Kuptova</button>
     </div>
 </div>
 
-<!-- CONFIRMATION MODAL -->
 <div id="confirm-modal" class="hidden fixed inset-0 z-[600] bg-black/50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-6 shadow-2xl">
         <div class="space-y-2">
@@ -77,24 +100,33 @@
     </div>
 </div>
 
-<!-- LOADING OVERLAY -->
 <div id="loading" class="fixed inset-0 bg-white/95 z-[300] flex items-center justify-center">
     <div class="flex flex-col items-center gap-4">
-        <div class="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
-        <p class="text-indigo-600 font-bold animate-pulse text-xs uppercase tracking-widest">Duke u lidhur...</p>
+        <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
+        <p class="text-slate-900 font-black text-xs uppercase tracking-[0.3em]">LindiMaps</p>
     </div>
 </div>
 
-<!-- MAIN APP CONTENT -->
 <div id="app-content" class="hidden">
-    <header class="glass-card sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+    <header class="glass-card sticky top-0 z-50 px-6 py-3 flex justify-between items-center">
         <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xl">L</div>
-            <span class="font-extrabold text-lg tracking-tight">LindiMaps <span class="text-indigo-600">Cloud</span></span>
+            <div class="h-8 w-8 flex items-center justify-center bg-slate-900 rounded-lg shadow">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.15"/>
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                    <circle cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-black text-sm tracking-tighter leading-none">
+                    <span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span>
+                </span>
+                <span class="text-[7px] uppercase font-bold text-slate-400 tracking-widest">Systems</span>
+            </div>
         </div>
         <div class="flex items-center gap-4">
             <button onclick="logout()" class="text-[10px] font-bold text-slate-400 uppercase hover:text-red-500">Dil</button>
-            <span id="sync-status" class="text-[10px] font-bold text-green-500 bg-green-50 px-3 py-1 rounded-full uppercase">Online</span>
+            <span id="sync-status" class="text-[10px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full uppercase">Sistemi Aktiv</span>
         </div>
     </header>
 
@@ -105,7 +137,6 @@
     </nav>
 
     <main class="max-w-3xl mx-auto p-4 md:p-8 space-y-8">
-        <!-- VIEW: LOG -->
         <div id="view-log" class="space-y-6">
             <div class="glass-card rounded-[2rem] p-6 shadow-xl shadow-slate-200/50 space-y-6 border border-white">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -126,7 +157,7 @@
                 <div class="pt-4 border-t border-slate-50">
                     <div class="space-y-2">
                         <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Orët e Punës</label>
-                        <input id="log-hours" type="number" step="0.1" placeholder="0.0" class="w-full p-4 rounded-2xl bg-indigo-50 text-indigo-600 font-black text-xl border-none">
+                        <input id="log-hours" type="number" step="0.1" placeholder="0.0" class="w-full p-4 rounded-2xl bg-blue-50 text-blue-600 font-black text-xl border-none">
                     </div>
                 </div>
                 <input type="hidden" id="log-edit-id">
@@ -137,7 +168,6 @@
             </div>
         </div>
 
-        <!-- VIEW: CONFIG -->
         <div id="view-config" class="hidden space-y-8">
             <div class="glass-card rounded-[2rem] p-8 space-y-6">
                 <div class="flex justify-between items-center">
@@ -148,16 +178,16 @@
                     <input id="edit-id" type="hidden">
                     <input id="new-act-name" type="text" placeholder="Emri i Aktivitetit" class="w-full p-4 rounded-xl bg-slate-50 border-none font-bold">
                     <textarea id="new-act-processes" placeholder="Proceset (Emri:numër/tekst)" class="w-full p-4 rounded-xl bg-slate-50 border-none h-32 font-medium"></textarea>
-                    <div class="flex items-center gap-2 bg-indigo-50 p-3 rounded-lg text-indigo-700">
-                        <input type="checkbox" id="auto-calc" class="w-5 h-5 accent-indigo-600">
+                    <div class="flex items-center gap-2 bg-blue-50 p-3 rounded-lg text-blue-700">
+                        <input type="checkbox" id="auto-calc" class="w-5 h-5 accent-blue-600">
                         <label for="auto-calc" class="text-xs font-bold">Llogarit bilancin automatik</label>
                     </div>
-                    <button id="add-act-btn" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold">Ruaj Aktivitetin</button>
+                    <button id="add-act-btn" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold">Ruaj Aktivitetin</button>
                 </div>
             </div>
             <div id="config-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             
-            <div class="glass-card rounded-[2rem] p-8 space-y-6 border-t-4 border-indigo-600">
+            <div class="glass-card rounded-[2rem] p-8 space-y-6 border-t-4 border-slate-900">
                 <h2 class="text-xl font-extrabold text-slate-800">Menaxho Ekspertët</h2>
                 <div class="flex gap-2">
                     <input id="edit-op-id" type="hidden">
@@ -169,7 +199,6 @@
             </div>
         </div>
 
-        <!-- VIEW: REPORTS -->
         <div id="view-reports" class="hidden space-y-6">
             <div class="glass-card rounded-[2rem] p-6 space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -184,7 +213,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <button onclick="renderReportList()" class="bg-slate-900 text-white p-4 rounded-xl font-bold text-xs uppercase">Filtro</button>
-                    <button onclick="exportToPDF()" class="bg-indigo-600 text-white p-4 rounded-xl font-bold text-xs uppercase">PDF</button>
+                    <button onclick="exportToPDF()" class="bg-blue-600 text-white p-4 rounded-xl font-bold text-xs uppercase">Shkarko PDF</button>
                 </div>
             </div>
             <div id="report-results" class="space-y-4"></div>
@@ -256,7 +285,6 @@
         document.getElementById(`${view}-form`).classList.remove('hidden');
     };
 
-    // --- AUTH ---
     onAuthStateChanged(auth, (user) => {
         document.getElementById('loading').classList.add('hidden');
         if (user) {
@@ -297,7 +325,6 @@
 
     window.logout = () => signOut(auth);
 
-    // --- DATA ---
     function startListening() {
         const base = `artifacts/${appId}/public/data`;
         onSnapshot(collection(db, base, 'config'), snap => {
@@ -316,7 +343,6 @@
         });
     }
 
-    // --- ACTIONS ---
     document.getElementById('add-act-btn').onclick = async () => {
         const name = document.getElementById('new-act-name').value.trim();
         const procRaw = document.getElementById('new-act-processes').value.trim();
@@ -370,7 +396,7 @@
         list.innerHTML = configData.map(c => `
             <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative group">
                 <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
-                    <button onclick="editAct('${c.id}')" class="text-indigo-500 bg-indigo-50 px-2 py-1 rounded text-[9px] font-bold">EDIT</button>
+                    <button onclick="editAct('${c.id}')" class="text-blue-500 bg-blue-50 px-2 py-1 rounded text-[9px] font-bold">EDIT</button>
                     <button onclick="deleteItem('config', '${c.id}')" class="text-red-400 bg-red-50 px-2 py-1 rounded text-[9px] font-bold">DEL</button>
                 </div>
                 <h4 class="font-bold text-slate-800">${c.name}</h4>
@@ -405,10 +431,10 @@
     function renderOperatorList() {
         const list = document.getElementById('operator-list');
         list.innerHTML = operatorData.map(o => `
-            <div class="bg-indigo-50 px-4 py-2 rounded-xl flex items-center gap-3">
-                <span class="text-xs font-bold text-indigo-700">${o.name}</span>
+            <div class="bg-blue-50 px-4 py-2 rounded-xl flex items-center gap-3">
+                <span class="text-xs font-bold text-blue-700">${o.name}</span>
                 <div class="flex gap-1">
-                    <button onclick="editOp('${o.id}')" class="text-indigo-400 text-[10px] font-bold uppercase">Edito</button>
+                    <button onclick="editOp('${o.id}')" class="text-blue-400 text-[10px] font-bold uppercase">Edito</button>
                     <button onclick="deleteItem('operators', '${o.id}')" class="text-red-400 font-bold hover:text-red-600 transition">&times;</button>
                 </div>
             </div>
@@ -437,7 +463,7 @@
                 <input type="${p.type}" data-label="${p.label}" value="${val}" class="process-input w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm" oninput="calculateBalance()">
             </div>`;
         });
-        if(act.autoCalc) container.innerHTML += `<div id="calc-preview" class="bg-indigo-600 text-white p-5 rounded-2xl text-center font-black">Llogaritja: 0</div>`;
+        if(act.autoCalc) container.innerHTML += `<div id="calc-preview" class="bg-slate-900 text-white p-5 rounded-2xl text-center font-black">Llogaritja: 0</div>`;
         if(valuesMap) calculateBalance();
     };
 
@@ -485,6 +511,7 @@
         document.getElementById('dynamic-fields-container').innerHTML = "";
         document.getElementById('cancel-log-edit').classList.add('hidden');
         document.getElementById('save-log-btn').innerText = "Ruaj në Cloud";
+        document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
     };
 
     window.editLogEntry = (id) => {
@@ -525,16 +552,16 @@
             <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
                 <div class="flex justify-between items-start">
                     <div>
-                        <span class="text-[9px] font-black bg-indigo-50 text-indigo-600 px-2 py-1 rounded uppercase">${log.actName}</span>
+                        <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded uppercase">${log.actName}</span>
                         <h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator} | ${log.date}</h4>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="editLogEntry('${log.id}')" class="text-indigo-500 text-[10px] font-bold uppercase bg-indigo-50 px-2 py-1 rounded">Edito</button>
+                        <button onclick="editLogEntry('${log.id}')" class="text-blue-500 text-[10px] font-bold uppercase bg-blue-50 px-2 py-1 rounded">Edito</button>
                         <button onclick="deleteItem('logs', '${log.id}')" class="text-red-300 font-bold hover:text-red-500 transition-colors">&times;</button>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2 border-t pt-2">${log.processes.map(p => `<div class="text-[10px]"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
-                <div class="text-[10px] text-right font-bold text-indigo-600">Ore: ${log.hours}</div>
+                <div class="text-[10px] text-right font-bold text-blue-600">Ore: ${log.hours}</div>
             </div>
         `).join("");
     };
@@ -547,18 +574,44 @@
         const start = document.getElementById('rep-start').value || "Fillimi";
         const end = document.getElementById('rep-end').value || "Sot";
         const op = document.getElementById('rep-op-select').value || "Të gjithë";
-        const actDropdownText = document.getElementById('rep-act-select').options[document.getElementById('rep-act-select').selectedIndex].text;
+        const actDropdownText = document.getElementById('rep-act-select').options[document.getElementById('rep-act-select').selectedIndex].text.replace("Aktiviteti: ", "");
 
-        // Titulli dhe Info
+        // --- BRAND LOGO NE PDF (ME PIKEN BLU) ---
+        docPDF.setFillColor(59, 130, 246); // Blue 500
+        docPDF.roundedRect(14, 10, 10, 10, 2, 2, 'F');
+        
+        // Trekëndëshi i bardhë
+        docPDF.setFillColor(255, 255, 255);
+        docPDF.triangle(19, 12, 16.5, 18, 21.5, 18, 'F');
+
+        // Pika blu qendrore
+        docPDF.setFillColor(59, 130, 246);
+        docPDF.circle(19, 14.8, 1, 'F');
+        docPDF.setDrawColor(255, 255, 255);
+        docPDF.setLineWidth(0.2);
+        docPDF.circle(19, 14.8, 1, 'S');
+
         docPDF.setFontSize(16);
-        docPDF.text("Raporti LindiMaps Cloud", 14, 15);
-        docPDF.setFontSize(10);
-        docPDF.text(`Periudha: ${start} deri ${end}`, 14, 22);
-        docPDF.text(`Eksperti: ${op}`, 14, 27);
-        docPDF.text(`Aktiviteti: ${actDropdownText}`, 14, 32);
+        docPDF.setTextColor(15, 23, 42); // Slate 900
+        docPDF.setFont("helvetica", "bold");
+        docPDF.text("LINDI", 28, 15);
+        
+        const lindiWidth = docPDF.getTextWidth("LINDI ");
+        docPDF.setTextColor(59, 130, 246);
+        docPDF.text("MAPS", 28 + lindiWidth, 15);
 
-        // Përcaktimi i të gjitha etiketave të proçeseve sipas radhës së konfigurimit
-        // Kjo siguron që kolonat të jenë gjithmonë në radhën e duhur
+        docPDF.setFontSize(8);
+        docPDF.setTextColor(100, 116, 139);
+        docPDF.text("SYSTEMS", 28, 19);
+
+        // --- HEADER I RAPORTIT ---
+        docPDF.setFontSize(10);
+        docPDF.setTextColor(0, 0, 0);
+        docPDF.setFont("helvetica", "normal");
+        docPDF.text(`Periudha: ${start} deri ${end}`, 14, 28);
+        docPDF.text(`Eksperti: ${op}`, 14, 33);
+        docPDF.text(`Aktiviteti: ${actDropdownText}`, 14, 38);
+
         let orderedLabels = [];
         configData.forEach(conf => {
             conf.processes.forEach(p => {
@@ -567,7 +620,6 @@
         });
 
         const headers = [['Data', 'Aktiviteti', 'Eksperti', 'Ore', ...orderedLabels]];
-        
         const bodyData = filtered.map(f => {
             const row = [f.date, f.actName, f.operator, f.hours];
             orderedLabels.forEach(label => {
@@ -577,38 +629,35 @@
             return row;
         });
 
-        // Tabela kryesore
         docPDF.autoTable({ 
-            startY: 40, 
+            startY: 45, 
             head: headers, 
             body: bodyData,
             theme: 'striped',
-            headStyles: { fillColor: [79, 70, 229] },
+            headStyles: { fillColor: [59, 130, 246] },
             styles: { fontSize: 8, cellPadding: 2 }
         });
 
-        // Llogaritja e Totaleve
         const totalHours = filtered.reduce((sum, log) => sum + (log.hours || 0), 0);
-        const totalActs = filtered.length;
         const uniqueDates = [...new Set(filtered.map(log => log.date))].length;
+        const uniqueActs = [...new Set(filtered.map(log => log.actName))].length;
 
-        // Tabela e Totaleve në fund
         const finalY = docPDF.lastAutoTable.finalY + 10;
         docPDF.autoTable({
             startY: finalY,
             head: [['Përmbledhja e Raportit', 'Vlera']],
             body: [
-                ['Total ditë pune', uniqueDates.toString()],
-                ['Total aktivitete të regjistruara', totalActs.toString()],
-                ['Total orë pune', totalHours.toFixed(1)]
+                ['Total ditë pune unike', uniqueDates.toString() + " Ditë"],
+                ['Total lloje aktivitetesh', uniqueActs.toString() + " Lloje"],
+                ['Total orë pune', totalHours.toFixed(1) + " Orë"]
             ],
             theme: 'grid',
-            headStyles: { fillColor: [30, 41, 59] },
+            headStyles: { fillColor: [15, 23, 42] },
             styles: { fontSize: 9, cellPadding: 3, fontStyle: 'bold' },
-            columnStyles: { 0: { cellWidth: 60 } }
+            columnStyles: { 0: { cellWidth: 70 } }
         });
 
-        docPDF.save(`Raport_LindiMaps_${start}_${end}.pdf`);
+        docPDF.save(`Raport_LindiMaps_${new Date().toLocaleDateString()}.pdf`);
     };
 
     const today = new Date().toISOString().split('T')[0];
