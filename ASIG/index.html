@@ -14,7 +14,6 @@
         .tab-active { color: #4f46e5; border-bottom: 3px solid #4f46e5; }
         input, select, textarea { transition: all 0.2s; }
         input:focus, select:focus { border-color: #4f46e5; outline: none; ring: 2px; ring-color: rgba(79, 70, 229, 0.1); }
-        .auth-view { transition: opacity 0.3s ease-in-out; }
     </style>
 </head>
 <body class="bg-[#f8fafc] min-h-screen pb-24 text-slate-900">
@@ -22,48 +21,36 @@
 <!-- AUTHENTICATION OVERLAY -->
 <div id="auth-overlay" class="fixed inset-0 z-[400] bg-white flex items-center justify-center p-6 hidden">
     <div class="max-w-md w-full space-y-8">
-        <!-- Brand Header -->
         <div class="flex flex-col items-center gap-3 text-center mb-8">
             <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-3xl shadow-xl shadow-indigo-200">L</div>
             <h1 class="text-3xl font-extrabold tracking-tight">LindiMaps <span class="text-indigo-600">Cloud</span></h1>
         </div>
 
-        <!-- Login Form -->
-        <div id="login-form" class="auth-view space-y-4">
+        <div id="login-form" class="space-y-4">
             <p class="text-slate-400 font-bold text-xs text-center uppercase tracking-widest">Hyr në sistem</p>
             <input id="login-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
             <input id="login-password" type="password" placeholder="Fjalëkalimi" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
-            <button id="login-btn" class="w-full bg-indigo-600 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">
-                Hyr
-            </button>
+            <button id="login-btn" class="w-full bg-indigo-600 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">Hyr</button>
             <div class="flex justify-between px-2 text-[11px] font-bold text-slate-400">
                 <button onclick="toggleAuth('reset')" class="hover:text-indigo-600">Harrova fjalëkalimin</button>
-                <button onclick="toggleAuth('signup')" class="text-indigo-600">Krijo llogari të re</button>
+                <button onclick="toggleAuth('signup')" class="text-indigo-600">Krijo llogari</button>
             </div>
         </div>
 
-        <!-- Signup Form -->
-        <div id="signup-form" class="auth-view space-y-4 hidden">
+        <div id="signup-form" class="space-y-4 hidden">
             <p class="text-slate-400 font-bold text-xs text-center uppercase tracking-widest">Regjistrohu</p>
             <input id="signup-email" type="email" placeholder="Email i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
-            <input id="signup-password" type="password" placeholder="Fjalëkalim i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
-            <button id="signup-btn" class="w-full bg-indigo-600 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">
-                Krijo Llogarinë
-            </button>
-            <button onclick="toggleAuth('login')" class="w-full text-[11px] font-bold text-slate-400 uppercase text-center">Kthehu te Hyrja</button>
-        </div>
-
-        <!-- Reset Form -->
-        <div id="reset-form" class="auth-view space-y-4 hidden">
-            <p class="text-slate-400 font-bold text-xs text-center uppercase tracking-widest">Rivendos Fjalëkalimin</p>
-            <p class="text-slate-500 text-[11px] text-center px-4">Vendosni emailin tuaj dhe ne do t'ju dërgojmë një link për të krijuar një fjalëkalim të ri.</p>
-            <input id="reset-email" type="email" placeholder="Email juaj" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
-            <button id="reset-btn" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-black active:scale-95 transition-all">
-                Dërgo Email-in
-            </button>
+            <input id="signup-password" type="password" placeholder="Fjalëkalim (min. 6 karaktere)" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
+            <button id="signup-btn" class="w-full bg-indigo-600 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">Krijo Llogarinë</button>
             <button onclick="toggleAuth('login')" class="w-full text-[11px] font-bold text-slate-400 uppercase text-center">Anulo</button>
         </div>
 
+        <div id="reset-form" class="space-y-4 hidden">
+            <p class="text-slate-400 font-bold text-xs text-center uppercase tracking-widest">Rivendos Fjalëkalimin</p>
+            <input id="reset-email" type="email" placeholder="Email juaj" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
+            <button id="reset-btn" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-black active:scale-95 transition-all">Dërgo Linkun</button>
+            <button onclick="toggleAuth('login')" class="w-full text-[11px] font-bold text-slate-400 uppercase text-center">Kthehu pas</button>
+        </div>
         <p id="auth-error" class="text-red-500 text-center text-xs font-bold hidden"></p>
     </div>
 </div>
@@ -80,7 +67,7 @@
 <div id="loading" class="fixed inset-0 bg-white/95 z-[300] flex items-center justify-center">
     <div class="flex flex-col items-center gap-4">
         <div class="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
-        <p class="text-indigo-600 font-bold animate-pulse text-xs uppercase tracking-widest">Duke lidhur Cloud-in...</p>
+        <p class="text-indigo-600 font-bold animate-pulse text-xs uppercase tracking-widest">Duke u lidhur...</p>
     </div>
 </div>
 
@@ -113,12 +100,12 @@
                         <input id="log-date" type="date" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Zgjidh Ekspertin</label>
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Eksperti</label>
                         <select id="log-operator-select" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold appearance-none"></select>
                     </div>
                 </div>
                 <div class="space-y-2">
-                    <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Zgjidh Aktivitetin</label>
+                    <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Aktiviteti</label>
                     <select id="log-act-select" onchange="generateProcessFields()" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold appearance-none"></select>
                 </div>
                 <div id="dynamic-fields-container" class="space-y-4 pt-4 border-t border-slate-50"></div>
@@ -128,7 +115,7 @@
                         <input id="log-hours" type="number" step="0.1" placeholder="0.0" class="w-full p-4 rounded-2xl bg-indigo-50 text-indigo-600 font-black text-xl border-none">
                     </div>
                 </div>
-                <button id="save-log-btn" class="w-full bg-slate-900 text-white p-5 rounded-[1.5rem] font-bold shadow-lg hover:bg-black transition-all transform active:scale-95">
+                <button id="save-log-btn" class="w-full bg-slate-900 text-white p-5 rounded-[1.5rem] font-bold shadow-lg hover:bg-black active:scale-95 transition-all">
                     Ruaj në Cloud
                 </button>
             </div>
@@ -144,15 +131,16 @@
                 <div class="space-y-4">
                     <input id="edit-id" type="hidden">
                     <input id="new-act-name" type="text" placeholder="Emri i Aktivitetit" class="w-full p-4 rounded-xl bg-slate-50 border-none font-bold">
-                    <textarea id="new-act-processes" placeholder="Proceset (Emri:numër)" class="w-full p-4 rounded-xl bg-slate-50 border-none h-32 font-medium"></textarea>
+                    <textarea id="new-act-processes" placeholder="Proceset (Emri:numër/tekst)" class="w-full p-4 rounded-xl bg-slate-50 border-none h-32 font-medium"></textarea>
                     <div class="flex items-center gap-2 bg-indigo-50 p-3 rounded-lg text-indigo-700">
                         <input type="checkbox" id="auto-calc" class="w-5 h-5 accent-indigo-600">
                         <label for="auto-calc" class="text-xs font-bold">Llogarit bilancin automatik</label>
                     </div>
-                    <button id="add-act-btn" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold">Ruaj Strukturën</button>
+                    <button id="add-act-btn" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold">Ruaj Aktivitetin</button>
                 </div>
             </div>
             <div id="config-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            
             <div class="glass-card rounded-[2rem] p-8 space-y-6 border-t-4 border-indigo-600">
                 <h2 class="text-xl font-extrabold text-slate-800">Menaxho Ekspertët</h2>
                 <div class="flex gap-2">
@@ -168,10 +156,13 @@
             <div class="glass-card rounded-[2rem] p-6 space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="grid grid-cols-2 gap-2">
-                        <input id="rep-start" type="date" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-xs">
-                        <input id="rep-end" type="date" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-xs">
+                        <input id="rep-start" type="date" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]">
+                        <input id="rep-end" type="date" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]">
                     </div>
-                    <select id="rep-op-select" class="w-full p-3 rounded-xl bg-slate-50 border-none font-bold text-xs"></select>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="rep-op-select" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]"></select>
+                        <select id="rep-act-select" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]"></select>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <button onclick="renderReportList()" class="bg-slate-900 text-white p-4 rounded-xl font-bold text-xs uppercase">Filtro</button>
@@ -207,7 +198,7 @@
     let logData = [];
     let operatorData = [];
 
-    // --- INTERFACE HELPERS ---
+    // --- INTERFACE ---
     window.showAlert = (msg) => {
         document.getElementById('alert-message').innerText = msg;
         document.getElementById('custom-alert').classList.remove('hidden');
@@ -222,130 +213,99 @@
     };
 
     window.toggleAuth = (view) => {
-        const error = document.getElementById('auth-error');
-        error.classList.add('hidden');
-        ['login-form', 'signup-form', 'reset-form'].forEach(id => {
-            document.getElementById(id).classList.add('hidden');
-        });
+        document.getElementById('auth-error').classList.add('hidden');
+        ['login-form', 'signup-form', 'reset-form'].forEach(f => document.getElementById(f).classList.add('hidden'));
         document.getElementById(`${view}-form`).classList.remove('hidden');
     };
 
-    // --- AUTH ACTIONS ---
+    // --- AUTH ---
     onAuthStateChanged(auth, (user) => {
-        const loading = document.getElementById('loading');
-        const appContent = document.getElementById('app-content');
-        const authOverlay = document.getElementById('auth-overlay');
-
-        loading.classList.add('hidden');
+        document.getElementById('loading').classList.add('hidden');
         if (user) {
-            appContent.classList.remove('hidden');
-            authOverlay.classList.add('hidden');
+            document.getElementById('app-content').classList.remove('hidden');
+            document.getElementById('auth-overlay').classList.add('hidden');
             startListening();
         } else {
-            appContent.classList.add('hidden');
-            authOverlay.classList.remove('hidden');
-            toggleAuth('login');
+            document.getElementById('app-content').classList.add('hidden');
+            document.getElementById('auth-overlay').classList.remove('hidden');
         }
     });
 
     document.getElementById('login-btn').onclick = async () => {
         const email = document.getElementById('login-email').value.trim();
         const pass = document.getElementById('login-password').value;
-        const error = document.getElementById('auth-error');
         if(!email || !pass) return;
-        try {
-            error.classList.add('hidden');
-            await signInWithEmailAndPassword(auth, email, pass);
-        } catch (e) {
-            error.innerText = "Email ose fjalëkalim i pasaktë.";
-            error.classList.remove('hidden');
+        try { await signInWithEmailAndPassword(auth, email, pass); }
+        catch (e) { 
+            const err = document.getElementById('auth-error');
+            err.innerText = "Kredenciale të pasakta."; err.classList.remove('hidden');
         }
     };
 
     document.getElementById('signup-btn').onclick = async () => {
         const email = document.getElementById('signup-email').value.trim();
         const pass = document.getElementById('signup-password').value;
-        const error = document.getElementById('auth-error');
-        if(pass.length < 6) {
-            error.innerText = "Fjalëkalimi duhet të ketë të paktën 6 karaktere.";
-            error.classList.remove('hidden');
-            return;
-        }
-        try {
-            await createUserWithEmailAndPassword(auth, email, pass);
-            showAlert("Llogaria u krijua me sukses!");
-        } catch (e) {
-            error.innerText = "Gabim gjatë regjistrimit. Ky email mund të jetë i zënë.";
-            error.classList.remove('hidden');
-        }
+        if(pass.length < 6) return showAlert("Fjalëkalimi duhet të ketë min. 6 karaktere.");
+        try { await createUserWithEmailAndPassword(auth, email, pass); showAlert("Llogaria u krijua!"); }
+        catch (e) { showAlert("Gabim gjatë regjistrimit."); }
     };
 
     document.getElementById('reset-btn').onclick = async () => {
         const email = document.getElementById('reset-email').value.trim();
         if(!email) return;
-        try {
-            await sendPasswordResetEmail(auth, email);
-            showAlert("Email-i për rivendosje u dërgua! Kontrollo Inbox-in ose Spam.");
-            toggleAuth('login');
-        } catch (e) {
-            showAlert("Ky email nuk ekziston në sistem.");
-        }
+        try { await sendPasswordResetEmail(auth, email); showAlert("Email-i u dërgua."); toggleAuth('login'); }
+        catch (e) { showAlert("Email-i nuk u gjet."); }
     };
 
     window.logout = () => signOut(auth);
 
-    // --- DATA SYNC ---
+    // --- DATA ---
     function startListening() {
-        const basePath = `artifacts/${appId}/public/data`;
-
-        onSnapshot(collection(db, basePath, 'config'), snap => {
+        const base = `artifacts/${appId}/public/data`;
+        onSnapshot(collection(db, base, 'config'), snap => {
             configData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             updateDropdowns();
             renderConfigList();
         });
-
-        onSnapshot(collection(db, basePath, 'logs'), snap => {
+        onSnapshot(collection(db, base, 'logs'), snap => {
             logData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             renderReportList();
         });
-
-        onSnapshot(collection(db, basePath, 'operators'), snap => {
+        onSnapshot(collection(db, base, 'operators'), snap => {
             operatorData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             updateDropdowns();
             renderOperatorList();
         });
     }
 
-    // --- APP LOGIC (NO CHANGES FROM ORIGINAL) ---
-    const cloudOp = async (fn) => {
-        try { await fn(); } catch (e) { showAlert("Dështoi sinkronizimi."); }
-    };
-
-    document.getElementById('add-act-btn').onclick = () => cloudOp(async () => {
+    // --- ACTIONS ---
+    document.getElementById('add-act-btn').onclick = async () => {
         const name = document.getElementById('new-act-name').value.trim();
         const procRaw = document.getElementById('new-act-processes').value.trim();
         const autoCalc = document.getElementById('auto-calc').checked;
         const editId = document.getElementById('edit-id').value;
-        if (!name || !procRaw) return showAlert("Plotësoni të gjitha fushat.");
+        if (!name || !procRaw) return showAlert("Plotësoni fushat.");
         const processes = procRaw.split('\n').map(line => {
             const parts = line.split(':');
             return { label: parts[0]?.trim(), type: parts[1]?.trim() === 'tekst' ? 'text' : 'number' };
         }).filter(p => p.label);
         const id = editId || Date.now().toString();
-        await setDoc(doc(db, `artifacts/${appId}/public/data/config`, id), { name, processes, autoCalc });
-        resetConfigForm();
-    });
+        try {
+            await setDoc(doc(db, `artifacts/${appId}/public/data/config`, id), { name, processes, autoCalc });
+            resetConfigForm();
+        } catch(e) { showAlert("Dështoi ruajtja."); }
+    };
 
     window.editAct = (id) => {
         const act = configData.find(c => c.id === id);
         if(!act) return;
         document.getElementById('edit-id').value = id;
         document.getElementById('new-act-name').value = act.name;
-        document.getElementById('new-act-processes').value = act.processes.map(p => `${p.label}:${p.type}`).join('\n');
+        document.getElementById('new-act-processes').value = act.processes.map(p => `${p.label}:${p.type === 'text' ? 'tekst' : 'numër'}`).join('\n');
         document.getElementById('auto-calc').checked = act.autoCalc;
-        document.getElementById('config-title').innerText = "Edito Strukturën";
+        document.getElementById('config-title').innerText = "Edito Aktivitetin";
         document.getElementById('cancel-edit-btn').classList.remove('hidden');
-        switchTab('config');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.resetConfigForm = () => {
@@ -362,20 +322,21 @@
         list.innerHTML = configData.map(c => `
             <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative group">
                 <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
-                    <button onclick="editAct('${c.id}')" class="text-indigo-500 bg-indigo-50 px-2 py-1 rounded text-[9px] font-bold">EDITO</button>
-                    <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/config', '${c.id}'))" class="text-red-400 bg-red-50 px-2 py-1 rounded text-[9px] font-bold">FSHIJ</button>
+                    <button onclick="editAct('${c.id}')" class="text-indigo-500 bg-indigo-50 px-2 py-1 rounded text-[9px] font-bold">EDIT</button>
+                    <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/config', '${c.id}'))" class="text-red-400 bg-red-50 px-2 py-1 rounded text-[9px] font-bold">DEL</button>
                 </div>
                 <h4 class="font-bold text-slate-800">${c.name}</h4>
+                <p class="text-[9px] text-slate-400 uppercase mt-1">${c.processes.length} procese</p>
             </div>
         `).join("");
     }
 
-    document.getElementById('add-op-btn').onclick = () => cloudOp(async () => {
+    document.getElementById('add-op-btn').onclick = async () => {
         const name = document.getElementById('new-op-name').value.trim();
         if(!name) return;
         await setDoc(doc(db, `artifacts/${appId}/public/data/operators`, Date.now().toString()), { name });
         document.getElementById('new-op-name').value = "";
-    });
+    };
 
     function renderOperatorList() {
         const list = document.getElementById('operator-list');
@@ -390,9 +351,10 @@
     function updateDropdowns() {
         const acts = configData.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
         const ops = operatorData.map(o => `<option value="${o.name}">${o.name}</option>`).join("");
-        document.getElementById('log-act-select').innerHTML = `<option value="">-- Zgjidh Aktivitetin --</option>` + acts;
-        document.getElementById('log-operator-select').innerHTML = `<option value="">-- Zgjidh Ekspertin --</option>` + ops;
-        document.getElementById('rep-op-select').innerHTML = `<option value="">-- Të gjithë Ekspertët --</option>` + ops;
+        document.getElementById('log-act-select').innerHTML = `<option value="">-- Zgjidh --</option>` + acts;
+        document.getElementById('log-operator-select').innerHTML = `<option value="">-- Zgjidh --</option>` + ops;
+        document.getElementById('rep-op-select').innerHTML = `<option value="">Eksperti: Të gjithë</option>` + ops;
+        document.getElementById('rep-act-select').innerHTML = `<option value="">Aktiviteti: Të gjithë</option>` + acts;
     }
 
     window.generateProcessFields = () => {
@@ -402,13 +364,12 @@
         if(!actId) return;
         const act = configData.find(c => c.id === actId);
         act.processes.forEach(p => {
-            const div = document.createElement('div');
-            div.className = "space-y-1";
-            div.innerHTML = `<label class="text-[10px] font-extrabold text-slate-500 uppercase">${p.label}</label>
-                <input type="${p.type}" data-label="${p.label}" class="process-input w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm" oninput="calculateBalance()">`;
-            container.appendChild(div);
+            container.innerHTML += `<div class="space-y-1">
+                <label class="text-[10px] font-extrabold text-slate-500 uppercase">${p.label}</label>
+                <input type="${p.type}" data-label="${p.label}" class="process-input w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm" oninput="calculateBalance()">
+            </div>`;
         });
-        if(act.autoCalc) container.innerHTML += `<div id="calc-preview" class="bg-indigo-600 text-white p-5 rounded-2xl text-center font-black">0</div>`;
+        if(act.autoCalc) container.innerHTML += `<div id="calc-preview" class="bg-indigo-600 text-white p-5 rounded-2xl text-center font-black">Llogaritja: 0</div>`;
     };
 
     window.calculateBalance = () => {
@@ -424,7 +385,7 @@
         document.getElementById('calc-preview').innerText = `Llogaritja: ${total}`;
     };
 
-    document.getElementById('save-log-btn').onclick = () => cloudOp(async () => {
+    document.getElementById('save-log-btn').onclick = async () => {
         const actId = document.getElementById('log-act-select').value;
         const date = document.getElementById('log-date').value;
         const operator = document.getElementById('log-operator-select').value;
@@ -434,29 +395,35 @@
             label: i.dataset.label, value: i.value
         }));
         await setDoc(doc(db, `artifacts/${appId}/public/data/logs`, Date.now().toString()), {
-            actName: configData.find(c => c.id === actId).name, date, operator, hours: parseFloat(hours), processes
+            actId, actName: configData.find(c => c.id === actId).name, date, operator, hours: parseFloat(hours), processes
         });
-        showAlert("U ruajt në Cloud!");
+        showAlert("U ruajt!");
         document.getElementById('log-hours').value = "";
         document.querySelectorAll('.process-input').forEach(i => i.value = "");
-    });
+    };
 
     window.renderReportList = () => {
         const start = document.getElementById('rep-start').value;
         const end = document.getElementById('rep-end').value;
         const selOp = document.getElementById('rep-op-select').value;
+        const selAct = document.getElementById('rep-act-select').value;
         let filtered = [...logData].sort((a,b) => b.date.localeCompare(a.date));
         if(start) filtered = filtered.filter(f => f.date >= start);
         if(end) filtered = filtered.filter(f => f.date <= end);
         if(selOp) filtered = filtered.filter(f => f.operator === selOp);
+        if(selAct) filtered = filtered.filter(f => f.actId === selAct);
+        
         document.getElementById('report-results').innerHTML = filtered.map(log => `
             <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
-                <div class="flex justify-between">
-                    <div><span class="text-[9px] font-black bg-indigo-50 text-indigo-600 px-2 py-1 rounded uppercase">${log.actName}</span>
-                    <h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator} | ${log.date}</h4></div>
-                    <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/logs', '${log.id}'))" class="text-red-300 font-bold">&times;</button>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-[9px] font-black bg-indigo-50 text-indigo-600 px-2 py-1 rounded uppercase">${log.actName}</span>
+                        <h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator} | ${log.date}</h4>
+                    </div>
+                    <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/logs', '${log.id}'))" class="text-red-300 font-bold hover:text-red-500">&times;</button>
                 </div>
                 <div class="grid grid-cols-2 gap-2 border-t pt-2">${log.processes.map(p => `<div class="text-[10px]"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
+                <div class="text-[10px] text-right font-bold text-indigo-600">Ore: ${log.hours}</div>
             </div>
         `).join("");
     };
