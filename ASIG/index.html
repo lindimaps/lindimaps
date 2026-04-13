@@ -198,6 +198,12 @@
     const db = getFirestore(app);
     const appId = "sistemi-aktiviteteve-v1";
 
+    // Ekspozojmë funksionet e Firebase që të përdoren nga butonat onclick
+    window.db = db;
+    window.doc = doc;
+    window.deleteDoc = deleteDoc;
+    window.appId = appId;
+
     let configData = [];
     let logData = [];
     let operatorData = [];
@@ -321,13 +327,22 @@
         document.getElementById('cancel-edit-btn').classList.add('hidden');
     };
 
+    // Funksione fshirjeje që thirren nga butonat
+    window.deleteItem = async (col, id) => {
+        try {
+            await deleteDoc(doc(window.db, `artifacts/${window.appId}/public/data/${col}`, id));
+        } catch (e) {
+            showAlert("Fshirja dështoi.");
+        }
+    };
+
     function renderConfigList() {
         const list = document.getElementById('config-list');
         list.innerHTML = configData.map(c => `
             <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative group">
                 <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
                     <button onclick="editAct('${c.id}')" class="text-indigo-500 bg-indigo-50 px-2 py-1 rounded text-[9px] font-bold">EDIT</button>
-                    <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/config', '${c.id}'))" class="text-red-400 bg-red-50 px-2 py-1 rounded text-[9px] font-bold">DEL</button>
+                    <button onclick="deleteItem('config', '${c.id}')" class="text-red-400 bg-red-50 px-2 py-1 rounded text-[9px] font-bold">DEL</button>
                 </div>
                 <h4 class="font-bold text-slate-800">${c.name}</h4>
                 <p class="text-[9px] text-slate-400 uppercase mt-1">${c.processes.length} procese</p>
@@ -365,7 +380,7 @@
                 <span class="text-xs font-bold text-indigo-700">${o.name}</span>
                 <div class="flex gap-1">
                     <button onclick="editOp('${o.id}')" class="text-indigo-400 text-[10px] font-bold uppercase">Edito</button>
-                    <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/operators', '${o.id}'))" class="text-red-400 font-bold hover:text-red-600 transition">&times;</button>
+                    <button onclick="deleteItem('operators', '${o.id}')" class="text-red-400 font-bold hover:text-red-600 transition">&times;</button>
                 </div>
             </div>
         `).join("");
@@ -486,7 +501,7 @@
                     </div>
                     <div class="flex gap-2">
                         <button onclick="editLogEntry('${log.id}')" class="text-indigo-500 text-[10px] font-bold uppercase bg-indigo-50 px-2 py-1 rounded">Edito</button>
-                        <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/logs', '${log.id}'))" class="text-red-300 font-bold hover:text-red-500 transition-colors">&times;</button>
+                        <button onclick="deleteItem('logs', '${log.id}')" class="text-red-300 font-bold hover:text-red-500 transition-colors">&times;</button>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2 border-t pt-2">${log.processes.map(p => `<div class="text-[10px]"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
