@@ -115,9 +115,11 @@
                         <input id="log-hours" type="number" step="0.1" placeholder="0.0" class="w-full p-4 rounded-2xl bg-indigo-50 text-indigo-600 font-black text-xl border-none">
                     </div>
                 </div>
+                <input type="hidden" id="log-edit-id">
                 <button id="save-log-btn" class="w-full bg-slate-900 text-white p-5 rounded-[1.5rem] font-bold shadow-lg hover:bg-black active:scale-95 transition-all">
                     Ruaj në Cloud
                 </button>
+                <button id="cancel-log-edit" class="hidden w-full bg-slate-200 text-slate-600 p-4 rounded-[1.5rem] font-bold mt-2" onclick="cancelLogEdit()">Anulo Modifikimin</button>
             </div>
         </div>
 
@@ -144,9 +146,11 @@
             <div class="glass-card rounded-[2rem] p-8 space-y-6 border-t-4 border-indigo-600">
                 <h2 class="text-xl font-extrabold text-slate-800">Menaxho Ekspertët</h2>
                 <div class="flex gap-2">
+                    <input id="edit-op-id" type="hidden">
                     <input id="new-op-name" type="text" placeholder="Emri i Ekspertit" class="flex-1 p-4 rounded-xl bg-slate-50 border-none font-bold">
-                    <button id="add-op-btn" class="bg-slate-900 text-white px-6 rounded-xl font-bold">Shto</button>
+                    <button id="add-op-btn" class="bg-slate-900 text-white px-6 rounded-xl font-bold">Ruaj</button>
                 </div>
+                <button id="cancel-op-edit" class="hidden text-xs font-bold text-slate-400 uppercase" onclick="resetOpForm()">Anulo</button>
                 <div id="operator-list" class="flex flex-wrap gap-2 pt-2"></div>
             </div>
         </div>
@@ -333,9 +337,25 @@
 
     document.getElementById('add-op-btn').onclick = async () => {
         const name = document.getElementById('new-op-name').value.trim();
+        const editOpId = document.getElementById('edit-op-id').value;
         if(!name) return;
-        await setDoc(doc(db, `artifacts/${appId}/public/data/operators`, Date.now().toString()), { name });
+        const id = editOpId || Date.now().toString();
+        await setDoc(doc(db, `artifacts/${appId}/public/data/operators`, id), { name });
+        resetOpForm();
+    };
+
+    window.editOp = (id) => {
+        const op = operatorData.find(o => o.id === id);
+        if(!op) return;
+        document.getElementById('edit-op-id').value = id;
+        document.getElementById('new-op-name').value = op.name;
+        document.getElementById('cancel-op-edit').classList.remove('hidden');
+    };
+
+    window.resetOpForm = () => {
+        document.getElementById('edit-op-id').value = "";
         document.getElementById('new-op-name').value = "";
+        document.getElementById('cancel-op-edit').classList.add('hidden');
     };
 
     function renderOperatorList() {
@@ -343,7 +363,10 @@
         list.innerHTML = operatorData.map(o => `
             <div class="bg-indigo-50 px-4 py-2 rounded-xl flex items-center gap-3">
                 <span class="text-xs font-bold text-indigo-700">${o.name}</span>
-                <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/operators', '${o.id}'))" class="text-red-400 font-bold hover:text-red-600 transition">&times;</button>
+                <div class="flex gap-1">
+                    <button onclick="editOp('${o.id}')" class="text-indigo-400 text-[10px] font-bold uppercase">Edito</button>
+                    <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/operators', '${o.id}'))" class="text-red-400 font-bold hover:text-red-600 transition">&times;</button>
+                </div>
             </div>
         `).join("");
     }
@@ -357,19 +380,21 @@
         document.getElementById('rep-act-select').innerHTML = `<option value="">Aktiviteti: Të gjithë</option>` + acts;
     }
 
-    window.generateProcessFields = () => {
+    window.generateProcessFields = (valuesMap = null) => {
         const actId = document.getElementById('log-act-select').value;
         const container = document.getElementById('dynamic-fields-container');
         container.innerHTML = "";
         if(!actId) return;
         const act = configData.find(c => c.id === actId);
         act.processes.forEach(p => {
+            const val = valuesMap ? (valuesMap[p.label] || "") : "";
             container.innerHTML += `<div class="space-y-1">
                 <label class="text-[10px] font-extrabold text-slate-500 uppercase">${p.label}</label>
-                <input type="${p.type}" data-label="${p.label}" class="process-input w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm" oninput="calculateBalance()">
+                <input type="${p.type}" data-label="${p.label}" value="${val}" class="process-input w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm" oninput="calculateBalance()">
             </div>`;
         });
         if(act.autoCalc) container.innerHTML += `<div id="calc-preview" class="bg-indigo-600 text-white p-5 rounded-2xl text-center font-black">Llogaritja: 0</div>`;
+        if(valuesMap) calculateBalance();
     };
 
     window.calculateBalance = () => {
@@ -390,16 +415,51 @@
         const date = document.getElementById('log-date').value;
         const operator = document.getElementById('log-operator-select').value;
         const hours = document.getElementById('log-hours').value;
+        const logEditId = document.getElementById('log-edit-id').value;
+
         if(!actId || !date || !operator || !hours) return showAlert("Plotësoni të gjitha fushat.");
+        
         const processes = Array.from(document.querySelectorAll('.process-input')).map(i => ({
             label: i.dataset.label, value: i.value
         }));
-        await setDoc(doc(db, `artifacts/${appId}/public/data/logs`, Date.now().toString()), {
+
+        const id = logEditId || Date.now().toString();
+        
+        await setDoc(doc(db, `artifacts/${appId}/public/data/logs`, id), {
             actId, actName: configData.find(c => c.id === actId).name, date, operator, hours: parseFloat(hours), processes
         });
-        showAlert("U ruajt!");
+        
+        showAlert(logEditId ? "Modifikimi u krye!" : "U ruajt!");
+        cancelLogEdit();
+    };
+
+    window.cancelLogEdit = () => {
+        document.getElementById('log-edit-id').value = "";
         document.getElementById('log-hours').value = "";
-        document.querySelectorAll('.process-input').forEach(i => i.value = "");
+        document.getElementById('log-act-select').value = "";
+        document.getElementById('log-operator-select').value = "";
+        document.getElementById('dynamic-fields-container').innerHTML = "";
+        document.getElementById('cancel-log-edit').classList.add('hidden');
+        document.getElementById('save-log-btn').innerText = "Ruaj në Cloud";
+    };
+
+    window.editLogEntry = (id) => {
+        const log = logData.find(l => l.id === id);
+        if(!log) return;
+        switchTab('log');
+        document.getElementById('log-edit-id').value = id;
+        document.getElementById('log-date').value = log.date;
+        document.getElementById('log-operator-select').value = log.operator;
+        document.getElementById('log-act-select').value = log.actId;
+        document.getElementById('log-hours').value = log.hours;
+        
+        const valuesMap = {};
+        log.processes.forEach(p => valuesMap[p.label] = p.value);
+        generateProcessFields(valuesMap);
+        
+        document.getElementById('cancel-log-edit').classList.remove('hidden');
+        document.getElementById('save-log-btn').innerText = "Zëvendëso dhe Ruaj";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.getFilteredLogs = () => {
@@ -424,7 +484,10 @@
                         <span class="text-[9px] font-black bg-indigo-50 text-indigo-600 px-2 py-1 rounded uppercase">${log.actName}</span>
                         <h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator} | ${log.date}</h4>
                     </div>
-                    <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/logs', '${log.id}'))" class="text-red-300 font-bold hover:text-red-500 transition-colors">&times;</button>
+                    <div class="flex gap-2">
+                        <button onclick="editLogEntry('${log.id}')" class="text-indigo-500 text-[10px] font-bold uppercase bg-indigo-50 px-2 py-1 rounded">Edito</button>
+                        <button onclick="deleteDoc(doc(db, 'artifacts/${appId}/public/data/logs', '${log.id}'))" class="text-red-300 font-bold hover:text-red-500 transition-colors">&times;</button>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2 border-t pt-2">${log.processes.map(p => `<div class="text-[10px]"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
                 <div class="text-[10px] text-right font-bold text-indigo-600">Ore: ${log.hours}</div>
@@ -434,7 +497,7 @@
 
     window.exportToPDF = () => {
         const { jsPDF } = window.jspdf;
-        const docPDF = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape mode to fit columns
+        const docPDF = new jsPDF('l', 'mm', 'a4');
         const filtered = getFilteredLogs();
 
         const start = document.getElementById('rep-start').value || "Fillimi";
@@ -442,7 +505,6 @@
         const op = document.getElementById('rep-op-select').value || "Të gjithë";
         const act = document.getElementById('rep-act-select').options[document.getElementById('rep-act-select').selectedIndex].text;
 
-        // Header Info
         docPDF.setFontSize(16);
         docPDF.text("Raporti LindiMaps Cloud", 14, 15);
         docPDF.setFontSize(10);
@@ -450,8 +512,6 @@
         docPDF.text(`Eksperti: ${op}`, 14, 27);
         docPDF.text(`Aktiviteti: ${act}`, 14, 32);
 
-        // Dynamic Columns for Processes
-        // We first identify all unique process labels in the filtered data to create headers
         let processLabels = [];
         filtered.forEach(log => {
             log.processes.forEach(p => {
@@ -463,7 +523,6 @@
         
         const bodyData = filtered.map(f => {
             const row = [f.date, f.actName, f.operator, f.hours];
-            // Fill columns for processes based on headers
             processLabels.forEach(label => {
                 const p = f.processes.find(item => item.label === label);
                 row.push(p ? p.value : "-");
