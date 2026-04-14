@@ -7,189 +7,686 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
         .tab-active { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
-        .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .logo-gradient {
+            background: linear-gradient(to right, #3b82f6, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        @keyframes pulse-dot {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-dot {
+            animation: pulse-dot 2s infinite ease-in-out;
+            transform-origin: center;
+        }
+        .logo-bg { transition: background-color 0.3s ease; }
+        .logo-container:hover .logo-bg { background-color: #2563eb; }
     </style>
 </head>
-
 <body class="bg-[#f8fafc] min-h-screen pb-24 text-slate-900">
 
-<div id="loading" class="fixed inset-0 bg-white flex items-center justify-center">
-    <div class="animate-spin h-10 w-10 border-4 border-blue-600 border-t-transparent rounded-full"></div>
-</div>
+<!-- AUTHENTICATION OVERLAY -->
+<div id="auth-overlay" class="fixed inset-0 z-[400] bg-white flex items-center justify-center p-6 hidden">
+    <div class="max-w-md w-full space-y-12">
+        <div class="flex items-center gap-3 logo-container justify-center">
+            <div class="logo-bg h-14 w-14 flex items-center justify-center bg-slate-900 rounded-2xl shadow-xl">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.15"/>
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                    <circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-3xl font-black tracking-tighter leading-none">
+                    <span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span>
+                </h1>
+                <span class="text-[10px] uppercase tracking-[0.4em] font-bold text-slate-400 mt-1">
+                    Systems
+                </span>
+            </div>
+        </div>
 
-<div id="auth-overlay" class="hidden fixed inset-0 flex items-center justify-center bg-white">
-    <div class="space-y-4 w-full max-w-sm p-6">
-        <input id="login-email" type="email" placeholder="Email" class="w-full p-3 border rounded">
-        <input id="login-password" type="password" placeholder="Fjalëkalimi" class="w-full p-3 border rounded">
-        <button id="login-btn" class="w-full bg-black text-white p-3 rounded">Hyr</button>
+        <div id="login-form" class="space-y-4">
+            <input id="login-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
+            <input id="login-password" type="password" placeholder="Fjalëkalimi" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
+            <button id="login-btn" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">Hyr në Sistem</button>
+            <div class="flex justify-between px-2 text-[11px] font-bold text-slate-400">
+                <button onclick="toggleAuth('reset')" class="hover:text-blue-600">Harrova fjalëkalimin</button>
+                <button onclick="toggleAuth('signup')" class="text-blue-600">Krijo llogari</button>
+            </div>
+        </div>
     </div>
 </div>
 
-<div id="app-content" class="hidden p-4 space-y-4">
-    <input id="log-date" type="date" class="border p-2">
-    <select id="log-operator-select" class="border p-2"></select>
-    <select id="log-act-select" class="border p-2"></select>
+<div id="custom-alert" class="hidden fixed inset-0 z-[500] bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
+        <p id="alert-message" class="font-bold text-slate-800"></p>
+        <button onclick="closeAlert()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold">Kuptova</button>
+    </div>
+</div>
 
-    <input id="log-start-time" type="time" onchange="calculateHours()" class="border p-2">
-    <input id="log-end-time" type="time" onchange="calculateHours()" class="border p-2">
+<div id="confirm-modal" class="hidden fixed inset-0 z-[600] bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-6 shadow-2xl">
+        <div class="space-y-2">
+            <h3 class="text-xl font-extrabold text-slate-800">A jeni i sigurt?</h3>
+            <p id="confirm-message" class="text-slate-500 font-medium text-sm">Ky veprim nuk mund të kthehet pas.</p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="closeConfirm()" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold">Anulo</button>
+            <button id="confirm-yes-btn" class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold">Fshije</button>
+        </div>
+    </div>
+</div>
 
-    <input id="log-hours" type="number" class="border p-2">
+<div id="loading" class="fixed inset-0 bg-white/95 z-[300] flex items-center justify-center">
+    <div class="flex flex-col items-center gap-4">
+        <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
+        <p class="text-slate-900 font-black text-xs uppercase tracking-[0.3em]">LindiMaps</p>
+    </div>
+</div>
 
-    <button id="save-log-btn" class="bg-blue-600 text-white p-3 rounded">Ruaj</button>
+<div id="app-content" class="hidden">
+    <header class="glass-card sticky top-0 z-50 px-6 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="h-8 w-8 flex items-center justify-center bg-slate-900 rounded-lg shadow">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.15"/>
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                    <circle cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-black text-sm tracking-tighter leading-none">
+                    <span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span>
+                </span>
+                <span class="text-[7px] uppercase font-bold text-slate-400 tracking-widest">Systems</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="logout()" class="text-[10px] font-bold text-slate-400 uppercase hover:text-red-500">Dil</button>
+            <span id="sync-status" class="text-[10px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full uppercase">Sistemi Aktiv</span>
+        </div>
+    </header>
+
+    <nav class="bg-white border-b border-slate-100 flex overflow-x-auto">
+        <button onclick="switchTab('log')" id="tab-log" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest tab-active">Regjistrim Ditor</button>
+        <button onclick="switchTab('config')" id="tab-config" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest text-slate-400">Struktura</button>
+        <button onclick="switchTab('reports')" id="tab-reports" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest text-slate-400">Raporte</button>
+    </nav>
+
+    <main class="max-w-3xl mx-auto p-4 md:p-8 space-y-8">
+        <div id="view-log" class="space-y-6">
+            <div class="glass-card rounded-[2rem] p-6 shadow-xl shadow-slate-200/50 space-y-6 border border-white">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Data</label>
+                        <input id="log-date" type="date" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Eksperti</label>
+                        <select id="log-operator-select" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold appearance-none"></select>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Aktiviteti</label>
+                    <select id="log-act-select" onchange="generateProcessFields()" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold appearance-none"></select>
+                </div>
+                <div id="dynamic-fields-container" class="space-y-4 pt-4 border-t border-slate-50"></div>
+                
+                <div class="pt-4 border-t border-slate-50 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Ora Fillimit</label>
+                            <input id="log-start-time" type="time" onchange="calculateHours()" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Ora Mbarimit</label>
+                            <input id="log-end-time" type="time" onchange="calculateHours()" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Total Orë Pune</label>
+                        <input id="log-hours" type="number" step="0.1" placeholder="0.0" class="w-full p-4 rounded-2xl bg-blue-50 text-blue-600 font-black text-xl border-none">
+                    </div>
+                </div>
+
+                <input type="hidden" id="log-edit-id">
+                <button id="save-log-btn" class="w-full bg-slate-900 text-white p-5 rounded-[1.5rem] font-bold shadow-lg hover:bg-black active:scale-95 transition-all">
+                    Ruaj në Cloud
+                </button>
+                <button id="cancel-log-edit" class="hidden w-full bg-slate-200 text-slate-600 p-4 rounded-[1.5rem] font-bold mt-2" onclick="cancelLogEdit()">Anulo Modifikimin</button>
+            </div>
+        </div>
+
+        <div id="view-config" class="hidden space-y-8">
+            <div class="glass-card rounded-[2rem] p-8 space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 id="config-title" class="text-xl font-extrabold text-slate-800">Shto Aktivitet</h2>
+                    <button id="cancel-edit-btn" class="hidden text-xs font-bold text-red-500 uppercase" onclick="resetConfigForm()">Anulo</button>
+                </div>
+                <div class="space-y-4">
+                    <input id="edit-id" type="hidden">
+                    <input id="new-act-name" type="text" placeholder="Emri i Aktivitetit" class="w-full p-4 rounded-xl bg-slate-50 border-none font-bold">
+                    <textarea id="new-act-processes" placeholder="Proceset (Emri:numër/tekst) - psh. Bashkia:tekst" class="w-full p-4 rounded-xl bg-slate-50 border-none h-32 font-medium"></textarea>
+                    <button id="add-act-btn" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold">Ruaj Aktivitetin</button>
+                </div>
+            </div>
+            <div id="config-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            
+            <div class="glass-card rounded-[2rem] p-8 space-y-6 border-t-4 border-slate-900">
+                <h2 class="text-xl font-extrabold text-slate-800">Ekspertët</h2>
+                <div class="flex gap-2">
+                    <input id="new-op-name" type="text" placeholder="Emri i Ekspertit" class="flex-1 p-4 rounded-xl bg-slate-50 border-none font-bold">
+                    <button id="add-op-btn" class="bg-slate-900 text-white px-6 rounded-xl font-bold">Shto</button>
+                </div>
+                <div id="operator-list" class="flex flex-wrap gap-2 pt-2"></div>
+            </div>
+        </div>
+
+        <div id="view-reports" class="hidden space-y-6">
+            <div class="glass-card rounded-[2rem] p-6 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input id="rep-start" type="date" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]">
+                        <input id="rep-end" type="date" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="rep-op-select" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]"></select>
+                        <select id="rep-act-select" onchange="updateProcessFilterUI()" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]"></select>
+                    </div>
+                </div>
+                <div id="rep-dynamic-filters" class="grid grid-cols-2 md:grid-cols-3 gap-2"></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="renderReportList()" class="bg-slate-900 text-white p-4 rounded-xl font-bold text-xs uppercase">Filtro</button>
+                    <button onclick="exportToPDF()" class="bg-blue-600 text-white p-4 rounded-xl font-bold text-xs uppercase">Shkarko PDF</button>
+                </div>
+            </div>
+            <div id="report-results" class="space-y-4"></div>
+        </div>
+    </main>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBk3Wi9DsGp9egY8qQnxeEdM9qlTZIodw0",
-  authDomain: "sistemi-aktiviteteve.firebaseapp.com",
-  projectId: "sistemi-aktiviteteve",
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyBk3Wi9DsGp9egY8qQnxeEdM9qlTZIodw0",
+      authDomain: "sistemi-aktiviteteve.firebaseapp.com",
+      projectId: "sistemi-aktiviteteve",
+      storageBucket: "sistemi-aktiviteteve.firebasestorage.app",
+      messagingSenderId: "289905439492",
+      appId: "1:289905439492:web:4e7e52e13a8379a74b9651",
+      measurementId: "G-W2F0WT24XJ"
+    };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const appId = "sistemi-aktiviteteve-v1";
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const appId = "sistemi-aktiviteteve-v1";
 
-let configData = [];
-let logData = [];
-let operatorData = [];
+    window.db = db;
+    window.doc = doc;
+    window.deleteDoc = deleteDoc;
+    window.appId = appId;
 
-/* -------- SAFE MATH -------- */
-window.handleMathInput = (event) => {
-    if (event.key === 'Enter') {
-        try {
-            const input = event.target.value;
-            if (!/^[0-9+\-*/().\s]+$/.test(input)) return;
-            const result = Function(`"use strict"; return (${input})`)();
-            if (!isNaN(result)) event.target.value = result;
-        } catch {}
-    }
-};
+    let configData = [];
+    let logData = [];
+    let operatorData = [];
+    let deleteCallback = null;
 
-/* -------- HOURS FIX -------- */
-window.calculateHours = () => {
-    const start = document.getElementById('log-start-time').value;
-    const end = document.getElementById('log-end-time').value;
+    // --- MATH & HOURS ---
+    window.handleMathInput = (event) => {
+        if (event.key === 'Enter') {
+            const input = event.target;
+            try {
+                const expression = input.value.replace(/[^0-9+\-*/().]/g, '');
+                if (expression) input.value = eval(expression);
+            } catch (e) { console.error("Invalid math"); }
+        }
+    };
 
-    if (!start || !end) return;
+    window.calculateHours = () => {
+        const start = document.getElementById('log-start-time').value;
+        const end = document.getElementById('log-end-time').value;
+        if (start && end) {
+            const startTime = new Date(`1970-01-01T${start}:00`);
+            const endTime = new Date(`1970-01-01T${end}:00`);
+            let diff = (endTime - startTime) / (1000 * 60 * 60);
+            if (diff < 0) diff += 24;
+            document.getElementById('log-hours').value = diff.toFixed(1);
+        }
+    };
 
-    const s = new Date(`1970-01-01T${start}`);
-    const e = new Date(`1970-01-01T${end}`);
+    // --- UI HELPERS ---
+    window.showAlert = (msg) => {
+        document.getElementById('alert-message').innerText = msg;
+        document.getElementById('custom-alert').classList.remove('hidden');
+    };
+    window.closeAlert = () => document.getElementById('custom-alert').classList.add('hidden');
 
-    let diff = (e - s) / 3600000;
-    if (diff < 0) diff += 24;
+    window.askConfirm = (msg, onConfirm) => {
+        document.getElementById('confirm-message').innerText = msg;
+        deleteCallback = onConfirm;
+        document.getElementById('confirm-modal').classList.remove('hidden');
+    };
+    window.closeConfirm = () => {
+        document.getElementById('confirm-modal').classList.add('hidden');
+        deleteCallback = null;
+    };
+    document.getElementById('confirm-yes-btn').onclick = () => {
+        if(deleteCallback) deleteCallback();
+        closeConfirm();
+    };
 
-    if (!isNaN(diff)) {
-        document.getElementById('log-hours').value = diff.toFixed(2);
-    }
-};
+    window.switchTab = (tab) => {
+        ['view-log', 'view-config', 'view-reports'].forEach(v => document.getElementById(v).classList.add('hidden'));
+        ['tab-log', 'tab-config', 'tab-reports'].forEach(t => document.getElementById(t).classList.replace('tab-active', 'text-slate-400'));
+        document.getElementById(`view-${tab}`).classList.remove('hidden');
+        document.getElementById(`tab-${tab}`).classList.replace('text-slate-400', 'tab-active');
+    };
 
-/* -------- LOGIN -------- */
-document.getElementById('login-btn').onclick = async () => {
-    const email = document.getElementById('login-email').value.trim();
-    const pass = document.getElementById('login-password').value;
-
-    if (!email || !pass) {
-        alert("Plotëso kredencialet");
-        return;
-    }
-
-    try {
-        await signInWithEmailAndPassword(auth, email, pass);
-    } catch (e) {
-        alert(e.message);
-    }
-};
-
-window.logout = () => signOut(auth);
-
-/* -------- SNAPSHOT -------- */
-function startListening() {
-    const base = `artifacts/${appId}/public/data`;
-
-    onSnapshot(collection(db, base, 'config'), snap => {
-        configData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        updateDropdowns();
+    onAuthStateChanged(auth, (user) => {
+        document.getElementById('loading').classList.add('hidden');
+        if (user) {
+            document.getElementById('app-content').classList.remove('hidden');
+            document.getElementById('auth-overlay').classList.add('hidden');
+            startListening();
+        } else {
+            document.getElementById('app-content').classList.add('hidden');
+            document.getElementById('auth-overlay').classList.remove('hidden');
+        }
     });
 
-    onSnapshot(collection(db, base, 'logs'), snap => {
-        logData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    });
+    document.getElementById('login-btn').onclick = async () => {
+        const email = document.getElementById('login-email').value.trim();
+        const pass = document.getElementById('login-password').value;
+        if(!email || !pass) return;
+        try { await signInWithEmailAndPassword(auth, email, pass); }
+        catch (e) { showAlert("Kredenciale të pasakta."); }
+    };
 
-    onSnapshot(collection(db, base, 'operators'), snap => {
-        operatorData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        updateDropdowns();
-    });
-}
+    window.logout = () => signOut(auth);
 
-/* -------- SAVE -------- */
-document.getElementById('save-log-btn').onclick = async () => {
-    try {
+    function startListening() {
+        const base = `artifacts/${appId}/public/data`;
+        onSnapshot(collection(db, base, 'config'), snap => {
+            configData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            updateDropdowns();
+            renderConfigList();
+        });
+        onSnapshot(collection(db, base, 'logs'), snap => {
+            logData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderReportList();
+            updateProcessFilterUI();
+        });
+        onSnapshot(collection(db, base, 'operators'), snap => {
+            operatorData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            updateDropdowns();
+            renderOperatorList();
+        });
+    }
+
+    // --- DATA HANDLING ---
+    window.generateProcessFields = (valuesMap = null) => {
+        const actId = document.getElementById('log-act-select').value;
+        const container = document.getElementById('dynamic-fields-container');
+        container.innerHTML = "";
+        if(!actId) return;
+        const act = configData.find(c => c.id === actId);
+        act.processes.forEach(p => {
+            const val = valuesMap ? (valuesMap[p.label] || "") : "";
+            const isNumber = p.type === 'number';
+            const extra = isNumber ? `onkeydown="handleMathInput(event)"` : '';
+            container.innerHTML += `<div class="space-y-1">
+                <label class="text-[10px] font-extrabold text-slate-500 uppercase">${p.label}</label>
+                <input type="text" data-label="${p.label}" data-original-type="${p.type}" value="${val}" ${extra} class="process-input w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm">
+            </div>`;
+        });
+    };
+
+    document.getElementById('save-log-btn').onclick = async () => {
         const actId = document.getElementById('log-act-select').value;
         const date = document.getElementById('log-date').value;
         const operator = document.getElementById('log-operator-select').value;
-        const hours = parseFloat(document.getElementById('log-hours').value);
-
-        if (!actId || !date || !operator || isNaN(hours)) {
-            alert("Plotësoni fushat");
-            return;
-        }
-
-        const act = configData.find(c => c.id === actId);
-        if (!act) return;
-
-        const id = Date.now().toString();
-
+        const hours = document.getElementById('log-hours').value;
+        if(!actId || !date || !operator || !hours) return showAlert("Plotësoni fushat.");
+        const processes = Array.from(document.querySelectorAll('.process-input')).map(i => ({ label: i.dataset.label, value: i.value }));
+        const id = document.getElementById('log-edit-id').value || Date.now().toString();
         await setDoc(doc(db, `artifacts/${appId}/public/data/logs`, id), {
-            actId,
-            actName: act.name,
-            date,
-            operator,
-            hours
+            actId, actName: configData.find(c => c.id === actId).name, date, operator, hours: parseFloat(hours),
+            startTime: document.getElementById('log-start-time').value, endTime: document.getElementById('log-end-time').value, processes
+        });
+        cancelLogEdit();
+    };
+
+    window.cancelLogEdit = () => {
+        document.getElementById('log-edit-id').value = "";
+        document.getElementById('log-hours').value = "";
+        document.getElementById('log-start-time').value = "";
+        document.getElementById('log-end-time').value = "";
+        document.getElementById('log-act-select').value = "";
+        document.getElementById('dynamic-fields-container').innerHTML = "";
+        document.getElementById('cancel-log-edit').classList.add('hidden');
+        document.getElementById('save-log-btn').innerText = "Ruaj në Cloud";
+    };
+
+    window.editLogEntry = (id) => {
+        const log = logData.find(l => l.id === id);
+        if(!log) return;
+        switchTab('log');
+        document.getElementById('log-edit-id').value = id;
+        document.getElementById('log-date').value = log.date;
+        document.getElementById('log-operator-select').value = log.operator;
+        document.getElementById('log-act-select').value = log.actId;
+        document.getElementById('log-hours').value = log.hours;
+        document.getElementById('log-start-time').value = log.startTime || "";
+        document.getElementById('log-end-time').value = log.endTime || "";
+        const valuesMap = {};
+        log.processes.forEach(p => valuesMap[p.label] = p.value);
+        generateProcessFields(valuesMap);
+        document.getElementById('cancel-log-edit').classList.remove('hidden');
+        document.getElementById('save-log-btn').innerText = "Zëvendëso";
+    };
+
+    window.updateProcessFilterUI = () => {
+        const actId = document.getElementById('rep-act-select').value;
+        const filterContainer = document.getElementById('rep-dynamic-filters');
+        
+        const currentSelections = {};
+        document.querySelectorAll('.rep-proc-filter').forEach(f => {
+            currentSelections[f.dataset.filterLabel] = f.value;
         });
 
-        alert("U ruajt!");
-    } catch (e) {
-        console.error(e);
-        alert("Gabim");
+        filterContainer.innerHTML = "";
+        if(!actId) return;
+
+        const activity = configData.find(c => c.id === actId);
+        if(!activity) return;
+
+        activity.processes.forEach(p => {
+            const uniqueValues = [...new Set(
+                logData
+                .filter(log => log.actId === actId)
+                .flatMap(log => log.processes)
+                .filter(proc => proc.label === p.label)
+                .map(proc => proc.value)
+                .filter(val => val !== "" && val !== undefined)
+            )].sort();
+
+            const options = uniqueValues.map(v => `<option value="${v}" ${currentSelections[p.label] === v ? 'selected' : ''}>${v}</option>`).join("");
+            
+            filterContainer.innerHTML += `
+                <div class="flex flex-col gap-1">
+                    <label class="text-[8px] font-bold text-slate-400 uppercase px-1">${p.label}</label>
+                    <select data-filter-label="${p.label}" class="rep-proc-filter p-2 rounded-lg bg-slate-50 border-none text-[9px] font-bold appearance-none">
+                        <option value="">Të gjitha</option>
+                        ${options}
+                    </select>
+                </div>`;
+        });
+    };
+
+    window.getFilteredLogs = () => {
+        const start = document.getElementById('rep-start').value;
+        const end = document.getElementById('rep-end').value;
+        const selOp = document.getElementById('rep-op-select').value;
+        const selAct = document.getElementById('rep-act-select').value;
+        let filtered = [...logData].sort((a,b) => b.date.localeCompare(a.date));
+        if(start) filtered = filtered.filter(f => f.date >= start);
+        if(end) filtered = filtered.filter(f => f.date <= end);
+        if(selOp) filtered = filtered.filter(f => f.operator === selOp);
+        if(selAct) filtered = filtered.filter(f => f.actId === selAct);
+        
+        const procFilters = Array.from(document.querySelectorAll('.rep-proc-filter'));
+        procFilters.forEach(f => {
+            const val = f.value.toLowerCase().trim();
+            if(val) filtered = filtered.filter(log => {
+                const p = log.processes.find(item => item.label === f.dataset.filterLabel);
+                return p && p.value.toString().toLowerCase() === val;
+            });
+        });
+        return filtered;
+    };
+
+    window.renderReportList = () => {
+        const filtered = getFilteredLogs();
+        document.getElementById('report-results').innerHTML = filtered.map(log => `
+            <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded uppercase">${log.actName}</span>
+                        <h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator} | ${log.date}</h4>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editLogEntry('${log.id}')" class="text-blue-500 text-[10px] font-bold uppercase bg-blue-50 px-2 py-1 rounded">Edito</button>
+                        <button onclick="deleteItem('logs', '${log.id}')" class="text-red-300 font-bold">&times;</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 border-t pt-2 mt-2">${log.processes.map(p => `<div class="text-[10px]"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
+                <div class="flex justify-between text-[10px] font-bold text-blue-600 mt-2">
+                    <span>${log.startTime || ''} - ${log.endTime || ''}</span>
+                    <span>Tot: ${log.hours} Orë</span>
+                </div>
+            </div>
+        `).join("");
+    };
+
+    window.exportToPDF = () => {
+        const { jsPDF } = window.jspdf;
+        const docPDF = new jsPDF('l', 'mm', 'a4');
+        const filtered = getFilteredLogs();
+
+        // --- BRAND LOGO ---
+        docPDF.setFillColor(59, 130, 246);
+        docPDF.roundedRect(14, 10, 10, 10, 2, 2, 'F');
+        docPDF.setFillColor(255, 255, 255);
+        docPDF.triangle(19, 12, 16.5, 18, 21.5, 18, 'F');
+        docPDF.setFillColor(59, 130, 246);
+        docPDF.circle(19, 14.8, 1, 'F');
+        docPDF.setDrawColor(255, 255, 255);
+        docPDF.setLineWidth(0.2);
+        docPDF.circle(19, 14.8, 1, 'S');
+
+        docPDF.setFontSize(16);
+        docPDF.setTextColor(15, 23, 42);
+        docPDF.setFont("helvetica", "bold");
+        docPDF.text("LINDI", 28, 15);
+        const lindiWidth = docPDF.getTextWidth("LINDI ");
+        docPDF.setTextColor(59, 130, 246);
+        docPDF.text("MAPS", 28 + lindiWidth, 15);
+        docPDF.setFontSize(8);
+        docPDF.setTextColor(100, 116, 139);
+        docPDF.text("SYSTEMS", 28, 19);
+
+        // --- APPLIED FILTERS HEADER ---
+        const selOp = document.getElementById('rep-op-select').value;
+        const selActId = document.getElementById('rep-act-select').value;
+        const repStart = document.getElementById('rep-start').value;
+        const repEnd = document.getElementById('rep-end').value;
+        
+        let headerY = 28;
+        docPDF.setFontSize(10);
+        docPDF.setTextColor(51, 65, 85);
+        docPDF.setFont("helvetica", "bold");
+        docPDF.text("PARAMETRAT E RAPORTIT", 14, headerY);
+        headerY += 5;
+        
+        docPDF.setFont("helvetica", "normal");
+        docPDF.setFontSize(8);
+        let filterParts = [];
+        if(repStart || repEnd) filterParts.push(`Periudha: ${repStart || '...'} deri ${repEnd || '...'}`);
+        if(selOp) filterParts.push(`Eksperti: ${selOp}`);
+        if(selActId) {
+            const actName = configData.find(c => c.id === selActId)?.name;
+            filterParts.push(`Aktiviteti: ${actName}`);
+        }
+        
+        document.querySelectorAll('.rep-proc-filter').forEach(f => {
+            if(f.value) filterParts.push(`${f.dataset.filterLabel}: ${f.value}`);
+        });
+
+        if(filterParts.length > 0) {
+            const splitText = docPDF.splitTextToSize(filterParts.join("  |  "), 260);
+            docPDF.text(splitText, 14, headerY);
+            headerY += (splitText.length * 4);
+        } else {
+            docPDF.text("Të gjitha të dhënat", 14, headerY);
+            headerY += 5;
+        }
+
+        // --- TABLE ---
+        const actId = document.getElementById('rep-act-select').value;
+        let orderedLabels = [];
+        if (actId) {
+            orderedLabels = configData.find(c => c.id === actId).processes.map(p => p.label);
+        } else {
+            configData.forEach(c => c.processes.forEach(p => { if(!orderedLabels.includes(p.label)) orderedLabels.push(p.label); }));
+        }
+
+        const headers = [['Data', 'Aktiviteti', 'Eksperti', 'Ore', ...orderedLabels]];
+        const bodyData = filtered.map(f => {
+            const row = [f.date, f.actName, f.operator, f.hours];
+            orderedLabels.forEach(label => {
+                const p = f.processes.find(item => item.label === label);
+                row.push(p ? p.value : "-");
+            });
+            return row;
+        });
+
+        docPDF.autoTable({ 
+            startY: headerY + 2, head: headers, body: bodyData, theme: 'striped',
+            headStyles: { fillColor: [59, 130, 246] },
+            styles: { fontSize: 8 }
+        });
+
+        const finalY = docPDF.lastAutoTable.finalY + 10;
+        const uniqueActs = new Set(filtered.map(l => l.actName));
+        const processSums = {};
+        orderedLabels.forEach(l => processSums[l] = 0);
+        let totalHours = 0;
+
+        filtered.forEach(log => {
+            totalHours += (log.hours || 0);
+            log.processes.forEach(p => {
+                const val = parseFloat(p.value);
+                if (!isNaN(val)) processSums[p.label] = (processSums[p.label] || 0) + val;
+            });
+        });
+
+        const statsBody = [
+            ['Total Raporte', filtered.length.toString()],
+            ['Aktivitete Unikë', uniqueActs.size.toString()],
+            ['Total Orë Pune', totalHours.toFixed(1)]
+        ];
+
+        orderedLabels.forEach(label => {
+            if (processSums[label] > 0) statsBody.push([`Total ${label}`, processSums[label].toLocaleString()]);
+        });
+
+        docPDF.autoTable({
+            startY: finalY,
+            head: [['Përmbledhja e Totaleve', 'Vlera']],
+            body: statsBody,
+            theme: 'grid',
+            headStyles: { fillColor: [15, 23, 42] },
+            styles: { fontSize: 9, fontStyle: 'bold' }
+        });
+
+        docPDF.save(`Raport_LindiMaps_${new Date().getTime()}.pdf`);
+    };
+
+    // --- CONFIG UI ---
+    function updateDropdowns() {
+        const acts = configData.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+        const ops = operatorData.map(o => `<option value="${o.name}">${o.name}</option>`).join("");
+        document.getElementById('log-act-select').innerHTML = `<option value="">-- Zgjidh --</option>` + acts;
+        document.getElementById('log-operator-select').innerHTML = `<option value="">-- Zgjidh --</option>` + ops;
+        document.getElementById('rep-op-select').innerHTML = `<option value="">Eksperti: Të gjithë</option>` + ops;
+        document.getElementById('rep-act-select').innerHTML = `<option value="">Aktiviteti: Të gjithë</option>` + acts;
     }
-};
 
-/* -------- DROPDOWNS -------- */
-function updateDropdowns() {
-    const acts = configData.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
-    const ops = operatorData.map(o => `<option value="${o.name}">${o.name}</option>`).join("");
-
-    document.getElementById('log-act-select').innerHTML = `<option value="">-- Zgjidh --</option>` + acts;
-    document.getElementById('log-operator-select').innerHTML = `<option value="">-- Zgjidh --</option>` + ops;
-}
-
-/* -------- AUTH STATE -------- */
-onAuthStateChanged(auth, (user) => {
-    document.getElementById('loading').classList.add('hidden');
-
-    if (user) {
-        document.getElementById('app-content').classList.remove('hidden');
-        document.getElementById('auth-overlay').classList.add('hidden');
-        startListening();
-    } else {
-        document.getElementById('app-content').classList.add('hidden');
-        document.getElementById('auth-overlay').classList.remove('hidden');
+    function renderConfigList() {
+        document.getElementById('config-list').innerHTML = configData.map(c => `
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm group relative flex justify-between items-center">
+                <div>
+                    <h4 class="font-bold text-slate-800">${c.name}</h4>
+                    <p class="text-[9px] text-slate-400 uppercase mt-1">${c.processes.length} procese</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="editConfigItem('${c.id}')" class="text-blue-500 font-bold text-[10px] uppercase bg-blue-50 px-2 py-1 rounded">Edito</button>
+                    <button onclick="deleteItem('config', '${c.id}')" class="text-red-400 font-bold text-lg">&times;</button>
+                </div>
+            </div>
+        `).join("");
     }
-});
 
-document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+    window.editConfigItem = (id) => {
+        const item = configData.find(c => c.id === id);
+        if(!item) return;
+        document.getElementById('edit-id').value = item.id;
+        document.getElementById('new-act-name').value = item.name;
+        document.getElementById('new-act-processes').value = item.processes.map(p => `${p.label}:${p.type === 'text' ? 'tekst' : 'numër'}`).join('\n');
+        document.getElementById('add-act-btn').innerText = "Zëvendëso Aktivitetin";
+        document.getElementById('config-title').innerText = "Edito Aktivitetin";
+        document.getElementById('cancel-edit-btn').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.resetConfigForm = () => {
+        document.getElementById('edit-id').value = "";
+        document.getElementById('new-act-name').value = "";
+        document.getElementById('new-act-processes').value = "";
+        document.getElementById('add-act-btn').innerText = "Ruaj Aktivitetin";
+        document.getElementById('config-title').innerText = "Shto Aktivitet";
+        document.getElementById('cancel-edit-btn').classList.add('hidden');
+    };
+
+    function renderOperatorList() {
+        document.getElementById('operator-list').innerHTML = operatorData.map(o => `
+            <div class="bg-blue-50 px-4 py-2 rounded-xl flex items-center gap-3">
+                <span class="text-xs font-bold text-blue-700">${o.name}</span>
+                <button onclick="deleteItem('operators', '${o.id}')" class="text-red-400 font-bold">&times;</button>
+            </div>
+        `).join("");
+    }
+
+    document.getElementById('add-act-btn').onclick = async () => {
+        const name = document.getElementById('new-act-name').value.trim();
+        const procRaw = document.getElementById('new-act-processes').value.trim();
+        if (!name || !procRaw) return;
+        const processes = procRaw.split('\n').map(line => {
+            const parts = line.split(':');
+            return { label: parts[0]?.trim(), type: parts[1]?.trim() === 'tekst' ? 'text' : 'number' };
+        }).filter(p => p.label);
+        
+        const id = document.getElementById('edit-id').value || Date.now().toString();
+        await setDoc(doc(db, `artifacts/${appId}/public/data/config`, id), { name, processes });
+        resetConfigForm();
+    };
+
+    document.getElementById('add-op-btn').onclick = async () => {
+        const name = document.getElementById('new-op-name').value.trim();
+        if(!name) return;
+        await setDoc(doc(db, `artifacts/${appId}/public/data/operators`, Date.now().toString()), { name });
+        document.getElementById('new-op-name').value = "";
+    };
+
+    window.deleteItem = (col, id) => {
+        askConfirm("A dëshironi ta fshini këtë element?", async () => { 
+            await deleteDoc(doc(window.db, `artifacts/${window.appId}/public/data/${col}`, id)); 
+        });
+    };
+
+    document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
 </script>
-
 </body>
-</html>
