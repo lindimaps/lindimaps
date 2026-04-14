@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LindiMaps Systems</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
+        .tab-active { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
+        .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+
+<body class="bg-[#f8fafc] min-h-screen pb-24 text-slate-900">
+
+<div id="loading" class="fixed inset-0 bg-white flex items-center justify-center">
+    <div class="animate-spin h-10 w-10 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+</div>
+
+<div id="auth-overlay" class="hidden fixed inset-0 flex items-center justify-center bg-white">
+    <div class="space-y-4 w-full max-w-sm p-6">
+        <input id="login-email" type="email" placeholder="Email" class="w-full p-3 border rounded">
+        <input id="login-password" type="password" placeholder="Fjalëkalimi" class="w-full p-3 border rounded">
+        <button id="login-btn" class="w-full bg-black text-white p-3 rounded">Hyr</button>
+    </div>
+</div>
+
+<div id="app-content" class="hidden p-4 space-y-4">
+    <input id="log-date" type="date" class="border p-2">
+    <select id="log-operator-select" class="border p-2"></select>
+    <select id="log-act-select" class="border p-2"></select>
+
+    <input id="log-start-time" type="time" onchange="calculateHours()" class="border p-2">
+    <input id="log-end-time" type="time" onchange="calculateHours()" class="border p-2">
+
+    <input id="log-hours" type="number" class="border p-2">
+
+    <button id="save-log-btn" class="bg-blue-600 text-white p-3 rounded">Ruaj</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBk3Wi9DsGp9egY8qQnxeEdM9qlTZIodw0",
+  authDomain: "sistemi-aktiviteteve.firebaseapp.com",
+  projectId: "sistemi-aktiviteteve",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = "sistemi-aktiviteteve-v1";
+
+let configData = [];
+let logData = [];
+let operatorData = [];
+
+/* -------- SAFE MATH -------- */
+window.handleMathInput = (event) => {
+    if (event.key === 'Enter') {
+        try {
+            const input = event.target.value;
+            if (!/^[0-9+\-*/().\s]+$/.test(input)) return;
+            const result = Function(`"use strict"; return (${input})`)();
+            if (!isNaN(result)) event.target.value = result;
+        } catch {}
+    }
+};
+
+/* -------- HOURS FIX -------- */
+window.calculateHours = () => {
+    const start = document.getElementById('log-start-time').value;
+    const end = document.getElementById('log-end-time').value;
+
+    if (!start || !end) return;
+
+    const s = new Date(`1970-01-01T${start}`);
+    const e = new Date(`1970-01-01T${end}`);
+
+    let diff = (e - s) / 3600000;
+    if (diff < 0) diff += 24;
+
+    if (!isNaN(diff)) {
+        document.getElementById('log-hours').value = diff.toFixed(2);
+    }
+};
+
+/* -------- LOGIN -------- */
+document.getElementById('login-btn').onclick = async () => {
+    const email = document.getElementById('login-email').value.trim();
+    const pass = document.getElementById('login-password').value;
+
+    if (!email || !pass) {
+        alert("Plotëso kredencialet");
+        return;
+    }
+
+    try {
+        await signInWithEmailAndPassword(auth, email, pass);
+    } catch (e) {
+        alert(e.message);
+    }
+};
+
+window.logout = () => signOut(auth);
+
+/* -------- SNAPSHOT -------- */
+function startListening() {
+    const base = `artifacts/${appId}/public/data`;
+
+    onSnapshot(collection(db, base, 'config'), snap => {
+        configData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        updateDropdowns();
+    });
+
+    onSnapshot(collection(db, base, 'logs'), snap => {
+        logData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    });
+
+    onSnapshot(collection(db, base, 'operators'), snap => {
+        operatorData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        updateDropdowns();
+    });
+}
+
+/* -------- SAVE -------- */
+document.getElementById('save-log-btn').onclick = async () => {
+    try {
+        const actId = document.getElementById('log-act-select').value;
+        const date = document.getElementById('log-date').value;
+        const operator = document.getElementById('log-operator-select').value;
+        const hours = parseFloat(document.getElementById('log-hours').value);
+
+        if (!actId || !date || !operator || isNaN(hours)) {
+            alert("Plotësoni fushat");
+            return;
+        }
+
+        const act = configData.find(c => c.id === actId);
+        if (!act) return;
+
+        const id = Date.now().toString();
+
+        await setDoc(doc(db, `artifacts/${appId}/public/data/logs`, id), {
+            actId,
+            actName: act.name,
+            date,
+            operator,
+            hours
+        });
+
+        alert("U ruajt!");
+    } catch (e) {
+        console.error(e);
+        alert("Gabim");
+    }
+};
+
+/* -------- DROPDOWNS -------- */
+function updateDropdowns() {
+    const acts = configData.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+    const ops = operatorData.map(o => `<option value="${o.name}">${o.name}</option>`).join("");
+
+    document.getElementById('log-act-select').innerHTML = `<option value="">-- Zgjidh --</option>` + acts;
+    document.getElementById('log-operator-select').innerHTML = `<option value="">-- Zgjidh --</option>` + ops;
+}
+
+/* -------- AUTH STATE -------- */
+onAuthStateChanged(auth, (user) => {
+    document.getElementById('loading').classList.add('hidden');
+
+    if (user) {
+        document.getElementById('app-content').classList.remove('hidden');
+        document.getElementById('auth-overlay').classList.add('hidden');
+        startListening();
+    } else {
+        document.getElementById('app-content').classList.add('hidden');
+        document.getElementById('auth-overlay').classList.remove('hidden');
+    }
+});
+
+document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+</script>
+
+</body>
+</html>
