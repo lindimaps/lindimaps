@@ -69,15 +69,12 @@ Sistemi Aktivitete
 </div>
 </div>
 
-<!-- Signup Form -->
+<!-- Signup Form (SECURED: No Role Selector) -->
 <div id="signup-section" class="hidden space-y-4">
 <h2 class="text-center font-extrabold text-slate-800 text-xl">Regjistrohu</h2>
+<p class="text-center text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pas regjistrimit, roli juaj do të jetë 'Operator'</p>
 <input id="signup-email" type="email" placeholder="Email i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
 <input id="signup-password" type="password" placeholder="Fjalëkalimi i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
-<select id="signup-role" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
-    <option value="user">Operator</option>
-    <option value="admin">Administrator</option>
-</select>
 <button id="signup-btn" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-blue-700 active:scale-95 transition-all">Krijo Llogarinë</button>
 <div class="text-center">
 <button onclick="showAuthSection('login')" class="text-[11px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest">Kthehu te Logimi</button>
@@ -97,6 +94,7 @@ Sistemi Aktivitete
 </div>
 </div>
 
+<!-- UI Elementet e tjera mbeten njesoj... -->
 <div id="custom-alert" class="hidden fixed inset-0 z-[500] bg-black/50 flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl border border-slate-100">
 <p id="alert-message" class="font-bold text-slate-800"></p>
@@ -197,6 +195,7 @@ Ruaj në Cloud
 </div>
 </div>
 
+<!-- Struktura (Vetëm Admin) -->
 <div id="view-config" class="hidden space-y-8">
 <div class="glass-card rounded-[2rem] p-8 space-y-6">
 <div class="flex justify-between items-center">
@@ -222,6 +221,7 @@ Ruaj në Cloud
 </div>
 </div>
 
+<!-- Raporte -->
 <div id="view-reports" class="hidden space-y-6">
 <div class="glass-card rounded-[2rem] p-6 space-y-4">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -248,9 +248,8 @@ Ruaj në Cloud
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, getDoc, deleteDoc, onSnapshot, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-// KONFIGURIMI I RI I PROJEKTIT TUAJ
 const firebaseConfig = {
   apiKey: "AIzaSyD8BxXSdcnnzJPtFHHq0eKjHXWjBkZq5Mc",
   authDomain: "lindimapsenterprise.firebaseapp.com",
@@ -271,55 +270,44 @@ let logData = [];
 let operatorData = [];
 let userRole = 'user'; 
 
-// --- AUTH SECTION TOGGLE ---
 window.showAuthSection = (section) => {
 document.getElementById('login-section').classList.add('hidden');
 document.getElementById('signup-section').classList.add('hidden');
 document.getElementById('reset-section').classList.add('hidden');
-
 if(section === 'login') document.getElementById('login-section').classList.remove('hidden');
 if(section === 'signup') document.getElementById('signup-section').classList.remove('hidden');
 if(section === 'reset') document.getElementById('reset-section').classList.remove('hidden');
 };
 
-// --- LOGIN LOGIC ---
 document.getElementById('login-btn').onclick = async () => {
 const email = document.getElementById('login-email').value.trim();
 const pass = document.getElementById('login-password').value;
-if(!email || !pass) return showAlert("Plotësoni email dhe fjalëkalimin.");
-try {
-await signInWithEmailAndPassword(auth, email, pass);
-} catch (e) {
-showAlert("Kredenciale të pasakta.");
-}
+if(!email || !pass) return showAlert("Plotësoni të dhënat.");
+try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { showAlert("Kredenciale të pasakta."); }
 };
 
-// --- SIGNUP LOGIC ---
 document.getElementById('signup-btn').onclick = async () => {
 const email = document.getElementById('signup-email').value.trim();
 const pass = document.getElementById('signup-password').value;
-const role = document.getElementById('signup-role').value;
-if(!email || pass.length < 6) return showAlert("Email i pavlefshëm ose fjalëkalim i shkurtër.");
+// ROLI CAKTOHET AUTOMATIKISHT USER
+if(!email || pass.length < 6) return showAlert("Email ose fjalëkalim i pasaktë.");
 try {
 const cred = await createUserWithEmailAndPassword(auth, email, pass);
 await setDoc(doc(db, `artifacts/${appId}/users`, cred.user.uid), {
     email: email,
-    role: role,
+    role: 'user', // Mbrojtje: Çdo llogari e re është automatikisht User
     uid: cred.user.uid
 });
-showAlert("Llogaria u krijua! Mund të hyni tani.");
-} catch (e) {
-showAlert("Gabim gjatë regjistrimit.");
-}
+showAlert("U krijua! Prisni që Admin t'ju autorizojë si Admin nëse duhet.");
+} catch (e) { showAlert("Gabim: " + e.message); }
 };
 
 onAuthStateChanged(auth, async (user) => {
 document.getElementById('loading').classList.add('hidden');
 if (user) {
     const userDoc = await getDoc(doc(db, `artifacts/${appId}/users`, user.uid));
-    if(userDoc.exists()) {
-        userRole = userDoc.data().role;
-    }
+    userRole = userDoc.exists() ? userDoc.data().role : 'user';
+    
     document.getElementById('role-indicator').innerHTML = userRole === 'admin' ? '<span class="admin-badge">ADMIN</span>' : '';
     document.getElementById('user-display').innerText = user.email;
     if(userRole === 'admin') document.getElementById('tab-config').classList.remove('hidden');
@@ -358,32 +346,27 @@ onSnapshot(collection(db, base, 'operators'), snap => {
 });
 }
 
-// --- LOG LOGIC ---
 document.getElementById('save-log-btn').onclick = async () => {
 const actId = document.getElementById('log-act-select').value;
 const date = document.getElementById('log-date').value;
 const operator = document.getElementById('log-operator-select').value;
 const hours = document.getElementById('log-hours').value;
-if(!actId || !date || !operator || !hours) return showAlert("Plotësoni të gjitha fushat.");
+if(!actId || !date || !operator || !hours) return showAlert("Plotësoni fushat.");
 const processes = Array.from(document.querySelectorAll('.process-input')).map(i => ({ label: i.dataset.label, value: i.value }));
 const id = document.getElementById('log-edit-id').value || Date.now().toString();
 
 await setDoc(doc(db, `artifacts/${appId}/public/data/logs`, id), {
-    actId, 
-    actName: configData.find(c => c.id === actId).name, 
-    date, 
-    operator, 
-    hours: parseFloat(hours),
+    actId, actName: configData.find(c => c.id === actId).name, 
+    date, operator, hours: parseFloat(hours),
     startTime: document.getElementById('log-start-time').value, 
     endTime: document.getElementById('log-end-time').value, 
-    processes,
-    creatorUid: auth.currentUser.uid,
-    status: 'pending'
+    processes, creatorUid: auth.currentUser.uid, status: 'pending'
 });
 cancelLogEdit();
 };
 
 window.approveLog = async (id) => {
+    if(userRole !== 'admin') return;
     await updateDoc(doc(db, `artifacts/${appId}/public/data/logs`, id), { status: 'approved' });
 };
 
@@ -437,7 +420,10 @@ document.getElementById('confirm-message').innerText = msg;
 window.deleteCallback = onConfirm;
 document.getElementById('confirm-modal').classList.remove('hidden');
 };
-window.closeConfirm = () => document.getElementById('confirm-modal').classList.add('hidden');
+window.closeConfirm = () => {
+document.getElementById('confirm-modal').classList.add('hidden');
+window.deleteCallback = null;
+};
 document.getElementById('confirm-yes-btn').onclick = () => {
 if(window.deleteCallback) window.deleteCallback();
 closeConfirm();
@@ -553,7 +539,7 @@ document.getElementById('operator-list').innerHTML = operatorData.map(o => `
 document.getElementById('add-act-btn').onclick = async () => {
 const name = document.getElementById('new-act-name').value.trim();
 const procRaw = document.getElementById('new-act-processes').value.trim();
-if (!name || !procRaw) return;
+if (!name || !procRaw || userRole !== 'admin') return;
 const processes = procRaw.split('\n').map(line => {
 const parts = line.split(':');
 return { label: parts[0]?.trim(), type: parts[1]?.trim() === 'tekst' ? 'text' : 'number' };
@@ -565,13 +551,13 @@ document.getElementById('new-act-processes').value = "";
 
 document.getElementById('add-op-btn').onclick = async () => {
 const name = document.getElementById('new-op-name').value.trim();
-if(!name) return;
+if(!name || userRole !== 'admin') return;
 await setDoc(doc(db, `artifacts/${appId}/public/data/operators`, Date.now().toString()), { name });
 document.getElementById('new-op-name').value = "";
 };
 
 window.deleteItem = (col, id) => {
-askConfirm("A dëshironi ta fshini këtë element?", async () => {
+askConfirm("A dëshironi ta fshini?", async () => {
 await deleteDoc(doc(db, `artifacts/${appId}/public/data/${col}`, id));
 });
 };
