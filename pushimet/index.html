@@ -85,7 +85,7 @@
             const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
             const [currentDate, setCurrentDate] = useState(new Date(selectedYear, new Date().getMonth(), 1));
             const [yearData, setYearData] = useState({ 
-                allowance: 24, 
+                allowance: 28, 
                 selected: [], 
                 medical: [],
                 movableDates: {}, 
@@ -104,14 +104,14 @@
                         if (doc.exists) {
                             const data = doc.data();
                             setYearData({
-                                allowance: data.allowance ?? 24,
+                                allowance: data.allowance ?? 28,
                                 selected: data.selected || [],
                                 medical: data.medical || [],
                                 movableDates: data.movableDates || {},
                                 manualCarryover: (data.manualCarryover !== undefined && data.manualCarryover !== "") ? data.manualCarryover : null
                             });
                         } else {
-                            setYearData({ allowance: 24, selected: [], medical: [], movableDates: {}, manualCarryover: null });
+                            setYearData({ allowance: 28, selected: [], medical: [], movableDates: {}, manualCarryover: null });
                         }
                     });
 
@@ -122,8 +122,8 @@
                         if (snap.exists) {
                             const data = snap.data();
                             const currentYearStart = (data.manualCarryover !== undefined && data.manualCarryover !== null && data.manualCarryover !== "") ? Number(data.manualCarryover) : chainValue;
-                            chainValue = Math.max(0, (currentYearStart + (Number(data.allowance) || 24)) - (data.selected || []).length);
-                        } else { chainValue += 24; }
+                            chainValue = Math.max(0, (currentYearStart + (Number(data.allowance) || 28)) - (data.selected || []).length);
+                        } else { chainValue += 28; }
                     }
                     setCalculatedCarryover(chainValue);
                 };
@@ -166,7 +166,7 @@
             }, [selectedYear, yearData.movableDates]);
 
             const activeCarryover = (yearData.manualCarryover !== null) ? Number(yearData.manualCarryover) : calculatedCarryover;
-            const allowanceVal = Number(yearData.allowance) || 24;
+            const allowanceVal = Number(yearData.allowance) || 28;
             const totalRemaining = (allowanceVal + activeCarryover) - yearData.selected.length;
             const carryoverRemaining = Math.max(0, activeCarryover - yearData.selected.length);
 
@@ -265,7 +265,7 @@
                             <Logo size="large" />
                             <div className="bg-white rounded-[2.5rem] p-10 shadow-2xl border border-slate-100">
                                 <h2 className="text-xl font-black mb-6 uppercase tracking-widest text-slate-800">
-                                    {isForgotPass ? 'Reset Password' : (isRegistering ? 'Regjistrim i Ri' : 'LINDIMAPS PUSHIMET LOGIN')}
+                                    {isForgotPass ? 'Reset Password' : (isRegistering ? 'Regjistrim i Ri' : 'LINDIMAPS PUSHIMET Login')}
                                 </h2>
                                 <form onSubmit={handleAuth} className="space-y-4">
                                     <input type="email" placeholder="Email" className="w-full bg-slate-50 border-none rounded-2xl p-4 outline-none font-bold text-slate-700" value={email} onChange={e => setEmail(e.target.value)} required />
