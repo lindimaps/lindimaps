@@ -57,7 +57,6 @@ Sistemi Aktivitete
 </div>
 </div>
 
-<!-- Login Form -->
 <div id="login-section" class="space-y-4">
 <h2 class="text-center font-extrabold text-slate-800 text-xl">Mirësevini përsëri</h2>
 <input id="login-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
@@ -69,7 +68,6 @@ Sistemi Aktivitete
 </div>
 </div>
 
-<!-- Signup Form -->
 <div id="signup-section" class="hidden space-y-4">
 <h2 class="text-center font-extrabold text-slate-800 text-xl">Regjistrohu</h2>
 <p class="text-center text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pas regjistrimit, roli juaj do të jetë 'Operator'</p>
@@ -81,7 +79,6 @@ Sistemi Aktivitete
 </div>
 </div>
 
-<!-- Reset Password Form -->
 <div id="reset-section" class="hidden space-y-4">
 <h2 class="text-center font-extrabold text-slate-800 text-xl">Rivendos Fjalëkalimin</h2>
 <p class="text-center text-xs text-slate-500 font-medium">Shkruani email-in tuaj dhe ne do t'ju dërgojmë një link për të ndryshuar fjalëkalimin.</p>
@@ -232,6 +229,23 @@ Ruaj në Cloud
 </div>
 </div>
 <div id="rep-dynamic-filters" class="grid grid-cols-2 md:grid-cols-3 gap-2"></div>
+
+<!-- Totals View -->
+<div id="report-totals" class="grid grid-cols-3 gap-3 pt-2 border-t border-slate-100">
+    <div class="text-center p-2 bg-slate-50 rounded-xl">
+        <p class="text-[8px] font-bold text-slate-400 uppercase">Tot Orë</p>
+        <p id="total-hours-val" class="text-sm font-black text-slate-900">0</p>
+    </div>
+    <div class="text-center p-2 bg-slate-50 rounded-xl">
+        <p class="text-[8px] font-bold text-slate-400 uppercase">Ditë Pune</p>
+        <p id="total-days-val" class="text-sm font-black text-slate-900">0</p>
+    </div>
+    <div class="text-center p-2 bg-slate-50 rounded-xl">
+        <p class="text-[8px] font-bold text-slate-400 uppercase">Aktivitete</p>
+        <p id="total-count-val" class="text-sm font-black text-slate-900">0</p>
+    </div>
+</div>
+
 <div class="grid grid-cols-2 gap-2">
 <button onclick="renderReportList()" class="bg-slate-900 text-white p-4 rounded-xl font-bold text-xs uppercase">Rifresko</button>
 <button onclick="exportToPDF()" class="bg-blue-600 text-white p-4 rounded-xl font-bold text-xs uppercase">Shkarko PDF</button>
@@ -336,8 +350,6 @@ onSnapshot(collection(db, base, 'operators'), snap => {
 });
 }
 
-// --- FILTRAT E AVANCUAR ME DROPDOWN LIST ---
-
 window.handleMainFilters = () => {
     updateDynamicDropdowns();
     renderReportList();
@@ -354,12 +366,10 @@ function updateDynamicDropdowns() {
     const activity = configData.find(c => c.id === selAct);
     if (!activity) return;
 
-    // Filtrojme loget bazuar ne operatorin nese eshte zgjedhur
     let dataForOptions = logData.filter(l => l.actId === selAct);
     if (selOp) dataForOptions = dataForOptions.filter(l => l.operator === selOp);
 
     activity.processes.forEach(p => {
-        // Marrim vlerat unike ekzistuese per kete proces nga loget e filtruara
         const uniqueValues = [...new Set(dataForOptions.flatMap(l => 
             l.processes.filter(proc => proc.label === p.label).map(proc => proc.value)
         ))].filter(v => v !== undefined && v !== "").sort();
@@ -380,6 +390,14 @@ function updateDynamicDropdowns() {
 
 window.renderReportList = () => {
 const filtered = getFilteredLogs();
+
+// Update Totals
+const totalHours = filtered.reduce((acc, curr) => acc + (curr.hours || 0), 0);
+const uniqueDays = [...new Set(filtered.map(f => f.date))].length;
+document.getElementById('total-hours-val').innerText = totalHours.toFixed(1);
+document.getElementById('total-days-val').innerText = uniqueDays;
+document.getElementById('total-count-val').innerText = filtered.length;
+
 document.getElementById('report-results').innerHTML = filtered.map(log => {
     const isApproved = log.status === 'approved';
     return `
@@ -418,7 +436,6 @@ if(end) filtered = filtered.filter(f => f.date <= end);
 if(selOp) filtered = filtered.filter(f => f.operator === selOp);
 if(selAct) filtered = filtered.filter(f => f.actId === selAct);
 
-// Filtri per proceset dinamike (tani me dropdown)
 dynamicFilters.forEach(f => {
     const val = f.value;
     const label = f.dataset.filterLabel;
@@ -430,8 +447,6 @@ dynamicFilters.forEach(f => {
 });
 return filtered;
 };
-
-// --- FUNKSIONET EKZISTUESE TE RUAJTURA ---
 
 document.getElementById('save-log-btn').onclick = async () => {
 const actId = document.getElementById('log-act-select').value;
@@ -598,13 +613,48 @@ await deleteDoc(doc(db, `artifacts/${appId}/public/data/${col}`, id));
 };
 
 window.exportToPDF = () => {
-const { jsPDF } = window.jspdf;
-const docPDF = new jsPDF('l');
-const filtered = getFilteredLogs();
-const headers = [['Data', 'Aktiviteti', 'Eksperti', 'Ore', 'Statusi']];
-const bodyData = filtered.map(f => [f.date, f.actName, f.operator, f.hours, f.status === 'approved' ? 'MIRATUAR' : 'PENDING']);
-docPDF.autoTable({ head: headers, body: bodyData });
-docPDF.save(`Raport_LindiMaps.pdf`);
+    const { jsPDF } = window.jspdf;
+    const docPDF = new jsPDF('l'); // Landscape
+    const filtered = getFilteredLogs();
+
+    // Stats for Footer/Header
+    const totalHours = filtered.reduce((acc, curr) => acc + (curr.hours || 0), 0);
+    const uniqueDays = [...new Set(filtered.map(f => f.date))].length;
+
+    docPDF.setFontSize(18);
+    docPDF.text("RAPORT AKTIVITETESH - LINDIMAPS", 14, 15);
+    docPDF.setFontSize(10);
+    docPDF.text(`Gjeneruar më: ${new Date().toLocaleDateString()}`, 14, 22);
+
+    const headers = [['Data', 'Aktiviteti', 'Eksperti', 'Detajet', 'Orë', 'Statusi']];
+    const bodyData = filtered.map(f => [
+        f.date, 
+        f.actName, 
+        f.operator, 
+        f.processes.map(p => `${p.label}: ${p.value}`).join(" | "), // Çdo detaj këtu
+        f.hours, 
+        f.status === 'approved' ? 'MIRATUAR' : 'PENDING'
+    ]);
+
+    docPDF.autoTable({
+        startY: 28,
+        head: headers,
+        body: bodyData,
+        theme: 'grid',
+        headStyles: { fillColor: [51, 65, 85] },
+        styles: { fontSize: 8 }
+    });
+
+    const finalY = docPDF.lastAutoTable.finalY || 30;
+    docPDF.setFontSize(10);
+    docPDF.setFont("helvetica", "bold");
+    docPDF.text(`PËRMBLEDHJE TOTALE:`, 14, finalY + 10);
+    docPDF.setFont("helvetica", "normal");
+    docPDF.text(`- Numri i Aktiviteteve: ${filtered.length}`, 14, finalY + 16);
+    docPDF.text(`- Total Orë Pune: ${totalHours.toFixed(1)} orë`, 14, finalY + 22);
+    docPDF.text(`- Ditë Pune (Unike): ${uniqueDays} ditë`, 14, finalY + 28);
+
+    docPDF.save(`Raport_Detajuar_LindiMaps.pdf`);
 };
 
 document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
