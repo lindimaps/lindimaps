@@ -78,7 +78,7 @@
             const [success, setSuccess] = useState('');
             const [authLoading, setAuthLoading] = useState(false);
             const [activeTab, setActiveTab] = useState('selected');
-            const [selectionMode, setSelectionMode] = useState('vacation'); // 'vacation' ose 'medical'
+            const [selectionMode, setSelectionMode] = useState('vacation');
             const [confirmDelete, setConfirmDelete] = useState(null);
             const [undoData, setUndoData] = useState(null);
 
@@ -87,7 +87,7 @@
             const [yearData, setYearData] = useState({ 
                 allowance: 28, 
                 selected: [], 
-                medical: [], // Fushë e re për raportet mjekësore
+                medical: [],
                 movableDates: {}, 
                 manualCarryover: null 
             });
@@ -391,6 +391,7 @@
                                                 <span className="text-sm font-black">{d}</span>
                                                 {isHol && <span className="text-[5px] uppercase truncate w-full px-1 text-center font-bold">{isHol}</span>}
                                                 {isMed && !isHol && <span className="text-[5px] uppercase font-bold">Raport</span>}
+                                                {isSel && !isHol && <span className="text-[5px] uppercase font-bold">Leje</span>}
                                             </div>
                                         );
                                     }
@@ -410,7 +411,6 @@
                                     <>
                                         <button onClick={generatePDF} className="w-full mb-4 bg-slate-900 text-white py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-lg">Shkarko Raportin</button>
                                         
-                                        {/* Lista e bashkuar e ditëve të marra */}
                                         {[
                                             ...yearData.selected.map((d, i) => ({ date: d, type: 'vacation', idx: i })),
                                             ...(yearData.medical || []).map(d => ({ date: d, type: 'medical' }))
