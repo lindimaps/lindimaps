@@ -35,8 +35,8 @@
 
 <!-- AUTHENTICATION OVERLAY -->
 <div id="auth-overlay" class="fixed inset-0 z-[400] bg-white flex items-center justify-center p-6 hidden">
-    <div class="max-w-md w-full space-y-12">
-        <div class="flex items-center gap-3 logo-container justify-center">
+    <div class="max-w-md w-full space-y-8">
+        <div class="flex items-center gap-3 logo-container justify-center mb-4">
             <div class="logo-bg h-14 w-14 flex items-center justify-center bg-slate-900 rounded-2xl shadow-xl">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.15"/>
@@ -54,20 +54,44 @@
             </div>
         </div>
 
-        <div id="login-form" class="space-y-4">
-            <input id="login-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
-            <input id="login-password" type="password" placeholder="Fjalëkalimi" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white">
+        <!-- Login Form -->
+        <div id="login-section" class="space-y-4">
+            <h2 class="text-center font-extrabold text-slate-800 text-xl">Mirësevini përsëri</h2>
+            <input id="login-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
+            <input id="login-password" type="password" placeholder="Fjalëkalimi" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
             <button id="login-btn" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">Hyr në Sistem</button>
             <div class="flex justify-between px-2 text-[11px] font-bold text-slate-400">
-                <button onclick="toggleAuth('reset')" class="hover:text-blue-600">Harrova fjalëkalimin</button>
-                <button onclick="toggleAuth('signup')" class="text-blue-600">Krijo llogari</button>
+                <button onclick="showAuthSection('reset')" class="hover:text-blue-600">Harrova fjalëkalimin</button>
+                <button onclick="showAuthSection('signup')" class="text-blue-600">Krijo llogari</button>
+            </div>
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signup-section" class="hidden space-y-4">
+            <h2 class="text-center font-extrabold text-slate-800 text-xl">Regjistrohu</h2>
+            <input id="signup-email" type="email" placeholder="Email i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
+            <input id="signup-password" type="password" placeholder="Fjalëkalimi i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
+            <button id="signup-btn" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-blue-700 active:scale-95 transition-all">Krijo Llogarinë</button>
+            <div class="text-center">
+                <button onclick="showAuthSection('login')" class="text-[11px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest">Kthehu te Logimi</button>
+            </div>
+        </div>
+
+        <!-- Reset Password Form -->
+        <div id="reset-section" class="hidden space-y-4">
+            <h2 class="text-center font-extrabold text-slate-800 text-xl">Rivendos Fjalëkalimin</h2>
+            <p class="text-center text-xs text-slate-500 font-medium">Shkruani email-in tuaj dhe ne do t'ju dërgojmë një link për të ndryshuar fjalëkalimin.</p>
+            <input id="reset-email" type="email" placeholder="Email-i juaj" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
+            <button id="reset-btn" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-black active:scale-95 transition-all">Dërgo Linkun</button>
+            <div class="text-center">
+                <button onclick="showAuthSection('login')" class="text-[11px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest">Anulo</button>
             </div>
         </div>
     </div>
 </div>
 
 <div id="custom-alert" class="hidden fixed inset-0 z-[500] bg-black/50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl border border-slate-100">
         <p id="alert-message" class="font-bold text-slate-800"></p>
         <button onclick="closeAlert()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold">Kuptova</button>
     </div>
@@ -217,7 +241,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBk3Wi9DsGp9egY8qQnxeEdM9qlTZIodw0",
@@ -243,6 +267,60 @@
     let logData = [];
     let operatorData = [];
     let deleteCallback = null;
+
+    // --- AUTH SECTION TOGGLE ---
+    window.showAuthSection = (section) => {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('signup-section').classList.add('hidden');
+        document.getElementById('reset-section').classList.add('hidden');
+
+        if(section === 'login') document.getElementById('login-section').classList.remove('hidden');
+        if(section === 'signup') document.getElementById('signup-section').classList.remove('hidden');
+        if(section === 'reset') document.getElementById('reset-section').classList.remove('hidden');
+    };
+
+    // --- LOGIN LOGIC ---
+    document.getElementById('login-btn').onclick = async () => {
+        const email = document.getElementById('login-email').value.trim();
+        const pass = document.getElementById('login-password').value;
+        if(!email || !pass) return showAlert("Plotësoni email dhe fjalëkalimin.");
+        try { 
+            await signInWithEmailAndPassword(auth, email, pass); 
+        } catch (e) { 
+            let msg = "Kredenciale të pasakta.";
+            if(e.code === 'auth/user-not-found') msg = "Përdoruesi nuk ekziston.";
+            if(e.code === 'auth/wrong-password') msg = "Fjalëkalimi është i gabuar.";
+            showAlert(msg); 
+        }
+    };
+
+    // --- SIGNUP LOGIC ---
+    document.getElementById('signup-btn').onclick = async () => {
+        const email = document.getElementById('signup-email').value.trim();
+        const pass = document.getElementById('signup-password').value;
+        if(!email || pass.length < 6) return showAlert("Email duhet të jetë i vlefshëm dhe fjalëkalimi min. 6 karaktere.");
+        try {
+            await createUserWithEmailAndPassword(auth, email, pass);
+            showAlert("Llogaria u krijua me sukses!");
+        } catch (e) {
+            let msg = "Gabim gjatë regjistrimit.";
+            if(e.code === 'auth/email-already-in-use') msg = "Ky email është i regjistruar më parë.";
+            showAlert(msg);
+        }
+    };
+
+    // --- RESET PASSWORD LOGIC ---
+    document.getElementById('reset-btn').onclick = async () => {
+        const email = document.getElementById('reset-email').value.trim();
+        if(!email) return showAlert("Ju lutem shkruani email-in.");
+        try {
+            await sendPasswordResetEmail(auth, email);
+            showAlert("Linku për rivendosjen e fjalëkalimit u dërgua në email.");
+            showAuthSection('login');
+        } catch (e) {
+            showAlert("Email-i nuk u gjet ose ka një gabim.");
+        }
+    };
 
     // --- MATH & HOURS ---
     window.handleMathInput = (event) => {
@@ -304,16 +382,9 @@
         } else {
             document.getElementById('app-content').classList.add('hidden');
             document.getElementById('auth-overlay').classList.remove('hidden');
+            showAuthSection('login'); // Default view
         }
     });
-
-    document.getElementById('login-btn').onclick = async () => {
-        const email = document.getElementById('login-email').value.trim();
-        const pass = document.getElementById('login-password').value;
-        if(!email || !pass) return;
-        try { await signInWithEmailAndPassword(auth, email, pass); }
-        catch (e) { showAlert("Kredenciale të pasakta."); }
-    };
 
     window.logout = () => signOut(auth);
 
