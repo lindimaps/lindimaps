@@ -214,6 +214,15 @@ let logData = [];
 let operatorData = [];
 let userRole = 'user';
 
+// BËJMË FUNKSIONET TË DISPONUESHME GLOBALISHT
+window.approveLog = async (id) => { 
+    try {
+        await updateDoc(doc(db, `artifacts/${appId}/public/data/logs`, id), { status: 'approved' });
+    } catch (e) {
+        console.error("Gabim gjatë miratimit:", e);
+    }
+};
+
 window.showAuthSection = (s) => {
     ['login-section', 'signup-section', 'reset-section'].forEach(id => document.getElementById(id).classList.add('hidden'));
     document.getElementById(s + '-section').classList.remove('hidden');
@@ -322,7 +331,7 @@ window.renderReportList = () => {
     document.getElementById('total-unique-val').innerText = unq;
 
     document.getElementById('report-results').innerHTML = filtered.map((l, idx) => `
-    <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm">
+    <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm ${l.status === 'approved' ? 'border-l-4 border-l-green-400' : ''}">
         <div class="flex justify-between items-start">
             <div>
                 <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded">NR. ${filtered.length - idx}</span>
@@ -330,7 +339,8 @@ window.renderReportList = () => {
                 <p class="text-[10px] text-slate-400 font-bold">${l.date}</p>
             </div>
             <div class="flex gap-2">
-                ${userRole === 'admin' && l.status !== 'approved' ? `<button onclick="approveLog('${l.id}')" class="text-green-500 text-[9px] font-bold">MIRATO</button>` : ''}
+                ${userRole === 'admin' && l.status !== 'approved' ? `<button onclick="window.approveLog('${l.id}')" class="text-green-500 text-[10px] font-black uppercase tracking-tighter">MIRATO</button>` : ''}
+                ${l.status === 'approved' ? '<span class="text-green-500 text-[9px] font-black">✓ OK</span>' : ''}
                 <button onclick="editLogEntry('${l.id}')" class="text-blue-500 text-[9px] font-bold">EDITO</button>
                 <button onclick="deleteItem('logs', '${l.id}')" class="text-red-300 font-bold">&times;</button>
             </div>
