@@ -12,9 +12,28 @@
     .worker-row { border-bottom: 1px solid #f1f5f9; padding: 12px 0; }
     button:active { transform: scale(0.96); opacity: 0.9; }
     input { font-size: 16px !important; }
-    .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; }
-    .tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; }
+    .modal-overlay { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .tab-active { border-bottom: 3px solid #3b82f6; color: #1e293b; }
     .time-input { padding: 4px 8px !important; height: 32px; font-size: 13px !important; }
+
+    /* Logo Gradient */
+    .logo-gradient {
+        background: linear-gradient(to right, #3b82f6, #2dd4bf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Pulse Dot Animation */
+    @keyframes pulse-dot {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.3); opacity: 0.7; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .animate-dot {
+        animation: pulse-dot 2s infinite ease-in-out;
+        transform-origin: center;
+    }
 </style>
 </head>
 
@@ -22,14 +41,30 @@
 
 <!-- LOGIN SECTION -->
 <div id="login" class="flex items-center justify-center min-h-screen px-4">
-    <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-sm:max-w-xs space-y-5 border border-slate-200">
-        <h2 class="text-2xl font-black text-center text-slate-800">LindiMaps</h2>
+    <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-sm:max-w-xs space-y-6 border border-slate-200">
+        <!-- Logo Integration -->
+        <div class="flex flex-col items-center gap-2 mb-4">
+            <div class="h-12 w-12 flex items-center justify-center bg-slate-900 rounded-xl shadow-lg">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.15"/>
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                    <circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
+                </svg>
+            </div>
+            <div class="text-center">
+                <h2 class="text-2xl font-black tracking-tighter leading-none">
+                    <span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span>
+                </h2>
+                <span class="text-[8px] uppercase tracking-[0.3em] font-bold text-slate-400 mt-1">Spatial Intelligence</span>
+            </div>
+        </div>
+
         <div class="space-y-4">
-            <input id="email" type="email" placeholder="Email" class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-indigo-500">
-            <input id="password" type="password" placeholder="Password" class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-indigo-500">
-            <button onclick="window.loginUser()" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold shadow-lg shadow-indigo-100">Kyçu</button>
+            <input id="email" type="email" placeholder="Email" class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500">
+            <input id="password" type="password" placeholder="Password" class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500">
+            <button onclick="window.loginUser()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold shadow-lg">Kyçu</button>
             <div class="flex flex-col items-center gap-3 pt-2">
-                <button onclick="window.toggleRegModal(true)" class="text-indigo-600 font-bold text-sm">Nuk keni llogari? Regjistrohu</button>
+                <button onclick="window.toggleRegModal(true)" class="text-blue-600 font-bold text-sm">Nuk keni llogari? Regjistrohu</button>
                 <button onclick="window.toggleForgotModal(true)" class="text-slate-400 text-xs underline">Harruat fjalëkalimin?</button>
             </div>
         </div>
@@ -41,9 +76,9 @@
     <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm space-y-4">
         <h3 class="text-xl font-bold text-slate-800">Krijo Llogari të Re</h3>
         <p class="text-sm text-slate-500">Plotësoni të dhënat për regjistrim.</p>
-        <input id="regEmail" type="email" placeholder="Email" class="w-full border p-3 rounded-xl outline-none focus:border-emerald-500">
-        <input id="regPassword" type="password" placeholder="Password i ri" class="w-full border p-3 rounded-xl outline-none focus:border-emerald-500">
-        <button onclick="window.registerUser()" class="w-full bg-emerald-600 text-white p-4 rounded-xl font-bold">Regjistrohu</button>
+        <input id="regEmail" type="email" placeholder="Email" class="w-full border p-3 rounded-xl outline-none focus:border-blue-500">
+        <input id="regPassword" type="password" placeholder="Password i ri" class="w-full border p-3 rounded-xl outline-none focus:border-blue-500">
+        <button onclick="window.registerUser()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold">Regjistrohu</button>
         <button onclick="window.toggleRegModal(false)" class="w-full text-slate-500 font-medium py-2">Anulo</button>
     </div>
 </div>
@@ -53,8 +88,8 @@
     <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm space-y-4">
         <h3 class="text-xl font-bold text-slate-800">Rivendos Fjalëkalimin</h3>
         <p class="text-sm text-slate-500">Shkruani email-in tuaj për të marrë linkun e rivendosjes.</p>
-        <input id="forgotEmail" type="email" placeholder="Email-i juaj" class="w-full border p-3 rounded-xl outline-none focus:border-indigo-500">
-        <button onclick="window.resetPassword()" class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold">Dërgo Email-in</button>
+        <input id="forgotEmail" type="email" placeholder="Email-i juaj" class="w-full border p-3 rounded-xl outline-none focus:border-blue-500">
+        <button onclick="window.resetPassword()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold">Dërgo Email-in</button>
         <button onclick="window.toggleForgotModal(false)" class="w-full text-slate-500 font-medium py-2">Anulo</button>
     </div>
 </div>
@@ -63,9 +98,9 @@
 <div id="noteModal" class="hidden modal-overlay">
     <div class="bg-white p-6 rounded-3xl shadow-2xl w-full max-w-sm space-y-4">
         <h3 id="noteTitle" class="text-lg font-bold text-slate-800">Shënim për Punëtorin</h3>
-        <textarea id="noteText" placeholder="Shkruani shënimin këtu..." class="w-full border border-slate-200 p-3 rounded-xl h-32 outline-none focus:border-indigo-500 bg-slate-50"></textarea>
+        <textarea id="noteText" placeholder="Shkruani shënimin këtu..." class="w-full border border-slate-200 p-3 rounded-xl h-32 outline-none focus:border-blue-500 bg-slate-50"></textarea>
         <div class="flex gap-2">
-            <button onclick="window.saveNote()" class="flex-1 bg-indigo-600 text-white p-3 rounded-xl font-bold">Ruaj</button>
+            <button onclick="window.saveNote()" class="flex-1 bg-blue-600 text-white p-3 rounded-xl font-bold">Ruaj</button>
             <button onclick="window.closeNoteModal()" class="flex-1 bg-slate-200 text-slate-700 p-3 rounded-xl font-bold">Mbyll</button>
         </div>
     </div>
@@ -74,8 +109,18 @@
 <!-- APP MAIN -->
 <div id="app" class="hidden max-w-lg mx-auto p-4 space-y-6">
     <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-        <span id="userEmail" class="font-bold text-slate-700 text-sm truncate max-w-[150px]"></span>
-        <button onclick="window.logout()" class="bg-red-500 text-white px-4 py-2 rounded-xl text-xs font-bold">Dil</button>
+        <div class="flex items-center gap-2">
+            <div class="h-6 w-6 flex items-center justify-center bg-slate-900 rounded-md">
+                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <span class="font-black text-xs tracking-tighter"><span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span></span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span id="userEmail" class="font-bold text-slate-400 text-[10px] truncate max-w-[100px]"></span>
+            <button onclick="window.logout()" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">Dil</button>
+        </div>
     </div>
 
     <!-- TABS -->
@@ -93,10 +138,10 @@
                 <select id="workerLogFilter" onchange="window.renderDaily()" class="flex-1 border-none bg-slate-100 text-slate-700 font-bold p-1 rounded-lg text-[11px] outline-none">
                     <option value="all">Të Gjithë Punëtorët</option>
                 </select>
-                <input type="date" id="date" class="border-none bg-indigo-50 text-indigo-700 font-bold p-1 rounded-lg text-sm">
+                <input type="date" id="date" class="border-none bg-blue-50 text-blue-700 font-bold p-1 rounded-lg text-sm">
             </div>
             <div id="daily" class="space-y-3"></div>
-            <button onclick="window.saveHours()" class="w-full bg-black text-white p-4 rounded-2xl font-bold shadow-lg mt-4">Ruaj Orët Ditore</button>
+            <button onclick="window.saveHours()" class="w-full bg-slate-900 text-white p-4 rounded-2xl font-bold shadow-lg mt-4">Ruaj Orët Ditore</button>
         </div>
         
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
@@ -120,14 +165,14 @@
             </div>
             
             <div id="totals" class="divide-y divide-slate-100"></div>
-            <button id="saveListChangesBtn" onclick="window.saveListChanges()" class="hidden w-full bg-indigo-600 text-white p-3 rounded-xl font-bold mt-4 shadow-md text-sm">Ruaj Ndryshimet e Listës</button>
+            <button id="saveListChangesBtn" onclick="window.saveListChanges()" class="hidden w-full bg-blue-600 text-white p-3 rounded-xl font-bold mt-4 shadow-md text-sm">Ruaj Ndryshimet e Listës</button>
             
             <div class="grid grid-cols-2 gap-3 mt-6 border-t pt-5">
-                <div class="bg-indigo-50 p-4 rounded-2xl text-center">
-                    <p class="text-[9px] font-black text-indigo-400 uppercase">Totali €</p>
-                    <span id="totalMoney" class="font-black text-xl text-indigo-700">0.00€</span>
+                <div class="bg-blue-50 p-4 rounded-2xl text-center border border-blue-100">
+                    <p class="text-[9px] font-black text-blue-400 uppercase">Totali €</p>
+                    <span id="totalMoney" class="font-black text-xl text-blue-700">0.00€</span>
                 </div>
-                <div class="bg-slate-50 p-4 rounded-2xl text-center">
+                <div class="bg-slate-50 p-4 rounded-2xl text-center border border-slate-200">
                     <p class="text-[9px] font-black text-slate-400 uppercase">Totali Orë</p>
                     <span id="totalHours" class="font-black text-xl text-slate-700">0h</span>
                 </div>
@@ -140,11 +185,11 @@
         <div id="workerForm" class="bg-white p-6 rounded-b-2xl shadow-sm border border-slate-200 border-t-0 space-y-4">
             <h3 id="formTitle" class="text-lg font-bold text-slate-800">Shto Punëtor të Ri</h3>
             <div class="space-y-3">
-                <input id="name" placeholder="Emri Mbiemri" class="border border-slate-200 p-3 rounded-xl w-full bg-slate-50 outline-none focus:border-indigo-500">
-                <input id="rate" type="number" step="0.01" placeholder="Pagesa për orë (€/h)" class="border border-slate-200 p-3 rounded-xl w-full bg-slate-50 outline-none focus:border-indigo-500">
+                <input id="name" placeholder="Emri Mbiemri" class="border border-slate-200 p-3 rounded-xl w-full bg-slate-50 outline-none focus:border-blue-500">
+                <input id="rate" type="number" step="0.01" placeholder="Pagesa për orë (€/h)" class="border border-slate-200 p-3 rounded-xl w-full bg-slate-50 outline-none focus:border-blue-500">
             </div>
             <div class="flex flex-col gap-2">
-                <button id="addBtn" onclick="window.addWorker()" class="bg-indigo-600 text-white p-3 rounded-xl font-bold">Ruaj Punëtorin</button>
+                <button id="addBtn" onclick="window.addWorker()" class="bg-slate-900 text-white p-3 rounded-xl font-bold">Ruaj Punëtorin</button>
                 <button id="cancelBtn" onclick="window.cancelEdit()" class="hidden bg-slate-200 text-slate-700 p-3 rounded-xl font-bold">Anulo Editimin</button>
             </div>
             <div class="pt-4 border-t">
@@ -166,7 +211,7 @@
                     </select>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <button onclick="window.exportPDF()" class="bg-indigo-600 text-white p-3 rounded-xl font-bold text-sm">Gjenero PDF</button>
+                    <button onclick="window.exportPDF()" class="bg-blue-600 text-white p-3 rounded-xl font-bold text-sm">Gjenero PDF</button>
                     <button onclick="window.backupData()" class="bg-slate-800 text-white p-3 rounded-xl font-bold text-sm">Backup</button>
                 </div>
             </div>
@@ -262,19 +307,19 @@ window.switchTab = (tab) => {
     document.getElementById('viewManage').classList.add('hidden');
     document.getElementById('viewReports').classList.add('hidden');
     
-    document.getElementById('tabWork').classList.remove('tab-active', 'text-indigo-600');
-    document.getElementById('tabManage').classList.remove('tab-active', 'text-indigo-600');
-    document.getElementById('tabReports').classList.remove('tab-active', 'text-indigo-600');
+    document.getElementById('tabWork').classList.remove('tab-active', 'text-blue-600');
+    document.getElementById('tabManage').classList.remove('tab-active', 'text-blue-600');
+    document.getElementById('tabReports').classList.remove('tab-active', 'text-blue-600');
 
     if (tab === 'work') {
         document.getElementById('viewWork').classList.remove('hidden');
-        document.getElementById('tabWork').classList.add('tab-active', 'text-indigo-600');
+        document.getElementById('tabWork').classList.add('tab-active', 'text-blue-600');
     } else if (tab === 'manage') {
         document.getElementById('viewManage').classList.remove('hidden');
-        document.getElementById('tabManage').classList.add('tab-active', 'text-indigo-600');
+        document.getElementById('tabManage').classList.add('tab-active', 'text-blue-600');
     } else {
         document.getElementById('viewReports').classList.remove('hidden');
-        document.getElementById('tabReports').classList.add('tab-active', 'text-indigo-600');
+        document.getElementById('tabReports').classList.add('tab-active', 'text-blue-600');
     }
 };
 
@@ -419,7 +464,7 @@ window.renderDaily = ()=>{
     <div class="flex justify-between items-center">
         <span class="font-black text-slate-800 text-sm uppercase tracking-tighter">${w.name}</span>
         <div class="flex items-center gap-1 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-sm">
-            <input type="number" step="0.01" id="total-${w.id}" value="${l?l.hours:''}" class="w-16 text-center font-black text-indigo-600 bg-transparent outline-none text-xl">
+            <input type="number" step="0.01" id="total-${w.id}" value="${l?l.hours:''}" class="w-16 text-center font-black text-blue-600 bg-transparent outline-none text-xl">
             <span class="text-[10px] font-black text-slate-400">ORË</span>
         </div>
     </div>
@@ -485,9 +530,9 @@ window.renderTotals = ()=>{
        <div class="flex justify-between items-center">
         <div class="flex items-center gap-2">
             <span class="font-bold text-sm text-slate-800">${w.name}</span>
-            <button onclick="window.openNote('${w.id}')" class="w-6 h-6 flex items-center justify-center rounded-full ${n ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'} text-xs font-bold">+</button>
+            <button onclick="window.openNote('${w.id}')" class="w-6 h-6 flex items-center justify-center rounded-full ${n ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'} text-xs font-bold">+</button>
         </div>
-        <span class="text-sm font-black text-indigo-600">${h.toFixed(1)}h | ${m.toFixed(2)}€</span>
+        <span class="text-sm font-black text-slate-900">${h.toFixed(1)}h | <span class="text-blue-600">${m.toFixed(2)}€</span></span>
        </div>
        <div class="flex gap-4 items-center">
         <button onclick="window.editWorker('${w.id}')" class="text-[10px] text-blue-500 font-black uppercase tracking-widest">Edito</button>
@@ -515,7 +560,7 @@ window.renderTotals = ()=>{
             <div class="flex justify-between items-center">
                 <span class="text-xs font-black text-slate-500">${l.date.split('-').reverse().join('.')}</span>
                 <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-slate-200">
-                    <input type="number" step="0.01" id="total-${rowId}" value="${l.hours}" class="w-12 text-center font-bold text-indigo-600 outline-none text-sm bg-transparent">
+                    <input type="number" step="0.01" id="total-${rowId}" value="${l.hours}" class="w-12 text-center font-bold text-blue-600 outline-none text-sm bg-transparent">
                     <span class="text-[8px] font-bold text-slate-400">H</span>
                 </div>
             </div>
@@ -650,7 +695,7 @@ window.exportPDF = ()=>{
     docPDF.setFont("helvetica", "bold");
     docPDF.text(`TOTALI MUJOR: ${totalH.toFixed(2)} orë | ${totalM.toFixed(2)} €`, 15, y+10);
  }
- docPDF.save(`Raporti-${monthName}.pdf`);
+ docPDF.save(`Raporti-LindiMaps-${monthName}.pdf`);
 };
 
 window.backupData = ()=>{
