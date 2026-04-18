@@ -57,7 +57,6 @@ Sistemi Aktivitete
 </div>
 </div>
 
-<!-- Login Form -->
 <div id="login-section" class="space-y-4">
 <h2 class="text-center font-extrabold text-slate-800 text-xl">Mirësevini përsëri</h2>
 <input id="login-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
@@ -69,7 +68,6 @@ Sistemi Aktivitete
 </div>
 </div>
 
-<!-- Signup Form (SECURED: No Role Selector) -->
 <div id="signup-section" class="hidden space-y-4">
 <h2 class="text-center font-extrabold text-slate-800 text-xl">Regjistrohu</h2>
 <p class="text-center text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pas regjistrimit, roli juaj do të jetë 'Operator'</p>
@@ -81,7 +79,6 @@ Sistemi Aktivitete
 </div>
 </div>
 
-<!-- Reset Password Form -->
 <div id="reset-section" class="hidden space-y-4">
 <h2 class="text-center font-extrabold text-slate-800 text-xl">Rivendos Fjalëkalimin</h2>
 <p class="text-center text-xs text-slate-500 font-medium">Shkruani email-in tuaj dhe ne do t'ju dërgojmë një link për të ndryshuar fjalëkalimin.</p>
@@ -94,7 +91,6 @@ Sistemi Aktivitete
 </div>
 </div>
 
-<!-- UI Elementet e tjera mbeten njesoj... -->
 <div id="custom-alert" class="hidden fixed inset-0 z-[500] bg-black/50 flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl border border-slate-100">
 <p id="alert-message" class="font-bold text-slate-800"></p>
@@ -195,7 +191,6 @@ Ruaj në Cloud
 </div>
 </div>
 
-<!-- Struktura (Vetëm Admin) -->
 <div id="view-config" class="hidden space-y-8">
 <div class="glass-card rounded-[2rem] p-8 space-y-6">
 <div class="flex justify-between items-center">
@@ -221,7 +216,6 @@ Ruaj në Cloud
 </div>
 </div>
 
-<!-- Raporte -->
 <div id="view-reports" class="hidden space-y-6">
 <div class="glass-card rounded-[2rem] p-6 space-y-4">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -230,8 +224,8 @@ Ruaj në Cloud
 <input id="rep-end" type="date" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]">
 </div>
 <div class="grid grid-cols-2 gap-2">
-<select id="rep-op-select" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]"></select>
-<select id="rep-act-select" onchange="updateProcessFilterUI()" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]"></select>
+<select id="rep-op-select" onchange="handleRepOpChange()" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]"></select>
+<select id="rep-act-select" onchange="handleRepActChange()" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]"></select>
 </div>
 </div>
 <div id="rep-dynamic-filters" class="grid grid-cols-2 md:grid-cols-3 gap-2"></div>
@@ -289,13 +283,12 @@ try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { showAle
 document.getElementById('signup-btn').onclick = async () => {
 const email = document.getElementById('signup-email').value.trim();
 const pass = document.getElementById('signup-password').value;
-// ROLI CAKTOHET AUTOMATIKISHT USER
 if(!email || pass.length < 6) return showAlert("Email ose fjalëkalim i pasaktë.");
 try {
 const cred = await createUserWithEmailAndPassword(auth, email, pass);
 await setDoc(doc(db, `artifacts/${appId}/users`, cred.user.uid), {
     email: email,
-    role: 'user', // Mbrojtje: Çdo llogari e re është automatikisht User
+    role: 'user',
     uid: cred.user.uid
 });
 showAlert("U krijua! Prisni që Admin t'ju autorizojë si Admin nëse duhet.");
@@ -370,6 +363,60 @@ window.approveLog = async (id) => {
     await updateDoc(doc(db, `artifacts/${appId}/public/data/logs`, id), { status: 'approved' });
 };
 
+// --- LOGJIKA E FILTRIMIT TE NDERLIDHUR (CASCADING) ---
+window.handleRepOpChange = () => {
+    const selOp = document.getElementById('rep-op-select').value;
+    updateActDropdownBasedOnOp(selOp);
+    renderReportList();
+};
+
+window.handleRepActChange = () => {
+    const selAct = document.getElementById('rep-act-select').value;
+    updateOpDropdownBasedOnAct(selAct);
+    updateProcessFilterUI();
+    renderReportList();
+};
+
+function updateActDropdownBasedOnOp(operatorName) {
+    const actSelect = document.getElementById('rep-act-select');
+    const currentAct = actSelect.value;
+    let availableActIds = [];
+    
+    if(!operatorName) {
+        availableActIds = configData.map(c => c.id);
+    } else {
+        availableActIds = [...new Set(logData.filter(l => l.operator === operatorName).map(l => l.actId))];
+    }
+
+    let html = `<option value="">Aktiviteti: Të gjithë</option>`;
+    configData.forEach(c => {
+        if(availableActIds.includes(c.id)) {
+            html += `<option value="${c.id}" ${c.id === currentAct ? 'selected' : ''}>${c.name}</option>`;
+        }
+    });
+    actSelect.innerHTML = html;
+}
+
+function updateOpDropdownBasedOnAct(actId) {
+    const opSelect = document.getElementById('rep-op-select');
+    const currentOp = opSelect.value;
+    let availableOps = [];
+
+    if(!actId) {
+        availableOps = operatorData.map(o => o.name);
+    } else {
+        availableOps = [...new Set(logData.filter(l => l.actId === actId).map(l => l.operator))];
+    }
+
+    let html = `<option value="">Eksperti: Të gjithë</option>`;
+    operatorData.forEach(o => {
+        if(availableOps.includes(o.name)) {
+            html += `<option value="${o.name}" ${o.name === currentOp ? 'selected' : ''}>${o.name}</option>`;
+        }
+    });
+    opSelect.innerHTML = html;
+}
+
 window.renderReportList = () => {
 const filtered = getFilteredLogs();
 document.getElementById('report-results').innerHTML = filtered.map(log => {
@@ -388,8 +435,16 @@ ${userRole === 'admin' && !isApproved ? `<button onclick="approveLog('${log.id}'
 <button onclick="deleteItem('logs', '${log.id}')" class="text-red-300 font-bold">&times;</button>
 </div>
 </div>
-<div class="grid grid-cols-2 gap-2 border-t pt-2 mt-2">${log.processes.map(p => `<div class="text-[10px]"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
-<div class="flex justify-between text-[10px] font-bold text-blue-600 mt-2">
+<!-- KETU SHFAQEN TE GJITHA PROCESET DINAMIKE AUTOMATIKISHT -->
+<div class="grid grid-cols-2 gap-2 border-t pt-3 mt-3">
+    ${log.processes.map(p => `
+        <div class="flex flex-col">
+            <span class="text-[8px] text-slate-400 font-bold uppercase tracking-tighter">${p.label}</span>
+            <span class="text-[11px] font-extrabold text-slate-700">${p.value || '-'}</span>
+        </div>
+    `).join("")}
+</div>
+<div class="flex justify-between text-[10px] font-bold text-blue-600 mt-4 pt-2 border-t border-slate-50">
 <span>${log.startTime || ''} - ${log.endTime || ''}</span>
 <span>Tot: ${log.hours} Orë</span>
 </div>
@@ -444,6 +499,7 @@ const container = document.getElementById('dynamic-fields-container');
 container.innerHTML = "";
 if(!actId) return;
 const act = configData.find(c => c.id === actId);
+if(!act) return;
 act.processes.forEach(p => {
 const val = valuesMap ? (valuesMap[p.label] || "") : "";
 container.innerHTML += `<div class="space-y-1">
@@ -487,11 +543,27 @@ const start = document.getElementById('rep-start').value;
 const end = document.getElementById('rep-end').value;
 const selOp = document.getElementById('rep-op-select').value;
 const selAct = document.getElementById('rep-act-select').value;
+const procFilters = Array.from(document.querySelectorAll('.rep-proc-filter'));
+
 let filtered = [...logData].sort((a,b) => b.date.localeCompare(a.date));
+
 if(start) filtered = filtered.filter(f => f.date >= start);
 if(end) filtered = filtered.filter(f => f.date <= end);
 if(selOp) filtered = filtered.filter(f => f.operator === selOp);
 if(selAct) filtered = filtered.filter(f => f.actId === selAct);
+
+// Filtrimi i detajuar i proceseve dinamike
+procFilters.forEach(filter => {
+    const val = filter.value.trim().toLowerCase();
+    const label = filter.dataset.filterLabel;
+    if(val) {
+        filtered = filtered.filter(log => {
+            const p = log.processes.find(proc => proc.label === label);
+            return p && p.value.toString().toLowerCase().includes(val);
+        });
+    }
+});
+
 return filtered;
 };
 
@@ -503,7 +575,7 @@ if(!actId) return;
 const activity = configData.find(c => c.id === actId);
 if(!activity) return;
 activity.processes.forEach(p => {
-    filterContainer.innerHTML += `<input type="text" data-filter-label="${p.label}" placeholder="${p.label}" class="rep-proc-filter p-2 rounded-lg bg-slate-50 border-none text-[9px] font-bold">`;
+    filterContainer.innerHTML += `<input type="text" oninput="renderReportList()" data-filter-label="${p.label}" placeholder="${p.label}.." class="rep-proc-filter p-2 rounded-lg bg-slate-50 border border-slate-100 text-[9px] font-bold outline-none focus:bg-white">`;
 });
 };
 
@@ -566,10 +638,35 @@ window.exportToPDF = () => {
 const { jsPDF } = window.jspdf;
 const docPDF = new jsPDF('l');
 const filtered = getFilteredLogs();
-const headers = [['Data', 'Aktiviteti', 'Eksperti', 'Ore', 'Statusi']];
-const bodyData = filtered.map(f => [f.date, f.actName, f.operator, f.hours, f.status === 'approved' ? 'MIRATUAR' : 'PENDING']);
-docPDF.autoTable({ head: headers, body: bodyData });
-docPDF.save(`Raport_LindiMaps.pdf`);
+
+// Percaktimi i kolonave dinamike per PDF
+// Marrim te gjitha titujt unik te proceseve per aktivitetet e zgjedhura
+let dynamicLabels = [];
+if (document.getElementById('rep-act-select').value) {
+    const act = configData.find(c => c.id === document.getElementById('rep-act-select').value);
+    if(act) dynamicLabels = act.processes.map(p => p.label);
+}
+
+const headRows = ['Data', 'Eksperti', 'Aktiviteti', ...dynamicLabels, 'Ore', 'Statusi'];
+const bodyData = filtered.map(f => {
+    const row = [f.date, f.operator, f.actName];
+    dynamicLabels.forEach(label => {
+        const p = f.processes.find(proc => proc.label === label);
+        row.push(p ? p.value : '-');
+    });
+    row.push(f.hours, f.status === 'approved' ? 'MIRATUAR' : 'PENDING');
+    return row;
+});
+
+docPDF.autoTable({ 
+    head: [headRows], 
+    body: bodyData,
+    theme: 'grid',
+    headStyles: { fillStyle: '#0f172a', fontSize: 8 },
+    styles: { fontSize: 7 }
+});
+
+docPDF.save(`LindiMaps_Raport_${new Date().toLocaleDateString()}.pdf`);
 };
 
 document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
