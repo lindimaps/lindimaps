@@ -111,7 +111,7 @@
                                 manualCarryover: (data.manualCarryover !== undefined && data.manualCarryover !== "") ? data.manualCarryover : null
                             });
                         } else {
-                            setYearData({ allowance: 28, selected: [], medical: [], movableDates: {}, manualCarryover: null });
+                            setYearData({ allowance: 24, selected: [], medical: [], movableDates: {}, manualCarryover: null });
                         }
                     });
 
@@ -122,8 +122,8 @@
                         if (snap.exists) {
                             const data = snap.data();
                             const currentYearStart = (data.manualCarryover !== undefined && data.manualCarryover !== null && data.manualCarryover !== "") ? Number(data.manualCarryover) : chainValue;
-                            chainValue = Math.max(0, (currentYearStart + (Number(data.allowance) || 28)) - (data.selected || []).length);
-                        } else { chainValue += 28; }
+                            chainValue = Math.max(0, (currentYearStart + (Number(data.allowance) || 24)) - (data.selected || []).length);
+                        } else { chainValue += 24; }
                     }
                     setCalculatedCarryover(chainValue);
                 };
@@ -166,7 +166,7 @@
             }, [selectedYear, yearData.movableDates]);
 
             const activeCarryover = (yearData.manualCarryover !== null) ? Number(yearData.manualCarryover) : calculatedCarryover;
-            const allowanceVal = Number(yearData.allowance) || 28;
+            const allowanceVal = Number(yearData.allowance) || 24;
             const totalRemaining = (allowanceVal + activeCarryover) - yearData.selected.length;
             const carryoverRemaining = Math.max(0, activeCarryover - yearData.selected.length);
 
