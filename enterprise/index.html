@@ -12,23 +12,7 @@
 body { font-family: 'Plus Jakarta Sans', sans-serif; }
 .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
 .tab-active { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
-
-.logo-gradient {
-background: linear-gradient(to right, #3b82f6, #2dd4bf);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-}
-@keyframes pulse-dot {
-0% { transform: scale(1); opacity: 1; }
-50% { transform: scale(1.3); opacity: 0.7; }
-100% { transform: scale(1); opacity: 1; }
-}
-.animate-dot {
-animation: pulse-dot 2s infinite ease-in-out;
-transform-origin: center;
-}
-.logo-bg { transition: background-color 0.3s ease; }
-.logo-container:hover .logo-bg { background-color: #2563eb; }
+.logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .admin-badge { background: #fee2e2; color: #ef4444; font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 800; margin-left: 5px; }
 .status-approved { color: #10b981; }
 .status-pending { color: #f59e0b; }
@@ -36,224 +20,145 @@ transform-origin: center;
 </head>
 <body class="bg-[#f8fafc] min-h-screen pb-24 text-slate-900">
 
-<!-- AUTHENTICATION OVERLAY -->
 <div id="auth-overlay" class="fixed inset-0 z-[400] bg-white flex items-center justify-center p-6 hidden">
-<div class="max-w-md w-full space-y-8">
-<div class="flex items-center gap-3 logo-container justify-center mb-4">
-<div class="logo-bg h-14 w-14 flex items-center justify-center bg-slate-900 rounded-2xl shadow-xl">
-<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.15"/>
-<path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-<circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
-</svg>
-</div>
-<div class="flex flex-col">
-<h1 class="text-3xl font-black tracking-tighter leading-none">
-<span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span>
-</h1>
-<span class="text-[10px] uppercase tracking-[0.4em] font-bold text-slate-400 mt-1">
-Sistemi Aktivitete
-</span>
-</div>
-</div>
-
-<div id="login-section" class="space-y-4">
-<h2 class="text-center font-extrabold text-slate-800 text-xl">Mirësevini përsëri</h2>
-<input id="login-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
-<input id="login-password" type="password" placeholder="Fjalëkalimi" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
-<button id="login-btn" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">Hyr në Sistem</button>
-<div class="flex justify-between px-2 text-[11px] font-bold text-slate-400">
-<button onclick="showAuthSection('reset')" class="hover:text-blue-600">Harrova fjalëkalimin</button>
-<button onclick="showAuthSection('signup')" class="text-blue-600">Krijo llogari</button>
-</div>
-</div>
-
-<div id="signup-section" class="hidden space-y-4">
-<h2 class="text-center font-extrabold text-slate-800 text-xl">Regjistrohu</h2>
-<p class="text-center text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pas regjistrimit, roli juaj do të jetë 'Operator'</p>
-<input id="signup-email" type="email" placeholder="Email i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
-<input id="signup-password" type="password" placeholder="Fjalëkalimi i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
-<button id="signup-btn" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-blue-700 active:scale-95 transition-all">Krijo Llogarinë</button>
-<div class="text-center">
-<button onclick="showAuthSection('login')" class="text-[11px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest">Kthehu te Logimi</button>
-</div>
-</div>
-
-<div id="reset-section" class="hidden space-y-4">
-<h2 class="text-center font-extrabold text-slate-800 text-xl">Rivendos Fjalëkalimin</h2>
-<p class="text-center text-xs text-slate-500 font-medium">Shkruani email-in tuaj dhe ne do t'ju dërgojmë një link për të ndryshuar fjalëkalimin.</p>
-<input id="reset-email" type="email" placeholder="Email-i juaj" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
-<button id="reset-btn" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold shadow-lg hover:bg-black active:scale-95 transition-all">Dërgo Linkun</button>
-<div class="text-center">
-<button onclick="showAuthSection('login')" class="text-[11px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest">Anulo</button>
-</div>
-</div>
+<div class="max-w-md w-full space-y-8 text-center">
+    <div class="flex items-center gap-3 justify-center mb-4">
+        <div class="h-14 w-14 flex items-center justify-center bg-slate-900 rounded-2xl shadow-xl">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
+        </div>
+        <div class="flex flex-col text-left">
+            <h1 class="text-3xl font-black tracking-tighter leading-none">LINDI<span class="logo-gradient">MAPS</span></h1>
+            <span class="text-[10px] uppercase tracking-[0.4em] font-bold text-slate-400 mt-1">Sistemi Aktivitete</span>
+        </div>
+    </div>
+    <div id="login-section" class="space-y-4">
+        <input id="login-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
+        <input id="login-password" type="password" placeholder="Fjalëkalimi" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold focus:bg-white outline-none">
+        <button id="login-btn" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold shadow-lg">Hyr në Sistem</button>
+        <button onclick="showAuthSection('signup')" class="text-blue-600 font-bold text-xs uppercase tracking-widest">Krijo llogari</button>
+    </div>
+    <div id="signup-section" class="hidden space-y-4">
+        <input id="signup-email" type="email" placeholder="Email i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold outline-none">
+        <input id="signup-password" type="password" placeholder="Fjalëkalimi i ri" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold outline-none">
+        <button id="signup-btn" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-bold shadow-lg">Regjistrohu</button>
+        <button onclick="showAuthSection('login')" class="text-slate-400 font-bold text-xs uppercase">Anulo</button>
+    </div>
 </div>
 </div>
 
 <div id="custom-alert" class="hidden fixed inset-0 z-[500] bg-black/50 flex items-center justify-center p-4">
-<div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl border border-slate-100">
-<p id="alert-message" class="font-bold text-slate-800"></p>
-<button onclick="closeAlert()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold">Kuptova</button>
-</div>
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
+        <p id="alert-message" class="font-bold text-slate-800"></p>
+        <button onclick="closeAlert()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold">Kuptova</button>
+    </div>
 </div>
 
 <div id="confirm-modal" class="hidden fixed inset-0 z-[600] bg-black/50 flex items-center justify-center p-4">
-<div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-6 shadow-2xl">
-<div class="space-y-2">
-<h3 class="text-xl font-extrabold text-slate-800">A jeni i sigurt?</h3>
-<p id="confirm-message" class="text-slate-500 font-medium text-sm">Ky veprim nuk mund të kthehet pas.</p>
-</div>
-<div class="flex gap-3">
-<button onclick="closeConfirm()" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold">Anulo</button>
-<button id="confirm-yes-btn" class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold">Konfirmo</button>
-</div>
-</div>
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-6 shadow-2xl">
+        <h3 class="text-xl font-extrabold text-slate-800">A jeni i sigurt?</h3>
+        <p id="confirm-message" class="text-slate-500 font-medium text-sm"></p>
+        <div class="flex gap-3">
+            <button onclick="closeConfirm()" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold">Anulo</button>
+            <button id="confirm-yes-btn" class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold">Fshije</button>
+        </div>
+    </div>
 </div>
 
 <div id="loading" class="fixed inset-0 bg-white/95 z-[300] flex items-center justify-center">
-<div class="flex flex-col items-center gap-4">
-<div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
-<p class="text-slate-900 font-black text-xs uppercase tracking-[0.3em]">LindiMaps</p>
-</div>
+    <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
 </div>
 
 <div id="app-content" class="hidden">
-<header class="glass-card sticky top-0 z-50 px-6 py-3 flex justify-between items-center">
-<div class="flex items-center gap-2">
-<div class="h-8 w-8 flex items-center justify-center bg-slate-900 rounded-lg shadow">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.15"/>
-<path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
-</svg>
-</div>
-<div class="flex flex-col">
-<span class="font-black text-sm tracking-tighter leading-none">
-<span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span><span id="role-indicator"></span>
-</span>
-<span id="user-display" class="text-[7px] uppercase font-bold text-slate-400 tracking-widest">Sistemi Aktivitete </span>
-</div>
-</div>
-<div class="flex items-center gap-4">
-<button onclick="logout()" class="text-[10px] font-bold text-slate-400 uppercase hover:text-red-500">Dil</button>
-<span id="sync-status" class="text-[10px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full uppercase">Sistemi Aktiv</span>
-</div>
-</header>
+    <header class="glass-card sticky top-0 z-50 px-6 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="h-8 w-8 flex items-center justify-center bg-slate-900 rounded-lg shadow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg></div>
+            <div class="flex flex-col">
+                <span class="font-black text-sm tracking-tighter">LINDI<span class="logo-gradient">MAPS</span><span id="role-indicator"></span></span>
+                <span id="user-display" class="text-[7px] uppercase font-bold text-slate-400 tracking-widest"></span>
+            </div>
+        </div>
+        <button onclick="logout()" class="text-[10px] font-bold text-slate-400 uppercase hover:text-red-500">Dil</button>
+    </header>
 
-<nav class="bg-white border-b border-slate-100 flex overflow-x-auto">
-<button onclick="switchTab('log')" id="tab-log" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest tab-active">Regjistrim Ditor</button>
-<button onclick="switchTab('reports')" id="tab-reports" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest text-slate-400">Raporte</button>
-<button onclick="switchTab('config')" id="tab-config" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest text-slate-400 hidden">Struktura</button>
-</nav>
+    <nav class="bg-white border-b border-slate-100 flex overflow-x-auto">
+        <button onclick="switchTab('log')" id="tab-log" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest tab-active">Regjistrim Ditor</button>
+        <button onclick="switchTab('reports')" id="tab-reports" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest text-slate-400">Raporte</button>
+        <button onclick="switchTab('config')" id="tab-config" class="flex-1 py-4 text-xs font-extrabold uppercase tracking-widest text-slate-400 hidden">Struktura</button>
+    </nav>
 
-<main class="max-w-3xl mx-auto p-4 md:p-8 space-y-8">
-<div id="view-log" class="space-y-6">
-<div class="glass-card rounded-[2rem] p-6 shadow-xl shadow-slate-200/50 space-y-6 border border-white">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div class="space-y-2">
-<label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Data</label>
-<input id="log-date" type="date" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold">
-</div>
-<div class="space-y-2">
-<label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Eksperti</label>
-<select id="log-operator-select" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold appearance-none"></select>
-</div>
-</div>
-<div class="space-y-2">
-<label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Aktiviteti</label>
-<select id="log-act-select" onchange="generateProcessFields()" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold appearance-none"></select>
-</div>
-<div id="dynamic-fields-container" class="space-y-4 pt-4 border-t border-slate-50"></div>
+    <main class="max-w-3xl mx-auto p-4 md:p-8 space-y-8">
+        <div id="view-log" class="space-y-6">
+            <div class="glass-card rounded-[2rem] p-6 shadow-xl space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Data</label>
+                        <input id="log-date" type="date" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Eksperti</label>
+                        <select id="log-operator-select" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold"></select>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Aktiviteti</label>
+                    <select id="log-act-select" onchange="generateProcessFields()" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold"></select>
+                </div>
+                <div id="dynamic-fields-container" class="space-y-4 pt-4 border-t border-slate-50"></div>
+                <div class="pt-4 border-t border-slate-50 grid grid-cols-2 gap-4">
+                    <input id="log-start-time" type="time" onchange="calculateHours()" class="p-4 rounded-2xl bg-slate-50 font-bold">
+                    <input id="log-end-time" type="time" onchange="calculateHours()" class="p-4 rounded-2xl bg-slate-50 font-bold">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[11px] font-extrabold text-slate-400 uppercase">Total Orë Pune</label>
+                    <input id="log-hours" type="number" step="0.1" class="w-full p-4 rounded-2xl bg-blue-50 text-blue-600 font-black text-xl border-none">
+                </div>
+                <input type="hidden" id="log-edit-id">
+                <button id="save-log-btn" class="w-full bg-slate-900 text-white p-5 rounded-[1.5rem] font-bold shadow-lg">Ruaj Aktivitetin</button>
+                <button id="cancel-log-edit" class="hidden w-full bg-slate-200 text-slate-600 p-4 rounded-[1.5rem] font-bold" onclick="cancelLogEdit()">Anulo</button>
+            </div>
+        </div>
 
-<div class="pt-4 border-t border-slate-50 space-y-4">
-<div class="grid grid-cols-2 gap-4">
-<div class="space-y-2">
-<label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Ora Fillimit</label>
-<input id="log-start-time" type="time" onchange="calculateHours()" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold">
-</div>
-<div class="space-y-2">
-<label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Ora Mbarimit</label>
-<input id="log-end-time" type="time" onchange="calculateHours()" class="w-full p-4 rounded-2xl bg-slate-50 border-slate-100 font-bold">
-</div>
-</div>
-<div class="space-y-2">
-<label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Total Orë Pune</label>
-<input id="log-hours" type="number" step="0.1" placeholder="0.0" class="w-full p-4 rounded-2xl bg-blue-50 text-blue-600 font-black text-xl border-none">
-</div>
-</div>
+        <div id="view-config" class="hidden space-y-8">
+            <div class="glass-card rounded-[2rem] p-8 space-y-6">
+                <div class="flex justify-between items-center"><h2 id="config-title" class="text-xl font-extrabold text-slate-800">Shto Aktivitet</h2><button id="cancel-edit-btn" class="hidden text-xs font-bold text-red-500 uppercase" onclick="resetConfigForm()">Anulo</button></div>
+                <input id="edit-id" type="hidden">
+                <input id="new-act-name" type="text" placeholder="Emri i Aktivitetit" class="w-full p-4 rounded-xl bg-slate-50 font-bold">
+                <textarea id="new-act-processes" placeholder="Bashkia:tekst&#10;Kati:numër" class="w-full p-4 rounded-xl bg-slate-50 h-32"></textarea>
+                <button id="add-act-btn" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold">Ruaj Strukturën</button>
+            </div>
+            <div id="config-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            <div class="glass-card rounded-[2rem] p-8 space-y-6 border-t-4 border-slate-900">
+                <h2 class="text-xl font-extrabold text-slate-800">Ekspertët</h2>
+                <div class="flex gap-2"><input id="new-op-name" type="text" placeholder="Emri" class="flex-1 p-4 rounded-xl bg-slate-50 font-bold"><button id="add-op-btn" class="bg-slate-900 text-white px-6 rounded-xl font-bold">Shto</button></div>
+                <div id="operator-list" class="flex flex-wrap gap-2 pt-2"></div>
+            </div>
+        </div>
 
-<input type="hidden" id="log-edit-id">
-<button id="save-log-btn" class="w-full bg-slate-900 text-white p-5 rounded-[1.5rem] font-bold shadow-lg hover:bg-black active:scale-95 transition-all">
-Ruaj në Cloud
-</button>
-<button id="cancel-log-edit" class="hidden w-full bg-slate-200 text-slate-600 p-4 rounded-[1.5rem] font-bold mt-2" onclick="cancelLogEdit()">Anulo Modifikimin</button>
-</div>
-</div>
-
-<div id="view-config" class="hidden space-y-8">
-<div class="glass-card rounded-[2rem] p-8 space-y-6">
-<div class="flex justify-between items-center">
-<h2 id="config-title" class="text-xl font-extrabold text-slate-800">Shto Aktivitet</h2>
-<button id="cancel-edit-btn" class="hidden text-xs font-bold text-red-500 uppercase" onclick="resetConfigForm()">Anulo</button>
-</div>
-<div class="space-y-4">
-<input id="edit-id" type="hidden">
-<input id="new-act-name" type="text" placeholder="Emri i Aktivitetit" class="w-full p-4 rounded-xl bg-slate-50 border-none font-bold">
-<textarea id="new-act-processes" placeholder="Proceset (Emri:numër/tekst) - psh. Bashkia:tekst" class="w-full p-4 rounded-xl bg-slate-50 border-none h-32 font-medium"></textarea>
-<button id="add-act-btn" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold">Ruaj Aktivitetin</button>
-</div>
-</div>
-<div id="config-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-
-<div class="glass-card rounded-[2rem] p-8 space-y-6 border-t-4 border-slate-900">
-<h2 class="text-xl font-extrabold text-slate-800">Ekspertët</h2>
-<div class="flex gap-2">
-<input id="new-op-name" type="text" placeholder="Emri i Ekspertit" class="flex-1 p-4 rounded-xl bg-slate-50 border-none font-bold">
-<button id="add-op-btn" class="bg-slate-900 text-white px-6 rounded-xl font-bold">Shto</button>
-</div>
-<div id="operator-list" class="flex flex-wrap gap-2 pt-2"></div>
-</div>
-</div>
-
-<div id="view-reports" class="hidden space-y-6">
-<div class="glass-card rounded-[2rem] p-6 space-y-4">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div class="grid grid-cols-2 gap-2">
-<input id="rep-start" type="date" onchange="renderReportList()" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]">
-<input id="rep-end" type="date" onchange="renderReportList()" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]">
-</div>
-<div class="grid grid-cols-2 gap-2">
-<select id="rep-op-select" onchange="handleMainFilters()" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]"></select>
-<select id="rep-act-select" onchange="handleMainFilters()" class="p-3 rounded-xl bg-slate-50 border-none font-bold text-[10px]"></select>
-</div>
-</div>
-<div id="rep-dynamic-filters" class="grid grid-cols-2 md:grid-cols-3 gap-2"></div>
-
-<!-- Totals View -->
-<div id="report-totals" class="grid grid-cols-3 gap-3 pt-2 border-t border-slate-100">
-    <div class="text-center p-2 bg-slate-50 rounded-xl">
-        <p class="text-[8px] font-bold text-slate-400 uppercase">Tot Orë</p>
-        <p id="total-hours-val" class="text-sm font-black text-slate-900">0</p>
-    </div>
-    <div class="text-center p-2 bg-slate-50 rounded-xl">
-        <p class="text-[8px] font-bold text-slate-400 uppercase">Ditë Pune</p>
-        <p id="total-days-val" class="text-sm font-black text-slate-900">0</p>
-    </div>
-    <div class="text-center p-2 bg-slate-50 rounded-xl">
-        <p class="text-[8px] font-bold text-slate-400 uppercase">Aktivitete</p>
-        <p id="total-count-val" class="text-sm font-black text-slate-900">0</p>
-    </div>
-</div>
-
-<div class="grid grid-cols-2 gap-2">
-<button onclick="renderReportList()" class="bg-slate-900 text-white p-4 rounded-xl font-bold text-xs uppercase">Rifresko</button>
-<button onclick="exportToPDF()" class="bg-blue-600 text-white p-4 rounded-xl font-bold text-xs uppercase">Shkarko PDF</button>
-</div>
-</div>
-<div id="report-results" class="space-y-4"></div>
-</div>
-</main>
+        <div id="view-reports" class="hidden space-y-6">
+            <div class="glass-card rounded-[2rem] p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-2">
+                    <input id="rep-start" type="date" onchange="renderReportList()" class="p-3 rounded-xl bg-slate-50 text-[10px]">
+                    <input id="rep-end" type="date" onchange="renderReportList()" class="p-3 rounded-xl bg-slate-50 text-[10px]">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="rep-op-select" onchange="handleMainFilters()" class="p-3 rounded-xl bg-slate-50 text-[10px] font-bold"></select>
+                    <select id="rep-act-select" onchange="handleMainFilters()" class="p-3 rounded-xl bg-slate-50 text-[10px] font-bold"></select>
+                </div>
+                <div id="rep-dynamic-filters" class="grid grid-cols-2 md:grid-cols-3 gap-2"></div>
+                <div id="report-totals" class="grid grid-cols-4 gap-2 pt-2 border-t text-center">
+                    <div class="p-2 bg-slate-50 rounded-xl"><p class="text-[7px] font-bold text-slate-400">ORË</p><p id="total-hours-val" class="text-xs font-black">0</p></div>
+                    <div class="p-2 bg-slate-50 rounded-xl"><p class="text-[7px] font-bold text-slate-400">DITË</p><p id="total-days-val" class="text-xs font-black">0</p></div>
+                    <div class="p-2 bg-slate-50 rounded-xl"><p class="text-[7px] font-bold text-slate-400">RAPORTE</p><p id="total-count-val" class="text-xs font-black">0</p></div>
+                    <div class="p-2 bg-slate-50 rounded-xl"><p class="text-[7px] font-bold text-slate-400">UNIK</p><p id="total-unique-val" class="text-xs font-black">0</p></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="renderReportList()" class="bg-slate-900 text-white p-4 rounded-xl font-bold text-[10px] uppercase">Rifresko</button>
+                    <button onclick="exportToPDF()" class="bg-blue-600 text-white p-4 rounded-xl font-bold text-[10px] uppercase">Shkarko PDF</button>
+                </div>
+            </div>
+            <div id="report-results" class="space-y-4"></div>
+        </div>
+    </main>
 </div>
 
 <script type="module">
@@ -266,9 +171,7 @@ const firebaseConfig = {
   authDomain: "lindimapsenterprise.firebaseapp.com",
   projectId: "lindimapsenterprise",
   storageBucket: "lindimapsenterprise.firebasestorage.app",
-  messagingSenderId: "109088070908",
-  appId: "1:109088070908:web:8c1b041656e6b7e3900b79",
-  measurementId: "G-29H90XKCRM"
+  appId: "1:109088070908:web:8c1b041656e6b7e3900b79"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -279,75 +182,64 @@ const appId = "lindi-maps-enterprise-v1";
 let configData = [];
 let logData = [];
 let operatorData = [];
-let userRole = 'user'; 
+let userRole = 'user';
 
-window.showAuthSection = (section) => {
-document.getElementById('login-section').classList.add('hidden');
-document.getElementById('signup-section').classList.add('hidden');
-document.getElementById('reset-section').classList.add('hidden');
-if(section === 'login') document.getElementById('login-section').classList.remove('hidden');
-if(section === 'signup') document.getElementById('signup-section').classList.remove('hidden');
-if(section === 'reset') document.getElementById('reset-section').classList.remove('hidden');
+window.showAuthSection = (s) => {
+    ['login-section', 'signup-section'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    document.getElementById(s + '-section').classList.remove('hidden');
 };
 
 document.getElementById('login-btn').onclick = async () => {
-const email = document.getElementById('login-email').value.trim();
-const pass = document.getElementById('login-password').value;
-if(!email || !pass) return showAlert("Plotësoni të dhënat.");
-try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { showAlert("Kredenciale të pasakta."); }
+    const e = document.getElementById('login-email').value;
+    const p = document.getElementById('login-password').value;
+    try { await signInWithEmailAndPassword(auth, e, p); } catch { showAlert("Email ose fjalëkalim i pasaktë."); }
 };
 
 document.getElementById('signup-btn').onclick = async () => {
-const email = document.getElementById('signup-email').value.trim();
-const pass = document.getElementById('signup-password').value;
-if(!email || pass.length < 6) return showAlert("Email ose fjalëkalim i pasaktë.");
-try {
-const cred = await createUserWithEmailAndPassword(auth, email, pass);
-await setDoc(doc(db, `artifacts/${appId}/users`, cred.user.uid), {
-    email: email,
-    role: 'user',
-    uid: cred.user.uid
-});
-showAlert("U krijua! Prisni që Admin t'ju autorizojë si Admin nëse duhet.");
-} catch (e) { showAlert("Gabim: " + e.message); }
+    const e = document.getElementById('signup-email').value;
+    const p = document.getElementById('signup-password').value;
+    try {
+        const c = await createUserWithEmailAndPassword(auth, e, p);
+        await setDoc(doc(db, `artifacts/${appId}/users`, c.user.uid), { email: e, role: 'user', uid: c.user.uid });
+        showAlert("U regjistrua! Prisni konfirmimin.");
+    } catch (e) { showAlert(e.message); }
 };
 
-onAuthStateChanged(auth, async (user) => {
-document.getElementById('loading').classList.add('hidden');
-if (user) {
-    const userDoc = await getDoc(doc(db, `artifacts/${appId}/users`, user.uid));
-    userRole = userDoc.exists() ? userDoc.data().role : 'user';
-    document.getElementById('role-indicator').innerHTML = userRole === 'admin' ? '<span class="admin-badge">ADMIN</span>' : '';
-    document.getElementById('user-display').innerText = user.email;
-    if(userRole === 'admin') document.getElementById('tab-config').classList.remove('hidden');
-    document.getElementById('app-content').classList.remove('hidden');
-    document.getElementById('auth-overlay').classList.add('hidden');
-    startListening();
-} else {
-    document.getElementById('app-content').classList.add('hidden');
-    document.getElementById('auth-overlay').classList.remove('hidden');
-    showAuthSection('login');
-}
+onAuthStateChanged(auth, async (u) => {
+    document.getElementById('loading').classList.add('hidden');
+    if (u) {
+        const docRef = await getDoc(doc(db, `artifacts/${appId}/users`, u.uid));
+        userRole = docRef.exists() ? docRef.data().role : 'user';
+        document.getElementById('role-indicator').innerHTML = userRole === 'admin' ? '<span class="admin-badge">ADMIN</span>' : '';
+        document.getElementById('user-display').innerText = u.email;
+        if(userRole === 'admin') document.getElementById('tab-config').classList.remove('hidden');
+        document.getElementById('app-content').classList.remove('hidden');
+        document.getElementById('auth-overlay').classList.add('hidden');
+        startListening();
+    } else {
+        document.getElementById('app-content').classList.add('hidden');
+        document.getElementById('auth-overlay').classList.remove('hidden');
+    }
 });
 
 function startListening() {
-const base = `artifacts/${appId}/public/data`;
-onSnapshot(collection(db, base, 'config'), snap => {
-    configData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    updateDropdowns();
-    renderConfigList();
-});
-const logsRef = collection(db, base, 'logs');
-const qLogs = userRole === 'admin' ? query(logsRef) : query(logsRef, where("creatorUid", "==", auth.currentUser.uid));
-onSnapshot(qLogs, snap => {
-    logData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderReportList();
-});
-onSnapshot(collection(db, base, 'operators'), snap => {
-    operatorData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    updateDropdowns();
-    renderOperatorList();
-});
+    const base = `artifacts/${appId}/public/data`;
+    onSnapshot(collection(db, base, 'config'), snap => {
+        configData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        updateDropdowns();
+        renderConfigList();
+    });
+    onSnapshot(collection(db, base, 'operators'), snap => {
+        operatorData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        updateDropdowns();
+        renderOperatorList();
+    });
+    const logsRef = collection(db, base, 'logs');
+    const q = userRole === 'admin' ? query(logsRef) : query(logsRef, where("creatorUid", "==", auth.currentUser.uid));
+    onSnapshot(q, snap => {
+        logData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderReportList();
+    });
 }
 
 window.handleMainFilters = () => {
@@ -358,305 +250,260 @@ window.handleMainFilters = () => {
 function updateDynamicDropdowns() {
     const selOp = document.getElementById('rep-op-select').value;
     const selAct = document.getElementById('rep-act-select').value;
-    const filterContainer = document.getElementById('rep-dynamic-filters');
-    filterContainer.innerHTML = "";
-
+    const cont = document.getElementById('rep-dynamic-filters');
+    cont.innerHTML = "";
     if (!selAct) return;
-
     const activity = configData.find(c => c.id === selAct);
     if (!activity) return;
-
-    let dataForOptions = logData.filter(l => l.actId === selAct);
-    if (selOp) dataForOptions = dataForOptions.filter(l => l.operator === selOp);
-
+    let pool = logData.filter(l => l.actId === selAct);
+    if (selOp) pool = pool.filter(l => l.operator === selOp);
     activity.processes.forEach(p => {
-        const uniqueValues = [...new Set(dataForOptions.flatMap(l => 
-            l.processes.filter(proc => proc.label === p.label).map(proc => proc.value)
-        ))].filter(v => v !== undefined && v !== "").sort();
-
-        let optionsHtml = `<option value="">${p.label}: Gjithë</option>`;
-        uniqueValues.forEach(val => {
-            optionsHtml += `<option value="${val}">${val}</option>`;
-        });
-
-        const select = document.createElement('select');
-        select.className = "rep-proc-filter p-2 rounded-lg bg-slate-50 border-none text-[9px] font-bold outline-none";
-        select.dataset.filterLabel = p.label;
-        select.innerHTML = optionsHtml;
-        select.onchange = renderReportList;
-        filterContainer.appendChild(select);
+        const vals = [...new Set(pool.flatMap(l => l.processes.filter(pr => pr.label === p.label).map(pr => pr.value)))].filter(v => v).sort();
+        let html = `<option value="">${p.label}: Gjithë</option>`;
+        vals.forEach(v => html += `<option value="${v}">${v}</option>`);
+        const s = document.createElement('select');
+        s.className = "rep-proc-filter p-2 rounded-lg bg-slate-50 text-[9px] font-bold";
+        s.dataset.filterLabel = p.label;
+        s.innerHTML = html;
+        s.onchange = renderReportList;
+        cont.appendChild(s);
     });
 }
 
 window.renderReportList = () => {
-const filtered = getFilteredLogs();
+    const filtered = getFilteredLogs();
+    const hrs = filtered.reduce((a, c) => a + (c.hours || 0), 0);
+    const dys = [...new Set(filtered.map(f => f.date))].length;
+    const unq = [...new Set(filtered.map(f => f.actId))].length;
+    document.getElementById('total-hours-val').innerText = hrs.toFixed(1);
+    document.getElementById('total-days-val').innerText = dys;
+    document.getElementById('total-count-val').innerText = filtered.length;
+    document.getElementById('total-unique-val').innerText = unq;
 
-// Update Totals
-const totalHours = filtered.reduce((acc, curr) => acc + (curr.hours || 0), 0);
-const uniqueDays = [...new Set(filtered.map(f => f.date))].length;
-document.getElementById('total-hours-val').innerText = totalHours.toFixed(1);
-document.getElementById('total-days-val').innerText = uniqueDays;
-document.getElementById('total-count-val').innerText = filtered.length;
-
-document.getElementById('report-results').innerHTML = filtered.map(log => {
-    const isApproved = log.status === 'approved';
-    return `
-<div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm">
-<div class="flex justify-between items-start">
-<div>
-<span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded uppercase">${log.actName}</span>
-<span class="text-[9px] font-black ml-2 ${isApproved ? 'status-approved' : 'status-pending'} uppercase">${isApproved ? 'Miratuar' : 'Në Pritje'}</span>
-<h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator} | ${log.date}</h4>
-</div>
-<div class="flex gap-2">
-${userRole === 'admin' && !isApproved ? `<button onclick="approveLog('${log.id}')" class="text-green-500 text-[10px] font-bold uppercase bg-green-50 px-2 py-1 rounded">Mirato</button>` : ''}
-<button onclick="editLogEntry('${log.id}')" class="text-blue-500 text-[10px] font-bold uppercase bg-blue-50 px-2 py-1 rounded">Edito</button>
-<button onclick="deleteItem('logs', '${log.id}')" class="text-red-300 font-bold">&times;</button>
-</div>
-</div>
-<div class="grid grid-cols-2 gap-2 border-t pt-2 mt-2">${log.processes.map(p => `<div class="text-[10px]"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
-<div class="flex justify-between text-[10px] font-bold text-blue-600 mt-2">
-<span>${log.startTime || ''} - ${log.endTime || ''}</span>
-<span>Tot: ${log.hours} Orë</span>
-</div>
-</div>
-`}).join("");
+    document.getElementById('report-results').innerHTML = filtered.map((l, idx) => `
+    <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm">
+        <div class="flex justify-between items-start">
+            <div>
+                <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded">NR. ${filtered.length - idx}</span>
+                <h4 class="font-bold text-slate-800 text-sm mt-1">${l.actName} - ${l.operator}</h4>
+                <p class="text-[10px] text-slate-400 font-bold">${l.date}</p>
+            </div>
+            <div class="flex gap-2">
+                ${userRole === 'admin' && l.status !== 'approved' ? `<button onclick="approveLog('${l.id}')" class="text-green-500 text-[9px] font-bold">MIRATO</button>` : ''}
+                <button onclick="editLogEntry('${l.id}')" class="text-blue-500 text-[9px] font-bold">EDITO</button>
+                <button onclick="deleteItem('logs', '${l.id}')" class="text-red-300 font-bold">&times;</button>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 border-t pt-2 mt-2">${l.processes.map(p => `<div class="text-[9px]"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
+        <div class="flex justify-between text-[10px] font-black text-blue-600 mt-2"><span>${l.startTime} - ${l.endTime}</span><span>${l.hours} ORË</span></div>
+    </div>
+    `).join("");
 };
 
 window.getFilteredLogs = () => {
-const start = document.getElementById('rep-start').value;
-const end = document.getElementById('rep-end').value;
-const selOp = document.getElementById('rep-op-select').value;
-const selAct = document.getElementById('rep-act-select').value;
-const dynamicFilters = Array.from(document.querySelectorAll('.rep-proc-filter'));
-
-let filtered = [...logData].sort((a,b) => b.date.localeCompare(a.date));
-if(start) filtered = filtered.filter(f => f.date >= start);
-if(end) filtered = filtered.filter(f => f.date <= end);
-if(selOp) filtered = filtered.filter(f => f.operator === selOp);
-if(selAct) filtered = filtered.filter(f => f.actId === selAct);
-
-dynamicFilters.forEach(f => {
-    const val = f.value;
-    const label = f.dataset.filterLabel;
-    if(val) {
-        filtered = filtered.filter(log => 
-            log.processes.some(p => p.label === label && p.value.toString() === val.toString())
-        );
-    }
-});
-return filtered;
+    const s = document.getElementById('rep-start').value;
+    const e = document.getElementById('rep-end').value;
+    const o = document.getElementById('rep-op-select').value;
+    const a = document.getElementById('rep-act-select').value;
+    const dyn = Array.from(document.querySelectorAll('.rep-proc-filter'));
+    let f = [...logData].sort((a,b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+    if(s) f = f.filter(x => x.date >= s);
+    if(e) f = f.filter(x => x.date <= e);
+    if(o) f = f.filter(x => x.operator === o);
+    if(a) f = f.filter(x => x.actId === a);
+    dyn.forEach(sel => {
+        if(sel.value) f = f.filter(l => l.processes.some(p => p.label === sel.dataset.filterLabel && p.value == sel.value));
+    });
+    return f;
 };
 
 document.getElementById('save-log-btn').onclick = async () => {
-const actId = document.getElementById('log-act-select').value;
-const date = document.getElementById('log-date').value;
-const operator = document.getElementById('log-operator-select').value;
-const hours = document.getElementById('log-hours').value;
-if(!actId || !date || !operator || !hours) return showAlert("Plotësoni fushat.");
-const processes = Array.from(document.querySelectorAll('.process-input')).map(i => ({ label: i.dataset.label, value: i.value }));
-const id = document.getElementById('log-edit-id').value || Date.now().toString();
-
-await setDoc(doc(db, `artifacts/${appId}/public/data/logs`, id), {
-    actId, actName: configData.find(c => c.id === actId).name, 
-    date, operator, hours: parseFloat(hours),
-    startTime: document.getElementById('log-start-time').value, 
-    endTime: document.getElementById('log-end-time').value, 
-    processes, creatorUid: auth.currentUser.uid, status: 'pending'
-});
-cancelLogEdit();
+    const aid = document.getElementById('log-act-select').value;
+    const d = document.getElementById('log-date').value;
+    const op = document.getElementById('log-operator-select').value;
+    const h = document.getElementById('log-hours').value;
+    if(!aid || !d || !op || !h) return showAlert("Plotësoni të gjitha fushat.");
+    const procs = Array.from(document.querySelectorAll('.process-input')).map(i => ({ label: i.dataset.label, value: i.value }));
+    const id = document.getElementById('log-edit-id').value || Date.now().toString();
+    await setDoc(doc(db, `artifacts/${appId}/public/data/logs`, id), {
+        actId: aid, actName: configData.find(c => c.id === aid).name,
+        date: d, operator: op, hours: parseFloat(h),
+        startTime: document.getElementById('log-start-time').value,
+        endTime: document.getElementById('log-end-time').value,
+        processes: procs, creatorUid: auth.currentUser.uid, status: 'pending'
+    });
+    cancelLogEdit();
 };
 
-window.approveLog = async (id) => {
-    if(userRole !== 'admin') return;
-    await updateDoc(doc(db, `artifacts/${appId}/public/data/logs`, id), { status: 'approved' });
-};
+window.approveLog = async (id) => { await updateDoc(doc(db, `artifacts/${appId}/public/data/logs`, id), { status: 'approved' }); };
 
 window.calculateHours = () => {
-const start = document.getElementById('log-start-time').value;
-const end = document.getElementById('log-end-time').value;
-if (start && end) {
-const startTime = new Date(`1970-01-01T${start}:00`);
-const endTime = new Date(`1970-01-01T${end}:00`);
-let diff = (endTime - startTime) / (1000 * 60 * 60);
-if (diff < 0) diff += 24;
-document.getElementById('log-hours').value = diff.toFixed(1);
-}
+    const s = document.getElementById('log-start-time').value;
+    const e = document.getElementById('log-end-time').value;
+    if(s && e) {
+        let diff = (new Date(`1970-01-01T${e}`) - new Date(`1970-01-01T${s}`)) / 3600000;
+        if(diff < 0) diff += 24;
+        document.getElementById('log-hours').value = diff.toFixed(1);
+    }
 };
 
-window.showAlert = (msg) => {
-document.getElementById('alert-message').innerText = msg;
-document.getElementById('custom-alert').classList.remove('hidden');
-};
-window.closeAlert = () => document.getElementById('custom-alert').classList.add('hidden');
-
-window.askConfirm = (msg, onConfirm) => {
-document.getElementById('confirm-message').innerText = msg;
-window.deleteCallback = onConfirm;
-document.getElementById('confirm-modal').classList.remove('hidden');
-};
-window.closeConfirm = () => {
-document.getElementById('confirm-modal').classList.add('hidden');
-window.deleteCallback = null;
-};
-document.getElementById('confirm-yes-btn').onclick = () => {
-if(window.deleteCallback) window.deleteCallback();
-closeConfirm();
-};
-
-window.switchTab = (tab) => {
-['view-log', 'view-config', 'view-reports'].forEach(v => document.getElementById(v).classList.add('hidden'));
-['tab-log', 'tab-config', 'tab-reports'].forEach(t => document.getElementById(t).classList.replace('tab-active', 'text-slate-400'));
-document.getElementById(`view-${tab}`).classList.remove('hidden');
-document.getElementById(`tab-${tab}`).classList.replace('text-slate-400', 'tab-active');
-};
-
-window.logout = () => signOut(auth);
-
-window.generateProcessFields = (valuesMap = null) => {
-const actId = document.getElementById('log-act-select').value;
-const container = document.getElementById('dynamic-fields-container');
-container.innerHTML = "";
-if(!actId) return;
-const act = configData.find(c => c.id === actId);
-act.processes.forEach(p => {
-const val = valuesMap ? (valuesMap[p.label] || "") : "";
-container.innerHTML += `<div class="space-y-1">
-<label class="text-[10px] font-extrabold text-slate-500 uppercase">${p.label}</label>
-<input type="text" data-label="${p.label}" value="${val}" class="process-input w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm">
-</div>`;
-});
+window.generateProcessFields = (m = null) => {
+    const id = document.getElementById('log-act-select').value;
+    const cont = document.getElementById('dynamic-fields-container');
+    cont.innerHTML = "";
+    if(!id) return;
+    configData.find(c => c.id === id).processes.forEach(p => {
+        cont.innerHTML += `<div class="space-y-1"><label class="text-[9px] font-black text-slate-500 uppercase">${p.label}</label>
+        <input type="text" data-label="${p.label}" value="${m ? (m[p.label] || "") : ""}" class="process-input w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-xs"></div>`;
+    });
 };
 
 window.cancelLogEdit = () => {
-document.getElementById('log-edit-id').value = "";
-document.getElementById('log-hours').value = "";
-document.getElementById('log-start-time').value = "";
-document.getElementById('log-end-time').value = "";
-document.getElementById('log-act-select').value = "";
-document.getElementById('dynamic-fields-container').innerHTML = "";
-document.getElementById('cancel-log-edit').classList.add('hidden');
-document.getElementById('save-log-btn').innerText = "Ruaj në Cloud";
+    document.getElementById('log-edit-id').value = "";
+    document.getElementById('log-act-select').value = "";
+    document.getElementById('dynamic-fields-container').innerHTML = "";
+    document.getElementById('cancel-log-edit').classList.add('hidden');
+    document.getElementById('save-log-btn').innerText = "Ruaj Aktivitetin";
 };
 
 window.editLogEntry = (id) => {
-const log = logData.find(l => l.id === id);
-if(!log) return;
-switchTab('log');
-document.getElementById('log-edit-id').value = id;
-document.getElementById('log-date').value = log.date;
-document.getElementById('log-operator-select').value = log.operator;
-document.getElementById('log-act-select').value = log.actId;
-document.getElementById('log-hours').value = log.hours;
-document.getElementById('log-start-time').value = log.startTime || "";
-document.getElementById('log-end-time').value = log.endTime || "";
-const valuesMap = {};
-log.processes.forEach(p => valuesMap[p.label] = p.value);
-generateProcessFields(valuesMap);
-document.getElementById('cancel-log-edit').classList.remove('hidden');
-document.getElementById('save-log-btn').innerText = "Zëvendëso";
+    const l = logData.find(x => x.id === id);
+    if(!l) return;
+    switchTab('log');
+    document.getElementById('log-edit-id').value = id;
+    document.getElementById('log-date').value = l.date;
+    document.getElementById('log-operator-select').value = l.operator;
+    document.getElementById('log-act-select').value = l.actId;
+    document.getElementById('log-hours').value = l.hours;
+    document.getElementById('log-start-time').value = l.startTime;
+    document.getElementById('log-end-time').value = l.endTime;
+    const m = {}; l.processes.forEach(p => m[p.label] = p.value);
+    generateProcessFields(m);
+    document.getElementById('cancel-log-edit').classList.remove('hidden');
+    document.getElementById('save-log-btn').innerText = "Zëvendëso";
 };
 
 window.updateDropdowns = () => {
-const acts = configData.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
-const ops = operatorData.map(o => `<option value="${o.name}">${o.name}</option>`).join("");
-document.getElementById('log-act-select').innerHTML = `<option value="">-- Zgjidh --</option>` + acts;
-document.getElementById('log-operator-select').innerHTML = `<option value="">-- Zgjidh --</option>` + ops;
-document.getElementById('rep-op-select').innerHTML = `<option value="">Eksperti: Të gjithë</option>` + ops;
-document.getElementById('rep-act-select').innerHTML = `<option value="">Aktiviteti: Të gjithë</option>` + acts;
+    const a = configData.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+    const o = operatorData.map(x => `<option value="${x.name}">${x.name}</option>`).join("");
+    document.getElementById('log-act-select').innerHTML = `<option value="">-- Zgjidh --</option>` + a;
+    document.getElementById('log-operator-select').innerHTML = `<option value="">-- Zgjidh --</option>` + o;
+    document.getElementById('rep-op-select').innerHTML = `<option value="">Eksperti: Të gjithë</option>` + o;
+    document.getElementById('rep-act-select').innerHTML = `<option value="">Aktiviteti: Të gjithë</option>` + a;
 };
 
 window.renderConfigList = () => {
-document.getElementById('config-list').innerHTML = configData.map(c => `
-<div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center">
-<div><h4 class="font-bold text-slate-800">${c.name}</h4></div>
-<div class="flex gap-2">
-<button onclick="deleteItem('config', '${c.id}')" class="text-red-400 font-bold text-lg">&times;</button>
-</div>
-</div>
-`).join("");
+    document.getElementById('config-list').innerHTML = configData.map(c => `
+    <div class="bg-white p-5 rounded-2xl border border-slate-100 flex justify-between items-center">
+        <h4 class="font-bold text-slate-800 text-sm">${c.name}</h4>
+        <div class="flex gap-2">
+            <button onclick="editConfig('${c.id}')" class="text-blue-500 text-xs font-bold">EDITO</button>
+            <button onclick="deleteItem('config', '${c.id}')" class="text-red-400 font-bold">&times;</button>
+        </div>
+    </div>`).join("");
 };
 
-window.renderOperatorList = () => {
-document.getElementById('operator-list').innerHTML = operatorData.map(o => `
-<div class="bg-blue-50 px-4 py-2 rounded-xl flex items-center gap-3">
-<span class="text-xs font-bold text-blue-700">${o.name}</span>
-<button onclick="deleteItem('operators', '${o.id}')" class="text-red-400 font-bold">&times;</button>
-</div>
-`).join("");
+window.editConfig = (id) => {
+    const c = configData.find(x => x.id === id);
+    document.getElementById('edit-id').value = id;
+    document.getElementById('new-act-name').value = c.name;
+    document.getElementById('new-act-processes').value = c.processes.map(p => `${p.label}:${p.type === 'text' ? 'tekst' : 'numër'}`).join("\n");
+    document.getElementById('config-title').innerText = "Edito Aktivitetin";
+    document.getElementById('cancel-edit-btn').classList.remove('hidden');
+};
+
+window.resetConfigForm = () => {
+    document.getElementById('edit-id').value = "";
+    document.getElementById('new-act-name').value = "";
+    document.getElementById('new-act-processes').value = "";
+    document.getElementById('config-title').innerText = "Shto Aktivitet";
+    document.getElementById('cancel-edit-btn').classList.add('hidden');
 };
 
 document.getElementById('add-act-btn').onclick = async () => {
-const name = document.getElementById('new-act-name').value.trim();
-const procRaw = document.getElementById('new-act-processes').value.trim();
-if (!name || !procRaw || userRole !== 'admin') return;
-const processes = procRaw.split('\n').map(line => {
-const parts = line.split(':');
-return { label: parts[0]?.trim(), type: parts[1]?.trim() === 'tekst' ? 'text' : 'number' };
-}).filter(p => p.label);
-await setDoc(doc(db, `artifacts/${appId}/public/data/config`, Date.now().toString()), { name, processes });
-document.getElementById('new-act-name').value = "";
-document.getElementById('new-act-processes').value = "";
+    const n = document.getElementById('new-act-name').value;
+    const r = document.getElementById('new-act-processes').value;
+    const id = document.getElementById('edit-id').value || Date.now().toString();
+    const p = r.split('\n').map(l => {
+        const parts = l.split(':');
+        return { label: parts[0]?.trim(), type: parts[1]?.trim() === 'tekst' ? 'text' : 'number' };
+    }).filter(x => x.label);
+    await setDoc(doc(db, `artifacts/${appId}/public/data/config`, id), { name: n, processes: p });
+    resetConfigForm();
+};
+
+window.renderOperatorList = () => {
+    document.getElementById('operator-list').innerHTML = operatorData.map(o => `
+    <div class="bg-slate-100 px-4 py-2 rounded-xl flex items-center gap-2">
+        <span class="text-xs font-bold">${o.name}</span>
+        <button onclick="deleteItem('operators', '${o.id}')" class="text-red-400 font-bold">&times;</button>
+    </div>`).join("");
 };
 
 document.getElementById('add-op-btn').onclick = async () => {
-const name = document.getElementById('new-op-name').value.trim();
-if(!name || userRole !== 'admin') return;
-await setDoc(doc(db, `artifacts/${appId}/public/data/operators`, Date.now().toString()), { name });
-document.getElementById('new-op-name').value = "";
+    const n = document.getElementById('new-op-name').value;
+    if(n) await setDoc(doc(db, `artifacts/${appId}/public/data/operators`, Date.now().toString()), { name: n });
+    document.getElementById('new-op-name').value = "";
 };
 
-window.deleteItem = (col, id) => {
-askConfirm("A dëshironi ta fshini?", async () => {
-await deleteDoc(doc(db, `artifacts/${appId}/public/data/${col}`, id));
-});
+window.deleteItem = (c, id) => {
+    askConfirm("Dëshironi ta fshini këtë rekord?", async () => { await deleteDoc(doc(db, `artifacts/${appId}/public/data/${c}`, id)); });
 };
 
 window.exportToPDF = () => {
     const { jsPDF } = window.jspdf;
-    const docPDF = new jsPDF('l'); // Landscape
+    const docPDF = new jsPDF('l');
     const filtered = getFilteredLogs();
+    const hrs = filtered.reduce((a, c) => a + (c.hours || 0), 0);
+    const dys = [...new Set(filtered.map(f => f.date))].length;
+    const unq = [...new Set(filtered.map(f => f.actId))].length;
 
-    // Stats for Footer/Header
-    const totalHours = filtered.reduce((acc, curr) => acc + (curr.hours || 0), 0);
-    const uniqueDays = [...new Set(filtered.map(f => f.date))].length;
-
-    docPDF.setFontSize(18);
-    docPDF.text("RAPORT AKTIVITETESH - LINDIMAPS", 14, 15);
-    docPDF.setFontSize(10);
-    docPDF.text(`Gjeneruar më: ${new Date().toLocaleDateString()}`, 14, 22);
-
-    const headers = [['Data', 'Aktiviteti', 'Eksperti', 'Detajet', 'Orë', 'Statusi']];
-    const bodyData = filtered.map(f => [
-        f.date, 
-        f.actName, 
-        f.operator, 
-        f.processes.map(p => `${p.label}: ${p.value}`).join(" | "), // Çdo detaj këtu
-        f.hours, 
-        f.status === 'approved' ? 'MIRATUAR' : 'PENDING'
+    docPDF.setFontSize(16);
+    docPDF.text("RAPORT AKTIVITETESH - LINDI MAPS", 14, 15);
+    
+    const headers = [['Nr.', 'Data', 'Eksperti', 'Aktiviteti', 'Detajet e Raportimit', 'Orë', 'Statusi']];
+    const data = filtered.map((f, i) => [
+        filtered.length - i,
+        f.date,
+        f.operator,
+        f.actName,
+        f.processes.map(p => `${p.label}: ${p.value}`).join(" | "),
+        f.hours,
+        f.status === 'approved' ? 'OK' : '...'
     ]);
 
     docPDF.autoTable({
-        startY: 28,
+        startY: 25,
         head: headers,
-        body: bodyData,
+        body: data,
         theme: 'grid',
-        headStyles: { fillColor: [51, 65, 85] },
-        styles: { fontSize: 8 }
+        styles: { fontSize: 7 },
+        headStyles: { fillColor: [30, 41, 59] }
     });
 
-    const finalY = docPDF.lastAutoTable.finalY || 30;
+    const finalY = docPDF.lastAutoTable.finalY + 10;
     docPDF.setFontSize(10);
-    docPDF.setFont("helvetica", "bold");
-    docPDF.text(`PËRMBLEDHJE TOTALE:`, 14, finalY + 10);
-    docPDF.setFont("helvetica", "normal");
-    docPDF.text(`- Numri i Aktiviteteve: ${filtered.length}`, 14, finalY + 16);
-    docPDF.text(`- Total Orë Pune: ${totalHours.toFixed(1)} orë`, 14, finalY + 22);
-    docPDF.text(`- Ditë Pune (Unike): ${uniqueDays} ditë`, 14, finalY + 28);
+    docPDF.text(`PËRMBLEDHJE TOTALE:`, 14, finalY);
+    docPDF.text(`1. Total Aktivitete (Raporte): ${filtered.length}`, 14, finalY + 7);
+    docPDF.text(`2. Aktivitete Unike të kryera: ${unq}`, 14, finalY + 14);
+    docPDF.text(`3. Total Orë Pune: ${hrs.toFixed(1)} orë`, 14, finalY + 21);
+    docPDF.text(`4. Total Ditë Pune: ${dys} ditë`, 14, finalY + 28);
 
-    docPDF.save(`Raport_Detajuar_LindiMaps.pdf`);
+    docPDF.save(`Raport_LindiMaps_${new Date().getTime()}.pdf`);
 };
 
+window.showAlert = (m) => { document.getElementById('alert-message').innerText = m; document.getElementById('custom-alert').classList.remove('hidden'); };
+window.closeAlert = () => document.getElementById('custom-alert').classList.add('hidden');
+window.askConfirm = (m, cb) => { document.getElementById('confirm-message').innerText = m; window.deleteCallback = cb; document.getElementById('confirm-modal').classList.remove('hidden'); };
+window.closeConfirm = () => document.getElementById('confirm-modal').classList.add('hidden');
+document.getElementById('confirm-yes-btn').onclick = () => { if(window.deleteCallback) window.deleteCallback(); closeConfirm(); };
+window.switchTab = (t) => {
+    ['view-log', 'view-config', 'view-reports'].forEach(v => document.getElementById(v).classList.add('hidden'));
+    ['tab-log', 'tab-config', 'tab-reports'].forEach(id => document.getElementById(id).classList.replace('tab-active', 'text-slate-400'));
+    document.getElementById('view-' + t).classList.remove('hidden');
+    document.getElementById('tab-' + t).classList.replace('text-slate-400', 'tab-active');
+};
+window.logout = () => signOut(auth);
 document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
 </script>
 </body>
