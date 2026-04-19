@@ -2,195 +2,526 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Financat e Mia</title>
-    <!-- Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LindiBank - Financat e Mia</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React Core -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel for JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            -webkit-tap-highlight-color: transparent;
-        }
-        .custom-shadow { shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .modal-animate { animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .animate-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-    <div id="root">
-        <!-- Loading State para se te niset React -->
-        <div class="flex items-center justify-center min-h-screen">
-            <div class="animate-pulse flex flex-col items-center">
-                <div class="w-12 h-12 bg-indigo-600 rounded-2xl mb-4"></div>
-                <div class="h-2 w-24 bg-slate-200 rounded"></div>
+<body class="bg-slate-50 text-slate-900 pb-24">
+
+    <!-- Auth Guard Layer -->
+    <div id="authOverlay" class="fixed inset-0 bg-white z-[100] flex items-center justify-center p-4">
+        <div class="w-full max-w-md space-y-8 text-center">
+            <div class="bg-indigo-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto shadow-xl text-white">
+                <i data-lucide="wallet" class="w-10 h-10"></i>
+            </div>
+            <div id="authContent">
+                <h1 class="text-3xl font-black text-slate-800">LindiBank</h1>
+                <p class="text-slate-500 mt-2">Identifikohuni për të menaxhuar financat</p>
+                <div class="mt-8 space-y-4">
+                    <input type="email" id="loginEmail" placeholder="Email" class="w-full p-4 bg-slate-100 rounded-2xl border-none outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                    <input type="password" id="loginPass" placeholder="Fjalëkalimi" class="w-full p-4 bg-slate-100 rounded-2xl border-none outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                    <button id="authBtn" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg hover:bg-indigo-700 transition-all active:scale-95">HYNI NË LLOGARI</button>
+                    <button id="toggleAuthMode" class="text-indigo-600 font-bold text-sm">Nuk keni llogari? Regjistrohuni</button>
+                </div>
+            </div>
+            <div id="authLoading" class="hidden">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+                <p class="mt-4 font-bold text-slate-400">Duke u lidhur...</p>
             </div>
         </div>
     </div>
 
-    <script type="text/babel">
-        const { useState, useMemo, useEffect } = React;
-
-        // SVG ICONS - I kemi brenda qe mos te dalin "blank"
-        const Icons = {
-            Wallet: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>,
-            Settings: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
-            Plus: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>,
-            ArrowUp: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/></svg>,
-            ArrowDown: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 4 4 4-4"/><path d="M12 8v8"/></svg>,
-            History: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>,
-            Grid: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>,
-            Close: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-        };
-
-        const App = () => {
-            const [activeTab, setActiveTab] = useState('home');
-            
-            // Database fillestare (ne memorje)
-            const [accounts, setAccounts] = useState([
-                { id: '1', name: 'Karta kryesore', balance: 50000, type: 'asset' },
-                { id: '2', name: 'Kursime', balance: 120000, type: 'asset' },
-                { id: '3', name: 'Credit Card', balance: -25000, type: 'debt', limit: 100000 },
-                { id: '4', name: 'Cash', balance: 2500, type: 'asset' }
-            ]);
-
-            const [transactions, setTransactions] = useState([
-                { id: 1, type: 'expense', amount: 1500, title: 'Ushqime', date: 'Sot', accName: 'Cash' },
-                { id: 2, type: 'income', amount: 80000, title: 'Paga', date: 'Dje', accName: 'Karta kryesore' }
-            ]);
-
-            const totals = useMemo(() => {
-                const assets = accounts.filter(a => a.type === 'asset').reduce((s, a) => s + a.balance, 0);
-                const debts = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + a.balance, 0);
-                return { assets, debts, net: assets + debts };
-            }, [accounts]);
-
-            return (
-                <div className="max-w-md mx-auto min-h-screen bg-slate-50 relative flex flex-col">
-                    
-                    {/* Top Bar */}
-                    <header className="p-6 flex justify-between items-center bg-white border-b border-slate-100">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-indigo-600 p-2 rounded-xl text-white">
-                                <Icons.Wallet />
-                            </div>
-                            <h1 className="font-bold text-lg tracking-tight">Financat e Mia</h1>
-                        </div>
-                        <button className="p-2 text-slate-400 hover:text-indigo-600 transition-colors">
-                            <Icons.Settings />
-                        </button>
-                    </header>
-
-                    <main className="flex-1 p-6 space-y-6 overflow-y-auto no-scrollbar pb-32">
-                        {activeTab === 'home' ? (
-                            <React.Fragment>
-                                {/* Balance Card */}
-                                <div className="bg-slate-900 rounded-[32px] p-8 text-white shadow-2xl shadow-indigo-200/50 relative overflow-hidden">
-                                    <div className="relative z-10">
-                                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-50 mb-2">Gjendja Neto</p>
-                                        <h2 className="text-4xl font-extrabold mb-8">{totals.net.toLocaleString()} <span className="text-lg font-normal opacity-50">ALL</span></h2>
-                                        
-                                        <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/10">
-                                            <div>
-                                                <p className="text-[10px] font-bold uppercase opacity-40 mb-1">Pasuria</p>
-                                                <p className="text-lg font-bold">+{totals.assets.toLocaleString()}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-[10px] font-bold uppercase opacity-40 mb-1">Detyrime</p>
-                                                <p className="text-lg font-bold text-indigo-300">{totals.debts.toLocaleString()}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
-                                </div>
-
-                                {/* Quick Actions */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-3 active:scale-95 transition-transform">
-                                        <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl"><Icons.ArrowUp /></div>
-                                        <span className="font-bold text-sm">Hyrje</span>
-                                    </button>
-                                    <button className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-3 active:scale-95 transition-transform">
-                                        <div className="p-2 bg-red-50 text-red-600 rounded-xl"><Icons.ArrowDown /></div>
-                                        <span className="font-bold text-sm">Shpenzim</span>
-                                    </button>
-                                </div>
-
-                                {/* Accounts List */}
-                                <section className="space-y-4">
-                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Llogaritë Aktive</h3>
-                                    {accounts.map(acc => (
-                                        <div key={acc.id} className="bg-white p-5 rounded-[24px] border border-slate-100 flex items-center justify-between shadow-sm">
-                                            <div className="flex items-center gap-4">
-                                                <div className={`p-3 rounded-2xl ${acc.type === 'asset' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-500'}`}>
-                                                    <Icons.Wallet />
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-sm">{acc.name}</p>
-                                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{acc.type === 'asset' ? 'Gjendje' : 'Borxh/Limit'}</p>
-                                                </div>
-                                            </div>
-                                            <p className={`font-bold ${acc.balance < 0 ? 'text-red-500' : 'text-emerald-600'}`}>
-                                                {acc.balance.toLocaleString()}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </section>
-                            </React.Fragment>
-                        ) : (
-                            <section className="space-y-4 animate-in">
-                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Historiku i Lëvizjeve</h3>
-                                {transactions.map(t => (
-                                    <div key={t.id} className="bg-white p-5 rounded-[24px] border border-slate-100 flex items-center justify-between shadow-sm">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`p-3 rounded-2xl ${t.type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
-                                                {t.type === 'income' ? <Icons.ArrowUp /> : <Icons.ArrowDown />}
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-sm">{t.title}</p>
-                                                <p className="text-[10px] text-slate-400 font-bold uppercase">{t.accName} • {t.date}</p>
-                                            </div>
-                                        </div>
-                                        <p className={`font-bold ${t.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}>
-                                            {t.type === 'income' ? '+' : '-'}{t.amount.toLocaleString()}
-                                        </p>
-                                    </div>
-                                ))}
-                            </section>
-                        )}
-                    </main>
-
-                    {/* Bottom Nav */}
-                    <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/80 backdrop-blur-xl border-t border-slate-100 p-6 flex justify-around items-center z-50">
-                        <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'home' ? 'text-indigo-600 scale-110' : 'text-slate-300 hover:text-slate-500'}`}>
-                            <Icons.Grid />
-                            <span className="text-[9px] font-bold uppercase tracking-tighter">Përmbledhja</span>
-                        </button>
-                        <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 active:scale-90 transition-transform cursor-pointer">
-                            <Icons.Plus />
-                        </div>
-                        <button onClick={() => setActiveTab('history')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'history' ? 'text-indigo-600 scale-110' : 'text-slate-300 hover:text-slate-500'}`}>
-                            <Icons.History />
-                            <span className="text-[9px] font-bold uppercase tracking-tighter">Aktiviteti</span>
-                        </button>
-                    </nav>
+    <div id="mainApp" class="hidden">
+        <!-- Header -->
+        <header class="bg-white border-b p-4 sticky top-0 z-20">
+            <div class="max-w-2xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="bg-indigo-600 p-2 rounded-xl text-white">
+                        <i data-lucide="wallet" class="w-6 h-6"></i>
+                    </div>
+                    <h1 class="font-bold text-xl">Financat e Mia</h1>
                 </div>
-            );
+                <div class="flex gap-2">
+                    <button id="openManageBtn" class="p-2 bg-slate-100 rounded-full text-slate-600 active:scale-95">
+                        <i data-lucide="settings-2" class="w-5 h-5"></i>
+                    </button>
+                    <button id="logoutBtn" class="p-2 bg-red-50 rounded-full text-red-500 active:scale-95">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-2xl mx-auto p-4 space-y-6">
+            <!-- Bilanci Përmbledhës -->
+            <div class="bg-indigo-600 rounded-3xl p-6 text-white shadow-xl shadow-indigo-100 relative overflow-hidden">
+                <div class="relative z-10">
+                    <p class="text-xs font-bold uppercase opacity-70">Gjendja Neto</p>
+                    <h2 class="text-3xl font-black mb-4" id="netBalance">0 ALL</h2>
+                    <div class="flex justify-between border-t border-indigo-500 pt-4">
+                        <div>
+                            <p class="text-[10px] uppercase opacity-70">Pasuri</p>
+                            <p class="font-bold" id="assetTotal">0</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] uppercase opacity-70">Detyrime</p>
+                            <p class="font-bold" id="debtTotal">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <i data-lucide="wallet" class="w-32 h-32"></i>
+                </div>
+            </div>
+
+            <div id="tabOverview">
+                <div class="grid grid-cols-3 gap-2 mb-6">
+                    <button id="openIncomeBtn" class="bg-white p-3 rounded-2xl flex flex-col items-center gap-1 border shadow-sm border-slate-200 active:bg-emerald-50">
+                        <i data-lucide="arrow-up-circle" class="text-emerald-500"></i>
+                        <span class="font-bold text-[10px] uppercase">Të Ardhura</span>
+                    </button>
+                    <button id="openExpenseBtn" class="bg-white p-3 rounded-2xl flex flex-col items-center gap-1 border shadow-sm border-slate-200 active:bg-red-50">
+                        <i data-lucide="trending-down" class="text-red-500"></i>
+                        <span class="font-bold text-[10px] uppercase">Shpenzim</span>
+                    </button>
+                    <button id="openTransferBtn" class="bg-white p-3 rounded-2xl flex flex-col items-center gap-1 border shadow-sm border-slate-200 active:bg-blue-50">
+                        <i data-lucide="arrow-right-left" class="text-blue-500"></i>
+                        <span class="font-bold text-[10px] uppercase">Transfertë</span>
+                    </button>
+                </div>
+
+                <section class="space-y-3">
+                    <h3 class="font-bold flex items-center gap-2 text-slate-500 text-sm uppercase tracking-wider">Llogaritë</h3>
+                    <div id="accountsList" class="space-y-3"></div>
+                </section>
+            </div>
+
+            <div id="tabHistory" class="hidden">
+                <section class="space-y-3">
+                    <h3 class="font-bold text-slate-500 text-sm uppercase tracking-wider">Lëvizjet</h3>
+                    <div id="transactionsList" class="space-y-3"></div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Navigation Bar -->
+        <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t flex justify-around p-4 z-30 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+            <button id="navOverview" class="flex flex-col items-center gap-1 text-indigo-600 transition-colors">
+                <i data-lucide="layout-dashboard"></i>
+                <span class="text-[9px] font-black uppercase tracking-tighter">Kreu</span>
+            </button>
+            <button id="navHistory" class="flex flex-col items-center gap-1 text-slate-400 transition-colors">
+                <i data-lucide="history"></i>
+                <span class="text-[9px] font-black uppercase tracking-tighter">Lëvizjet</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modals (Hidden by default) -->
+    <div id="modalContainer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex items-end sm:items-center justify-center p-4">
+        <!-- Content injected dynamically -->
+        <div id="modalBox" class="bg-white w-full max-w-md rounded-[32px] p-8 space-y-4 animate-in overflow-y-auto max-h-[90vh]"></div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD6laDM0cnLjqvZu1ZV9Or9IuguGwRK4b4",
+            authDomain: "lindibank-72a9f.firebaseapp.com",
+            projectId: "lindibank-72a9f",
+            storageBucket: "lindibank-72a9f.firebasestorage.app",
+            messagingSenderId: "267454156254",
+            appId: "1:267454156254:web:646d45c4c12e01323c214f",
+            measurementId: "G-7SW8XSHWLK"
         };
 
-        // Render me kontroll per gabimet
-        try {
-            const root = ReactDOM.createRoot(document.getElementById('root'));
-            root.render(<App />);
-        } catch (e) {
-            document.getElementById('root').innerHTML = `<div style="padding: 20px; color: red;">Gabim gjatë ngarkimit: ${e.message}</div>`;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State Management
+        let accounts = [];
+        let expenseCategories = [{ id: 'ec1', name: 'Shtëpiake' }, { id: 'ec2', name: 'Shëndet' }, { id: 'ec3', name: 'Ushqim' }];
+        let incomeCategories = [{ id: 'ic1', name: 'Rroga' }, { id: 'ic2', name: 'Qira' }, { id: 'ic3', name: 'Bonuse' }];
+        let transactions = [];
+        let isLoginMode = true;
+
+        // UI Handlers
+        const authOverlay = document.getElementById('authOverlay');
+        const mainApp = document.getElementById('mainApp');
+        const modalContainer = document.getElementById('modalContainer');
+        const modalBox = document.getElementById('modalBox');
+
+        // --- AUTH LOGIC ---
+        document.getElementById('toggleAuthMode').onclick = () => {
+            isLoginMode = !isLoginMode;
+            document.getElementById('authBtn').innerText = isLoginMode ? 'HYNI NË LLOGARI' : 'KRIJONI LLOGARI';
+            document.getElementById('toggleAuthMode').innerText = isLoginMode ? 'Nuk keni llogari? Regjistrohuni' : 'Keni llogari? Identifikohuni';
+        };
+
+        document.getElementById('authBtn').onclick = async () => {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            if(!email || !pass) return;
+
+            document.getElementById('authContent').classList.add('hidden');
+            document.getElementById('authLoading').classList.remove('hidden');
+
+            try {
+                if(isLoginMode) await signInWithEmailAndPassword(auth, email, pass);
+                else await createUserWithEmailAndPassword(auth, email, pass);
+            } catch (err) {
+                alert("Gabim: " + err.message);
+                document.getElementById('authContent').classList.remove('hidden');
+                document.getElementById('authLoading').classList.add('hidden');
+            }
+        };
+
+        document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authOverlay.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                initData(user.uid);
+            } else {
+                authOverlay.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+                document.getElementById('authContent').classList.remove('hidden');
+                document.getElementById('authLoading').classList.add('hidden');
+            }
+        });
+
+        // --- DATA SYNC ---
+        function initData(uid) {
+            const userPath = `artifacts/lindibank/users/${uid}`;
+            
+            // Sync Accounts
+            onSnapshot(collection(db, `${userPath}/accounts`), (snap) => {
+                accounts = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                if (accounts.length === 0) {
+                    // Default accounts nese eshte user i ri
+                    const defaults = [
+                        { name: 'Debit Card', balance: 0, type: 'asset', limit: 0 },
+                        { name: 'Overdraft', balance: 0, type: 'debt', limit: 50000 },
+                        { name: 'Cash', balance: 0, type: 'asset', limit: 0 }
+                    ];
+                    defaults.forEach(acc => addDoc(collection(db, `${userPath}/accounts`), acc));
+                }
+                renderUI();
+            });
+
+            // Sync Categories
+            onSnapshot(collection(db, `${userPath}/categories`), (snap) => {
+                const cats = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                if (cats.length > 0) {
+                    expenseCategories = cats.filter(c => c.type === 'expense');
+                    incomeCategories = cats.filter(c => c.type === 'income');
+                } else {
+                    [...expenseCategories, ...incomeCategories].forEach(c => {
+                        addDoc(collection(db, `${userPath}/categories`), { name: c.name, type: c.id.startsWith('ec') ? 'expense' : 'income' });
+                    });
+                }
+            });
+
+            // Sync Transactions
+            onSnapshot(collection(db, `${userPath}/transactions`), (snap) => {
+                transactions = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => b.timestamp - a.timestamp);
+                renderUI();
+            });
         }
+
+        // --- RENDER ENGINE ---
+        function renderUI() {
+            // Totals
+            const assets = accounts.filter(a => a.type === 'asset').reduce((s, a) => s + Number(a.balance), 0);
+            const debts = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + Number(a.balance), 0);
+            document.getElementById('netBalance').innerText = (assets + debts).toLocaleString() + " ALL";
+            document.getElementById('assetTotal').innerText = assets.toLocaleString();
+            document.getElementById('debtTotal').innerText = debts.toLocaleString();
+
+            // Accounts List
+            const accList = document.getElementById('accountsList');
+            accList.innerHTML = '';
+            accounts.forEach(acc => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-2xl border border-slate-100 shadow-sm animate-in";
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="font-bold text-slate-700">${acc.name}</span>
+                        <span class="font-black ${acc.balance < 0 ? 'text-red-500' : 'text-emerald-600'}">
+                            ${Number(acc.balance).toLocaleString()} ALL
+                        </span>
+                    </div>
+                    ${acc.type === 'debt' ? `
+                        <div class="mt-2">
+                            <div class="flex justify-between text-[10px] text-slate-400 font-bold mb-1 uppercase">
+                                <span>LIMITI: ${acc.limit.toLocaleString()}</span>
+                                <span>I LIRË: ${(Number(acc.limit) + Number(acc.balance)).toLocaleString()}</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                <div class="h-full bg-red-400 transition-all duration-500" style="width: ${Math.min((Math.abs(acc.balance) / acc.limit) * 100, 100)}%"></div>
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+                accList.appendChild(div);
+            });
+
+            // History List
+            const transList = document.getElementById('transactionsList');
+            transList.innerHTML = transactions.length === 0 ? '<p class="text-center py-10 text-slate-400 text-sm italic">Nuk ka transaksione ende.</p>' : '';
+            transactions.forEach(t => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between animate-in";
+                const isExp = t.type === 'expense';
+                const isInc = t.type === 'income';
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 rounded-lg ${isExp ? 'bg-red-50 text-red-500' : isInc ? 'bg-emerald-50 text-emerald-500' : 'bg-blue-50 text-blue-500'}">
+                            <i data-lucide="${isExp ? 'trending-down' : isInc ? 'trending-up' : 'arrow-right-left'}" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm">${t.desc || (isExp ? expenseCategories.find(c => c.id === t.catId)?.name : incomeCategories.find(c => c.id === t.catId)?.name) || 'Transfertë'}</p>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">${new Date(t.timestamp).toLocaleDateString('sq-AL')}</p>
+                        </div>
+                    </div>
+                    <p class="font-black ${isExp ? 'text-red-500' : isInc ? 'text-emerald-600' : 'text-blue-500'}">
+                        ${isExp ? '-' : isInc ? '+' : ''}${Number(t.amount).toLocaleString()}
+                    </p>
+                `;
+                transList.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        // --- NAVIGATION ---
+        const navOverview = document.getElementById('navOverview');
+        const navHistory = document.getElementById('navHistory');
+        const tabOverview = document.getElementById('tabOverview');
+        const tabHistory = document.getElementById('tabHistory');
+
+        navOverview.onclick = () => {
+            tabOverview.classList.remove('hidden');
+            tabHistory.classList.add('hidden');
+            navOverview.className = "flex flex-col items-center gap-1 text-indigo-600 transition-colors";
+            navHistory.className = "flex flex-col items-center gap-1 text-slate-400 transition-colors";
+        };
+
+        navHistory.onclick = () => {
+            tabOverview.classList.add('hidden');
+            tabHistory.classList.remove('hidden');
+            navHistory.className = "flex flex-col items-center gap-1 text-indigo-600 transition-colors";
+            navOverview.className = "flex flex-col items-center gap-1 text-slate-400 transition-colors";
+        };
+
+        // --- MODAL SYSTEM ---
+        function showModal(content) {
+            modalBox.innerHTML = content;
+            modalContainer.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        window.closeModal = () => {
+            modalContainer.classList.add('hidden');
+            modalBox.innerHTML = '';
+        };
+
+        // --- CORE ACTIONS ---
+        document.getElementById('openIncomeBtn').onclick = () => {
+            showModal(`
+                <h2 class="text-xl font-black text-emerald-600">Regjistro të Ardhura</h2>
+                <div class="space-y-4 pt-2">
+                    <div class="relative">
+                        <input id="mAmt" type="number" placeholder="0.00" class="w-full text-4xl font-black bg-slate-50 rounded-2xl p-6 outline-none text-emerald-600 placeholder-emerald-200">
+                        <span class="absolute right-6 top-1/2 -translate-y-1/2 font-black text-emerald-300">ALL</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <select id="mCat" class="bg-slate-100 p-4 rounded-2xl outline-none text-xs font-black uppercase">
+                            ${incomeCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                        </select>
+                        <select id="mAcc" class="bg-slate-100 p-4 rounded-2xl outline-none text-xs font-black uppercase">
+                            ${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <input id="mDesc" type="text" placeholder="Shënim (opsionale)" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border border-slate-100 text-sm font-bold">
+                    <div class="flex gap-2 pt-4">
+                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400">Anulo</button>
+                        <button id="mSubmit" class="flex-[2] bg-emerald-600 text-white py-4 rounded-2xl font-black shadow-lg">KRYEJ</button>
+                    </div>
+                </div>
+            `);
+            document.getElementById('mSubmit').onclick = () => handleTransaction('income');
+        };
+
+        document.getElementById('openExpenseBtn').onclick = () => {
+            showModal(`
+                <h2 class="text-xl font-black text-red-600">Shpenzim i Ri</h2>
+                <div class="space-y-4 pt-2">
+                    <div class="relative">
+                        <input id="mAmt" type="number" placeholder="0.00" class="w-full text-4xl font-black bg-slate-50 rounded-2xl p-6 outline-none text-red-600 placeholder-red-200">
+                        <span class="absolute right-6 top-1/2 -translate-y-1/2 font-black text-red-300">ALL</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <select id="mCat" class="bg-slate-100 p-4 rounded-2xl outline-none text-xs font-black uppercase">
+                            ${expenseCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                        </select>
+                        <select id="mAcc" class="bg-slate-100 p-4 rounded-2xl outline-none text-xs font-black uppercase">
+                            ${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <input id="mDesc" type="text" placeholder="Ku u shpenzuan?" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border border-slate-100 text-sm font-bold">
+                    <div class="flex gap-2 pt-4">
+                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400">Anulo</button>
+                        <button id="mSubmit" class="flex-[2] bg-red-600 text-white py-4 rounded-2xl font-black shadow-lg">RUAJ</button>
+                    </div>
+                </div>
+            `);
+            document.getElementById('mSubmit').onclick = () => handleTransaction('expense');
+        };
+
+        document.getElementById('openTransferBtn').onclick = () => {
+            showModal(`
+                <h2 class="text-xl font-black text-blue-600 text-center">Transfertë / Larje Borxhi</h2>
+                <div class="space-y-4 pt-2">
+                    <div class="relative">
+                        <input id="mAmt" type="number" placeholder="0.00" class="w-full text-4xl font-black bg-slate-50 rounded-2xl p-6 outline-none text-blue-600">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <select id="mAccFrom" class="bg-slate-100 p-4 rounded-2xl outline-none text-[10px] font-black uppercase">
+                            <option value="">Nga</option>
+                            ${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
+                        </select>
+                        <select id="mAccTo" class="bg-slate-100 p-4 rounded-2xl outline-none text-[10px] font-black uppercase">
+                            <option value="">Tek</option>
+                            ${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="flex gap-2 pt-4">
+                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400">Anulo</button>
+                        <button id="mSubmit" class="flex-[2] bg-blue-600 text-white py-4 rounded-2xl font-black shadow-lg">TRANSFERO</button>
+                    </div>
+                </div>
+            `);
+            document.getElementById('mSubmit').onclick = handleTransfer;
+        };
+
+        // --- TRANSACTION HANDLERS ---
+        async function handleTransaction(type) {
+            const amt = Number(document.getElementById('mAmt').value);
+            const catId = document.getElementById('mCat').value;
+            const accId = document.getElementById('mAcc').value;
+            const desc = document.getElementById('mDesc').value;
+            const uid = auth.currentUser.uid;
+            
+            if (!amt || !accId) return;
+
+            const acc = accounts.find(a => a.id === accId);
+            const newBalance = type === 'income' ? Number(acc.balance) + amt : Number(acc.balance) - amt;
+
+            const userPath = `artifacts/lindibank/users/${uid}`;
+            await updateDoc(doc(db, `${userPath}/accounts`, accId), { balance: newBalance });
+            await addDoc(collection(db, `${userPath}/transactions`), {
+                type, amount: amt, catId, accId, desc, timestamp: Date.now()
+            });
+            
+            closeModal();
+        }
+
+        async function handleTransfer() {
+            const amt = Number(document.getElementById('mAmt').value);
+            const fromId = document.getElementById('mAccFrom').value;
+            const toId = document.getElementById('mAccTo').value;
+            const uid = auth.currentUser.uid;
+
+            if(!amt || !fromId || !toId) return;
+
+            const fromAcc = accounts.find(a => a.id === fromId);
+            const toAcc = accounts.find(a => a.id === toId);
+            const userPath = `artifacts/lindibank/users/${uid}`;
+
+            await updateDoc(doc(db, `${userPath}/accounts`, fromId), { balance: Number(fromAcc.balance) - amt });
+            await updateDoc(doc(db, `${userPath}/accounts`, toId), { balance: Number(toAcc.balance) + amt });
+            await addDoc(collection(db, `${userPath}/transactions`), {
+                type: 'transfer', amount: amt, fromId, toId, timestamp: Date.now()
+            });
+
+            closeModal();
+        }
+
+        // --- MANAGE SYSTEM (SETTINGS) ---
+        document.getElementById('openManageBtn').onclick = () => {
+            showModal(`
+                <div class="flex justify-between items-center pb-4 border-b">
+                    <h2 class="text-xl font-black">Menaxho Sistemin</h2>
+                    <button onclick="closeModal()" class="text-slate-400"><i data-lucide="x"></i></button>
+                </div>
+                <div class="space-y-6 pt-4">
+                    <div class="space-y-2">
+                        <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Llogaritë Tuaja</h3>
+                        <div id="mAccList" class="space-y-2"></div>
+                        <div class="p-4 bg-indigo-50 rounded-2xl space-y-2">
+                            <input id="newAccName" placeholder="Emri i llogarisë" class="w-full p-2 rounded-lg text-sm font-bold border-none outline-none">
+                            <div class="flex gap-2">
+                                <select id="newAccType" class="flex-1 p-2 rounded-lg text-[10px] font-black uppercase border-none">
+                                    <option value="asset">Pasuri</option>
+                                    <option value="debt">Borxh</option>
+                                </select>
+                                <input id="newAccLimit" type="number" placeholder="Limiti" class="flex-1 p-2 rounded-lg text-sm border-none">
+                                <button id="addNewAcc" class="bg-indigo-600 text-white px-4 rounded-lg"><i data-lucide="plus"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+            
+            const list = document.getElementById('mAccList');
+            accounts.forEach(acc => {
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between bg-slate-50 p-3 rounded-xl";
+                div.innerHTML = `
+                    <div>
+                        <p class="font-bold text-sm">${acc.name}</p>
+                        <p class="text-[9px] text-slate-400 font-black uppercase">${acc.type === 'asset' ? 'Pasuri' : `Detyrim (${acc.limit})`}</p>
+                    </div>
+                    <button onclick="window.delAcc('${acc.id}')" class="text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                `;
+                list.appendChild(div);
+            });
+
+            document.getElementById('addNewAcc').onclick = async () => {
+                const name = document.getElementById('newAccName').value;
+                const type = document.getElementById('newAccType').value;
+                const limit = Number(document.getElementById('newAccLimit').value) || 0;
+                if(!name) return;
+                await addDoc(collection(db, `artifacts/lindibank/users/${auth.currentUser.uid}/accounts`), {
+                    name, type, limit, balance: 0
+                });
+                closeModal(); // Refresh UI
+            };
+            lucide.createIcons();
+        };
+
+        window.delAcc = async (id) => {
+            if(!confirm("A jeni i sigurt?")) return;
+            await deleteDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/accounts`, id));
+            closeModal();
+        };
+
+        lucide.createIcons();
     </script>
 </body>
 </html>
