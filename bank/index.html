@@ -11,6 +11,21 @@
         body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         .animate-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .account-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 12px;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .account-carousel::-webkit-scrollbar { display: none; }
+        .account-card {
+            flex: 0 0 85%;
+            scroll-snap-align: center;
+        }
+        
         @media print {
             .no-print { display: none !important; }
             .print-only { display: block !important; }
@@ -34,7 +49,6 @@
                     <input type="email" id="loginEmail" placeholder="Email" class="w-full p-4 bg-slate-100 rounded-2xl border-none outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
                     <input type="password" id="loginPass" placeholder="Fjalëkalimi" class="w-full p-4 bg-slate-100 rounded-2xl border-none outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
                     <button id="authBtn" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg hover:bg-indigo-700 transition-all active:scale-95">HYNI NË LLOGARI</button>
-                    <button id="toggleAuthMode" class="text-indigo-600 font-bold text-sm">Nuk keni llogari? Regjistrohuni</button>
                 </div>
             </div>
             <div id="authLoading" class="hidden">
@@ -66,25 +80,25 @@
         </header>
 
         <div class="max-w-2xl mx-auto p-4 space-y-6">
-            <!-- Bilanci Përmbledhës -->
-            <div class="bg-indigo-600 rounded-3xl p-6 text-white shadow-xl shadow-indigo-100 relative overflow-hidden no-print">
-                <div class="relative z-10">
-                    <p class="text-[10px] font-bold uppercase opacity-70 tracking-widest">Gjendja Neto (Cash - Borxh)</p>
-                    <h2 class="text-4xl font-black mb-4" id="netBalance">0 ALL</h2>
-                    <div class="grid grid-cols-2 gap-4 border-t border-indigo-500 pt-4">
-                        <div>
-                            <p class="text-[9px] uppercase opacity-70">Gjendja Cash</p>
-                            <p class="font-bold text-sm" id="cashOnly">0</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[9px] uppercase opacity-70">Limite të Lira</p>
-                            <p class="font-bold text-sm" id="limitsOnly">0</p>
-                        </div>
+            <!-- Përmbledhja Neto -->
+            <div class="bg-slate-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden no-print">
+                <p class="text-[10px] font-bold uppercase opacity-60 tracking-widest mb-1">Gjendja Neto (Total)</p>
+                <h2 class="text-3xl font-black mb-4" id="netBalance">0 ALL</h2>
+                <div class="grid grid-cols-2 gap-4 border-t border-white/10 pt-4">
+                    <div>
+                        <p class="text-[9px] uppercase opacity-60">Gjendja Cash</p>
+                        <p class="font-bold text-sm" id="cashOnly">0</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[9px] uppercase opacity-60">Limite të Lira</p>
+                        <p class="font-bold text-sm" id="limitsOnly">0</p>
                     </div>
                 </div>
-                <div class="absolute top-0 right-0 p-4 opacity-10">
-                    <i data-lucide="landmark" class="w-32 h-32"></i>
-                </div>
+            </div>
+
+            <!-- Carousel i Llogarive -->
+            <div id="accountCarousel" class="account-carousel no-print">
+                <!-- Cards will be injected here -->
             </div>
 
             <!-- Content Tabs -->
@@ -92,8 +106,8 @@
                 <div id="budgetStatus" class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm hidden animate-in no-print">
                     <div class="flex justify-between items-end mb-2">
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase">Buxheti i Muajit</p>
-                            <p id="budgetLabel" class="text-sm font-bold text-slate-700">Shpenzuar: 0 / 0 ALL</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Limit Shpenzimi (Buxheti)</p>
+                            <p id="budgetLabel" class="text-sm font-bold text-slate-700">0 / 0 ALL</p>
                         </div>
                         <p id="budgetPercent" class="text-xs font-black text-indigo-600">0%</p>
                     </div>
@@ -116,15 +130,12 @@
                         <span class="font-bold text-[10px] uppercase">Transfertë</span>
                     </button>
                 </div>
-
-                <section class="space-y-3 no-print">
-                    <h3 class="font-bold text-slate-500 text-sm uppercase tracking-wider">Llogaritë</h3>
-                    <div id="accountsList" class="space-y-3"></div>
-                </section>
             </div>
 
             <div id="tabHistory" class="hidden space-y-4 no-print">
-                <h3 class="font-bold text-slate-500 text-sm uppercase tracking-wider">Historiku i Lëvizjeve</h3>
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-slate-500 text-sm uppercase tracking-wider">Historiku i Lëvizjeve</h3>
+                </div>
                 <div id="transactionsList" class="space-y-3"></div>
             </div>
 
@@ -142,9 +153,7 @@
                             <option value="10">Nëntor</option><option value="11">Dhjetor</option>
                         </select>
                         <select id="reportYear" class="p-3 bg-slate-50 rounded-xl border-none font-bold text-sm">
-                            <option value="2024">2024</option>
-                            <option value="2025" selected>2025</option>
-                            <option value="2026">2026</option>
+                            <!-- Vitet do shtohen dinamikisht -->
                         </select>
                     </div>
                     <button id="printReportBtn" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black flex items-center justify-center gap-2">
@@ -189,8 +198,8 @@
     <!-- Confirm Modal -->
     <div id="confirmModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-[100] hidden flex items-center justify-center p-6 no-print" onclick="closeConfirm()">
         <div class="bg-white w-full max-w-sm rounded-[32px] p-8 space-y-4 animate-in shadow-2xl" onclick="event.stopPropagation()">
-            <h3 id="confirmTitle" class="text-xl font-black text-center">Titulli</h3>
-            <p id="confirmMessage" class="text-slate-500 text-center text-sm">Mesazhi</p>
+            <h3 id="confirmTitle" class="text-xl font-black text-center">Konfirmim</h3>
+            <p id="confirmMessage" class="text-slate-500 text-center text-sm">Dëshironi të vazhdoni?</p>
             <div class="flex gap-3 pt-4">
                 <button id="confirmCancel" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Jo</button>
                 <button id="confirmYes" class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold">Po</button>
@@ -201,7 +210,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, collection, addDoc, deleteDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, collection, addDoc, deleteDoc, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD6laDM0cnLjqvZu1ZV9Or9IuguGwRK4b4",
@@ -226,13 +235,10 @@
         const modalContainer = document.getElementById('modalContainer');
         const modalBox = document.getElementById('modalBox');
 
-        // Close logic
-        window.handleOutsideClick = (e) => {
-            if (e.target === modalContainer) closeModal();
-        };
+        window.handleOutsideClick = (e) => { if (e.target === modalContainer) closeModal(); };
         window.closeConfirm = () => document.getElementById('confirmModal').classList.add('hidden');
+        window.closeModal = () => { modalContainer.classList.add('hidden'); editingId = null; };
 
-        // Auth
         document.getElementById('authBtn').onclick = async () => {
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
@@ -268,15 +274,32 @@
             });
             onSnapshot(collection(db, `${userPath}/categories`), snap => {
                 categories = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                if(modalContainer.classList.contains('manage-open')) renderManageContent();
             });
             onSnapshot(collection(db, `${userPath}/transactions`), snap => {
                 transactions = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => b.timestamp - a.timestamp);
+                updateYearFilter();
                 renderAll();
             });
             onSnapshot(doc(db, `${userPath}/settings`, 'budget'), snap => {
-                monthlyBudget = snap.exists() ? snap.data().amount : 0;
+                monthlyBudget = snap.exists() ? Number(snap.data().amount) : 0;
                 renderAll();
             });
+        }
+
+        function updateYearFilter() {
+            const yearSelect = document.getElementById('reportYear');
+            const currentYearValue = yearSelect.value;
+            const years = [...new Set(transactions.map(t => new Date(t.timestamp).getFullYear()))];
+            if (years.length === 0) years.push(new Date().getFullYear());
+            years.sort((a,b) => b-a);
+            
+            yearSelect.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
+            if (years.includes(Number(currentYearValue))) {
+                yearSelect.value = currentYearValue;
+            } else {
+                yearSelect.value = years[0];
+            }
         }
 
         window.switchTab = (tab) => {
@@ -289,54 +312,64 @@
         };
 
         function renderAll() {
-            // Logjika e re e ndarë
             const cashOnly = accounts.filter(a => a.type === 'asset' && a.balance > 0).reduce((s, a) => s + Number(a.balance), 0);
             const debtsOnly = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + Math.abs(Number(a.balance)), 0);
             const limitsOnly = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + (Number(a.limit) + Number(a.balance)), 0);
-            
-            // Gjendja Neto mbetet si diferencë reale
             const netBalance = cashOnly - debtsOnly;
 
             document.getElementById('netBalance').innerText = netBalance.toLocaleString() + " ALL";
             document.getElementById('cashOnly').innerText = cashOnly.toLocaleString();
             document.getElementById('limitsOnly').innerText = limitsOnly.toLocaleString();
 
+            renderCarousel();
             if (activeTab === 'overview') renderOverview();
             if (activeTab === 'history') renderHistory();
             if (activeTab === 'reports') renderReports();
             lucide.createIcons();
         }
 
-        function renderOverview() {
-            const list = document.getElementById('accountsList');
-            list.innerHTML = '';
-            accounts.forEach(acc => {
-                const div = document.createElement('div');
-                div.className = "bg-white p-4 rounded-2xl border border-slate-100 shadow-sm animate-in";
+        function renderCarousel() {
+            const carousel = document.getElementById('accountCarousel');
+            carousel.innerHTML = '';
+            accounts.forEach((acc, idx) => {
+                const card = document.createElement('div');
+                card.className = "account-card";
                 const mbetja = acc.type === 'debt' ? (Number(acc.limit) + Number(acc.balance)) : acc.balance;
-                div.innerHTML = `
-                    <div class="flex justify-between items-start mb-1">
-                        <div>
-                            <span class="font-bold text-slate-700">${acc.name}</span>
-                            <p class="text-[9px] text-slate-400 font-black uppercase">${acc.type === 'debt' ? 'Borxh/Limit' : 'Cash'}</p>
+                const isDebt = acc.type === 'debt';
+                card.onclick = () => openDirectEditAccount(acc);
+                card.innerHTML = `
+                    <div class="bg-indigo-600 rounded-[28px] p-6 text-white h-44 shadow-lg flex flex-col justify-between relative overflow-hidden cursor-pointer active:scale-95 transition-transform">
+                        <div class="z-10">
+                            <p class="text-[9px] font-black uppercase opacity-60">${acc.name}</p>
+                            <h4 class="text-2xl font-black mt-1">${Number(acc.balance).toLocaleString()} ALL</h4>
                         </div>
-                        <div class="text-right">
-                            <span class="font-black ${acc.balance < 0 ? 'text-red-500' : 'text-emerald-600'}">${Number(acc.balance).toLocaleString()} ALL</span>
-                            ${acc.type === 'debt' ? `<p class="text-[10px] text-slate-400 font-bold">Limit i Lirë: ${mbetja.toLocaleString()}</p>` : ''}
+                        <div class="z-10">
+                            <p class="text-[8px] font-bold opacity-60">${isDebt ? 'Limit i Lirë' : 'Gjendja'}</p>
+                            <p class="text-sm font-black">${mbetja.toLocaleString()} ALL</p>
+                        </div>
+                        <div class="absolute -bottom-4 -right-4 opacity-10">
+                            <i data-lucide="${isDebt ? 'credit-card' : 'banknote'}" class="w-24 h-24"></i>
+                        </div>
+                        <div class="absolute top-4 right-4 bg-white/10 p-2 rounded-full">
+                            <i data-lucide="pencil" class="w-3 h-3"></i>
                         </div>
                     </div>
                 `;
-                list.appendChild(div);
+                carousel.appendChild(card);
             });
+        }
 
+        function renderOverview() {
             if (monthlyBudget > 0) {
                 const now = new Date();
                 const spent = transactions.filter(t => t.type === 'expense' && new Date(t.timestamp).getMonth() === now.getMonth()).reduce((s, t) => s + Number(t.amount), 0);
                 const p = Math.min((spent/monthlyBudget)*100, 100);
                 document.getElementById('budgetStatus').classList.remove('hidden');
-                document.getElementById('budgetLabel').innerText = `Shpenzuar: ${spent.toLocaleString()} / ${monthlyBudget.toLocaleString()}`;
+                document.getElementById('budgetLabel').innerText = `${spent.toLocaleString()} / ${monthlyBudget.toLocaleString()} ALL`;
                 document.getElementById('budgetPercent').innerText = `${Math.round(p)}%`;
                 document.getElementById('budgetBar').style.width = p + '%';
+            } else {
+                document.getElementById('budgetStatus').classList.add('hidden');
             }
         }
 
@@ -351,15 +384,15 @@
                 div.onclick = () => openEditTransaction(t);
                 div.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <div class="p-2 rounded-lg ${t.type === 'expense' ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-500'}">
-                            <i data-lucide="${t.type === 'expense' ? 'trending-down' : 'trending-up'}" class="w-4 h-4"></i>
+                        <div class="p-2 rounded-lg ${t.type === 'expense' ? 'bg-red-50 text-red-500' : (t.type === 'income' ? 'bg-emerald-50 text-emerald-500' : 'bg-blue-50 text-blue-500')}">
+                            <i data-lucide="${t.type === 'expense' ? 'trending-down' : (t.type === 'income' ? 'trending-up' : 'arrow-right-left')}" class="w-4 h-4"></i>
                         </div>
                         <div>
-                            <p class="font-bold text-sm">${t.desc || cat?.name || 'Transaksion'}</p>
-                            <p class="text-[9px] text-slate-400 font-bold uppercase">${d.toLocaleDateString('sq-AL')} ${d.toLocaleTimeString('sq-AL', {hour:'2-digit', minute:'2-digit'})}</p>
+                            <p class="font-bold text-sm">${t.desc || cat?.name || (t.type === 'transfer' ? 'Transfertë' : 'Veprim')}</p>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase">${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>
                         </div>
                     </div>
-                    <p class="font-black ${t.type === 'expense' ? 'text-red-500' : 'text-emerald-600'}">${t.type === 'expense' ? '-' : '+'}${Number(t.amount).toLocaleString()}</p>
+                    <p class="font-black ${t.type === 'expense' ? 'text-red-500' : (t.type === 'income' ? 'text-emerald-600' : 'text-blue-500')}">${t.type === 'expense' ? '-' : (t.type === 'income' ? '+' : '')}${Number(t.amount).toLocaleString()}</p>
                 `;
                 list.appendChild(div);
             });
@@ -371,24 +404,87 @@
             statsList.innerHTML = '';
             const m = document.getElementById('reportMonth').value;
             const y = document.getElementById('reportYear').value;
+            
             const filtered = transactions.filter(t => {
                 const d = new Date(t.timestamp);
                 return (m === 'all' || d.getMonth() == m) && d.getFullYear() == y && t.type === 'expense';
             });
+            
             const catTotals = {};
             filtered.forEach(t => {
                 const c = categories.find(cat => cat.id === t.catId)?.name || 'Të tjera';
                 catTotals[c] = (catTotals[c] || 0) + Number(t.amount);
             });
+            
+            const sortedCats = Object.entries(catTotals).sort((a,b) => b[1] - a[1]);
             const total = Object.values(catTotals).reduce((a,b)=>a+b, 0);
-            Object.entries(catTotals).forEach(([name, amt]) => {
+
+            sortedCats.forEach(([name, amt]) => {
                 const p = (amt/total)*100;
                 const div = document.createElement('div');
-                div.className = "bg-white p-4 rounded-xl border border-slate-100";
-                div.innerHTML = `<div class="flex justify-between text-xs font-bold mb-1"><span>${name}</span><span>${amt.toLocaleString()}</span></div><div class="w-full bg-slate-50 h-1 rounded-full overflow-hidden"><div class="h-full bg-indigo-500" style="width:${p}%"></div></div>`;
+                div.className = "bg-white p-4 rounded-xl border border-slate-100 flex items-center justify-between";
+                div.innerHTML = `
+                    <div class="flex-1 mr-4">
+                        <div class="flex justify-between text-xs font-black mb-1">
+                            <span>${name}</span>
+                            <span class="text-indigo-600">${amt.toLocaleString()} ALL</span>
+                        </div>
+                        <div class="w-full bg-slate-50 h-1.5 rounded-full overflow-hidden">
+                            <div class="h-full bg-indigo-500 transition-all duration-500" style="width:${p}%"></div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-black text-slate-400">${Math.round(p)}%</span>
+                `;
                 statsList.appendChild(div);
             });
+            
+            if(sortedCats.length === 0) {
+                statsList.innerHTML = '<p class="text-center py-8 text-slate-400 text-xs font-bold">Nuk ka shpenzime për këtë periudhë</p>';
+            }
         }
+
+        window.openDirectEditAccount = (acc) => {
+            showModal(`
+                <h2 class="text-xl font-black">Edito Llogarinë</h2>
+                <div class="space-y-4 pt-2">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-400">Emri i Llogarisë</label>
+                        <input id="directEditName" type="text" value="${acc.name}" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-400">Lloji</label>
+                        <select id="directEditType" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none">
+                            <option value="asset" ${acc.type==='asset'?'selected':''}>Cash</option>
+                            <option value="debt" ${acc.type==='debt'?'selected':''}>Borxh / Overdraft</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-400">Balanca Aktuale (ALL)</label>
+                        <input id="directEditBal" type="number" value="${acc.balance}" class="w-full p-4 bg-slate-50 rounded-2xl font-black border-none outline-none">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-400">Limiti (nëse është borxh)</label>
+                        <input id="directEditLimit" type="number" value="${acc.limit || 0}" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none">
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Anulo</button>
+                        <button onclick="saveDirectAcc('${acc.id}')" class="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl font-black">RUAJ NDRYSHIMET</button>
+                    </div>
+                </div>
+            `);
+        };
+
+        window.saveDirectAcc = async (id) => {
+            const name = document.getElementById('directEditName').value;
+            const type = document.getElementById('directEditType').value;
+            const balance = Number(document.getElementById('directEditBal').value);
+            const limit = Number(document.getElementById('directEditLimit').value);
+            
+            await updateDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/accounts`, id), {
+                name, type, balance, limit
+            });
+            closeModal();
+        };
 
         window.openEditTransaction = (t) => {
             showModal(`
@@ -406,7 +502,7 @@
                         <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
                         <button onclick="saveTransaction('${t.id}', '${t.accId}', ${t.amount})" class="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
                     </div>
-                    <button onclick="deleteTransaction('${t.id}', '${t.accId}', ${t.amount}, '${t.type}')" class="w-full text-red-500 font-bold text-[10px] uppercase">Fshi transaksionin</button>
+                    <button onclick="deleteTransaction('${t.id}', '${t.accId}', ${t.amount}, '${t.type}')" class="w-full text-red-500 font-bold text-[10px] uppercase py-2">FSHI TRANSAKSIONIN</button>
                 </div>
             `);
         };
@@ -415,19 +511,26 @@
             const newAmt = Number(document.getElementById('editTransAmt').value);
             const desc = document.getElementById('editTransDesc').value;
             const diff = newAmt - oldAmt;
-            const acc = accounts.find(a => a.id === accId);
             const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
-            await updateDoc(doc(db, `${userPath}/accounts`, accId), { balance: Number(acc.balance) - diff });
-            await updateDoc(doc(db, `${userPath}/transactions`, tid), { amount: newAmt, desc });
+            const accRef = doc(db, `${userPath}/accounts`, accId);
+            const accSnap = await getDoc(accRef);
+            if(accSnap.exists()){
+                await updateDoc(accRef, { balance: Number(accSnap.data().balance) - diff });
+                await updateDoc(doc(db, `${userPath}/transactions`, tid), { amount: newAmt, desc });
+            }
             closeModal();
         };
 
         window.deleteTransaction = (tid, accId, amt, type) => {
-            askConfirm("Fshirje", "A jeni të sigurt? Balanca e llogarisë do të rikthehet.", async () => {
-                const acc = accounts.find(a => a.id === accId);
+            askConfirm("Fshirje", "Dëshironi ta fshini këtë lëvizje?", async () => {
                 const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
-                const restoreBal = type === 'expense' ? Number(acc.balance) + amt : Number(acc.balance) - amt;
-                await updateDoc(doc(db, `${userPath}/accounts`, accId), { balance: restoreBal });
+                const accRef = doc(db, `${userPath}/accounts`, accId);
+                const accSnap = await getDoc(accRef);
+                if(accSnap.exists()){
+                    const currentBalance = Number(accSnap.data().balance);
+                    const restoreBal = type === 'expense' ? currentBalance + Number(amt) : currentBalance - Number(amt);
+                    await updateDoc(accRef, { balance: restoreBal });
+                }
                 await deleteDoc(doc(db, `${userPath}/transactions`, tid));
                 closeModal();
             });
@@ -441,21 +544,32 @@
                 </div>
                 <div class="space-y-6 pt-4 pb-10">
                     <section class="space-y-3">
-                        <h3 class="text-[10px] font-black text-indigo-600 uppercase">Buxheti Mujor</h3>
+                        <h3 class="text-[10px] font-black text-indigo-600 uppercase">Limit Shpenzimi (Buxheti)</h3>
                         <div class="flex gap-2">
-                            <input id="mBudget" type="number" value="${monthlyBudget}" class="flex-1 p-4 bg-slate-50 rounded-2xl font-bold">
+                            <input id="mBudget" type="number" value="${monthlyBudget}" class="flex-1 p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none" placeholder="Vendos limitin (0 për ta fshirë)">
                             <button onclick="saveGlobalBudget()" class="bg-indigo-600 text-white px-6 rounded-2xl font-black">OK</button>
                         </div>
                     </section>
+                    
                     <section class="space-y-3">
-                        <h3 class="text-[10px] font-black text-indigo-600 uppercase">Llogaritë</h3>
+                        <h3 class="text-[10px] font-black text-indigo-600 uppercase">Menaxho Llogaritë</h3>
                         <div id="mAccList" class="space-y-2"></div>
-                        <button id="showNewAcc" class="w-full py-3 border-2 border-dashed rounded-xl text-slate-400 font-bold text-xs">+ SHTO LLOGARI</button>
+                        <button id="showNewAcc" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 font-bold text-xs hover:border-indigo-300 transition-colors">+ SHTO LLOGARI TË RE</button>
                         <div id="newAccBox" class="hidden p-4 bg-slate-50 rounded-2xl space-y-2 animate-in">
-                            <input id="nAccName" placeholder="Emri" class="w-full p-3 rounded-lg border-none font-bold">
-                            <select id="nAccType" class="w-full p-3 rounded-lg border-none font-bold"><option value="asset">Llogari Cash</option><option value="debt">Borxh/Overdraft</option></select>
-                            <input id="nAccLimit" type="number" placeholder="Limiti (nëse ka)" class="w-full p-3 rounded-lg border-none font-bold">
+                            <input id="nAccName" placeholder="Emri i llogarisë" class="w-full p-3 rounded-lg font-bold border-none">
+                            <select id="nAccType" class="w-full p-3 rounded-lg font-bold border-none"><option value="asset">Llogari Cash</option><option value="debt">Borxh / Overdraft</option></select>
+                            <input id="nAccLimit" type="number" placeholder="Limiti (nëse ka)" class="w-full p-3 rounded-lg font-bold border-none">
                             <button onclick="submitNewAcc()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-black">KRIJO</button>
+                        </div>
+                    </section>
+
+                    <section class="space-y-3">
+                        <h3 class="text-[10px] font-black text-indigo-600 uppercase">Menaxho Kategoritë</h3>
+                        <div id="mCatList" class="space-y-2"></div>
+                        <div class="bg-slate-50 p-4 rounded-2xl space-y-2">
+                            <input id="nCatName" placeholder="Emri i Kategorisë" class="w-full p-3 rounded-lg font-bold border-none">
+                            <select id="nCatType" class="w-full p-3 rounded-lg font-bold border-none"><option value="expense">Kategori Shpenzimi</option><option value="income">Kategori Të Ardhura</option></select>
+                            <button onclick="submitNewCat()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-black">SHTO KATEGORI</button>
                         </div>
                     </section>
                 </div>
@@ -464,65 +578,78 @@
         };
 
         function renderManageContent() {
-            const list = document.getElementById('mAccList');
-            if(!list) return;
-            list.innerHTML = '';
+            const accList = document.getElementById('mAccList');
+            const catList = document.getElementById('mCatList');
+            if(!accList || !catList) return;
+
+            accList.innerHTML = '';
             accounts.forEach(acc => {
                 const div = document.createElement('div');
-                div.className = "bg-white p-3 rounded-xl border flex flex-col gap-2";
-                if(editingId === acc.id) {
-                    div.innerHTML = `
-                        <div class="space-y-2">
-                            <label class="text-[9px] font-black uppercase text-slate-400">Emri Llogarisë</label>
-                            <input id="eName" value="${acc.name}" class="w-full p-2 border rounded font-bold">
-                            <label class="text-[9px] font-black uppercase text-slate-400">Tipi</label>
-                            <select id="eType" class="w-full p-2 border rounded font-bold">
-                                <option value="asset" ${acc.type==='asset'?'selected':''}>Llogari Cash</option>
-                                <option value="debt" ${acc.type==='debt'?'selected':''}>Borxh/Overdraft</option>
-                            </select>
-                            <label class="text-[9px] font-black uppercase text-slate-400">Limiti</label>
-                            <input id="eLimit" type="number" value="${acc.limit || 0}" class="w-full p-2 border rounded font-bold">
-                            <div class="flex gap-2">
-                                <button onclick="saveAccEdit('${acc.id}')" class="flex-1 bg-indigo-600 text-white p-3 rounded-lg font-bold">RUAJ</button>
-                                <button onclick="setEditing(null)" class="flex-1 bg-slate-100 text-slate-400 p-3 rounded-lg font-bold">ANULO</button>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    div.innerHTML = `
-                        <div class="flex justify-between items-center">
-                            <div><p class="font-bold text-sm">${acc.name}</p><p class="text-[9px] text-slate-400 uppercase font-black">${acc.type === 'debt' ? 'Borxh' : 'Cash'}</p></div>
-                            <div class="flex gap-1">
-                                <button onclick="setEditing('${acc.id}')" class="p-2 text-blue-500"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                                <button onclick="delAcc('${acc.id}', '${acc.name}')" class="p-2 text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                            </div>
-                        </div>
-                    `;
-                }
-                list.appendChild(div);
+                div.className = "bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center";
+                div.innerHTML = `
+                    <div><p class="font-bold text-sm">${acc.name}</p><p class="text-[9px] text-slate-400 font-black">${acc.type.toUpperCase()}</p></div>
+                    <div class="flex gap-1">
+                        <button onclick="openDirectEditAccount(${JSON.stringify(acc).replace(/"/g, '&quot;')})" class="p-2 text-indigo-500"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                        <button onclick="delAcc('${acc.id}', '${acc.name}')" class="p-2 text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
+                `;
+                accList.appendChild(div);
             });
+
+            catList.innerHTML = '';
+            categories.forEach(cat => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center";
+                div.innerHTML = `
+                    <div><p class="font-bold text-sm">${cat.name}</p><p class="text-[9px] text-slate-400 font-black">${cat.type.toUpperCase()}</p></div>
+                    <div class="flex gap-1">
+                        <button onclick="openEditCat('${cat.id}')" class="p-2 text-indigo-500"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                        <button onclick="delCat('${cat.id}')" class="p-2 text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
+                `;
+                catList.appendChild(div);
+            });
+            
             document.getElementById('showNewAcc').onclick = () => document.getElementById('newAccBox').classList.toggle('hidden');
             lucide.createIcons();
         }
 
-        window.setEditing = (id) => { editingId = id; renderManageContent(); };
-        window.saveAccEdit = async (id) => {
-            const n = document.getElementById('eName').value;
-            const t = document.getElementById('eType').value;
-            const l = Number(document.getElementById('eLimit').value);
-            await updateDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/accounts`, id), { name: n, type: t, limit: l });
-            editingId = null;
+        window.openEditCat = (id) => {
+            const cat = categories.find(c => c.id === id);
+            showModal(`
+                <h2 class="text-xl font-black">Edito Kategorinë</h2>
+                <div class="space-y-4 pt-2">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-400">Emri i Kategorisë</label>
+                        <input id="editCatName" type="text" value="${cat.name}" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-400">Lloji</label>
+                        <select id="editCatType" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none">
+                            <option value="expense" ${cat.type==='expense'?'selected':''}>Shpenzim</option>
+                            <option value="income" ${cat.type==='income'?'selected':''}>Ardhura</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Anulo</button>
+                        <button onclick="saveEditedCat('${id}')" class="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
+                    </div>
+                </div>
+            `);
+        };
+
+        window.saveEditedCat = async (id) => {
+            const name = document.getElementById('editCatName').value;
+            const type = document.getElementById('editCatType').value;
+            if(!name) return;
+            await updateDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/categories`, id), { name, type });
+            closeModal();
         };
 
         window.delAcc = (id, name) => {
-            askConfirm("Fshirje", `Dëshironi të fshini llogarinë ${name}?`, async () => {
+            askConfirm("Fshirje", `Fshini llogarinë ${name}? Të dhënat do të humbasin.`, async () => {
                 await deleteDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/accounts`, id));
             });
-        };
-
-        window.saveGlobalBudget = async () => {
-            const amt = Number(document.getElementById('mBudget').value);
-            await setDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/settings`, 'budget'), { amount: amt });
         };
 
         window.submitNewAcc = async () => {
@@ -532,6 +659,26 @@
             if(!name) return;
             await addDoc(collection(db, `artifacts/lindibank/users/${auth.currentUser.uid}/accounts`), { name, type, limit, balance: 0 });
             document.getElementById('newAccBox').classList.add('hidden');
+        };
+
+        window.submitNewCat = async () => {
+            const name = document.getElementById('nCatName').value;
+            const type = document.getElementById('nCatType').value;
+            if(!name) return;
+            await addDoc(collection(db, `artifacts/lindibank/users/${auth.currentUser.uid}/categories`), { name, type });
+            document.getElementById('nCatName').value = '';
+        };
+
+        window.delCat = (id) => {
+            askConfirm("Fshirje", "Dëshironi të fshini këtë kategori?", async () => {
+                await deleteDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/categories`, id));
+            });
+        };
+
+        window.saveGlobalBudget = async () => {
+            const amt = Number(document.getElementById('mBudget').value);
+            await setDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/settings`, 'budget'), { amount: amt });
+            closeModal();
         };
 
         window.handleTransaction = async (type) => {
@@ -558,7 +705,7 @@
             const toAcc = accounts.find(a => a.id === toId);
             await updateDoc(doc(db, `${userPath}/accounts`, fromId), { balance: Number(fromAcc.balance) - amt });
             await updateDoc(doc(db, `${userPath}/accounts`, toId), { balance: Number(toAcc.balance) + amt });
-            await addDoc(collection(db, `${userPath}/transactions`), { type: 'transfer', amount: amt, fromId, toId, desc: 'Transfertë Interne', timestamp: Date.now() });
+            await addDoc(collection(db, `${userPath}/transactions`), { type: 'transfer', amount: amt, fromId, toId, desc: 'Transfertë', timestamp: Date.now() });
             closeModal();
         };
 
@@ -578,19 +725,17 @@
             lucide.createIcons();
         };
 
-        window.closeModal = () => modalContainer.classList.add('hidden');
-
         document.getElementById('openIncomeBtn').onclick = () => {
             const incCats = categories.filter(c => c.type === 'income');
             showModal(`
-                <h2 class="text-xl font-black text-emerald-600">Regjistro të Ardhura</h2>
+                <h2 class="text-xl font-black text-emerald-600">Ardhura</h2>
                 <div class="space-y-4 pt-2">
                     <input id="mAmt" type="number" placeholder="0.00" class="w-full text-4xl font-black bg-slate-50 p-6 rounded-2xl outline-none">
                     <div class="grid grid-cols-2 gap-3">
-                        <select id="mCat" class="bg-slate-100 p-4 rounded-2xl outline-none font-bold">${incCats.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}</select>
-                        <select id="mAcc" class="bg-slate-100 p-4 rounded-2xl outline-none font-bold">${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
+                        <select id="mCat" class="bg-slate-100 p-4 rounded-2xl font-bold border-none outline-none">${incCats.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}</select>
+                        <select id="mAcc" class="bg-slate-100 p-4 rounded-2xl font-bold border-none outline-none">${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
                     </div>
-                    <input id="mDesc" type="text" placeholder="Shënim" class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold">
+                    <input id="mDesc" type="text" placeholder="Shënim" class="w-full bg-slate-50 p-4 rounded-2xl font-bold border-none outline-none">
                     <div class="flex gap-2">
                         <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
                         <button onclick="handleTransaction('income')" class="flex-[2] bg-emerald-600 text-white py-4 rounded-2xl font-black">REGJISTRO</button>
@@ -602,14 +747,14 @@
         document.getElementById('openExpenseBtn').onclick = () => {
             const expCats = categories.filter(c => c.type === 'expense');
             showModal(`
-                <h2 class="text-xl font-black text-red-600">Regjistro Shpenzim</h2>
+                <h2 class="text-xl font-black text-red-600">Shpenzim</h2>
                 <div class="space-y-4 pt-2">
                     <input id="mAmt" type="number" placeholder="0.00" class="w-full text-4xl font-black bg-slate-50 p-6 rounded-2xl outline-none">
                     <div class="grid grid-cols-2 gap-3">
-                        <select id="mCat" class="bg-slate-100 p-4 rounded-2xl outline-none font-bold">${expCats.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}</select>
-                        <select id="mAcc" class="bg-slate-100 p-4 rounded-2xl outline-none font-bold">${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
+                        <select id="mCat" class="bg-slate-100 p-4 rounded-2xl font-bold border-none outline-none">${expCats.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}</select>
+                        <select id="mAcc" class="bg-slate-100 p-4 rounded-2xl font-bold border-none outline-none">${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
                     </div>
-                    <input id="mDesc" type="text" placeholder="Shënim" class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold">
+                    <input id="mDesc" type="text" placeholder="Shënim" class="w-full bg-slate-50 p-4 rounded-2xl font-bold border-none outline-none">
                     <div class="flex gap-2">
                         <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
                         <button onclick="handleTransaction('expense')" class="flex-[2] bg-red-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
@@ -624,12 +769,12 @@
                 <div class="space-y-4 pt-2">
                     <input id="mAmt" type="number" placeholder="0.00" class="w-full text-4xl font-black bg-slate-50 p-6 rounded-2xl outline-none">
                     <div class="grid grid-cols-2 gap-3">
-                        <select id="mAccFrom" class="bg-slate-100 p-4 rounded-2xl font-bold"><option value="">NGA</option>${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
-                        <select id="mAccTo" class="bg-slate-100 p-4 rounded-2xl font-bold"><option value="">TEK</option>${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
+                        <select id="mAccFrom" class="bg-slate-100 p-4 rounded-2xl font-bold border-none outline-none"><option value="">NGA</option>${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
+                        <select id="mAccTo" class="bg-slate-100 p-4 rounded-2xl font-bold border-none outline-none"><option value="">TEK</option>${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
-                        <button onclick="handleTransferInternal()" class="flex-[2] bg-blue-600 text-white py-4 rounded-2xl font-black">TRANSFERO</button>
+                        <button onclick="handleTransferInternal()" class="flex-[2] bg-blue-600 text-white py-4 rounded-2xl font-black">OK</button>
                     </div>
                 </div>
             `);
@@ -638,18 +783,88 @@
         document.getElementById('printReportBtn').onclick = () => {
             const m = document.getElementById('reportMonth').value;
             const y = document.getElementById('reportYear').value;
-            let html = `<h1 class="text-2xl font-bold mb-6">Raporti Financiar LindiBank - ${m === 'all' ? 'Gjithë kohës' : 'Muaji ' + (Number(m)+1)} ${y}</h1>`;
-            html += `<table class="w-full border-collapse mb-8"><tr class="bg-slate-100"><th class="border p-2 text-left">Llogaria</th><th class="border p-2 text-right">Balanca</th></tr>`;
-            accounts.forEach(a => html += `<tr><td class="border p-2">${a.name}</td><td class="border p-2 text-right">${a.balance.toLocaleString()}</td></tr>`);
-            html += `</table><h2 class="font-bold mb-4">Transaksionet</h2><table class="w-full text-xs border-collapse">`;
-            html += `<tr class="bg-slate-100"><th class="border p-1">Data</th><th class="border p-1">Përshkrimi</th><th class="border p-1 text-right">Shuma</th></tr>`;
-            transactions.filter(t => {
+            const periodText = m === 'all' ? `Gjithë Kohës - ${y}` : `Muaji ${Number(m)+1}/${y}`;
+            
+            const filtered = transactions.filter(t => {
                 const d = new Date(t.timestamp);
                 return (m === 'all' || d.getMonth() == m) && d.getFullYear() == y;
-            }).forEach(t => {
-                html += `<tr><td class="border p-1">${new Date(t.timestamp).toLocaleDateString()}</td><td class="border p-1">${t.desc || ''}</td><td class="border p-1 text-right">${t.amount.toLocaleString()}</td></tr>`;
+            }).sort((a,b) => b.timestamp - a.timestamp);
+
+            let totalIn = 0;
+            let totalOut = 0;
+
+            let html = `
+                <div class="mb-10 text-center">
+                    <h1 class="text-3xl font-black uppercase tracking-tighter">Raporti Financiar LindiBank</h1>
+                    <p class="text-slate-500 font-bold">${periodText}</p>
+                </div>
+                
+                <h2 class="text-lg font-black mb-4 border-b-2 border-slate-900 pb-1">Gjendja e Llogarive</h2>
+                <table class="w-full border-collapse mb-10">
+                    <tr class="bg-slate-50">
+                        <th class="border p-3 text-left font-black uppercase text-[10px]">Llogaria</th>
+                        <th class="border p-3 text-right font-black uppercase text-[10px]">Balanca</th>
+                    </tr>
+            `;
+            
+            accounts.forEach(a => {
+                html += `<tr><td class="border p-3 font-bold">${a.name}</td><td class="border p-3 text-right font-black">${a.balance.toLocaleString()} ALL</td></tr>`;
             });
-            html += `</table>`;
+            
+            html += `
+                </table>
+                <h2 class="text-lg font-black mb-4 border-b-2 border-slate-900 pb-1">Historiku i Lëvizjeve</h2>
+                <table class="w-full border-collapse">
+                    <tr class="bg-slate-50">
+                        <th class="border p-2 text-left font-black uppercase text-[10px]">Data & Ora</th>
+                        <th class="border p-2 text-left font-black uppercase text-[10px]">Përshkrimi</th>
+                        <th class="border p-2 text-left font-black uppercase text-[10px]">Kategoria</th>
+                        <th class="border p-2 text-right font-black uppercase text-[10px]">Shuma</th>
+                    </tr>
+            `;
+            
+            filtered.forEach(t => {
+                const d = new Date(t.timestamp);
+                const dateStr = d.toLocaleDateString('sq-AL');
+                const timeStr = d.toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
+                const catName = categories.find(c => c.id === t.catId)?.name || (t.type === 'transfer' ? 'Transfertë' : '-');
+                const isOut = t.type === 'expense';
+                const isIn = t.type === 'income';
+                
+                if (isOut) totalOut += Number(t.amount);
+                if (isIn) totalIn += Number(t.amount);
+
+                html += `
+                    <tr>
+                        <td class="border p-2 text-[11px] font-medium">${dateStr} ${timeStr}</td>
+                        <td class="border p-2 text-[11px] font-bold">${t.desc || '-'}</td>
+                        <td class="border p-2 text-[11px] uppercase font-black opacity-60">${catName}</td>
+                        <td class="border p-2 text-right font-black ${isOut ? 'text-red-600' : (isIn ? 'text-emerald-600' : 'text-blue-600')}">
+                            ${isOut ? '-' : (isIn ? '+' : '')}${Number(t.amount).toLocaleString()}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                </table>
+                <div class="mt-10 border-t-4 border-slate-900 pt-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-black uppercase text-xs">Total të Ardhura:</span>
+                        <span class="text-emerald-600 font-black text-xl">+ ${totalIn.toLocaleString()} ALL</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-black uppercase text-xs">Total Shpenzime:</span>
+                        <span class="text-red-600 font-black text-xl">- ${totalOut.toLocaleString()} ALL</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-900 text-white p-4 rounded-xl mt-4">
+                        <span class="font-black uppercase text-sm">Bilanci i Periudhës:</span>
+                        <span class="font-black text-2xl">${(totalIn - totalOut).toLocaleString()} ALL</span>
+                    </div>
+                </div>
+                <p class="text-[9px] text-center mt-20 opacity-40 font-bold uppercase">Gjeneruar nga LindiBank - ${new Date().toLocaleString()}</p>
+            `;
+            
             document.getElementById('printContent').innerHTML = html;
             window.print();
         };
