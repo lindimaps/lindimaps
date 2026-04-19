@@ -2,286 +2,195 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financat e Mia - Full App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Financat e Mia</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & ReactDOM -->
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- React Core -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@0.321.0/dist/umd/lucide.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .animate-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        .custom-shadow { shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .modal-animate { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-slate-50">
-    <div id="root"></div>
+<body class="bg-slate-50 text-slate-900">
+    <div id="root">
+        <!-- Loading State para se te niset React -->
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="animate-pulse flex flex-col items-center">
+                <div class="w-12 h-12 bg-indigo-600 rounded-2xl mb-4"></div>
+                <div class="h-2 w-24 bg-slate-200 rounded"></div>
+            </div>
+        </div>
+    </div>
 
     <script type="text/babel">
         const { useState, useMemo, useEffect } = React;
 
-        // Firebase Mock/Stub for the Environment
-        // Në projektin tuaj në GitHub, zëvendësoni këto me importet reale të Firebase nëse përdorni module
-        // Ose përdorni scriptet e Firebase CDN nëse doni ta mbani në një skedar.
-        
+        // SVG ICONS - I kemi brenda qe mos te dalin "blank"
+        const Icons = {
+            Wallet: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>,
+            Settings: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
+            Plus: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>,
+            ArrowUp: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/></svg>,
+            ArrowDown: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 4 4 4-4"/><path d="M12 8v8"/></svg>,
+            History: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>,
+            Grid: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>,
+            Close: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        };
+
         const App = () => {
-            // --- STATE ---
-            const [activeTab, setActiveTab] = useState('overview');
-            const [isLoading, setIsLoading] = useState(false);
+            const [activeTab, setActiveTab] = useState('home');
             
-            // Data State
+            // Database fillestare (ne memorje)
             const [accounts, setAccounts] = useState([
-                { id: '1', name: 'Debit Card', balance: 45000, type: 'asset', limit: 0 },
-                { id: '2', name: 'Overdraft', balance: -12000, type: 'debt', limit: 50000 },
-                { id: '3', name: 'Credit Card', balance: -34000, type: 'debt', limit: 100000 },
-                { id: '4', name: 'Kursime', balance: 120000, type: 'asset', limit: 0 },
-                { id: '5', name: 'Cash', balance: 5400, type: 'asset', limit: 0 },
-            ]);
-
-            const [expenseCategories, setExpenseCategories] = useState([
-                { id: 'ec1', name: 'Shtëpiake' },
-                { id: 'ec2', name: 'Shëndet' },
-                { id: 'ec3', name: 'Ushqim' },
-                { id: 'ec4', name: 'Transport' },
-            ]);
-
-            const [incomeCategories, setIncomeCategories] = useState([
-                { id: 'ic1', name: 'Rroga' },
-                { id: 'ic2', name: 'Qira' },
-                { id: 'ic3', name: 'Bonuse' },
+                { id: '1', name: 'Karta kryesore', balance: 50000, type: 'asset' },
+                { id: '2', name: 'Kursime', balance: 120000, type: 'asset' },
+                { id: '3', name: 'Credit Card', balance: -25000, type: 'debt', limit: 100000 },
+                { id: '4', name: 'Cash', balance: 2500, type: 'asset' }
             ]);
 
             const [transactions, setTransactions] = useState([
-                { id: 1, type: 'expense', amount: 2500, catId: 'ec3', accId: '1', desc: 'Market', date: '15/05/2024' },
-                { id: 2, type: 'income', amount: 85000, catId: 'ic1', accId: '1', desc: 'Rroga Prill', date: '01/05/2024' }
+                { id: 1, type: 'expense', amount: 1500, title: 'Ushqime', date: 'Sot', accName: 'Cash' },
+                { id: 2, type: 'income', amount: 80000, title: 'Paga', date: 'Dje', accName: 'Karta kryesore' }
             ]);
-            
-            // UI State
-            const [editingAcc, setEditingAcc] = useState(null);
-            const [showExpenseModal, setShowExpenseModal] = useState(false);
-            const [showIncomeModal, setShowIncomeModal] = useState(false);
-            const [showTransferModal, setShowTransferModal] = useState(false);
-            const [showManageModal, setShowManageModal] = useState(false);
-            const [confirmModal, setConfirmModal] = useState({ show: false, title: '', message: '', onConfirm: null });
 
-            // Form states
-            const [expenseForm, setExpenseForm] = useState({ amount: '', categoryId: '', accountId: '', desc: '' });
-            const [incomeForm, setIncomeForm] = useState({ amount: '', categoryId: '', accountId: '', desc: '' });
-            const [transferForm, setTransferForm] = useState({ from: '', to: '', amount: '' });
-            const [newAccForm, setNewAccForm] = useState({ name: '', type: 'asset', balance: 0, limit: 0 });
-            const [newCatForm, setNewCatForm] = useState({ name: '', type: 'expense' });
-
-            // --- CALCULATIONS ---
             const totals = useMemo(() => {
                 const assets = accounts.filter(a => a.type === 'asset').reduce((s, a) => s + a.balance, 0);
                 const debts = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + a.balance, 0);
                 return { assets, debts, net: assets + debts };
             }, [accounts]);
 
-            // --- HANDLERS ---
-            const askConfirmation = (title, message, onConfirm) => {
-                setConfirmModal({ show: true, title, message, onConfirm });
-            };
-
-            const handleAddAccount = () => {
-                if (!newAccForm.name.trim()) return;
-                setAccounts([...accounts, { 
-                    ...newAccForm, 
-                    id: Date.now().toString(), 
-                    balance: Number(newAccForm.balance), 
-                    limit: Number(newAccForm.limit) 
-                }]);
-                setNewAccForm({ name: '', type: 'asset', balance: 0, limit: 0 });
-            };
-
-            const handleDeleteAccount = (id, name) => {
-                askConfirmation(
-                    "Fshij Llogarinë",
-                    `A jeni i sigurt që dëshironi të fshini llogarinë "${name}"?`,
-                    () => setAccounts(accounts.filter(a => a.id !== id))
-                );
-            };
-
-            const handleIncome = (e) => {
-                e.preventDefault();
-                const amt = parseFloat(incomeForm.amount);
-                if (!amt || !incomeForm.accountId) return;
-                setAccounts(accounts.map(a => a.id === incomeForm.accountId ? { ...a, balance: a.balance + amt } : a));
-                setTransactions([{ id: Date.now(), type: 'income', amount: amt, catId: incomeForm.categoryId, accId: incomeForm.accountId, desc: incomeForm.desc, date: new Date().toLocaleDateString('sq-AL') }, ...transactions]);
-                setShowIncomeModal(false);
-                setIncomeForm({ amount: '', categoryId: '', accountId: '', desc: '' });
-            };
-
-            const handleExpense = (e) => {
-                e.preventDefault();
-                const amt = parseFloat(expenseForm.amount);
-                if (!amt || !expenseForm.accountId) return;
-                setAccounts(accounts.map(a => a.id === expenseForm.accountId ? { ...a, balance: a.balance - amt } : a));
-                setTransactions([{ id: Date.now(), type: 'expense', amount: amt, catId: expenseForm.categoryId, accId: expenseForm.accountId, desc: expenseForm.desc, date: new Date().toLocaleDateString('sq-AL') }, ...transactions]);
-                setShowExpenseModal(false);
-                setExpenseForm({ amount: '', categoryId: '', accountId: '', desc: '' });
-            };
-
-            // Helpers for Icons
-            const Icon = ({ name, size = 20, ...props }) => {
-                const LucideIcon = lucide[name.charAt(0).toUpperCase() + name.slice(1)];
-                return LucideIcon ? <LucideIcon size={size} {...props} /> : null;
-            };
-
             return (
-                <div className="min-h-screen pb-24">
-                    {/* Header */}
-                    <div className="bg-white border-b p-4 sticky top-0 z-20 shadow-sm">
-                        <div className="max-w-2xl mx-auto flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <div className="bg-indigo-600 p-2.5 rounded-2xl text-white">
-                                    <Icon name="Wallet" />
-                                </div>
-                                <h1 className="font-bold text-lg">Financat e Mia</h1>
+                <div className="max-w-md mx-auto min-h-screen bg-slate-50 relative flex flex-col">
+                    
+                    {/* Top Bar */}
+                    <header className="p-6 flex justify-between items-center bg-white border-b border-slate-100">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-indigo-600 p-2 rounded-xl text-white">
+                                <Icons.Wallet />
                             </div>
-                            <button onClick={() => setShowManageModal(true)} className="p-3 bg-slate-100 rounded-full text-slate-600">
-                                <Icon name="Settings2" />
-                            </button>
+                            <h1 className="font-bold text-lg tracking-tight">Financat e Mia</h1>
                         </div>
-                    </div>
+                        <button className="p-2 text-slate-400 hover:text-indigo-600 transition-colors">
+                            <Icons.Settings />
+                        </button>
+                    </header>
 
-                    <div className="max-w-2xl mx-auto p-4 space-y-6">
-                        {/* Card Përmbledhëse */}
-                        <div className="bg-gradient-to-br from-indigo-600 to-slate-900 rounded-[36px] p-8 text-white shadow-xl relative overflow-hidden">
-                            <div className="relative z-10">
-                                <p className="text-[10px] font-bold uppercase opacity-60 tracking-widest">Gjendja Neto</p>
-                                <h2 className="text-4xl font-black mt-2 mb-8">{totals.net.toLocaleString()} ALL</h2>
-                                <div className="flex justify-between border-t border-white/10 pt-6">
-                                    <div>
-                                        <p className="text-[9px] font-bold uppercase opacity-40 mb-1">Pasuri</p>
-                                        <p className="font-extrabold text-xl">{totals.assets.toLocaleString()}</p>
+                    <main className="flex-1 p-6 space-y-6 overflow-y-auto no-scrollbar pb-32">
+                        {activeTab === 'home' ? (
+                            <React.Fragment>
+                                {/* Balance Card */}
+                                <div className="bg-slate-900 rounded-[32px] p-8 text-white shadow-2xl shadow-indigo-200/50 relative overflow-hidden">
+                                    <div className="relative z-10">
+                                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-50 mb-2">Gjendja Neto</p>
+                                        <h2 className="text-4xl font-extrabold mb-8">{totals.net.toLocaleString()} <span className="text-lg font-normal opacity-50">ALL</span></h2>
+                                        
+                                        <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/10">
+                                            <div>
+                                                <p className="text-[10px] font-bold uppercase opacity-40 mb-1">Pasuria</p>
+                                                <p className="text-lg font-bold">+{totals.assets.toLocaleString()}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-[10px] font-bold uppercase opacity-40 mb-1">Detyrime</p>
+                                                <p className="text-lg font-bold text-indigo-300">{totals.debts.toLocaleString()}</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-[9px] font-bold uppercase opacity-40 mb-1">Detyrime</p>
-                                        <p className="font-extrabold text-xl">{totals.debts.toLocaleString()}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {activeTab === 'overview' ? (
-                            <div className="space-y-6 animate-in">
-                                <div className="grid grid-cols-3 gap-3">
-                                    <button onClick={() => setShowIncomeModal(true)} className="bg-white p-5 rounded-3xl flex flex-col items-center gap-2 border border-slate-100 shadow-sm">
-                                        <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-500"><Icon name="ArrowUpCircle" size={24} /></div>
-                                        <span className="font-bold text-[9px] uppercase text-slate-500">Hyrje</span>
-                                    </button>
-                                    <button onClick={() => setShowExpenseModal(true)} className="bg-white p-5 rounded-3xl flex flex-col items-center gap-2 border border-slate-100 shadow-sm">
-                                        <div className="p-3 bg-red-50 rounded-2xl text-red-500"><Icon name="TrendingDown" size={24} /></div>
-                                        <span className="font-bold text-[9px] uppercase text-slate-500">Dalje</span>
-                                    </button>
-                                    <button onClick={() => setShowTransferModal(true)} className="bg-white p-5 rounded-3xl flex flex-col items-center gap-2 border border-slate-100 shadow-sm">
-                                        <div className="p-3 bg-blue-50 rounded-2xl text-blue-500"><Icon name="ArrowRightLeft" size={24} /></div>
-                                        <span className="font-bold text-[9px] uppercase text-slate-500">Transfertë</span>
-                                    </button>
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
                                 </div>
 
-                                <section className="space-y-3">
-                                    <h3 className="font-bold text-slate-400 text-[10px] uppercase tracking-widest px-1">Llogaritë</h3>
+                                {/* Quick Actions */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <button className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-3 active:scale-95 transition-transform">
+                                        <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl"><Icons.ArrowUp /></div>
+                                        <span className="font-bold text-sm">Hyrje</span>
+                                    </button>
+                                    <button className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-3 active:scale-95 transition-transform">
+                                        <div className="p-2 bg-red-50 text-red-600 rounded-xl"><Icons.ArrowDown /></div>
+                                        <span className="font-bold text-sm">Shpenzim</span>
+                                    </button>
+                                </div>
+
+                                {/* Accounts List */}
+                                <section className="space-y-4">
+                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Llogaritë Aktive</h3>
                                     {accounts.map(acc => (
-                                        <div key={acc.id} className="bg-white p-6 rounded-[28px] border border-slate-100 flex justify-between items-center shadow-sm">
-                                            <div className="flex items-center gap-3">
-                                                <div className={`p-2.5 rounded-xl ${acc.type === 'asset' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-50 text-slate-500'}`}>
-                                                    <Icon name={acc.type === 'asset' ? "Wallet" : "CreditCard"} size={18} />
+                                        <div key={acc.id} className="bg-white p-5 rounded-[24px] border border-slate-100 flex items-center justify-between shadow-sm">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-2xl ${acc.type === 'asset' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-500'}`}>
+                                                    <Icons.Wallet />
                                                 </div>
                                                 <div>
-                                                    <span className="font-bold text-sm text-slate-800 block">{acc.name}</span>
-                                                    <span className="text-[9px] font-bold text-slate-400 uppercase">{acc.type === 'asset' ? 'Pasuri' : 'Detyrim'}</span>
+                                                    <p className="font-bold text-sm">{acc.name}</p>
+                                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{acc.type === 'asset' ? 'Gjendje' : 'Borxh/Limit'}</p>
                                                 </div>
                                             </div>
-                                            <span className={`font-black text-base ${acc.balance < 0 ? 'text-red-500' : 'text-emerald-600'}`}>
-                                                {acc.balance.toLocaleString()} ALL
-                                            </span>
+                                            <p className={`font-bold ${acc.balance < 0 ? 'text-red-500' : 'text-emerald-600'}`}>
+                                                {acc.balance.toLocaleString()}
+                                            </p>
                                         </div>
                                     ))}
                                 </section>
-                            </div>
+                            </React.Fragment>
                         ) : (
-                            <section className="space-y-3 animate-in">
-                                <h3 className="font-bold text-slate-400 text-[10px] uppercase tracking-widest px-1">Lëvizjet e Fundit</h3>
+                            <section className="space-y-4 animate-in">
+                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Historiku i Lëvizjeve</h3>
                                 {transactions.map(t => (
-                                    <div key={t.id} className="bg-white p-5 rounded-3xl border border-slate-100 flex items-center justify-between">
+                                    <div key={t.id} className="bg-white p-5 rounded-[24px] border border-slate-100 flex items-center justify-between shadow-sm">
                                         <div className="flex items-center gap-4">
-                                            <div className={`p-3 rounded-2xl ${t.type === 'expense' ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-500'}`}>
-                                                <Icon name={t.type === 'expense' ? 'TrendingDown' : 'TrendingUp'} />
+                                            <div className={`p-3 rounded-2xl ${t.type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                                                {t.type === 'income' ? <Icons.ArrowUp /> : <Icons.ArrowDown />}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-sm text-slate-800">{t.desc || 'Transaksion'}</p>
-                                                <p className="text-[9px] text-slate-400 uppercase tracking-widest">{t.date}</p>
+                                                <p className="font-bold text-sm">{t.title}</p>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase">{t.accName} • {t.date}</p>
                                             </div>
                                         </div>
-                                        <p className={`font-black ${t.type === 'expense' ? 'text-red-500' : 'text-emerald-600'}`}>
-                                            {t.type === 'expense' ? '-' : '+'}{t.amount.toLocaleString()}
+                                        <p className={`font-bold ${t.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}>
+                                            {t.type === 'income' ? '+' : '-'}{t.amount.toLocaleString()}
                                         </p>
                                     </div>
                                 ))}
                             </section>
                         )}
-                    </div>
+                    </main>
 
                     {/* Bottom Nav */}
-                    <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t flex justify-around p-5 z-30">
-                        <button onClick={() => setActiveTab('overview')} className={`flex flex-col items-center gap-1 ${activeTab === 'overview' ? 'text-indigo-600' : 'text-slate-400'}`}>
-                            <Icon name="LayoutDashboard" size={24} />
-                            <span className="text-[8px] font-bold uppercase">Dashboard</span>
+                    <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/80 backdrop-blur-xl border-t border-slate-100 p-6 flex justify-around items-center z-50">
+                        <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'home' ? 'text-indigo-600 scale-110' : 'text-slate-300 hover:text-slate-500'}`}>
+                            <Icons.Grid />
+                            <span className="text-[9px] font-bold uppercase tracking-tighter">Përmbledhja</span>
                         </button>
-                        <button onClick={() => setActiveTab('history')} className={`flex flex-col items-center gap-1 ${activeTab === 'history' ? 'text-indigo-600' : 'text-slate-400'}`}>
-                            <Icon name="History" size={24} />
-                            <span className="text-[8px] font-bold uppercase">Aktiviteti</span>
+                        <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 active:scale-90 transition-transform cursor-pointer">
+                            <Icons.Plus />
+                        </div>
+                        <button onClick={() => setActiveTab('history')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'history' ? 'text-indigo-600 scale-110' : 'text-slate-300 hover:text-slate-500'}`}>
+                            <Icons.History />
+                            <span className="text-[9px] font-bold uppercase tracking-tighter">Aktiviteti</span>
                         </button>
-                    </div>
-
-                    {/* Simple Modals - Shfaqen sipas State */}
-                    {showIncomeModal && (
-                        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
-                            <div className="bg-white w-full max-w-sm rounded-[40px] p-8 space-y-6 animate-in">
-                                <h2 className="text-xl font-black text-center text-emerald-600">Shto të Ardhura</h2>
-                                <form onSubmit={handleIncome} className="space-y-4">
-                                    <input type="number" required placeholder="Shuma (ALL)" className="w-full p-4 bg-slate-50 rounded-2xl font-bold" value={incomeForm.amount} onChange={e => setIncomeForm({...incomeForm, amount: e.target.value})} />
-                                    <select className="w-full p-4 bg-slate-50 rounded-2xl font-bold" required value={incomeForm.accountId} onChange={e => setIncomeForm({...incomeForm, accountId: e.target.value})}>
-                                        <option value="">Zgjidh Llogarinë</option>
-                                        {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                                    </select>
-                                    <button type="submit" className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold">KONFIRMO</button>
-                                    <button type="button" onClick={() => setShowIncomeModal(false)} className="w-full text-slate-400 font-bold text-xs uppercase">Anulo</button>
-                                </form>
-                            </div>
-                        </div>
-                    )}
-
-                    {showExpenseModal && (
-                        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
-                            <div className="bg-white w-full max-w-sm rounded-[40px] p-8 space-y-6 animate-in">
-                                <h2 className="text-xl font-black text-center text-red-600">Shto Shpenzim</h2>
-                                <form onSubmit={handleExpense} className="space-y-4">
-                                    <input type="number" required placeholder="Shuma (ALL)" className="w-full p-4 bg-slate-50 rounded-2xl font-bold" value={expenseForm.amount} onChange={e => setExpenseForm({...expenseForm, amount: e.target.value})} />
-                                    <select className="w-full p-4 bg-slate-50 rounded-2xl font-bold" required value={expenseForm.accountId} onChange={e => setExpenseForm({...expenseForm, accountId: e.target.value})}>
-                                        <option value="">Nga Llogaria</option>
-                                        {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                                    </select>
-                                    <button type="submit" className="w-full bg-red-600 text-white py-4 rounded-2xl font-bold">KONFIRMO</button>
-                                    <button type="button" onClick={() => setShowExpenseModal(false)} className="w-full text-slate-400 font-bold text-xs uppercase">Anulo</button>
-                                </form>
-                            </div>
-                        </div>
-                    )}
+                    </nav>
                 </div>
             );
         };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        // Render me kontroll per gabimet
+        try {
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(<App />);
+        } catch (e) {
+            document.getElementById('root').innerHTML = `<div style="padding: 20px; color: red;">Gabim gjatë ngarkimit: ${e.message}</div>`;
+        }
     </script>
 </body>
 </html>
