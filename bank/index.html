@@ -82,7 +82,7 @@
         <div class="max-w-2xl mx-auto p-4 space-y-6">
             <!-- Përmbledhja Neto -->
             <div class="bg-slate-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden no-print">
-                <p class="text-[10px] font-bold uppercase opacity-60 tracking-widest mb-1">Gjendja Neto (Total)</p>
+                <p class="text-[10px] font-bold uppercase opacity-60 tracking-widest mb-1">Gjendja Neto (Cash - Borxh)</p>
                 <h2 class="text-3xl font-black mb-4" id="netBalance">0 ALL</h2>
                 <div class="grid grid-cols-2 gap-4 border-t border-white/10 pt-4">
                     <div>
@@ -90,7 +90,7 @@
                         <p class="font-bold text-sm" id="cashOnly">0</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-[9px] uppercase opacity-60">Limite të Lira</p>
+                        <p class="text-[9px] uppercase opacity-60">Limite të Lira (Totali)</p>
                         <p class="font-bold text-sm" id="limitsOnly">0</p>
                     </div>
                 </div>
@@ -312,14 +312,18 @@
         };
 
         function renderAll() {
-            const cashOnly = accounts.filter(a => a.type === 'asset' && a.balance > 0).reduce((s, a) => s + Number(a.balance), 0);
-            const debtsOnly = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + Math.abs(Number(a.balance)), 0);
-            const limitsOnly = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + (Number(a.limit) + Number(a.balance)), 0);
-            const netBalance = cashOnly - debtsOnly;
+            // Logjika e re e balancave
+            const totalCash = accounts.filter(a => a.type === 'asset').reduce((s, a) => s + Number(a.balance), 0);
+            const totalSpentDebt = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + Number(a.balance), 0);
+            
+            // Limiti i lirë për çdo llogari borxhi është: Limit - Shpenzim
+            const totalFreeLimits = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + (Number(a.limit) - Number(a.balance)), 0);
+            
+            const netBalance = totalCash - totalSpentDebt;
 
             document.getElementById('netBalance').innerText = netBalance.toLocaleString() + " ALL";
-            document.getElementById('cashOnly').innerText = cashOnly.toLocaleString();
-            document.getElementById('limitsOnly').innerText = limitsOnly.toLocaleString();
+            document.getElementById('cashOnly').innerText = totalCash.toLocaleString();
+            document.getElementById('limitsOnly').innerText = totalFreeLimits.toLocaleString();
 
             renderCarousel();
             if (activeTab === 'overview') renderOverview();
@@ -334,18 +338,22 @@
             accounts.forEach((acc, idx) => {
                 const card = document.createElement('div');
                 card.className = "account-card";
-                const mbetja = acc.type === 'debt' ? (Number(acc.limit) + Number(acc.balance)) : acc.balance;
                 const isDebt = acc.type === 'debt';
+                // Për borxhin: Mbetja (limiti i lirë) = Limit - Shpenzim
+                const freeLimit = isDebt ? (Number(acc.limit) - Number(acc.balance)) : acc.balance;
+                
                 card.onclick = () => openDirectEditAccount(acc);
                 card.innerHTML = `
                     <div class="bg-indigo-600 rounded-[28px] p-6 text-white h-44 shadow-lg flex flex-col justify-between relative overflow-hidden cursor-pointer active:scale-95 transition-transform">
                         <div class="z-10">
                             <p class="text-[9px] font-black uppercase opacity-60">${acc.name}</p>
-                            <h4 class="text-2xl font-black mt-1">${Number(acc.balance).toLocaleString()} ALL</h4>
+                            <h4 class="text-2xl font-black mt-1">
+                                ${isDebt ? 'Shpenzuar: ' : ''}${Number(acc.balance).toLocaleString()} ALL
+                            </h4>
                         </div>
                         <div class="z-10">
                             <p class="text-[8px] font-bold opacity-60">${isDebt ? 'Limit i Lirë' : 'Gjendja'}</p>
-                            <p class="text-sm font-black">${mbetja.toLocaleString()} ALL</p>
+                            <p class="text-sm font-black">${freeLimit.toLocaleString()} ALL</p>
                         </div>
                         <div class="absolute -bottom-4 -right-4 opacity-10">
                             <i data-lucide="${isDebt ? 'credit-card' : 'banknote'}" class="w-24 h-24"></i>
@@ -420,7 +428,7 @@
             const total = Object.values(catTotals).reduce((a,b)=>a+b, 0);
 
             sortedCats.forEach(([name, amt]) => {
-                const p = (amt/total)*100;
+                const p = total > 0 ? (amt/total)*100 : 0;
                 const div = document.createElement('div');
                 div.className = "bg-white p-4 rounded-xl border border-slate-100 flex items-center justify-between";
                 div.innerHTML = `
@@ -454,16 +462,17 @@
                     <div class="space-y-1">
                         <label class="text-[10px] font-black uppercase text-slate-400">Lloji</label>
                         <select id="directEditType" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none">
-                            <option value="asset" ${acc.type==='asset'?'selected':''}>Cash</option>
-                            <option value="debt" ${acc.type==='debt'?'selected':''}>Borxh / Overdraft</option>
+                            <option value="asset" ${acc.type==='asset'?'selected':''}>Cash / Debit Card</option>
+                            <option value="debt" ${acc.type==='debt'?'selected':''}>Borxh (Credit Card / Overdraft)</option>
                         </select>
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Balanca Aktuale (ALL)</label>
+                        <label class="text-[10px] font-black uppercase text-slate-400">Gjendja/Shpenzimi Aktual (ALL)</label>
+                        <p class="text-[9px] text-slate-400 mb-1 italic">Për borxhin: vendos sa ke shpenzuar nga limiti.</p>
                         <input id="directEditBal" type="number" value="${acc.balance}" class="w-full p-4 bg-slate-50 rounded-2xl font-black border-none outline-none">
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Limiti (nëse është borxh)</label>
+                        <label class="text-[10px] font-black uppercase text-slate-400">Limiti Total (nëse është borxh)</label>
                         <input id="directEditLimit" type="number" value="${acc.limit || 0}" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none">
                     </div>
                     <div class="flex gap-2">
@@ -500,22 +509,32 @@
                     </div>
                     <div class="flex gap-2">
                         <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
-                        <button onclick="saveTransaction('${t.id}', '${t.accId}', ${t.amount})" class="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
+                        <button onclick="saveTransaction('${t.id}', '${t.accId}', ${t.amount}, '${t.type}')" class="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
                     </div>
                     <button onclick="deleteTransaction('${t.id}', '${t.accId}', ${t.amount}, '${t.type}')" class="w-full text-red-500 font-bold text-[10px] uppercase py-2">FSHI TRANSAKSIONIN</button>
                 </div>
             `);
         };
 
-        window.saveTransaction = async (tid, accId, oldAmt) => {
+        window.saveTransaction = async (tid, accId, oldAmt, type) => {
             const newAmt = Number(document.getElementById('editTransAmt').value);
             const desc = document.getElementById('editTransDesc').value;
             const diff = newAmt - oldAmt;
             const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
             const accRef = doc(db, `${userPath}/accounts`, accId);
             const accSnap = await getDoc(accRef);
+            
             if(accSnap.exists()){
-                await updateDoc(accRef, { balance: Number(accSnap.data().balance) - diff });
+                const accData = accSnap.data();
+                let updatedBal;
+                if (type === 'income') {
+                    // Ardhura rrit balancën në cash, por ul shpenzimin në borxh
+                    updatedBal = accData.type === 'asset' ? Number(accData.balance) + diff : Number(accData.balance) - diff;
+                } else {
+                    // Shpenzimi ul balancën në cash, por rrit shpenzimin në borxh
+                    updatedBal = accData.type === 'asset' ? Number(accData.balance) - diff : Number(accData.balance) + diff;
+                }
+                await updateDoc(accRef, { balance: updatedBal });
                 await updateDoc(doc(db, `${userPath}/transactions`, tid), { amount: newAmt, desc });
             }
             closeModal();
@@ -527,8 +546,17 @@
                 const accRef = doc(db, `${userPath}/accounts`, accId);
                 const accSnap = await getDoc(accRef);
                 if(accSnap.exists()){
-                    const currentBalance = Number(accSnap.data().balance);
-                    const restoreBal = type === 'expense' ? currentBalance + Number(amt) : currentBalance - Number(amt);
+                    const accData = accSnap.data();
+                    let restoreBal;
+                    if (type === 'expense') {
+                        // Fshirja e shpenzimit: rrit balancën cash, ul balancën borxh
+                        restoreBal = accData.type === 'asset' ? Number(accData.balance) + Number(amt) : Number(accData.balance) - Number(amt);
+                    } else if (type === 'income') {
+                        // Fshirja e të ardhurës: ul balancën cash, rrit balancën borxh
+                        restoreBal = accData.type === 'asset' ? Number(accData.balance) - Number(amt) : Number(accData.balance) + Number(amt);
+                    } else {
+                        restoreBal = accData.balance; // Për transfertat duhet llogari më komplekse, lihet kështu për thjeshtësi
+                    }
                     await updateDoc(accRef, { balance: restoreBal });
                 }
                 await deleteDoc(doc(db, `${userPath}/transactions`, tid));
@@ -557,8 +585,8 @@
                         <button id="showNewAcc" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 font-bold text-xs hover:border-indigo-300 transition-colors">+ SHTO LLOGARI TË RE</button>
                         <div id="newAccBox" class="hidden p-4 bg-slate-50 rounded-2xl space-y-2 animate-in">
                             <input id="nAccName" placeholder="Emri i llogarisë" class="w-full p-3 rounded-lg font-bold border-none">
-                            <select id="nAccType" class="w-full p-3 rounded-lg font-bold border-none"><option value="asset">Llogari Cash</option><option value="debt">Borxh / Overdraft</option></select>
-                            <input id="nAccLimit" type="number" placeholder="Limiti (nëse ka)" class="w-full p-3 rounded-lg font-bold border-none">
+                            <select id="nAccType" class="w-full p-3 rounded-lg font-bold border-none"><option value="asset">Llogari Cash</option><option value="debt">Borxh (Credit Card / Overdraft)</option></select>
+                            <input id="nAccLimit" type="number" placeholder="Limiti total i borxhit" class="w-full p-3 rounded-lg font-bold border-none">
                             <button onclick="submitNewAcc()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-black">KRIJO</button>
                         </div>
                     </section>
@@ -689,7 +717,16 @@
             if(!amt || !accId) return;
             const acc = accounts.find(a => a.id === accId);
             const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
-            const newBal = type === 'income' ? Number(acc.balance) + amt : Number(acc.balance) - amt;
+            
+            let newBal;
+            if (type === 'income') {
+                // Ardhura rrit cash-in, ul borxhin (shpenzimin)
+                newBal = acc.type === 'asset' ? Number(acc.balance) + amt : Number(acc.balance) - amt;
+            } else {
+                // Shpenzimi ul cash-in, rrit borxhin (shpenzimin)
+                newBal = acc.type === 'asset' ? Number(acc.balance) - amt : Number(acc.balance) + amt;
+            }
+            
             await updateDoc(doc(db, `${userPath}/accounts`, accId), { balance: newBal });
             await addDoc(collection(db, `${userPath}/transactions`), { type, amount: amt, catId, accId, desc, timestamp: Date.now() });
             closeModal();
@@ -703,8 +740,13 @@
             const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
             const fromAcc = accounts.find(a => a.id === fromId);
             const toAcc = accounts.find(a => a.id === toId);
-            await updateDoc(doc(db, `${userPath}/accounts`, fromId), { balance: Number(fromAcc.balance) - amt });
-            await updateDoc(doc(db, `${userPath}/accounts`, toId), { balance: Number(toAcc.balance) + amt });
+            
+            // Logjika e transferit: 'from' sillet si shpenzim, 'to' sillet si ardhurë
+            let newFromBal = fromAcc.type === 'asset' ? Number(fromAcc.balance) - amt : Number(fromAcc.balance) + amt;
+            let newToBal = toAcc.type === 'asset' ? Number(toAcc.balance) + amt : Number(toAcc.balance) - amt;
+
+            await updateDoc(doc(db, `${userPath}/accounts`, fromId), { balance: newFromBal });
+            await updateDoc(doc(db, `${userPath}/accounts`, toId), { balance: newToBal });
             await addDoc(collection(db, `${userPath}/transactions`), { type: 'transfer', amount: amt, fromId, toId, desc: 'Transfertë', timestamp: Date.now() });
             closeModal();
         };
@@ -803,12 +845,22 @@
                 <table class="w-full border-collapse mb-10">
                     <tr class="bg-slate-50">
                         <th class="border p-3 text-left font-black uppercase text-[10px]">Llogaria</th>
-                        <th class="border p-3 text-right font-black uppercase text-[10px]">Balanca</th>
+                        <th class="border p-3 text-left font-black uppercase text-[10px]">Tipi</th>
+                        <th class="border p-3 text-right font-black uppercase text-[10px]">Gjendja/Shpenzimi</th>
+                        <th class="border p-3 text-right font-black uppercase text-[10px]">Limiti Lirë</th>
                     </tr>
             `;
             
             accounts.forEach(a => {
-                html += `<tr><td class="border p-3 font-bold">${a.name}</td><td class="border p-3 text-right font-black">${a.balance.toLocaleString()} ALL</td></tr>`;
+                const isDebt = a.type === 'debt';
+                const free = isDebt ? (Number(a.limit) - Number(a.balance)) : a.balance;
+                html += `
+                    <tr>
+                        <td class="border p-3 font-bold">${a.name}</td>
+                        <td class="border p-3 text-[10px] uppercase font-bold opacity-60">${isDebt ? 'Borxh' : 'Cash'}</td>
+                        <td class="border p-3 text-right font-black">${a.balance.toLocaleString()} ALL</td>
+                        <td class="border p-3 text-right font-black text-indigo-600">${free.toLocaleString()} ALL</td>
+                    </tr>`;
             });
             
             html += `
@@ -850,11 +902,11 @@
                 </table>
                 <div class="mt-10 border-t-4 border-slate-900 pt-6">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="font-black uppercase text-xs">Total të Ardhura:</span>
+                        <span class="font-black uppercase text-xs">Total të Ardhura (Periudha):</span>
                         <span class="text-emerald-600 font-black text-xl">+ ${totalIn.toLocaleString()} ALL</span>
                     </div>
                     <div class="flex justify-between items-center mb-2">
-                        <span class="font-black uppercase text-xs">Total Shpenzime:</span>
+                        <span class="font-black uppercase text-xs">Total Shpenzime (Periudha):</span>
                         <span class="text-red-600 font-black text-xl">- ${totalOut.toLocaleString()} ALL</span>
                     </div>
                     <div class="flex justify-between items-center bg-slate-900 text-white p-4 rounded-xl mt-4">
