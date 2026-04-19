@@ -69,16 +69,16 @@
             <!-- Bilanci Përmbledhës -->
             <div class="bg-indigo-600 rounded-3xl p-6 text-white shadow-xl shadow-indigo-100 relative overflow-hidden no-print">
                 <div class="relative z-10">
-                    <p class="text-[10px] font-bold uppercase opacity-70 tracking-widest">Gjendja Neto (Pasuri - Borxh)</p>
+                    <p class="text-[10px] font-bold uppercase opacity-70 tracking-widest">Gjendja Neto (Cash - Borxh)</p>
                     <h2 class="text-4xl font-black mb-4" id="netBalance">0 ALL</h2>
                     <div class="grid grid-cols-2 gap-4 border-t border-indigo-500 pt-4">
                         <div>
-                            <p class="text-[9px] uppercase opacity-70">Likuiditeti (Cash + Limite)</p>
-                            <p class="font-bold text-sm" id="cashFree">0</p>
+                            <p class="text-[9px] uppercase opacity-70">Gjendja Cash</p>
+                            <p class="font-bold text-sm" id="cashOnly">0</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-[9px] uppercase opacity-70">Detyrime Totale</p>
-                            <p class="font-bold text-sm" id="debtTotal">0</p>
+                            <p class="text-[9px] uppercase opacity-70">Limite të Lira</p>
+                            <p class="font-bold text-sm" id="limitsOnly">0</p>
                         </div>
                     </div>
                 </div>
@@ -124,7 +124,7 @@
             </div>
 
             <div id="tabHistory" class="hidden space-y-4 no-print">
-                <h3 class="font-bold text-slate-500 text-sm uppercase tracking-wider">Historiiku i Lëvizjeve</h3>
+                <h3 class="font-bold text-slate-500 text-sm uppercase tracking-wider">Historiku i Lëvizjeve</h3>
                 <div id="transactionsList" class="space-y-3"></div>
             </div>
 
@@ -182,13 +182,13 @@
     </div>
 
     <!-- Modal Container -->
-    <div id="modalContainer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex items-end sm:items-center justify-center p-4 no-print">
-        <div id="modalBox" class="bg-white w-full max-w-md rounded-[32px] p-8 space-y-4 animate-in overflow-y-auto max-h-[90vh]"></div>
+    <div id="modalContainer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex items-end sm:items-center justify-center p-4 no-print" onclick="handleOutsideClick(event)">
+        <div id="modalBox" class="bg-white w-full max-w-md rounded-[32px] p-8 space-y-4 animate-in overflow-y-auto max-h-[90vh]" onclick="event.stopPropagation()"></div>
     </div>
 
     <!-- Confirm Modal -->
-    <div id="confirmModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-[100] hidden flex items-center justify-center p-6 no-print">
-        <div class="bg-white w-full max-w-sm rounded-[32px] p-8 space-y-4 animate-in shadow-2xl">
+    <div id="confirmModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-[100] hidden flex items-center justify-center p-6 no-print" onclick="closeConfirm()">
+        <div class="bg-white w-full max-w-sm rounded-[32px] p-8 space-y-4 animate-in shadow-2xl" onclick="event.stopPropagation()">
             <h3 id="confirmTitle" class="text-xl font-black text-center">Titulli</h3>
             <p id="confirmMessage" class="text-slate-500 text-center text-sm">Mesazhi</p>
             <div class="flex gap-3 pt-4">
@@ -225,6 +225,12 @@
 
         const modalContainer = document.getElementById('modalContainer');
         const modalBox = document.getElementById('modalBox');
+
+        // Close logic
+        window.handleOutsideClick = (e) => {
+            if (e.target === modalContainer) closeModal();
+        };
+        window.closeConfirm = () => document.getElementById('confirmModal').classList.add('hidden');
 
         // Auth
         document.getElementById('authBtn').onclick = async () => {
@@ -283,20 +289,17 @@
         };
 
         function renderAll() {
-            // Net Balance: (Assets) - (Absolute Debts)
-            const assetsOnly = accounts.filter(a => a.type === 'asset').reduce((s, a) => s + Number(a.balance), 0);
+            // Logjika e re e ndarë
+            const cashOnly = accounts.filter(a => a.type === 'asset' && a.balance > 0).reduce((s, a) => s + Number(a.balance), 0);
             const debtsOnly = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + Math.abs(Number(a.balance)), 0);
+            const limitsOnly = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + (Number(a.limit) + Number(a.balance)), 0);
             
-            // Likuiditeti: Assets + Mbetja nga Limitët e Borxheve
-            const cashFree = accounts.reduce((total, acc) => {
-                if (acc.type === 'asset') return total + Number(acc.balance);
-                // Nëse është borxh, llogarit sa ka mbetur nga limiti (Limit + Balanca negative)
-                return total + (Number(acc.limit) + Number(acc.balance));
-            }, 0);
+            // Gjendja Neto mbetet si diferencë reale
+            const netBalance = cashOnly - debtsOnly;
 
-            document.getElementById('netBalance').innerText = (assetsOnly - debtsOnly).toLocaleString() + " ALL";
-            document.getElementById('cashFree').innerText = cashFree.toLocaleString();
-            document.getElementById('debtTotal').innerText = debtsOnly.toLocaleString();
+            document.getElementById('netBalance').innerText = netBalance.toLocaleString() + " ALL";
+            document.getElementById('cashOnly').innerText = cashOnly.toLocaleString();
+            document.getElementById('limitsOnly').innerText = limitsOnly.toLocaleString();
 
             if (activeTab === 'overview') renderOverview();
             if (activeTab === 'history') renderHistory();
@@ -315,11 +318,11 @@
                     <div class="flex justify-between items-start mb-1">
                         <div>
                             <span class="font-bold text-slate-700">${acc.name}</span>
-                            <p class="text-[9px] text-slate-400 font-black uppercase">${acc.type === 'debt' ? 'Overdraft / Credit' : 'Cash / Debit'}</p>
+                            <p class="text-[9px] text-slate-400 font-black uppercase">${acc.type === 'debt' ? 'Borxh/Limit' : 'Cash'}</p>
                         </div>
                         <div class="text-right">
                             <span class="font-black ${acc.balance < 0 ? 'text-red-500' : 'text-emerald-600'}">${Number(acc.balance).toLocaleString()} ALL</span>
-                            ${acc.type === 'debt' ? `<p class="text-[10px] text-slate-400 font-bold">Mbetja: ${mbetja.toLocaleString()}</p>` : ''}
+                            ${acc.type === 'debt' ? `<p class="text-[10px] text-slate-400 font-bold">Limit i Lirë: ${mbetja.toLocaleString()}</p>` : ''}
                         </div>
                     </div>
                 `;
@@ -400,7 +403,7 @@
                         <input id="editTransDesc" type="text" value="${t.desc || ''}" class="w-full p-4 bg-slate-50 rounded-2xl border-none outline-none font-bold">
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400">Anulo</button>
+                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
                         <button onclick="saveTransaction('${t.id}', '${t.accId}', ${t.amount})" class="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
                     </div>
                     <button onclick="deleteTransaction('${t.id}', '${t.accId}', ${t.amount}, '${t.type}')" class="w-full text-red-500 font-bold text-[10px] uppercase">Fshi transaksionin</button>
@@ -414,7 +417,6 @@
             const diff = newAmt - oldAmt;
             const acc = accounts.find(a => a.id === accId);
             const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
-            // Balanca korrigjohet bazuar në diferencën mes shumës së vjetër dhe të re
             await updateDoc(doc(db, `${userPath}/accounts`, accId), { balance: Number(acc.balance) - diff });
             await updateDoc(doc(db, `${userPath}/transactions`, tid), { amount: newAmt, desc });
             closeModal();
@@ -451,8 +453,8 @@
                         <button id="showNewAcc" class="w-full py-3 border-2 border-dashed rounded-xl text-slate-400 font-bold text-xs">+ SHTO LLOGARI</button>
                         <div id="newAccBox" class="hidden p-4 bg-slate-50 rounded-2xl space-y-2 animate-in">
                             <input id="nAccName" placeholder="Emri" class="w-full p-3 rounded-lg border-none font-bold">
-                            <select id="nAccType" class="w-full p-3 rounded-lg border-none font-bold"><option value="asset">Cash / Debit</option><option value="debt">Overdraft / Credit</option></select>
-                            <input id="nAccLimit" type="number" placeholder="Limiti" class="w-full p-3 rounded-lg border-none font-bold">
+                            <select id="nAccType" class="w-full p-3 rounded-lg border-none font-bold"><option value="asset">Llogari Cash</option><option value="debt">Borxh/Overdraft</option></select>
+                            <input id="nAccLimit" type="number" placeholder="Limiti (nëse ka)" class="w-full p-3 rounded-lg border-none font-bold">
                             <button onclick="submitNewAcc()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-black">KRIJO</button>
                         </div>
                     </section>
@@ -475,8 +477,8 @@
                             <input id="eName" value="${acc.name}" class="w-full p-2 border rounded font-bold">
                             <label class="text-[9px] font-black uppercase text-slate-400">Tipi</label>
                             <select id="eType" class="w-full p-2 border rounded font-bold">
-                                <option value="asset" ${acc.type==='asset'?'selected':''}>Cash / Debit</option>
-                                <option value="debt" ${acc.type==='debt'?'selected':''}>Overdraft / Credit</option>
+                                <option value="asset" ${acc.type==='asset'?'selected':''}>Llogari Cash</option>
+                                <option value="debt" ${acc.type==='debt'?'selected':''}>Borxh/Overdraft</option>
                             </select>
                             <label class="text-[9px] font-black uppercase text-slate-400">Limiti</label>
                             <input id="eLimit" type="number" value="${acc.limit || 0}" class="w-full p-2 border rounded font-bold">
@@ -489,7 +491,7 @@
                 } else {
                     div.innerHTML = `
                         <div class="flex justify-between items-center">
-                            <div><p class="font-bold text-sm">${acc.name}</p><p class="text-[9px] text-slate-400 uppercase font-black">${acc.type === 'debt' ? 'Overdraft' : 'Asset'}</p></div>
+                            <div><p class="font-bold text-sm">${acc.name}</p><p class="text-[9px] text-slate-400 uppercase font-black">${acc.type === 'debt' ? 'Borxh' : 'Cash'}</p></div>
                             <div class="flex gap-1">
                                 <button onclick="setEditing('${acc.id}')" class="p-2 text-blue-500"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
                                 <button onclick="delAcc('${acc.id}', '${acc.name}')" class="p-2 text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -521,7 +523,6 @@
         window.saveGlobalBudget = async () => {
             const amt = Number(document.getElementById('mBudget').value);
             await setDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/settings`, 'budget'), { amount: amt });
-            alert("Buxheti u azhurnua!");
         };
 
         window.submitNewAcc = async () => {
@@ -590,7 +591,10 @@
                         <select id="mAcc" class="bg-slate-100 p-4 rounded-2xl outline-none font-bold">${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
                     </div>
                     <input id="mDesc" type="text" placeholder="Shënim" class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold">
-                    <button onclick="handleTransaction('income')" class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black">REGJISTRO</button>
+                    <div class="flex gap-2">
+                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
+                        <button onclick="handleTransaction('income')" class="flex-[2] bg-emerald-600 text-white py-4 rounded-2xl font-black">REGJISTRO</button>
+                    </div>
                 </div>
             `);
         };
@@ -606,7 +610,10 @@
                         <select id="mAcc" class="bg-slate-100 p-4 rounded-2xl outline-none font-bold">${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
                     </div>
                     <input id="mDesc" type="text" placeholder="Shënim" class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold">
-                    <button onclick="handleTransaction('expense')" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
+                    <div class="flex gap-2">
+                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
+                        <button onclick="handleTransaction('expense')" class="flex-[2] bg-red-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
+                    </div>
                 </div>
             `);
         };
@@ -620,7 +627,10 @@
                         <select id="mAccFrom" class="bg-slate-100 p-4 rounded-2xl font-bold"><option value="">NGA</option>${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
                         <select id="mAccTo" class="bg-slate-100 p-4 rounded-2xl font-bold"><option value="">TEK</option>${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
                     </div>
-                    <button onclick="handleTransferInternal()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black">TRANSFERO</button>
+                    <div class="flex gap-2">
+                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
+                        <button onclick="handleTransferInternal()" class="flex-[2] bg-blue-600 text-white py-4 rounded-2xl font-black">TRANSFERO</button>
+                    </div>
                 </div>
             `);
         };
