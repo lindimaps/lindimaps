@@ -17,13 +17,17 @@
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             gap: 12px;
-            padding-bottom: 8px;
+            padding: 4px;
             -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
         }
         .account-carousel::-webkit-scrollbar { display: none; }
         .account-card {
             flex: 0 0 85%;
             scroll-snap-align: center;
+        }
+        @media (min-width: 640px) {
+            .account-card { flex: 0 0 45%; }
         }
         
         @media print {
@@ -96,9 +100,22 @@
                 </div>
             </div>
 
-            <!-- Carousel i Llogarive -->
-            <div id="accountCarousel" class="account-carousel no-print">
-                <!-- Cards will be injected here -->
+            <!-- Carousel Kontrollet & Container -->
+            <div class="relative no-print group">
+                <div class="flex justify-between items-center mb-2 px-1">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Llogaritë e Mia</h3>
+                    <div class="flex gap-2">
+                        <button onclick="scrollCarousel(-250)" class="p-1.5 bg-white border rounded-full shadow-sm active:scale-90 transition-all">
+                            <i data-lucide="chevron-left" class="w-4 h-4 text-slate-600"></i>
+                        </button>
+                        <button onclick="scrollCarousel(250)" class="p-1.5 bg-white border rounded-full shadow-sm active:scale-90 transition-all">
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="accountCarousel" class="account-carousel">
+                    <!-- Cards will be injected here -->
+                </div>
             </div>
 
             <!-- Content Tabs -->
@@ -152,9 +169,7 @@
                             <option value="8">Shtator</option><option value="9">Tetor</option>
                             <option value="10">Nëntor</option><option value="11">Dhjetor</option>
                         </select>
-                        <select id="reportYear" class="p-3 bg-slate-50 rounded-xl border-none font-bold text-sm">
-                            <!-- Vitet do shtohen dinamikisht -->
-                        </select>
+                        <select id="reportYear" class="p-3 bg-slate-50 rounded-xl border-none font-bold text-sm"></select>
                     </div>
                     <button id="printReportBtn" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black flex items-center justify-center gap-2">
                         <i data-lucide="printer" class="w-5 h-5"></i>
@@ -230,23 +245,22 @@
         let transactions = [];
         let monthlyBudget = 0;
         let activeTab = 'overview';
-        let editingId = null;
 
         const modalContainer = document.getElementById('modalContainer');
         const modalBox = document.getElementById('modalBox');
 
+        window.scrollCarousel = (val) => { document.getElementById('accountCarousel').scrollBy({ left: val, behavior: 'smooth' }); };
         window.handleOutsideClick = (e) => { if (e.target === modalContainer) closeModal(); };
         window.closeConfirm = () => document.getElementById('confirmModal').classList.add('hidden');
-        window.closeModal = () => { modalContainer.classList.add('hidden'); editingId = null; };
+        window.closeModal = () => { modalContainer.classList.add('hidden'); };
 
         document.getElementById('authBtn').onclick = async () => {
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
             if(!email || !pass) return;
             document.getElementById('authLoading').classList.remove('hidden');
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch (err) {
+            try { await signInWithEmailAndPassword(auth, email, pass); } 
+            catch (err) {
                 try { await createUserWithEmailAndPassword(auth, email, pass); }
                 catch(e) { alert("Gabim: " + e.message); document.getElementById('authLoading').classList.add('hidden'); }
             }
@@ -289,17 +303,10 @@
 
         function updateYearFilter() {
             const yearSelect = document.getElementById('reportYear');
-            const currentYearValue = yearSelect.value;
             const years = [...new Set(transactions.map(t => new Date(t.timestamp).getFullYear()))];
             if (years.length === 0) years.push(new Date().getFullYear());
             years.sort((a,b) => b-a);
-            
             yearSelect.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
-            if (years.includes(Number(currentYearValue))) {
-                yearSelect.value = currentYearValue;
-            } else {
-                yearSelect.value = years[0];
-            }
         }
 
         window.switchTab = (tab) => {
@@ -312,13 +319,9 @@
         };
 
         function renderAll() {
-            // Logjika e re e balancave
             const totalCash = accounts.filter(a => a.type === 'asset').reduce((s, a) => s + Number(a.balance), 0);
             const totalSpentDebt = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + Number(a.balance), 0);
-            
-            // Limiti i lirë për çdo llogari borxhi është: Limit - Shpenzim
             const totalFreeLimits = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + (Number(a.limit) - Number(a.balance)), 0);
-            
             const netBalance = totalCash - totalSpentDebt;
 
             document.getElementById('netBalance').innerText = netBalance.toLocaleString() + " ALL";
@@ -335,31 +338,25 @@
         function renderCarousel() {
             const carousel = document.getElementById('accountCarousel');
             carousel.innerHTML = '';
-            accounts.forEach((acc, idx) => {
+            accounts.forEach(acc => {
+                const isDebt = acc.type === 'debt';
+                const freeLimit = isDebt ? (Number(acc.limit) - Number(acc.balance)) : acc.balance;
                 const card = document.createElement('div');
                 card.className = "account-card";
-                const isDebt = acc.type === 'debt';
-                // Për borxhin: Mbetja (limiti i lirë) = Limit - Shpenzim
-                const freeLimit = isDebt ? (Number(acc.limit) - Number(acc.balance)) : acc.balance;
-                
                 card.onclick = () => openDirectEditAccount(acc);
                 card.innerHTML = `
                     <div class="bg-indigo-600 rounded-[28px] p-6 text-white h-44 shadow-lg flex flex-col justify-between relative overflow-hidden cursor-pointer active:scale-95 transition-transform">
                         <div class="z-10">
                             <p class="text-[9px] font-black uppercase opacity-60">${acc.name}</p>
-                            <h4 class="text-2xl font-black mt-1">
-                                ${isDebt ? 'Shpenzuar: ' : ''}${Number(acc.balance).toLocaleString()} ALL
-                            </h4>
+                            <h4 class="text-2xl font-black mt-1">${Number(acc.balance).toLocaleString()} ALL</h4>
+                            <p class="text-[7px] font-bold uppercase opacity-60">${isDebt ? 'Borxh Aktual' : 'Gjendja'}</p>
                         </div>
                         <div class="z-10">
-                            <p class="text-[8px] font-bold opacity-60">${isDebt ? 'Limit i Lirë' : 'Gjendja'}</p>
+                            <p class="text-[8px] font-bold opacity-60">${isDebt ? 'Limit i Lirë' : 'Likuiditeti'}</p>
                             <p class="text-sm font-black">${freeLimit.toLocaleString()} ALL</p>
                         </div>
                         <div class="absolute -bottom-4 -right-4 opacity-10">
                             <i data-lucide="${isDebt ? 'credit-card' : 'banknote'}" class="w-24 h-24"></i>
-                        </div>
-                        <div class="absolute top-4 right-4 bg-white/10 p-2 rounded-full">
-                            <i data-lucide="pencil" class="w-3 h-3"></i>
                         </div>
                     </div>
                 `;
@@ -390,17 +387,26 @@
                 const div = document.createElement('div');
                 div.className = "bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between cursor-pointer active:scale-95 transition-all";
                 div.onclick = () => openEditTransaction(t);
+                
+                let icon = 'trending-down';
+                let color = 'text-red-500';
+                let bg = 'bg-red-50';
+                let symbol = '-';
+                
+                if(t.type === 'income') { icon = 'trending-up'; color = 'text-emerald-500'; bg = 'bg-emerald-50'; symbol = '+'; }
+                if(t.type === 'transfer') { icon = 'arrow-right-left'; color = 'text-blue-500'; bg = 'bg-blue-50'; symbol = ''; }
+
                 div.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <div class="p-2 rounded-lg ${t.type === 'expense' ? 'bg-red-50 text-red-500' : (t.type === 'income' ? 'bg-emerald-50 text-emerald-500' : 'bg-blue-50 text-blue-500')}">
-                            <i data-lucide="${t.type === 'expense' ? 'trending-down' : (t.type === 'income' ? 'trending-up' : 'arrow-right-left')}" class="w-4 h-4"></i>
+                        <div class="p-2 rounded-lg ${bg} ${color}">
+                            <i data-lucide="${icon}" class="w-4 h-4"></i>
                         </div>
                         <div>
                             <p class="font-bold text-sm">${t.desc || cat?.name || (t.type === 'transfer' ? 'Transfertë' : 'Veprim')}</p>
                             <p class="text-[9px] text-slate-400 font-bold uppercase">${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>
                         </div>
                     </div>
-                    <p class="font-black ${t.type === 'expense' ? 'text-red-500' : (t.type === 'income' ? 'text-emerald-600' : 'text-blue-500')}">${t.type === 'expense' ? '-' : (t.type === 'income' ? '+' : '')}${Number(t.amount).toLocaleString()}</p>
+                    <p class="font-black ${color}">${symbol}${Number(t.amount).toLocaleString()}</p>
                 `;
                 list.appendChild(div);
             });
@@ -412,322 +418,55 @@
             statsList.innerHTML = '';
             const m = document.getElementById('reportMonth').value;
             const y = document.getElementById('reportYear').value;
-            
             const filtered = transactions.filter(t => {
                 const d = new Date(t.timestamp);
                 return (m === 'all' || d.getMonth() == m) && d.getFullYear() == y && t.type === 'expense';
             });
-            
             const catTotals = {};
             filtered.forEach(t => {
                 const c = categories.find(cat => cat.id === t.catId)?.name || 'Të tjera';
                 catTotals[c] = (catTotals[c] || 0) + Number(t.amount);
             });
-            
             const sortedCats = Object.entries(catTotals).sort((a,b) => b[1] - a[1]);
             const total = Object.values(catTotals).reduce((a,b)=>a+b, 0);
-
             sortedCats.forEach(([name, amt]) => {
                 const p = total > 0 ? (amt/total)*100 : 0;
                 const div = document.createElement('div');
                 div.className = "bg-white p-4 rounded-xl border border-slate-100 flex items-center justify-between";
                 div.innerHTML = `
                     <div class="flex-1 mr-4">
-                        <div class="flex justify-between text-xs font-black mb-1">
-                            <span>${name}</span>
-                            <span class="text-indigo-600">${amt.toLocaleString()} ALL</span>
-                        </div>
-                        <div class="w-full bg-slate-50 h-1.5 rounded-full overflow-hidden">
-                            <div class="h-full bg-indigo-500 transition-all duration-500" style="width:${p}%"></div>
-                        </div>
+                        <div class="flex justify-between text-xs font-black mb-1"><span>${name}</span><span class="text-indigo-600">${amt.toLocaleString()} ALL</span></div>
+                        <div class="w-full bg-slate-50 h-1.5 rounded-full overflow-hidden"><div class="h-full bg-indigo-500 transition-all duration-500" style="width:${p}%"></div></div>
                     </div>
                     <span class="text-[10px] font-black text-slate-400">${Math.round(p)}%</span>
                 `;
                 statsList.appendChild(div);
             });
-            
-            if(sortedCats.length === 0) {
-                statsList.innerHTML = '<p class="text-center py-8 text-slate-400 text-xs font-bold">Nuk ka shpenzime për këtë periudhë</p>';
-            }
         }
 
-        window.openDirectEditAccount = (acc) => {
-            showModal(`
-                <h2 class="text-xl font-black">Edito Llogarinë</h2>
-                <div class="space-y-4 pt-2">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Emri i Llogarisë</label>
-                        <input id="directEditName" type="text" value="${acc.name}" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Lloji</label>
-                        <select id="directEditType" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none">
-                            <option value="asset" ${acc.type==='asset'?'selected':''}>Cash / Debit Card</option>
-                            <option value="debt" ${acc.type==='debt'?'selected':''}>Borxh (Credit Card / Overdraft)</option>
-                        </select>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Gjendja/Shpenzimi Aktual (ALL)</label>
-                        <p class="text-[9px] text-slate-400 mb-1 italic">Për borxhin: vendos sa ke shpenzuar nga limiti.</p>
-                        <input id="directEditBal" type="number" value="${acc.balance}" class="w-full p-4 bg-slate-50 rounded-2xl font-black border-none outline-none">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Limiti Total (nëse është borxh)</label>
-                        <input id="directEditLimit" type="number" value="${acc.limit || 0}" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none">
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Anulo</button>
-                        <button onclick="saveDirectAcc('${acc.id}')" class="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl font-black">RUAJ NDRYSHIMET</button>
-                    </div>
-                </div>
-            `);
-        };
-
-        window.saveDirectAcc = async (id) => {
-            const name = document.getElementById('directEditName').value;
-            const type = document.getElementById('directEditType').value;
-            const balance = Number(document.getElementById('directEditBal').value);
-            const limit = Number(document.getElementById('directEditLimit').value);
-            
-            await updateDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/accounts`, id), {
-                name, type, balance, limit
-            });
-            closeModal();
-        };
-
-        window.openEditTransaction = (t) => {
-            showModal(`
-                <h2 class="text-xl font-black">Edito Transaksionin</h2>
-                <div class="space-y-4 pt-2">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Shuma</label>
-                        <input id="editTransAmt" type="number" value="${t.amount}" class="w-full text-3xl font-black p-4 bg-slate-50 rounded-2xl outline-none">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Shënimi</label>
-                        <input id="editTransDesc" type="text" value="${t.desc || ''}" class="w-full p-4 bg-slate-50 rounded-2xl border-none outline-none font-bold">
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
-                        <button onclick="saveTransaction('${t.id}', '${t.accId}', ${t.amount}, '${t.type}')" class="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
-                    </div>
-                    <button onclick="deleteTransaction('${t.id}', '${t.accId}', ${t.amount}, '${t.type}')" class="w-full text-red-500 font-bold text-[10px] uppercase py-2">FSHI TRANSAKSIONIN</button>
-                </div>
-            `);
-        };
-
-        window.saveTransaction = async (tid, accId, oldAmt, type) => {
-            const newAmt = Number(document.getElementById('editTransAmt').value);
-            const desc = document.getElementById('editTransDesc').value;
-            const diff = newAmt - oldAmt;
-            const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
-            const accRef = doc(db, `${userPath}/accounts`, accId);
-            const accSnap = await getDoc(accRef);
-            
-            if(accSnap.exists()){
-                const accData = accSnap.data();
-                let updatedBal;
-                if (type === 'income') {
-                    // Ardhura rrit balancën në cash, por ul shpenzimin në borxh
-                    updatedBal = accData.type === 'asset' ? Number(accData.balance) + diff : Number(accData.balance) - diff;
-                } else {
-                    // Shpenzimi ul balancën në cash, por rrit shpenzimin në borxh
-                    updatedBal = accData.type === 'asset' ? Number(accData.balance) - diff : Number(accData.balance) + diff;
-                }
-                await updateDoc(accRef, { balance: updatedBal });
-                await updateDoc(doc(db, `${userPath}/transactions`, tid), { amount: newAmt, desc });
-            }
-            closeModal();
-        };
-
-        window.deleteTransaction = (tid, accId, amt, type) => {
-            askConfirm("Fshirje", "Dëshironi ta fshini këtë lëvizje?", async () => {
-                const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
-                const accRef = doc(db, `${userPath}/accounts`, accId);
-                const accSnap = await getDoc(accRef);
-                if(accSnap.exists()){
-                    const accData = accSnap.data();
-                    let restoreBal;
-                    if (type === 'expense') {
-                        // Fshirja e shpenzimit: rrit balancën cash, ul balancën borxh
-                        restoreBal = accData.type === 'asset' ? Number(accData.balance) + Number(amt) : Number(accData.balance) - Number(amt);
-                    } else if (type === 'income') {
-                        // Fshirja e të ardhurës: ul balancën cash, rrit balancën borxh
-                        restoreBal = accData.type === 'asset' ? Number(accData.balance) - Number(amt) : Number(accData.balance) + Number(amt);
-                    } else {
-                        restoreBal = accData.balance; // Për transfertat duhet llogari më komplekse, lihet kështu për thjeshtësi
-                    }
-                    await updateDoc(accRef, { balance: restoreBal });
-                }
-                await deleteDoc(doc(db, `${userPath}/transactions`, tid));
-                closeModal();
-            });
-        };
-
-        document.getElementById('openManageBtn').onclick = () => {
-            showModal(`
-                <div class="flex justify-between items-center border-b pb-4">
-                    <h2 class="text-xl font-black">Konfigurime</h2>
-                    <button onclick="closeModal()"><i data-lucide="x"></i></button>
-                </div>
-                <div class="space-y-6 pt-4 pb-10">
-                    <section class="space-y-3">
-                        <h3 class="text-[10px] font-black text-indigo-600 uppercase">Limit Shpenzimi (Buxheti)</h3>
-                        <div class="flex gap-2">
-                            <input id="mBudget" type="number" value="${monthlyBudget}" class="flex-1 p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none" placeholder="Vendos limitin (0 për ta fshirë)">
-                            <button onclick="saveGlobalBudget()" class="bg-indigo-600 text-white px-6 rounded-2xl font-black">OK</button>
-                        </div>
-                    </section>
-                    
-                    <section class="space-y-3">
-                        <h3 class="text-[10px] font-black text-indigo-600 uppercase">Menaxho Llogaritë</h3>
-                        <div id="mAccList" class="space-y-2"></div>
-                        <button id="showNewAcc" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 font-bold text-xs hover:border-indigo-300 transition-colors">+ SHTO LLOGARI TË RE</button>
-                        <div id="newAccBox" class="hidden p-4 bg-slate-50 rounded-2xl space-y-2 animate-in">
-                            <input id="nAccName" placeholder="Emri i llogarisë" class="w-full p-3 rounded-lg font-bold border-none">
-                            <select id="nAccType" class="w-full p-3 rounded-lg font-bold border-none"><option value="asset">Llogari Cash</option><option value="debt">Borxh (Credit Card / Overdraft)</option></select>
-                            <input id="nAccLimit" type="number" placeholder="Limiti total i borxhit" class="w-full p-3 rounded-lg font-bold border-none">
-                            <button onclick="submitNewAcc()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-black">KRIJO</button>
-                        </div>
-                    </section>
-
-                    <section class="space-y-3">
-                        <h3 class="text-[10px] font-black text-indigo-600 uppercase">Menaxho Kategoritë</h3>
-                        <div id="mCatList" class="space-y-2"></div>
-                        <div class="bg-slate-50 p-4 rounded-2xl space-y-2">
-                            <input id="nCatName" placeholder="Emri i Kategorisë" class="w-full p-3 rounded-lg font-bold border-none">
-                            <select id="nCatType" class="w-full p-3 rounded-lg font-bold border-none"><option value="expense">Kategori Shpenzimi</option><option value="income">Kategori Të Ardhura</option></select>
-                            <button onclick="submitNewCat()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-black">SHTO KATEGORI</button>
-                        </div>
-                    </section>
-                </div>
-            `, true);
-            renderManageContent();
-        };
-
-        function renderManageContent() {
-            const accList = document.getElementById('mAccList');
-            const catList = document.getElementById('mCatList');
-            if(!accList || !catList) return;
-
-            accList.innerHTML = '';
-            accounts.forEach(acc => {
-                const div = document.createElement('div');
-                div.className = "bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center";
-                div.innerHTML = `
-                    <div><p class="font-bold text-sm">${acc.name}</p><p class="text-[9px] text-slate-400 font-black">${acc.type.toUpperCase()}</p></div>
-                    <div class="flex gap-1">
-                        <button onclick="openDirectEditAccount(${JSON.stringify(acc).replace(/"/g, '&quot;')})" class="p-2 text-indigo-500"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                        <button onclick="delAcc('${acc.id}', '${acc.name}')" class="p-2 text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>
-                `;
-                accList.appendChild(div);
-            });
-
-            catList.innerHTML = '';
-            categories.forEach(cat => {
-                const div = document.createElement('div');
-                div.className = "bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center";
-                div.innerHTML = `
-                    <div><p class="font-bold text-sm">${cat.name}</p><p class="text-[9px] text-slate-400 font-black">${cat.type.toUpperCase()}</p></div>
-                    <div class="flex gap-1">
-                        <button onclick="openEditCat('${cat.id}')" class="p-2 text-indigo-500"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                        <button onclick="delCat('${cat.id}')" class="p-2 text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>
-                `;
-                catList.appendChild(div);
-            });
-            
-            document.getElementById('showNewAcc').onclick = () => document.getElementById('newAccBox').classList.toggle('hidden');
-            lucide.createIcons();
-        }
-
-        window.openEditCat = (id) => {
-            const cat = categories.find(c => c.id === id);
-            showModal(`
-                <h2 class="text-xl font-black">Edito Kategorinë</h2>
-                <div class="space-y-4 pt-2">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Emri i Kategorisë</label>
-                        <input id="editCatName" type="text" value="${cat.name}" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Lloji</label>
-                        <select id="editCatType" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none">
-                            <option value="expense" ${cat.type==='expense'?'selected':''}>Shpenzim</option>
-                            <option value="income" ${cat.type==='income'?'selected':''}>Ardhura</option>
-                        </select>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Anulo</button>
-                        <button onclick="saveEditedCat('${id}')" class="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
-                    </div>
-                </div>
-            `);
-        };
-
-        window.saveEditedCat = async (id) => {
-            const name = document.getElementById('editCatName').value;
-            const type = document.getElementById('editCatType').value;
-            if(!name) return;
-            await updateDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/categories`, id), { name, type });
-            closeModal();
-        };
-
-        window.delAcc = (id, name) => {
-            askConfirm("Fshirje", `Fshini llogarinë ${name}? Të dhënat do të humbasin.`, async () => {
-                await deleteDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/accounts`, id));
-            });
-        };
-
-        window.submitNewAcc = async () => {
-            const name = document.getElementById('nAccName').value;
-            const type = document.getElementById('nAccType').value;
-            const limit = Number(document.getElementById('nAccLimit').value) || 0;
-            if(!name) return;
-            await addDoc(collection(db, `artifacts/lindibank/users/${auth.currentUser.uid}/accounts`), { name, type, limit, balance: 0 });
-            document.getElementById('newAccBox').classList.add('hidden');
-        };
-
-        window.submitNewCat = async () => {
-            const name = document.getElementById('nCatName').value;
-            const type = document.getElementById('nCatType').value;
-            if(!name) return;
-            await addDoc(collection(db, `artifacts/lindibank/users/${auth.currentUser.uid}/categories`), { name, type });
-            document.getElementById('nCatName').value = '';
-        };
-
-        window.delCat = (id) => {
-            askConfirm("Fshirje", "Dëshironi të fshini këtë kategori?", async () => {
-                await deleteDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/categories`, id));
-            });
-        };
-
-        window.saveGlobalBudget = async () => {
-            const amt = Number(document.getElementById('mBudget').value);
-            await setDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/settings`, 'budget'), { amount: amt });
-            closeModal();
-        };
-
+        // Logic Bankare e Përmirësuar
         window.handleTransaction = async (type) => {
             const amt = Number(document.getElementById('mAmt').value);
             const catId = document.getElementById('mCat').value;
             const accId = document.getElementById('mAcc').value;
             const desc = document.getElementById('mDesc').value;
             if(!amt || !accId) return;
-            const acc = accounts.find(a => a.id === accId);
-            const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
             
+            const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
+            const accRef = doc(db, `${userPath}/accounts`, accId);
+            const accSnap = await getDoc(accRef);
+            const acc = accSnap.data();
+
             let newBal;
-            if (type === 'income') {
-                // Ardhura rrit cash-in, ul borxhin (shpenzimin)
+            if(type === 'income') {
+                // Ardhura: rrit llogarinë aset, ul llogarinë borxh (paguhet borxhi)
                 newBal = acc.type === 'asset' ? Number(acc.balance) + amt : Number(acc.balance) - amt;
             } else {
-                // Shpenzimi ul cash-in, rrit borxhin (shpenzimin)
+                // Shpenzimi: ul llogarinë aset, rrit llogarinë borxh (rritet borxhi)
                 newBal = acc.type === 'asset' ? Number(acc.balance) - amt : Number(acc.balance) + amt;
             }
-            
-            await updateDoc(doc(db, `${userPath}/accounts`, accId), { balance: newBal });
+
+            await updateDoc(accRef, { balance: newBal });
             await addDoc(collection(db, `${userPath}/transactions`), { type, amount: amt, catId, accId, desc, timestamp: Date.now() });
             closeModal();
         };
@@ -736,187 +475,200 @@
             const amt = Number(document.getElementById('mAmt').value);
             const fromId = document.getElementById('mAccFrom').value;
             const toId = document.getElementById('mAccTo').value;
-            if(!amt || !fromId || !toId) return;
-            const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
-            const fromAcc = accounts.find(a => a.id === fromId);
-            const toAcc = accounts.find(a => a.id === toId);
+            if(!amt || !fromId || !toId || fromId === toId) return;
             
-            // Logjika e transferit: 'from' sillet si shpenzim, 'to' sillet si ardhurë
+            const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
+            const fromRef = doc(db, `${userPath}/accounts`, fromId);
+            const toRef = doc(db, `${userPath}/accounts`, toId);
+            const fromAcc = (await getDoc(fromRef)).data();
+            const toAcc = (await getDoc(toRef)).data();
+
+            // From: Heq paratë (Trajtohet si shpenzim)
             let newFromBal = fromAcc.type === 'asset' ? Number(fromAcc.balance) - amt : Number(fromAcc.balance) + amt;
+            // To: Merr paratë (Trajtohet si ardhurë)
             let newToBal = toAcc.type === 'asset' ? Number(toAcc.balance) + amt : Number(toAcc.balance) - amt;
 
-            await updateDoc(doc(db, `${userPath}/accounts`, fromId), { balance: newFromBal });
-            await updateDoc(doc(db, `${userPath}/accounts`, toId), { balance: newToBal });
-            await addDoc(collection(db, `${userPath}/transactions`), { type: 'transfer', amount: amt, fromId, toId, desc: 'Transfertë', timestamp: Date.now() });
+            await updateDoc(fromRef, { balance: newFromBal });
+            await updateDoc(toRef, { balance: newToBal });
+            await addDoc(collection(db, `${userPath}/transactions`), { 
+                type: 'transfer', 
+                amount: amt, 
+                fromId, 
+                toId, 
+                desc: `Transfertë: ${fromAcc.name} → ${toAcc.name}`, 
+                timestamp: Date.now() 
+            });
             closeModal();
         };
+
+        window.deleteTransaction = (tid, accId, amt, type, tData) => {
+            askConfirm("Fshirje", "Dëshironi ta fshini këtë lëvizje? Gjendja e llogarive do të kthehet siç ishte.", async () => {
+                const userPath = `artifacts/lindibank/users/${auth.currentUser.uid}`;
+                
+                if(type === 'transfer') {
+                    // LOGJIKA E PËRMBYSJES SË TRANSFERTËS
+                    const fromRef = doc(db, `${userPath}/accounts`, tData.fromId);
+                    const toRef = doc(db, `${userPath}/accounts`, tData.toId);
+                    const fromAcc = (await getDoc(fromRef)).data();
+                    const toAcc = (await getDoc(toRef)).data();
+
+                    // Kthe paratë te dërguesi (Përmbys 'From' - shtoja asetin ose uli borxhin)
+                    let undoFromBal = fromAcc.type === 'asset' ? Number(fromAcc.balance) + Number(amt) : Number(fromAcc.balance) - Number(amt);
+                    // Hiqi paratë nga marrësi (Përmbys 'To' - uli asetin ose shtoja borxhin)
+                    let undoToBal = toAcc.type === 'asset' ? Number(toAcc.balance) - Number(amt) : Number(toAcc.balance) + Number(amt);
+
+                    await updateDoc(fromRef, { balance: undoFromBal });
+                    await updateDoc(toRef, { balance: undoToBal });
+                } else {
+                    // Logjika për income/expense
+                    const accRef = doc(db, `${userPath}/accounts`, accId);
+                    const acc = (await getDoc(accRef)).data();
+                    let undoBal;
+                    if(type === 'expense') {
+                        // Kthe shpenzimin: shto asetin, ul borxhin
+                        undoBal = acc.type === 'asset' ? Number(acc.balance) + Number(amt) : Number(acc.balance) - Number(amt);
+                    } else if(type === 'income') {
+                        // Hiq të ardhurën: ul asetin, shto borxhin
+                        undoBal = acc.type === 'asset' ? Number(acc.balance) - Number(amt) : Number(acc.balance) + Number(amt);
+                    }
+                    await updateDoc(accRef, { balance: undoBal });
+                }
+
+                await deleteDoc(doc(db, `${userPath}/transactions`, tid));
+                closeModal();
+            });
+        };
+
+        // UI Modals
+        window.openDirectEditAccount = (acc) => {
+            showModal(`
+                <h2 class="text-xl font-black">Llogaria: ${acc.name}</h2>
+                <div class="space-y-4 pt-2">
+                    <div class="space-y-1"><label class="text-[10px] font-black uppercase text-slate-400">Emri</label><input id="dName" value="${acc.name}" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black uppercase text-slate-400">Gjendja/Shpenzimi Aktual</label><input id="dBal" type="number" value="${acc.balance}" class="w-full p-4 bg-slate-50 rounded-2xl font-black border-none outline-none"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black uppercase text-slate-400">Limiti (vetëm borxh)</label><input id="dLim" type="number" value="${acc.limit || 0}" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none"></div>
+                    <div class="flex gap-2">
+                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Anulo</button>
+                        <button onclick="saveDirectAcc('${acc.id}')" class="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
+                    </div>
+                </div>
+            `);
+        };
+
+        window.saveDirectAcc = async (id) => {
+            const name = document.getElementById('dName').value;
+            const balance = Number(document.getElementById('dBal').value);
+            const limit = Number(document.getElementById('dLim').value);
+            await updateDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/accounts`, id), { name, balance, limit });
+            closeModal();
+        };
+
+        window.openEditTransaction = (t) => {
+            showModal(`
+                <h2 class="text-xl font-black">Detajet e Lëvizjes</h2>
+                <div class="space-y-4 pt-2">
+                    <div class="p-4 bg-slate-50 rounded-2xl"><p class="text-[10px] font-black text-slate-400 uppercase">Shuma</p><p class="text-2xl font-black">${Number(t.amount).toLocaleString()} ALL</p></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black uppercase text-slate-400">Shënimi</label><input id="editTDesc" value="${t.desc || ''}" class="w-full p-4 bg-slate-50 rounded-2xl border-none outline-none font-bold"></div>
+                    <div class="flex gap-2">
+                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
+                        <button onclick="updateTDesc('${t.id}')" class="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
+                    </div>
+                    <button onclick='deleteTransaction("${t.id}", "${t.accId || ''}", ${t.amount}, "${t.type}", ${JSON.stringify(t)})' class="w-full text-red-500 font-black text-[10px] py-4 uppercase">FSHI TRANSAKSIONIN</button>
+                </div>
+            `);
+        };
+
+        window.updateTDesc = async (id) => {
+            const desc = document.getElementById('editTDesc').value;
+            await updateDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/transactions`, id), { desc });
+            closeModal();
+        };
+
+        // Menaxhimi Global (Settings)
+        document.getElementById('openManageBtn').onclick = () => {
+            showModal(`
+                <div class="flex justify-between items-center border-b pb-4"><h2 class="text-xl font-black">Konfigurime</h2><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
+                <div class="space-y-6 pt-4 pb-10">
+                    <section class="space-y-2"><h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Buxheti Mujor</h3><div class="flex gap-2"><input id="mBudget" type="number" value="${monthlyBudget}" class="flex-1 p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none"><button onclick="saveGlobalBudget()" class="bg-indigo-600 text-white px-6 rounded-2xl font-black">OK</button></div></section>
+                    <section class="space-y-2"><h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Llogaritë</h3><div id="mAccList" class="space-y-2"></div><button id="showNewAcc" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-black text-[10px] uppercase">+ Shto Llogari</button><div id="newAccBox" class="hidden p-4 bg-slate-50 rounded-2xl space-y-2 animate-in"><input id="nAccName" placeholder="Emri" class="w-full p-3 rounded-lg font-bold border-none"><select id="nAccType" class="w-full p-3 rounded-lg font-bold border-none"><option value="asset">Likuiditet (Aset)</option><option value="debt">Borxh (Kredit/Overdraft)</option></select><input id="nAccLimit" type="number" placeholder="Limiti (nëse është borxh)" class="w-full p-3 rounded-lg font-bold border-none"><button onclick="submitNewAcc()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-black">KRIJO</button></div></section>
+                    <section class="space-y-2"><h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Kategoritë</h3><div id="mCatList" class="space-y-2"></div><div class="bg-slate-50 p-4 rounded-2xl space-y-2"><input id="nCatName" placeholder="Emri" class="w-full p-3 rounded-lg font-bold border-none"><select id="nCatType" class="w-full p-3 rounded-lg font-bold border-none"><option value="expense">Shpenzim</option><option value="income">Ardhura</option></select><button onclick="submitNewCat()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-black">SHTO</button></div></section>
+                </div>
+            `, true);
+            renderManageContent();
+        };
+
+        function renderManageContent() {
+            const accList = document.getElementById('mAccList');
+            const catList = document.getElementById('mCatList');
+            if(!accList) return;
+            accList.innerHTML = accounts.map(acc => `<div class="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center"><div><p class="font-bold text-sm">${acc.name}</p></div><button onclick="delAcc('${acc.id}', '${acc.name}')" class="p-2 text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('');
+            catList.innerHTML = categories.map(cat => `<div class="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center"><div><p class="font-bold text-sm">${cat.name}</p></div><button onclick="delCat('${cat.id}')" class="p-2 text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('');
+            document.getElementById('showNewAcc').onclick = () => document.getElementById('newAccBox').classList.toggle('hidden');
+            lucide.createIcons();
+        }
+
+        window.submitNewAcc = async () => {
+            const name = document.getElementById('nAccName').value;
+            const type = document.getElementById('nAccType').value;
+            const limit = Number(document.getElementById('nAccLimit').value) || 0;
+            if(!name) return;
+            await addDoc(collection(db, `artifacts/lindibank/users/${auth.currentUser.uid}/accounts`), { name, type, limit, balance: 0 });
+            renderManageContent();
+        };
+
+        window.submitNewCat = async () => {
+            const name = document.getElementById('nCatName').value;
+            const type = document.getElementById('nCatType').value;
+            if(!name) return;
+            await addDoc(collection(db, `artifacts/lindibank/users/${auth.currentUser.uid}/categories`), { name, type });
+            document.getElementById('nCatName').value = '';
+            renderManageContent();
+        };
+
+        window.saveGlobalBudget = async () => {
+            const amt = Number(document.getElementById('mBudget').value);
+            await setDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/settings`, 'budget'), { amount: amt });
+            closeModal();
+        };
+
+        window.delAcc = (id, name) => askConfirm("Fshi Llogarinë", `Fshini ${name}?`, async () => deleteDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/accounts`, id)));
+        window.delCat = (id) => askConfirm("Fshi Kategorinë", "Konfirmoni fshirjen?", async () => deleteDoc(doc(db, `artifacts/lindibank/users/${auth.currentUser.uid}/categories`, id)));
 
         window.askConfirm = (title, msg, onYes) => {
             document.getElementById('confirmTitle').innerText = title;
             document.getElementById('confirmMessage').innerText = msg;
             document.getElementById('confirmModal').classList.remove('hidden');
-            document.getElementById('confirmYes').onclick = () => { onYes(); document.getElementById('confirmModal').classList.add('hidden'); };
-            document.getElementById('confirmCancel').onclick = () => document.getElementById('confirmModal').classList.add('hidden');
+            document.getElementById('confirmYes').onclick = () => { onYes(); closeConfirm(); };
         };
 
         window.showModal = (content, isManage = false) => {
             modalBox.innerHTML = content;
             modalContainer.classList.remove('hidden');
-            if (isManage) modalContainer.classList.add('manage-open');
+            if(isManage) modalContainer.classList.add('manage-open');
             else modalContainer.classList.remove('manage-open');
             lucide.createIcons();
         };
 
+        // Quick Actions UI
         document.getElementById('openIncomeBtn').onclick = () => {
-            const incCats = categories.filter(c => c.type === 'income');
-            showModal(`
-                <h2 class="text-xl font-black text-emerald-600">Ardhura</h2>
-                <div class="space-y-4 pt-2">
-                    <input id="mAmt" type="number" placeholder="0.00" class="w-full text-4xl font-black bg-slate-50 p-6 rounded-2xl outline-none">
-                    <div class="grid grid-cols-2 gap-3">
-                        <select id="mCat" class="bg-slate-100 p-4 rounded-2xl font-bold border-none outline-none">${incCats.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}</select>
-                        <select id="mAcc" class="bg-slate-100 p-4 rounded-2xl font-bold border-none outline-none">${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
-                    </div>
-                    <input id="mDesc" type="text" placeholder="Shënim" class="w-full bg-slate-50 p-4 rounded-2xl font-bold border-none outline-none">
-                    <div class="flex gap-2">
-                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
-                        <button onclick="handleTransaction('income')" class="flex-[2] bg-emerald-600 text-white py-4 rounded-2xl font-black">REGJISTRO</button>
-                    </div>
-                </div>
-            `);
+            const cats = categories.filter(c => c.type === 'income');
+            showModal(`<h2 class="text-xl font-black text-emerald-600">Regjistro Ardhura</h2><div class="space-y-4 pt-2"><input id="mAmt" type="number" placeholder="0.00" class="w-full text-4xl font-black bg-slate-50 p-6 rounded-2xl outline-none"><div class="grid grid-cols-2 gap-3"><select id="mCat" class="bg-slate-100 p-4 rounded-2xl font-bold border-none">${cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}</select><select id="mAcc" class="bg-slate-100 p-4 rounded-2xl font-bold border-none">${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select></div><input id="mDesc" type="text" placeholder="Shënim" class="w-full bg-slate-50 p-4 rounded-2xl font-bold border-none outline-none"><button onclick="handleTransaction('income')" class="w-full bg-emerald-600 text-white py-6 rounded-2xl font-black text-lg">KONFIRMO</button></div>`);
         };
-
         document.getElementById('openExpenseBtn').onclick = () => {
-            const expCats = categories.filter(c => c.type === 'expense');
-            showModal(`
-                <h2 class="text-xl font-black text-red-600">Shpenzim</h2>
-                <div class="space-y-4 pt-2">
-                    <input id="mAmt" type="number" placeholder="0.00" class="w-full text-4xl font-black bg-slate-50 p-6 rounded-2xl outline-none">
-                    <div class="grid grid-cols-2 gap-3">
-                        <select id="mCat" class="bg-slate-100 p-4 rounded-2xl font-bold border-none outline-none">${expCats.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}</select>
-                        <select id="mAcc" class="bg-slate-100 p-4 rounded-2xl font-bold border-none outline-none">${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
-                    </div>
-                    <input id="mDesc" type="text" placeholder="Shënim" class="w-full bg-slate-50 p-4 rounded-2xl font-bold border-none outline-none">
-                    <div class="flex gap-2">
-                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
-                        <button onclick="handleTransaction('expense')" class="flex-[2] bg-red-600 text-white py-4 rounded-2xl font-black">RUAJ</button>
-                    </div>
-                </div>
-            `);
+            const cats = categories.filter(c => c.type === 'expense');
+            showModal(`<h2 class="text-xl font-black text-red-600">Regjistro Shpenzim</h2><div class="space-y-4 pt-2"><input id="mAmt" type="number" placeholder="0.00" class="w-full text-4xl font-black bg-slate-50 p-6 rounded-2xl outline-none"><div class="grid grid-cols-2 gap-3"><select id="mCat" class="bg-slate-100 p-4 rounded-2xl font-bold border-none">${cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}</select><select id="mAcc" class="bg-slate-100 p-4 rounded-2xl font-bold border-none">${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select></div><input id="mDesc" type="text" placeholder="Shënim" class="w-full bg-slate-50 p-4 rounded-2xl font-bold border-none outline-none"><button onclick="handleTransaction('expense')" class="w-full bg-red-600 text-white py-6 rounded-2xl font-black text-lg">RUAN SHPENZIMIN</button></div>`);
         };
-
         document.getElementById('openTransferBtn').onclick = () => {
-            showModal(`
-                <h2 class="text-xl font-black text-blue-600">Transfertë</h2>
-                <div class="space-y-4 pt-2">
-                    <input id="mAmt" type="number" placeholder="0.00" class="w-full text-4xl font-black bg-slate-50 p-6 rounded-2xl outline-none">
-                    <div class="grid grid-cols-2 gap-3">
-                        <select id="mAccFrom" class="bg-slate-100 p-4 rounded-2xl font-bold border-none outline-none"><option value="">NGA</option>${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
-                        <select id="mAccTo" class="bg-slate-100 p-4 rounded-2xl font-bold border-none outline-none"><option value="">TEK</option>${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 bg-slate-100 rounded-2xl">Mbyll</button>
-                        <button onclick="handleTransferInternal()" class="flex-[2] bg-blue-600 text-white py-4 rounded-2xl font-black">OK</button>
-                    </div>
-                </div>
-            `);
+            showModal(`<h2 class="text-xl font-black text-blue-600">Transfertë Interne</h2><div class="space-y-4 pt-2"><input id="mAmt" type="number" placeholder="0.00" class="w-full text-4xl font-black bg-slate-50 p-6 rounded-2xl outline-none"><div class="grid grid-cols-2 gap-3"><select id="mAccFrom" class="bg-slate-100 p-4 rounded-2xl font-bold border-none"><option value="">NGA</option>${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select><select id="mAccTo" class="bg-slate-100 p-4 rounded-2xl font-bold border-none"><option value="">TEK</option>${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select></div><button onclick="handleTransferInternal()" class="w-full bg-blue-600 text-white py-6 rounded-2xl font-black text-lg">EKZEKUTO TRANSFERTËN</button></div>`);
         };
 
         document.getElementById('printReportBtn').onclick = () => {
             const m = document.getElementById('reportMonth').value;
             const y = document.getElementById('reportYear').value;
-            const periodText = m === 'all' ? `Gjithë Kohës - ${y}` : `Muaji ${Number(m)+1}/${y}`;
-            
-            const filtered = transactions.filter(t => {
-                const d = new Date(t.timestamp);
-                return (m === 'all' || d.getMonth() == m) && d.getFullYear() == y;
-            }).sort((a,b) => b.timestamp - a.timestamp);
-
-            let totalIn = 0;
-            let totalOut = 0;
-
-            let html = `
-                <div class="mb-10 text-center">
-                    <h1 class="text-3xl font-black uppercase tracking-tighter">Raporti Financiar LindiBank</h1>
-                    <p class="text-slate-500 font-bold">${periodText}</p>
-                </div>
-                
-                <h2 class="text-lg font-black mb-4 border-b-2 border-slate-900 pb-1">Gjendja e Llogarive</h2>
-                <table class="w-full border-collapse mb-10">
-                    <tr class="bg-slate-50">
-                        <th class="border p-3 text-left font-black uppercase text-[10px]">Llogaria</th>
-                        <th class="border p-3 text-left font-black uppercase text-[10px]">Tipi</th>
-                        <th class="border p-3 text-right font-black uppercase text-[10px]">Gjendja/Shpenzimi</th>
-                        <th class="border p-3 text-right font-black uppercase text-[10px]">Limiti Lirë</th>
-                    </tr>
-            `;
-            
-            accounts.forEach(a => {
-                const isDebt = a.type === 'debt';
-                const free = isDebt ? (Number(a.limit) - Number(a.balance)) : a.balance;
-                html += `
-                    <tr>
-                        <td class="border p-3 font-bold">${a.name}</td>
-                        <td class="border p-3 text-[10px] uppercase font-bold opacity-60">${isDebt ? 'Borxh' : 'Cash'}</td>
-                        <td class="border p-3 text-right font-black">${a.balance.toLocaleString()} ALL</td>
-                        <td class="border p-3 text-right font-black text-indigo-600">${free.toLocaleString()} ALL</td>
-                    </tr>`;
-            });
-            
-            html += `
-                </table>
-                <h2 class="text-lg font-black mb-4 border-b-2 border-slate-900 pb-1">Historiku i Lëvizjeve</h2>
-                <table class="w-full border-collapse">
-                    <tr class="bg-slate-50">
-                        <th class="border p-2 text-left font-black uppercase text-[10px]">Data & Ora</th>
-                        <th class="border p-2 text-left font-black uppercase text-[10px]">Përshkrimi</th>
-                        <th class="border p-2 text-left font-black uppercase text-[10px]">Kategoria</th>
-                        <th class="border p-2 text-right font-black uppercase text-[10px]">Shuma</th>
-                    </tr>
-            `;
-            
-            filtered.forEach(t => {
-                const d = new Date(t.timestamp);
-                const dateStr = d.toLocaleDateString('sq-AL');
-                const timeStr = d.toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
-                const catName = categories.find(c => c.id === t.catId)?.name || (t.type === 'transfer' ? 'Transfertë' : '-');
-                const isOut = t.type === 'expense';
-                const isIn = t.type === 'income';
-                
-                if (isOut) totalOut += Number(t.amount);
-                if (isIn) totalIn += Number(t.amount);
-
-                html += `
-                    <tr>
-                        <td class="border p-2 text-[11px] font-medium">${dateStr} ${timeStr}</td>
-                        <td class="border p-2 text-[11px] font-bold">${t.desc || '-'}</td>
-                        <td class="border p-2 text-[11px] uppercase font-black opacity-60">${catName}</td>
-                        <td class="border p-2 text-right font-black ${isOut ? 'text-red-600' : (isIn ? 'text-emerald-600' : 'text-blue-600')}">
-                            ${isOut ? '-' : (isIn ? '+' : '')}${Number(t.amount).toLocaleString()}
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            html += `
-                </table>
-                <div class="mt-10 border-t-4 border-slate-900 pt-6">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-black uppercase text-xs">Total të Ardhura (Periudha):</span>
-                        <span class="text-emerald-600 font-black text-xl">+ ${totalIn.toLocaleString()} ALL</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-black uppercase text-xs">Total Shpenzime (Periudha):</span>
-                        <span class="text-red-600 font-black text-xl">- ${totalOut.toLocaleString()} ALL</span>
-                    </div>
-                    <div class="flex justify-between items-center bg-slate-900 text-white p-4 rounded-xl mt-4">
-                        <span class="font-black uppercase text-sm">Bilanci i Periudhës:</span>
-                        <span class="font-black text-2xl">${(totalIn - totalOut).toLocaleString()} ALL</span>
-                    </div>
-                </div>
-                <p class="text-[9px] text-center mt-20 opacity-40 font-bold uppercase">Gjeneruar nga LindiBank - ${new Date().toLocaleString()}</p>
-            `;
-            
+            const filtered = transactions.filter(t => { const d = new Date(t.timestamp); return (m === 'all' || d.getMonth() == m) && d.getFullYear() == y; });
+            let html = `<div class="mb-10 text-center"><h1 class="text-3xl font-black uppercase">LindiBank Report</h1><p>${m==='all'?'Gjithë Viti':m}/${y}</p></div><table class="w-full border-collapse"><tr><th class="border p-2 text-left">Data</th><th class="border p-2 text-left">Përshkrimi</th><th class="border p-2 text-right">Shuma</th></tr>`;
+            filtered.forEach(t => { html += `<tr><td class="border p-2">${new Date(t.timestamp).toLocaleDateString()}</td><td class="border p-2">${t.desc || '-'}</td><td class="border p-2 text-right font-black">${t.amount.toLocaleString()}</td></tr>`; });
+            html += "</table>";
             document.getElementById('printContent').innerHTML = html;
             window.print();
         };
