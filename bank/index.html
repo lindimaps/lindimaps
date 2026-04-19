@@ -1,734 +1,287 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
-  signInAnonymously, 
-  onAuthStateChanged, 
-  signInWithCustomToken 
-} from 'firebase/auth';
-import { 
-  getFirestore, 
-  doc, 
-  onSnapshot, 
-  setDoc 
-} from 'firebase/firestore';
-import { 
-  Wallet, 
-  CreditCard, 
-  PlusCircle, 
-  ArrowRightLeft, 
-  PieChart, 
-  LayoutDashboard,
-  TrendingDown, 
-  TrendingUp,
-  History,
-  Plus,
-  Settings2,
-  Trash2,
-  Edit2,
-  X,
-  Check,
-  ArrowUpCircle,
-  AlertTriangle,
-  Cloud,
-  CloudOff
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financat e Mia - Full App</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@0.321.0/dist/umd/lucide.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .animate-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
 
-/**
- * KONFIGURIMI I FIREBASE
- * Për GitHub: Sigurohuni që këto variabla të vijnë nga .env ose 
- * zëvendësojini me vlerat tuaja reale nëse është projekt privat.
- */
-const firebaseConfig = typeof __firebase_config !== 'undefined' 
-  ? JSON.parse(__firebase_config) 
-  : {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'financat-e-mia-v1';
-
-const App = () => {
-  // --- STATE ---
-  const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('overview');
-  const [isSynced, setIsSynced] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Data State - Defaultet që shfaqen para se të ngarkohen nga Cloud
-  const [accounts, setAccounts] = useState([
-    { id: '1', name: 'Debit Card', balance: 0, type: 'asset', limit: 0 },
-    { id: '2', name: 'Overdraft', balance: 0, type: 'debt', limit: 50000 },
-    { id: '3', name: 'Credit Card', balance: 0, type: 'debt', limit: 100000 },
-    { id: '4', name: 'Kursime', balance: 0, type: 'asset', limit: 0 },
-    { id: '5', name: 'Cash', balance: 0, type: 'asset', limit: 0 },
-  ]);
-
-  const [expenseCategories, setExpenseCategories] = useState([
-    { id: 'ec1', name: 'Shtëpiake' },
-    { id: 'ec2', name: 'Shëndet' },
-    { id: 'ec3', name: 'Ushqim' },
-    { id: 'ec4', name: 'Transport' },
-  ]);
-
-  const [incomeCategories, setIncomeCategories] = useState([
-    { id: 'ic1', name: 'Rroga' },
-    { id: 'ic2', name: 'Qira' },
-    { id: 'ic3', name: 'Bonuse' },
-  ]);
-
-  const [transactions, setTransactions] = useState([]);
-  
-  // UI State
-  const [editingAcc, setEditingAcc] = useState(null);
-  const [showExpenseModal, setShowExpenseModal] = useState(false);
-  const [showIncomeModal, setShowIncomeModal] = useState(false);
-  const [showTransferModal, setShowTransferModal] = useState(false);
-  const [showManageModal, setShowManageModal] = useState(false);
-  const [confirmModal, setConfirmModal] = useState({ show: false, title: '', message: '', onConfirm: null });
-
-  // Form states
-  const [expenseForm, setExpenseForm] = useState({ amount: '', categoryId: '', accountId: '', desc: '' });
-  const [incomeForm, setIncomeForm] = useState({ amount: '', categoryId: '', accountId: '', desc: '' });
-  const [transferForm, setTransferForm] = useState({ from: '', to: '', amount: '' });
-  const [newAccForm, setNewAccForm] = useState({ name: '', type: 'asset', balance: 0, limit: 0 });
-  const [newCatForm, setNewCatForm] = useState({ name: '', type: 'expense' });
-
-  // --- FIREBASE SYNC ---
-
-  useEffect(() => {
-    const initAuth = async () => {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
-      } catch (err) {
-        console.error("Auth error:", err);
-      }
-    };
-    initAuth();
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      if (!u) setIsLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid);
-    
-    const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (data.accounts) setAccounts(data.accounts);
-        if (data.expenseCategories) setExpenseCategories(data.expenseCategories);
-        if (data.incomeCategories) setIncomeCategories(data.incomeCategories);
-        if (data.transactions) setTransactions(data.transactions);
-      } else {
-        // Inicializimi i parë
-        setDoc(userDocRef, { accounts, expenseCategories, incomeCategories, transactions });
-      }
-      setIsSynced(true);
-      setIsLoading(false);
-    }, (error) => {
-      console.error("Firestore sync error:", error);
-      setIsSynced(false);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
-
-  const pushUpdate = async (updates) => {
-    if (!user) return;
-    const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid);
-    try {
-      await setDoc(userDocRef, {
-        accounts,
-        expenseCategories,
-        incomeCategories,
-        transactions,
-        ...updates
-      }, { merge: true });
-    } catch (err) {
-      console.error("Failed to push update:", err);
-    }
-  };
-
-  // --- CALCULATIONS ---
-
-  const totals = useMemo(() => {
-    const assets = accounts.filter(a => a.type === 'asset').reduce((s, a) => s + a.balance, 0);
-    const debts = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + a.balance, 0);
-    return { assets, debts, net: assets + debts };
-  }, [accounts]);
-
-  // --- HANDLERS ---
-
-  const askConfirmation = (title, message, onConfirm) => {
-    setConfirmModal({ show: true, title, message, onConfirm });
-  };
-
-  const handleAddAccount = () => {
-    if (!newAccForm.name.trim()) return;
-    const updated = [...accounts, { 
-      ...newAccForm, 
-      id: Date.now().toString(), 
-      balance: Number(newAccForm.balance), 
-      limit: Number(newAccForm.limit) 
-    }];
-    setAccounts(updated);
-    pushUpdate({ accounts: updated });
-    setNewAccForm({ name: '', type: 'asset', balance: 0, limit: 0 });
-  };
-
-  const handleDeleteAccount = (id, name) => {
-    askConfirmation(
-      "Fshij Llogarinë",
-      `A jeni i sigurt që dëshironi të fshini llogarinë "${name}"? Të dhënat do të fshihen përgjithmonë.`,
-      () => {
-        const updated = accounts.filter(a => a.id !== id);
-        setAccounts(updated);
-        pushUpdate({ accounts: updated });
-      }
-    );
-  };
-
-  const handleEditAccount = (id, data) => {
-    const updated = accounts.map(a => a.id === id ? { ...a, ...data } : a);
-    setAccounts(updated);
-    pushUpdate({ accounts: updated });
-    setEditingAcc(null);
-  };
-
-  const handleAddCategory = () => {
-    if (!newCatForm.name.trim()) return;
-    const newEntry = { id: Date.now().toString(), name: newCatForm.name };
-    if (newCatForm.type === 'expense') {
-      const updated = [...expenseCategories, newEntry];
-      setExpenseCategories(updated);
-      pushUpdate({ expenseCategories: updated });
-    } else {
-      const updated = [...incomeCategories, newEntry];
-      setIncomeCategories(updated);
-      pushUpdate({ incomeCategories: updated });
-    }
-    setNewCatForm({ ...newCatForm, name: '' });
-  };
-
-  const handleDeleteCategory = (id, name, type) => {
-    askConfirmation(
-      "Fshij Kategorinë",
-      `A jeni i sigurt për fshirjen e kategorisë "${name}"?`,
-      () => {
-        if (type === 'expense') {
-          const updated = expenseCategories.filter(c => c.id !== id);
-          setExpenseCategories(updated);
-          pushUpdate({ expenseCategories: updated });
-        } else {
-          const updated = incomeCategories.filter(c => c.id !== id);
-          setIncomeCategories(updated);
-          pushUpdate({ incomeCategories: updated });
-        }
-      }
-    );
-  };
-
-  const handleIncome = (e) => {
-    e.preventDefault();
-    const amt = parseFloat(incomeForm.amount);
-    if (!amt || !incomeForm.accountId || !incomeForm.categoryId) return;
-    
-    const newAccs = accounts.map(a => a.id === incomeForm.accountId ? { ...a, balance: a.balance + amt } : a);
-    const newTrans = [{ 
-      id: Date.now(), 
-      type: 'income', 
-      amount: amt, 
-      catId: incomeForm.categoryId, 
-      accId: incomeForm.accountId, 
-      desc: incomeForm.desc, 
-      date: new Date().toLocaleDateString('sq-AL') 
-    }, ...transactions];
-
-    setAccounts(newAccs);
-    setTransactions(newTrans);
-    pushUpdate({ accounts: newAccs, transactions: newTrans });
-    setIncomeForm({ amount: '', categoryId: '', accountId: '', desc: '' });
-    setShowIncomeModal(false);
-  };
-
-  const handleExpense = (e) => {
-    e.preventDefault();
-    const amt = parseFloat(expenseForm.amount);
-    if (!amt || !expenseForm.accountId || !expenseForm.categoryId) return;
-    
-    const newAccs = accounts.map(a => a.id === expenseForm.accountId ? { ...a, balance: a.balance - amt } : a);
-    const newTrans = [{ 
-      id: Date.now(), 
-      type: 'expense', 
-      amount: amt, 
-      catId: expenseForm.categoryId, 
-      accId: expenseForm.accountId, 
-      desc: expenseForm.desc, 
-      date: new Date().toLocaleDateString('sq-AL') 
-    }, ...transactions];
-
-    setAccounts(newAccs);
-    setTransactions(newTrans);
-    pushUpdate({ accounts: newAccs, transactions: newTrans });
-    setExpenseForm({ amount: '', categoryId: '', accountId: '', desc: '' });
-    setShowExpenseModal(false);
-  };
-
-  const handleTransfer = (e) => {
-    e.preventDefault();
-    const amt = parseFloat(transferForm.amount);
-    if (!amt || !transferForm.from || !transferForm.to) return;
-
-    const newAccs = accounts.map(a => {
-      if (a.id === transferForm.from) return { ...a, balance: a.balance - amt };
-      if (a.id === transferForm.to) return { ...a, balance: a.balance + amt };
-      return a;
-    });
-    const newTrans = [{ 
-      id: Date.now(), 
-      type: 'transfer', 
-      amount: amt, 
-      from: transferForm.from, 
-      to: transferForm.to, 
-      date: new Date().toLocaleDateString('sq-AL') 
-    }, ...transactions];
-
-    setAccounts(newAccs);
-    setTransactions(newTrans);
-    pushUpdate({ accounts: newAccs, transactions: newTrans });
-    setTransferForm({ from: '', to: '', amount: '' });
-    setShowTransferModal(false);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Po ngarkohen të dhënat...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-24 font-sans select-none overflow-x-hidden">
-      {/* Header */}
-      <div className="bg-white border-b p-4 sticky top-0 z-20 shadow-sm">
-        <div className="max-w-2xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-2.5 rounded-2xl text-white shadow-lg shadow-indigo-100">
-              <Wallet size={20} />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg leading-none">Financat e Mia</h1>
-              <div className="flex items-center gap-1 mt-1">
-                {isSynced ? <Cloud size={10} className="text-emerald-500" /> : <CloudOff size={10} className="text-slate-300" />}
-                <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">
-                  {isSynced ? 'Në Cloud' : 'Offline'}
-                </span>
-              </div>
-            </div>
-          </div>
-          <button onClick={() => setShowManageModal(true)} className="p-3 bg-slate-100 rounded-full text-slate-600 active:scale-90 transition-transform">
-            <Settings2 size={20} />
-          </button>
-        </div>
-      </div>
-
-      <div className="max-w-2xl mx-auto p-4 space-y-6">
+        // Firebase Mock/Stub for the Environment
+        // Në projektin tuaj në GitHub, zëvendësoni këto me importet reale të Firebase nëse përdorni module
+        // Ose përdorni scriptet e Firebase CDN nëse doni ta mbani në një skedar.
         
-        {/* Card Përmbledhëse */}
-        <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-slate-900 rounded-[36px] p-8 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden">
-            <div className="relative z-10">
-                <p className="text-[10px] font-black uppercase opacity-60 tracking-widest">Gjendja Neto</p>
-                <h2 className="text-4xl font-black mt-2 mb-8 tracking-tight">{totals.net.toLocaleString()} ALL</h2>
-                <div className="flex justify-between border-t border-white/10 pt-6">
-                    <div>
-                        <p className="text-[9px] font-black uppercase opacity-40 tracking-tighter mb-1">Pasuri</p>
-                        <p className="font-extrabold text-xl">{totals.assets.toLocaleString()}</p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-[9px] font-black uppercase opacity-40 tracking-tighter mb-1">Detyrime</p>
-                        <p className="font-extrabold text-xl text-indigo-100">{totals.debts.toLocaleString()}</p>
-                    </div>
-                </div>
-            </div>
-            <div className="absolute -bottom-12 -right-12 opacity-5 rotate-12">
-                <Wallet size={240} />
-            </div>
-        </div>
+        const App = () => {
+            // --- STATE ---
+            const [activeTab, setActiveTab] = useState('overview');
+            const [isLoading, setIsLoading] = useState(false);
+            
+            // Data State
+            const [accounts, setAccounts] = useState([
+                { id: '1', name: 'Debit Card', balance: 45000, type: 'asset', limit: 0 },
+                { id: '2', name: 'Overdraft', balance: -12000, type: 'debt', limit: 50000 },
+                { id: '3', name: 'Credit Card', balance: -34000, type: 'debt', limit: 100000 },
+                { id: '4', name: 'Kursime', balance: 120000, type: 'asset', limit: 0 },
+                { id: '5', name: 'Cash', balance: 5400, type: 'asset', limit: 0 },
+            ]);
 
-        {activeTab === 'overview' && (
-          <div className="space-y-6 animate-in fade-in duration-500">
-            {/* Veprime të Shpejta */}
-            <div className="grid grid-cols-3 gap-3">
-              <button onClick={() => setShowIncomeModal(true)} className="bg-white p-5 rounded-3xl flex flex-col items-center gap-2 border border-slate-100 shadow-sm active:bg-emerald-50 active:scale-95 transition-all">
-                <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-500"><ArrowUpCircle size={24} /></div>
-                <span className="font-black text-[9px] uppercase text-slate-500">Të Ardhura</span>
-              </button>
-              <button onClick={() => setShowExpenseModal(true)} className="bg-white p-5 rounded-3xl flex flex-col items-center gap-2 border border-slate-100 shadow-sm active:bg-red-50 active:scale-95 transition-all">
-                <div className="p-3 bg-red-50 rounded-2xl text-red-500"><TrendingDown size={24} /></div>
-                <span className="font-black text-[9px] uppercase text-slate-500">Shpenzim</span>
-              </button>
-              <button onClick={() => setShowTransferModal(true)} className="bg-white p-5 rounded-3xl flex flex-col items-center gap-2 border border-slate-100 shadow-sm active:bg-blue-50 active:scale-95 transition-all">
-                <div className="p-3 bg-blue-50 rounded-2xl text-blue-500"><ArrowRightLeft size={24} /></div>
-                <span className="font-black text-[9px] uppercase text-slate-500">Transfertë</span>
-              </button>
-            </div>
+            const [expenseCategories, setExpenseCategories] = useState([
+                { id: 'ec1', name: 'Shtëpiake' },
+                { id: 'ec2', name: 'Shëndet' },
+                { id: 'ec3', name: 'Ushqim' },
+                { id: 'ec4', name: 'Transport' },
+            ]);
 
-            {/* List e Llogarive */}
-            <section className="space-y-3">
-              <div className="flex justify-between items-center px-1">
-                <h3 className="font-black text-slate-400 text-[10px] uppercase tracking-widest">Llogaritë Aktive</h3>
-                <span className="text-[9px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg uppercase">{accounts.length} Llogari</span>
-              </div>
-              {accounts.map(acc => (
-                <div key={acc.id} className="bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                        <div className={`p-2.5 rounded-xl ${acc.type === 'asset' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-50 text-slate-500'}`}>
-                            {acc.type === 'asset' ? <Wallet size={18}/> : <CreditCard size={18}/>}
+            const [incomeCategories, setIncomeCategories] = useState([
+                { id: 'ic1', name: 'Rroga' },
+                { id: 'ic2', name: 'Qira' },
+                { id: 'ic3', name: 'Bonuse' },
+            ]);
+
+            const [transactions, setTransactions] = useState([
+                { id: 1, type: 'expense', amount: 2500, catId: 'ec3', accId: '1', desc: 'Market', date: '15/05/2024' },
+                { id: 2, type: 'income', amount: 85000, catId: 'ic1', accId: '1', desc: 'Rroga Prill', date: '01/05/2024' }
+            ]);
+            
+            // UI State
+            const [editingAcc, setEditingAcc] = useState(null);
+            const [showExpenseModal, setShowExpenseModal] = useState(false);
+            const [showIncomeModal, setShowIncomeModal] = useState(false);
+            const [showTransferModal, setShowTransferModal] = useState(false);
+            const [showManageModal, setShowManageModal] = useState(false);
+            const [confirmModal, setConfirmModal] = useState({ show: false, title: '', message: '', onConfirm: null });
+
+            // Form states
+            const [expenseForm, setExpenseForm] = useState({ amount: '', categoryId: '', accountId: '', desc: '' });
+            const [incomeForm, setIncomeForm] = useState({ amount: '', categoryId: '', accountId: '', desc: '' });
+            const [transferForm, setTransferForm] = useState({ from: '', to: '', amount: '' });
+            const [newAccForm, setNewAccForm] = useState({ name: '', type: 'asset', balance: 0, limit: 0 });
+            const [newCatForm, setNewCatForm] = useState({ name: '', type: 'expense' });
+
+            // --- CALCULATIONS ---
+            const totals = useMemo(() => {
+                const assets = accounts.filter(a => a.type === 'asset').reduce((s, a) => s + a.balance, 0);
+                const debts = accounts.filter(a => a.type === 'debt').reduce((s, a) => s + a.balance, 0);
+                return { assets, debts, net: assets + debts };
+            }, [accounts]);
+
+            // --- HANDLERS ---
+            const askConfirmation = (title, message, onConfirm) => {
+                setConfirmModal({ show: true, title, message, onConfirm });
+            };
+
+            const handleAddAccount = () => {
+                if (!newAccForm.name.trim()) return;
+                setAccounts([...accounts, { 
+                    ...newAccForm, 
+                    id: Date.now().toString(), 
+                    balance: Number(newAccForm.balance), 
+                    limit: Number(newAccForm.limit) 
+                }]);
+                setNewAccForm({ name: '', type: 'asset', balance: 0, limit: 0 });
+            };
+
+            const handleDeleteAccount = (id, name) => {
+                askConfirmation(
+                    "Fshij Llogarinë",
+                    `A jeni i sigurt që dëshironi të fshini llogarinë "${name}"?`,
+                    () => setAccounts(accounts.filter(a => a.id !== id))
+                );
+            };
+
+            const handleIncome = (e) => {
+                e.preventDefault();
+                const amt = parseFloat(incomeForm.amount);
+                if (!amt || !incomeForm.accountId) return;
+                setAccounts(accounts.map(a => a.id === incomeForm.accountId ? { ...a, balance: a.balance + amt } : a));
+                setTransactions([{ id: Date.now(), type: 'income', amount: amt, catId: incomeForm.categoryId, accId: incomeForm.accountId, desc: incomeForm.desc, date: new Date().toLocaleDateString('sq-AL') }, ...transactions]);
+                setShowIncomeModal(false);
+                setIncomeForm({ amount: '', categoryId: '', accountId: '', desc: '' });
+            };
+
+            const handleExpense = (e) => {
+                e.preventDefault();
+                const amt = parseFloat(expenseForm.amount);
+                if (!amt || !expenseForm.accountId) return;
+                setAccounts(accounts.map(a => a.id === expenseForm.accountId ? { ...a, balance: a.balance - amt } : a));
+                setTransactions([{ id: Date.now(), type: 'expense', amount: amt, catId: expenseForm.categoryId, accId: expenseForm.accountId, desc: expenseForm.desc, date: new Date().toLocaleDateString('sq-AL') }, ...transactions]);
+                setShowExpenseModal(false);
+                setExpenseForm({ amount: '', categoryId: '', accountId: '', desc: '' });
+            };
+
+            // Helpers for Icons
+            const Icon = ({ name, size = 20, ...props }) => {
+                const LucideIcon = lucide[name.charAt(0).toUpperCase() + name.slice(1)];
+                return LucideIcon ? <LucideIcon size={size} {...props} /> : null;
+            };
+
+            return (
+                <div className="min-h-screen pb-24">
+                    {/* Header */}
+                    <div className="bg-white border-b p-4 sticky top-0 z-20 shadow-sm">
+                        <div className="max-w-2xl mx-auto flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <div className="bg-indigo-600 p-2.5 rounded-2xl text-white">
+                                    <Icon name="Wallet" />
+                                </div>
+                                <h1 className="font-bold text-lg">Financat e Mia</h1>
+                            </div>
+                            <button onClick={() => setShowManageModal(true)} className="p-3 bg-slate-100 rounded-full text-slate-600">
+                                <Icon name="Settings2" />
+                            </button>
                         </div>
-                        <div>
-                            <span className="font-extrabold text-sm text-slate-800 block">{acc.name}</span>
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-tight">{acc.type === 'asset' ? 'Pasuri' : 'Detyrim'}</span>
-                        </div>
                     </div>
-                    <span className={`font-black text-base ${acc.balance < 0 ? 'text-red-500' : 'text-emerald-600'}`}>
-                      {acc.balance.toLocaleString()} <span className="text-[10px]">ALL</span>
-                    </span>
-                  </div>
-                  {acc.type === 'debt' && (
-                    <div className="mt-5 pt-5 border-t border-slate-50">
-                        <div className="flex justify-between text-[9px] text-slate-400 font-black mb-2 uppercase tracking-tighter">
-                            <span>Limit: {acc.limit.toLocaleString()}</span>
-                            <span>I Lirë: {(acc.limit + acc.balance).toLocaleString()}</span>
+
+                    <div className="max-w-2xl mx-auto p-4 space-y-6">
+                        {/* Card Përmbledhëse */}
+                        <div className="bg-gradient-to-br from-indigo-600 to-slate-900 rounded-[36px] p-8 text-white shadow-xl relative overflow-hidden">
+                            <div className="relative z-10">
+                                <p className="text-[10px] font-bold uppercase opacity-60 tracking-widest">Gjendja Neto</p>
+                                <h2 className="text-4xl font-black mt-2 mb-8">{totals.net.toLocaleString()} ALL</h2>
+                                <div className="flex justify-between border-t border-white/10 pt-6">
+                                    <div>
+                                        <p className="text-[9px] font-bold uppercase opacity-40 mb-1">Pasuri</p>
+                                        <p className="font-extrabold text-xl">{totals.assets.toLocaleString()}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[9px] font-bold uppercase opacity-40 mb-1">Detyrime</p>
+                                        <p className="font-extrabold text-xl">{totals.debts.toLocaleString()}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                            <div 
-                                className="h-full bg-red-400 transition-all duration-700 rounded-full" 
-                                style={{ width: `${Math.min((Math.abs(acc.balance) / acc.limit) * 100, 100)}%` }}
-                            ></div>
+
+                        {activeTab === 'overview' ? (
+                            <div className="space-y-6 animate-in">
+                                <div className="grid grid-cols-3 gap-3">
+                                    <button onClick={() => setShowIncomeModal(true)} className="bg-white p-5 rounded-3xl flex flex-col items-center gap-2 border border-slate-100 shadow-sm">
+                                        <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-500"><Icon name="ArrowUpCircle" size={24} /></div>
+                                        <span className="font-bold text-[9px] uppercase text-slate-500">Hyrje</span>
+                                    </button>
+                                    <button onClick={() => setShowExpenseModal(true)} className="bg-white p-5 rounded-3xl flex flex-col items-center gap-2 border border-slate-100 shadow-sm">
+                                        <div className="p-3 bg-red-50 rounded-2xl text-red-500"><Icon name="TrendingDown" size={24} /></div>
+                                        <span className="font-bold text-[9px] uppercase text-slate-500">Dalje</span>
+                                    </button>
+                                    <button onClick={() => setShowTransferModal(true)} className="bg-white p-5 rounded-3xl flex flex-col items-center gap-2 border border-slate-100 shadow-sm">
+                                        <div className="p-3 bg-blue-50 rounded-2xl text-blue-500"><Icon name="ArrowRightLeft" size={24} /></div>
+                                        <span className="font-bold text-[9px] uppercase text-slate-500">Transfertë</span>
+                                    </button>
+                                </div>
+
+                                <section className="space-y-3">
+                                    <h3 className="font-bold text-slate-400 text-[10px] uppercase tracking-widest px-1">Llogaritë</h3>
+                                    {accounts.map(acc => (
+                                        <div key={acc.id} className="bg-white p-6 rounded-[28px] border border-slate-100 flex justify-between items-center shadow-sm">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`p-2.5 rounded-xl ${acc.type === 'asset' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-50 text-slate-500'}`}>
+                                                    <Icon name={acc.type === 'asset' ? "Wallet" : "CreditCard"} size={18} />
+                                                </div>
+                                                <div>
+                                                    <span className="font-bold text-sm text-slate-800 block">{acc.name}</span>
+                                                    <span className="text-[9px] font-bold text-slate-400 uppercase">{acc.type === 'asset' ? 'Pasuri' : 'Detyrim'}</span>
+                                                </div>
+                                            </div>
+                                            <span className={`font-black text-base ${acc.balance < 0 ? 'text-red-500' : 'text-emerald-600'}`}>
+                                                {acc.balance.toLocaleString()} ALL
+                                            </span>
+                                        </div>
+                                    ))}
+                                </section>
+                            </div>
+                        ) : (
+                            <section className="space-y-3 animate-in">
+                                <h3 className="font-bold text-slate-400 text-[10px] uppercase tracking-widest px-1">Lëvizjet e Fundit</h3>
+                                {transactions.map(t => (
+                                    <div key={t.id} className="bg-white p-5 rounded-3xl border border-slate-100 flex items-center justify-between">
+                                        <div className="flex items-center gap-4">
+                                            <div className={`p-3 rounded-2xl ${t.type === 'expense' ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-500'}`}>
+                                                <Icon name={t.type === 'expense' ? 'TrendingDown' : 'TrendingUp'} />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-sm text-slate-800">{t.desc || 'Transaksion'}</p>
+                                                <p className="text-[9px] text-slate-400 uppercase tracking-widest">{t.date}</p>
+                                            </div>
+                                        </div>
+                                        <p className={`font-black ${t.type === 'expense' ? 'text-red-500' : 'text-emerald-600'}`}>
+                                            {t.type === 'expense' ? '-' : '+'}{t.amount.toLocaleString()}
+                                        </p>
+                                    </div>
+                                ))}
+                            </section>
+                        )}
+                    </div>
+
+                    {/* Bottom Nav */}
+                    <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t flex justify-around p-5 z-30">
+                        <button onClick={() => setActiveTab('overview')} className={`flex flex-col items-center gap-1 ${activeTab === 'overview' ? 'text-indigo-600' : 'text-slate-400'}`}>
+                            <Icon name="LayoutDashboard" size={24} />
+                            <span className="text-[8px] font-bold uppercase">Dashboard</span>
+                        </button>
+                        <button onClick={() => setActiveTab('history')} className={`flex flex-col items-center gap-1 ${activeTab === 'history' ? 'text-indigo-600' : 'text-slate-400'}`}>
+                            <Icon name="History" size={24} />
+                            <span className="text-[8px] font-bold uppercase">Aktiviteti</span>
+                        </button>
+                    </div>
+
+                    {/* Simple Modals - Shfaqen sipas State */}
+                    {showIncomeModal && (
+                        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+                            <div className="bg-white w-full max-w-sm rounded-[40px] p-8 space-y-6 animate-in">
+                                <h2 className="text-xl font-black text-center text-emerald-600">Shto të Ardhura</h2>
+                                <form onSubmit={handleIncome} className="space-y-4">
+                                    <input type="number" required placeholder="Shuma (ALL)" className="w-full p-4 bg-slate-50 rounded-2xl font-bold" value={incomeForm.amount} onChange={e => setIncomeForm({...incomeForm, amount: e.target.value})} />
+                                    <select className="w-full p-4 bg-slate-50 rounded-2xl font-bold" required value={incomeForm.accountId} onChange={e => setIncomeForm({...incomeForm, accountId: e.target.value})}>
+                                        <option value="">Zgjidh Llogarinë</option>
+                                        {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                                    </select>
+                                    <button type="submit" className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold">KONFIRMO</button>
+                                    <button type="button" onClick={() => setShowIncomeModal(false)} className="w-full text-slate-400 font-bold text-xs uppercase">Anulo</button>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </section>
-          </div>
-        )}
+                    )}
 
-        {activeTab === 'history' && (
-          <section className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h3 className="font-black text-slate-400 text-[10px] uppercase tracking-widest px-1">Lëvizjet e Fundit</h3>
-            {transactions.length === 0 ? (
-                <div className="py-20 flex flex-col items-center gap-3 opacity-20">
-                    <History size={48} />
-                    <p className="font-bold text-sm italic">Nuk ka transaksione ende.</p>
-                </div>
-            ) : (
-                transactions.map(t => (
-                  <div key={t.id} className="bg-white p-5 rounded-3xl border border-slate-100 flex items-center justify-between shadow-sm">
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-2xl ${
-                        t.type === 'expense' ? 'bg-red-50 text-red-500' : 
-                        t.type === 'income' ? 'bg-emerald-50 text-emerald-500' : 'bg-blue-50 text-blue-500'
-                      }`}>
-                        {t.type === 'expense' ? <TrendingDown size={20}/> : t.type === 'income' ? <TrendingUp size={20}/> : <ArrowRightLeft size={20}/>}
-                      </div>
-                      <div>
-                        <p className="font-extrabold text-sm text-slate-800">
-                          {t.type === 'expense' ? (t.desc || expenseCategories.find(c => c.id === t.catId)?.name) : 
-                           t.type === 'income' ? (t.desc || incomeCategories.find(c => c.id === t.catId)?.name) : 'Transfertë'}
-                        </p>
-                        <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{t.date}</p>
-                      </div>
-                    </div>
-                    <p className={`font-black text-base ${t.type === 'expense' ? 'text-red-500' : t.type === 'income' ? 'text-emerald-600' : 'text-blue-500'}`}>
-                      {t.type === 'expense' ? '-' : t.type === 'income' ? '+' : ''}{t.amount.toLocaleString()}
-                    </p>
-                  </div>
-                ))
-            )}
-          </section>
-        )}
-      </div>
-
-      {/* --- MODALS --- */}
-
-      {/* Confirmation Modal */}
-      {confirmModal.show && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[100] flex items-center justify-center p-6">
-          <div className="bg-white w-full max-w-sm rounded-[40px] p-8 space-y-6 animate-in zoom-in-95 duration-200 shadow-2xl">
-            <div className="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto">
-                <AlertTriangle size={40} />
-            </div>
-            <div className="text-center space-y-2">
-                <h3 className="text-xl font-black">Konfirmoni Fshirjen</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{confirmModal.message}</p>
-            </div>
-            <div className="flex gap-3">
-              <button 
-                onClick={() => setConfirmModal({ ...confirmModal, show: false })}
-                className="flex-1 py-4 font-bold text-slate-400 bg-slate-50 rounded-2xl active:scale-95 transition-all"
-              >Anulo</button>
-              <button 
-                onClick={() => {
-                    confirmModal.onConfirm();
-                    setConfirmModal({ ...confirmModal, show: false });
-                }}
-                className="flex-1 py-4 bg-red-600 text-white rounded-2xl font-black shadow-lg shadow-red-100 active:scale-95 transition-all"
-              >Po, Fshije</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Settings Modal */}
-      {showManageModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg rounded-[40px] p-8 max-h-[90vh] overflow-y-auto space-y-10 animate-in zoom-in-95 duration-200 shadow-2xl relative">
-            <div className="flex justify-between items-center sticky top-0 bg-white pb-6 border-b z-10">
-              <h2 className="text-2xl font-black tracking-tight">Menaxhimi</h2>
-              <button onClick={() => setShowManageModal(false)} className="p-2.5 bg-slate-50 rounded-full text-slate-400 active:scale-90 transition-all"><X size={20}/></button>
-            </div>
-
-            <div className="space-y-10">
-              {/* Llogarite */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-4 bg-indigo-600 rounded-full"></div>
-                    <h3 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">Llogaritë Tuaja</h3>
-                </div>
-                <div className="space-y-3">
-                  {accounts.map(acc => (
-                    <div key={acc.id} className="flex items-center gap-3 bg-slate-50/50 p-4 rounded-[24px] border border-slate-100">
-                      {editingAcc === acc.id ? (
-                        <div className="flex flex-col gap-3 w-full animate-in fade-in duration-300">
-                          <input className="bg-white p-4 rounded-xl border-none text-sm font-bold shadow-sm" defaultValue={acc.name} id={`edit-name-${acc.id}`} />
-                          {acc.type === 'debt' && (
-                            <input className="bg-white p-4 rounded-xl border-none text-sm font-bold shadow-sm" type="number" defaultValue={acc.limit} id={`edit-limit-${acc.id}`} placeholder="Limit i ri" />
-                          )}
-                          <div className="flex gap-2">
-                            <button 
-                              className="bg-emerald-500 text-white p-4 rounded-xl flex-1 font-black flex items-center justify-center active:scale-95 transition-all"
-                              onClick={() => {
-                                  const name = document.getElementById(`edit-name-${acc.id}`).value;
-                                  const limit = acc.type === 'debt' ? Number(document.getElementById(`edit-limit-${acc.id}`).value) : 0;
-                                  handleEditAccount(acc.id, { name, limit });
-                              }}
-                            ><Check size={18}/></button>
-                            <button className="bg-slate-200 text-slate-600 p-4 rounded-xl flex-1 font-black flex items-center justify-center active:scale-95 transition-all" onClick={() => setEditingAcc(null)}><X size={18}/></button>
-                          </div>
+                    {showExpenseModal && (
+                        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+                            <div className="bg-white w-full max-w-sm rounded-[40px] p-8 space-y-6 animate-in">
+                                <h2 className="text-xl font-black text-center text-red-600">Shto Shpenzim</h2>
+                                <form onSubmit={handleExpense} className="space-y-4">
+                                    <input type="number" required placeholder="Shuma (ALL)" className="w-full p-4 bg-slate-50 rounded-2xl font-bold" value={expenseForm.amount} onChange={e => setExpenseForm({...expenseForm, amount: e.target.value})} />
+                                    <select className="w-full p-4 bg-slate-50 rounded-2xl font-bold" required value={expenseForm.accountId} onChange={e => setExpenseForm({...expenseForm, accountId: e.target.value})}>
+                                        <option value="">Nga Llogaria</option>
+                                        {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                                    </select>
+                                    <button type="submit" className="w-full bg-red-600 text-white py-4 rounded-2xl font-bold">KONFIRMO</button>
+                                    <button type="button" onClick={() => setShowExpenseModal(false)} className="w-full text-slate-400 font-bold text-xs uppercase">Anulo</button>
+                                </form>
+                            </div>
                         </div>
-                      ) : (
-                        <>
-                          <div className="flex-1 ml-1">
-                            <p className="font-extrabold text-sm text-slate-700">{acc.name}</p>
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{acc.type === 'asset' ? 'Pasuri' : 'Detyrim'}</p>
-                          </div>
-                          <button onClick={() => setEditingAcc(acc.id)} className="p-2.5 text-indigo-600 bg-white shadow-sm rounded-xl active:scale-90 transition-all"><Edit2 size={14}/></button>
-                          <button onClick={() => handleDeleteAccount(acc.id, acc.name)} className="p-2.5 text-red-400 bg-white shadow-sm rounded-xl active:scale-90 transition-all"><Trash2 size={14}/></button>
-                        </>
-                      )}
-                    </div>
-                  ))}
+                    )}
                 </div>
-                {/* Form per Llogari te Re */}
-                <div className="p-6 bg-indigo-50/30 rounded-[32px] space-y-4 border border-indigo-100/50">
-                  <p className="text-[10px] font-black text-indigo-700 uppercase tracking-widest text-center">Regjistro Llogari të re</p>
-                  <input placeholder="Emri i llogarisë" className="w-full p-4 rounded-2xl border-none text-sm font-bold bg-white shadow-sm" value={newAccForm.name} onChange={e => setNewAccForm({...newAccForm, name: e.target.value})} />
-                  <div className="grid grid-cols-2 gap-3">
-                    <select className="p-4 rounded-2xl border-none bg-white text-[11px] font-black uppercase shadow-sm" value={newAccForm.type} onChange={e => setNewAccForm({...newAccForm, type: e.target.value})}>
-                      <option value="asset">Gjendje</option>
-                      <option value="debt">Borxh</option>
-                    </select>
-                    <input type="number" placeholder="Limit" className="p-4 rounded-2xl border-none text-sm font-bold bg-white shadow-sm" value={newAccForm.limit} onChange={e => setNewAccForm({...newAccForm, limit: e.target.value})} />
-                  </div>
-                  <button onClick={handleAddAccount} className="w-full bg-indigo-600 text-white py-4.5 rounded-2xl font-black text-[11px] uppercase shadow-xl shadow-indigo-100 active:scale-95 transition-all tracking-widest">Shto Llogarinë</button>
-                </div>
-              </div>
+            );
+        };
 
-              {/* Kategorite */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-4 bg-blue-600 rounded-full"></div>
-                    <h3 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">Kategoritë</h3>
-                </div>
-                <div className="space-y-6">
-                  <div>
-                    <p className="text-[9px] font-black text-slate-400 mb-3 uppercase tracking-widest px-1">Shpenzimet</p>
-                    <div className="flex flex-wrap gap-2">
-                      {expenseCategories.map(cat => (
-                        <div key={cat.id} className="flex items-center gap-2 bg-red-50/50 text-red-700 px-4 py-2.5 rounded-2xl text-[10px] font-black border border-red-100 animate-in fade-in duration-300">
-                          {cat.name}
-                          <button onClick={() => handleDeleteCategory(cat.id, cat.name, 'expense')} className="hover:scale-125 transition-transform"><X size={14}/></button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-[9px] font-black text-slate-400 mb-3 uppercase tracking-widest px-1">Të Ardhura</p>
-                    <div className="flex flex-wrap gap-2">
-                      {incomeCategories.map(cat => (
-                        <div key={cat.id} className="flex items-center gap-2 bg-emerald-50/50 text-emerald-700 px-4 py-2.5 rounded-2xl text-[10px] font-black border border-emerald-100 animate-in fade-in duration-300">
-                          {cat.name}
-                          <button onClick={() => handleDeleteCategory(cat.id, cat.name, 'income')} className="hover:scale-125 transition-transform"><X size={14}/></button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                    <input placeholder="Emër kategorie..." className="flex-1 p-4 rounded-2xl bg-slate-50 border-none text-sm font-bold" value={newCatForm.name} onChange={e => setNewCatForm({...newCatForm, name: e.target.value})} />
-                    <select className="bg-slate-50 p-4 rounded-2xl text-[10px] font-black uppercase" value={newCatForm.type} onChange={e => setNewCatForm({...newCatForm, type: e.target.value})}>
-                      <option value="expense">Dalje</option>
-                      <option value="income">Hyrje</option>
-                    </select>
-                    <button onClick={handleAddCategory} className="bg-blue-600 text-white px-5 rounded-2xl active:scale-90 transition-all shadow-lg shadow-blue-50"><Plus size={24}/></button>
-                </div>
-              </div>
-            </div>
-            <button onClick={() => setShowManageModal(false)} className="w-full text-slate-300 py-6 font-black text-[10px] uppercase tracking-widest mt-4">Mbyll Dritaren</button>
-          </div>
-        </div>
-      )}
-
-      {/* Transaction Modals */}
-      {showIncomeModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-[40px] p-8 space-y-6 animate-in slide-in-from-bottom duration-500 shadow-2xl">
-            <h2 className="text-2xl font-black text-emerald-600 tracking-tight text-center">Regjistro Hyrje</h2>
-            <form onSubmit={handleIncome} className="space-y-6">
-              <div className="relative">
-                <input type="number" required placeholder="0.00" className="w-full text-5xl font-black bg-emerald-50/50 border-none rounded-[32px] p-10 outline-none text-emerald-600 text-center shadow-inner" value={incomeForm.amount} onChange={e => setIncomeForm({...incomeForm, amount: e.target.value})} />
-                <span className="absolute right-8 top-1/2 -translate-y-1/2 font-black text-emerald-200 text-sm">ALL</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-2">Burimi</p>
-                    <select className="w-full bg-slate-50 p-5 rounded-[24px] text-[11px] font-black uppercase outline-none border border-slate-100" required value={incomeForm.categoryId} onChange={e => setIncomeForm({...incomeForm, categoryId: e.target.value})}>
-                        <option value="">Zgjidh</option>
-                        {incomeCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
-                </div>
-                <div className="space-y-2">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-2">Në Llogarinë</p>
-                    <select className="w-full bg-slate-50 p-5 rounded-[24px] text-[11px] font-black uppercase outline-none border border-slate-100" required value={incomeForm.accountId} onChange={e => setIncomeForm({...incomeForm, accountId: e.target.value})}>
-                        <option value="">Zgjidh</option>
-                        {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                    </select>
-                </div>
-              </div>
-              <input type="text" placeholder="Shënim (fakultative)" className="w-full bg-slate-50 p-5 rounded-2xl outline-none text-sm font-bold border border-slate-100" value={incomeForm.desc} onChange={e => setIncomeForm({...incomeForm, desc: e.target.value})} />
-              <div className="pt-4 flex flex-col gap-2">
-                <button type="submit" className="w-full bg-emerald-600 text-white py-5 rounded-[24px] font-black text-sm shadow-xl shadow-emerald-100 active:scale-95 transition-all">SHTO TË ARDHURAT</button>
-                <button type="button" onClick={() => setShowIncomeModal(false)} className="w-full text-slate-400 font-black text-[10px] uppercase py-3 tracking-widest">Anulo</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {showExpenseModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-[40px] p-8 space-y-6 animate-in slide-in-from-bottom duration-500 shadow-2xl">
-            <h2 className="text-2xl font-black text-red-600 tracking-tight text-center">Regjistro Dalje</h2>
-            <form onSubmit={handleExpense} className="space-y-6">
-              <div className="relative">
-                <input type="number" required placeholder="0.00" className="w-full text-5xl font-black bg-red-50/50 border-none rounded-[32px] p-10 outline-none text-red-600 text-center shadow-inner" value={expenseForm.amount} onChange={e => setExpenseForm({...expenseForm, amount: e.target.value})} />
-                <span className="absolute right-8 top-1/2 -translate-y-1/2 font-black text-red-200 text-sm">ALL</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-2">Kategoria</p>
-                    <select className="w-full bg-slate-50 p-5 rounded-[24px] text-[11px] font-black uppercase outline-none border border-slate-100" required value={expenseForm.categoryId} onChange={e => setExpenseForm({...expenseForm, categoryId: e.target.value})}>
-                        <option value="">Zgjidh</option>
-                        {expenseCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
-                </div>
-                <div className="space-y-2">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-2">Nga Llogaria</p>
-                    <select className="w-full bg-slate-50 p-5 rounded-[24px] text-[11px] font-black uppercase outline-none border border-slate-100" required value={expenseForm.accountId} onChange={e => setExpenseForm({...expenseForm, accountId: e.target.value})}>
-                        <option value="">Zgjidh</option>
-                        {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                    </select>
-                </div>
-              </div>
-              <input type="text" placeholder="Shënim (ku u shpenzuan?)" className="w-full bg-slate-50 p-5 rounded-2xl outline-none text-sm font-bold border border-slate-100" value={expenseForm.desc} onChange={e => setExpenseForm({...expenseForm, desc: e.target.value})} />
-              <div className="pt-4 flex flex-col gap-2">
-                <button type="submit" className="w-full bg-red-600 text-white py-5 rounded-[24px] font-black text-sm shadow-xl shadow-red-100 active:scale-95 transition-all">KONFIRMO SHPENZIMIN</button>
-                <button type="button" onClick={() => setShowExpenseModal(false)} className="w-full text-slate-400 font-black text-[10px] uppercase py-3 tracking-widest">Anulo</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {showTransferModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-[40px] p-8 space-y-6 animate-in slide-in-from-bottom duration-500 shadow-2xl">
-            <h2 className="text-2xl font-black text-blue-600 tracking-tight text-center">Transfertë</h2>
-            <form onSubmit={handleTransfer} className="space-y-6">
-              <div className="relative">
-                <input type="number" required placeholder="0.00" className="w-full text-5xl font-black bg-blue-50/50 border-none rounded-[32px] p-10 outline-none text-blue-600 text-center shadow-inner" value={transferForm.amount} onChange={e => setTransferForm({...transferForm, amount: e.target.value})} />
-                <span className="absolute right-8 top-1/2 -translate-y-1/2 font-black text-blue-200 text-sm">ALL</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-[10px] font-black uppercase">
-                  <div className="space-y-2">
-                      <p className="ml-3 text-slate-400 tracking-widest">Dërgon:</p>
-                      <select className="w-full bg-slate-50 p-5 rounded-[24px] outline-none border border-slate-100" required value={transferForm.from} onChange={e => setTransferForm({...transferForm, from: e.target.value})}>
-                        <option value="">Zgjidh</option>
-                        {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                      </select>
-                  </div>
-                  <div className="space-y-2">
-                      <p className="ml-3 text-slate-400 tracking-widest">Përfiton:</p>
-                      <select className="w-full bg-slate-50 p-5 rounded-[24px] outline-none border border-slate-100" required value={transferForm.to} onChange={e => setTransferForm({...transferForm, to: e.target.value})}>
-                        <option value="">Zgjidh</option>
-                        {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                      </select>
-                  </div>
-              </div>
-              <div className="pt-4 flex flex-col gap-2">
-                <button type="submit" className="w-full bg-blue-600 text-white py-5 rounded-[24px] font-black text-sm shadow-xl shadow-blue-100 active:scale-95 transition-all">TRANSFERO MJETET</button>
-                <button type="button" onClick={() => setShowTransferModal(false)} className="w-full text-slate-400 font-black text-[10px] uppercase py-3 tracking-widest">Anulo</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Navigimi Poshtë */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t flex justify-around p-5 z-30 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-        <button onClick={() => setActiveTab('overview')} className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${activeTab === 'overview' ? 'text-indigo-600 scale-110' : 'text-slate-400 hover:text-slate-600'}`}>
-          <LayoutDashboard size={26} strokeWidth={activeTab === 'overview' ? 2.5 : 2} />
-          <span className="text-[9px] font-black uppercase tracking-widest">Dashboard</span>
-        </button>
-        <button onClick={() => setActiveTab('history')} className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${activeTab === 'history' ? 'text-indigo-600 scale-110' : 'text-slate-400 hover:text-slate-600'}`}>
-          <History size={26} strokeWidth={activeTab === 'history' ? 2.5 : 2} />
-          <span className="text-[9px] font-black uppercase tracking-widest">Aktiviteti</span>
-        </button>
-      </div>
-    </div>
-  );
-};
-
-export default App;
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
