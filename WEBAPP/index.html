@@ -100,16 +100,22 @@
         expandIconClass: "esri-icon-layers"
       }), "top-right");
 
+      // Kur klikojmë mbi hartë
       view.on("click", async (event) => {
-        const response = await view.hitTest(event);
-        const results = response.results.filter(r => r.graphic && (r.graphic.layer === zL || r.graphic.layer === bL));
+        // Përdorim opsionin include për të forcuar selektimin vetëm te këto shtresa
+        const response = await view.hitTest(event, { include: [zL, bL] });
         
-        if (results.length > 0) {
-          const graphic = results[0].graphic;
+        if (response.results.length > 0) {
+          // Gjejmë grafikun e parë që i përket njërës prej shtresave tona
+          const result = response.results.find(r => r.graphic && (r.graphic.layer === zL || r.graphic.layer === bL));
+          
+          if (!result) return;
+
+          const graphic = result.graphic;
           const isZone = (graphic.layer === zL);
           const attr = graphic.attributes;
           
-          // Leximi i atributeve (ZM ka fusha te ndryshme shpeshhere)
+          // Leximi i emrit nga atributet
           const emri = isZone 
             ? (attr.Emri || attr.ZONA_MBR || attr.NAME || attr.Emri_ZM || "Zonë e Mbrojtur")
             : (attr.Emri || attr.EMRI_BASHK || attr.NAME || "Bashki");
@@ -121,6 +127,7 @@
           });
 
           try {
+            // Analiza e pyjeve
             const pyjeQuery = pL.createQuery();
             pyjeQuery.geometry = graphic.geometry;
             pyjeQuery.spatialRelationship = "intersects";
@@ -139,6 +146,7 @@
               }
             });
 
+            // Analiza e kryqëzuar (Bashki/Zonë)
             const crossLayer = isZone ? bL : zL;
             const crossRes = await crossLayer.queryFeatures({
               geometry: graphic.geometry,
@@ -182,7 +190,8 @@
               </div>
             `;
           } catch (err) {
-            view.popup.content = "Gabim gjatë procesimit.";
+            console.error("Gabim gjatë analizës:", err);
+            view.popup.content = "Gabim gjatë procesimit të të dhënave.";
           }
         }
       });
