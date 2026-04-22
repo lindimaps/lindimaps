@@ -27,8 +27,6 @@ body, html, #v {
   justify-content: space-between;
 }
 
-#h h1 { margin: 0; font-size: 1rem; }
-
 .info-p {
   background: white;
   padding: 15px;
@@ -84,13 +82,13 @@ body, html, #v {
 <body>
 
 <div id="h">
-  <h1>ASIG - Analiza e Pyjeve</h1>
+  <h3>ASIG - Analiza e Pyjeve</h3>
 </div>
 
 <div id="overlay">
   <div class="card">
     <h3>Analiza e Sipërfaqes</h3>
-    <p>Zgjidh një zonë në hartë</p>
+    <p>Kliko mbi një zonë në hartë</p>
     <button onclick="overlay.style.display='none'">Fillo</button>
   </div>
 </div>
@@ -99,26 +97,28 @@ body, html, #v {
 
 <script>
 require([
-  "esri/config",
   "esri/Map",
   "esri/views/MapView",
   "esri/layers/FeatureLayer",
   "esri/geometry/geometryEngine",
   "esri/widgets/LayerList",
   "esri/widgets/Expand"
-], (esriConfig, Map, MapView, FeatureLayer, geometryEngine, LayerList, Expand) => {
+], (Map, MapView, FeatureLayer, geometryEngine, LayerList, Expand) => {
 
   const forestLayer = new FeatureLayer({
-    url: "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Pyje_Zonat_e_Mbrojtura/FeatureServer/0"
+    url: "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Pyje_Zonat_e_Mbrojtura/FeatureServer/0",
+    outFields: ["*"]
   });
 
   const zmLayer = new FeatureLayer({
     url: "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/ZM/FeatureServer/0",
+    outFields: ["*"],
     opacity: 0.5
   });
 
   const bashkiLayer = new FeatureLayer({
     url: "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Kufijt%C3%AB_e_Bashkive/FeatureServer/0",
+    outFields: ["*"],
     opacity: 0.4
   });
 
@@ -139,10 +139,26 @@ require([
     content: new LayerList({ view })
   }), "top-right");
 
-  let highlight;
+  // FUNKSION UNIVERSAL PER EMRIN
+  function getName(attr) {
+    if (!attr) return "Pa emër";
 
-  function getName(a) {
-    return a.Emri || a.EMRI || a.NAME || "Pa emër";
+    const keys = [
+      "EMRI","Emri","EMERTIMI","NAME",
+      "ZONA_MBR","EMRI_BASHK","BASHKIA"
+    ];
+
+    for (let k of keys) {
+      if (attr[k]) return attr[k];
+    }
+
+    for (let k in attr) {
+      if (typeof attr[k] === "string" && attr[k].length > 3) {
+        return attr[k];
+      }
+    }
+
+    return "Pa emër";
   }
 
   view.on("click", async (event) => {
@@ -157,12 +173,6 @@ require([
 
     const graphic = result.graphic;
 
-    // highlight
-    if (highlight) highlight.remove();
-    view.whenLayerView(graphic.layer).then(lv => {
-      highlight = lv.highlight(graphic);
-    });
-
     view.popup.open({
       location: event.mapPoint,
       title: getName(graphic.attributes),
@@ -171,10 +181,18 @@ require([
 
     try {
 
+      const oidField = graphic.layer.objectIdField;
+      const oid = graphic.attributes[oidField];
+
       const full = await graphic.layer.queryFeatures({
-        objectIds: [graphic.attributes[graphic.layer.objectIdField]],
+        objectIds: [oid],
         returnGeometry: true
       });
+
+      if (!full.features.length) {
+        view.popup.content = "Nuk u gjet zona";
+        return;
+      }
 
       const geom = full.features[0].geometry;
 
@@ -184,71 +202,46 @@ require([
         returnGeometry: true
       });
 
+      if (!forests.features.length) {
+        view.popup.content = "<p>Nuk ka pyje në këtë zonë</p>";
+        return;
+      }
+
       let total = 0;
-      let valid = [];
 
       forests.features.forEach(f => {
+        try {
+          if (!f.geometry) return;
 
-        // FAST CHECK me extent
-        if (!geometryEngine.intersects(geom.extent, f.geometry.extent)) return;
+          const cut = geometryEngine.intersect(geom, f.geometry);
 
-        const cut = geometryEngine.intersect(geom, f.geometry);
-
-        if (cut) {
-          const area = geometryEngine.geodesicArea(cut, "hectares");
-          if (area > 0) {
-            total += area;
-            valid.push({ geom: cut, area });
+          if (cut) {
+            const area = geometryEngine.geodesicArea(cut, "hectares");
+            if (area > 0) total += area;
           }
-        }
-      });
 
-      const crossLayer = graphic.layer === zmLayer ? bashkiLayer : zmLayer;
-
-      const cross = await crossLayer.queryFeatures({
-        geometry: geom,
-        spatialRelationship: "intersects",
-        returnGeometry: true
-      });
-
-      let html = "";
-
-      cross.features.forEach(c => {
-
-        let sub = 0;
-
-        valid.forEach(v => {
-
-          if (!geometryEngine.intersects(c.geometry.extent, v.geom.extent)) return;
-
-          const subCut = geometryEngine.intersect(c.geometry, v.geom);
-
-          if (subCut) {
-            sub += geometryEngine.geodesicArea(subCut, "hectares");
-          }
-        });
-
-        if (sub > 0.1) {
-          html += `<div class="res-item">
-            <span>${getName(c.attributes)}</span>
-            <b>${sub.toFixed(2)} ha</b>
-          </div>`;
+        } catch(e) {
+          console.warn("Gabim intersect");
         }
       });
 
       view.popup.content = `
         <div class="info-p">
-          <div>Total:</div>
-          <div class="stat-val">
-            ${total > 0 ? total.toFixed(2) + " ha" : "0 ha"}
-          </div>
-          ${html || "<p>Nuk ka ndarje</p>"}
+          <div>Sipërfaqe Pyjore:</div>
+          <div class="stat-val">${total.toFixed(2)} ha</div>
         </div>
       `;
 
-    } catch (e) {
-      console.error(e);
-      view.popup.content = "<p style='color:red'>Gabim gjatë analizës</p>";
+    } catch (err) {
+
+      console.error(err);
+
+      view.popup.content = `
+        <p style="color:red;">
+          Gabim gjatë analizës<br>
+          ${err.message}
+        </p>
+      `;
     }
 
   });
