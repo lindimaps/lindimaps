@@ -35,7 +35,7 @@
             box-shadow: var(--card-shadow); z-index: 10;
         }
 
-        .brand { display: flex; align-items: center; gap: 16px; }
+        .brand { display: flex; align-items: center; gap: 16px; width: 100%; }
         .brand img { height: 44px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
         .brand-info h1 { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--primary); letter-spacing: -0.02em; }
         .brand-info p { margin: 0; font-size: 0.7rem; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -68,7 +68,7 @@
         .section-title { font-size: 0.85rem; font-weight: 800; color: var(--text-dark); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
         
         /* Popup Styles */
-        .esri-popup__main-container { border-radius: 24px !important; overflow: hidden !important; }
+        .esri-popup__main-container { border-radius: 24px !important; overflow: hidden !important; max-height: 400px !important; }
         .custom-popup { padding: 8px; }
         .p-card { background: linear-gradient(135deg, #064e3b, #065f46); color: white; padding: 20px; border-radius: 16px; margin-bottom: 12px; }
         .p-label { font-size: 0.7rem; opacity: 0.8; font-weight: 700; text-transform: uppercase; }
@@ -79,11 +79,26 @@
         .p-info-text b { font-size: 0.65rem; color: var(--text-light); display: block; text-transform: uppercase; }
         .p-info-text span { font-size: 0.95rem; font-weight: 600; color: var(--text-dark); }
 
+        /* Responsive Optimization */
         @media (max-width: 768px) {
-            #sidebar { display: none !important; }
-            .toggle-btn { display: none; }
-            #header { left: 10px; right: 10px; padding: 0 15px; }
-            .brand-info h1 { font-size: 0.9rem; }
+            #header { top: 10px; left: 10px; right: 10px; height: 64px; padding: 0 15px; }
+            .brand img { height: 32px; }
+            .brand-info h1 { font-size: 0.85rem; }
+            .brand-info p { font-size: 0.55rem; }
+
+            #sidebar {
+                left: 10px; right: 10px; top: 85px; width: auto; bottom: 80px;
+                padding: 16px;
+            }
+            #sidebar.collapsed {
+                transform: translateY(120%); /* Slide down instead of left on mobile */
+                opacity: 0;
+            }
+            .toggle-btn { bottom: 15px; left: 50%; transform: translateX(-50%); }
+            .toggle-btn:hover { transform: translateX(-50%) scale(1.05); }
+
+            /* Ensure ArcGIS widgets don't overlap UI */
+            .esri-ui-top-right { top: 75px !important; }
         }
     </style>
 </head>
@@ -175,30 +190,39 @@ require([
         layers: [bashkiLayer, zmLayer, forestLayer]
     });
 
+    // Check if device is mobile
+    const isMobile = window.innerWidth <= 768;
+
     const view = new MapView({
         container: "viewDiv",
         map: map,
         center: [20.16, 41.15],
-        zoom: 8,
-        padding: { left: 300, top: 72 }
+        zoom: isMobile ? 7 : 8,
+        padding: { left: isMobile ? 0 : 300, top: isMobile ? 64 : 72 }
     });
 
     // Sidebar Toggle Logic
     const toggleBtn = document.getElementById("sidebarToggle");
     const sidebar = document.getElementById("sidebar");
-    const viewContainer = document.getElementById("viewDiv");
-    let isCollapsed = false;
+    let isCollapsed = isMobile; // Collapse by default on mobile
+
+    if (isMobile) {
+        sidebar.classList.add("collapsed");
+        toggleBtn.querySelector('span').textContent = 'menu';
+    }
 
     toggleBtn.addEventListener("click", () => {
         isCollapsed = !isCollapsed;
+        const mobile = window.innerWidth <= 768;
+        
         if (isCollapsed) {
             sidebar.classList.add("collapsed");
-            view.padding = { left: 0, top: 72 };
+            view.padding = { left: 0, top: mobile ? 64 : 72 };
             toggleBtn.querySelector('span').textContent = 'menu';
         } else {
             sidebar.classList.remove("collapsed");
-            view.padding = { left: 300, top: 72 };
-            toggleBtn.querySelector('span').textContent = 'menu_open';
+            view.padding = { left: mobile ? 0 : 300, top: mobile ? 64 : 72 };
+            toggleBtn.querySelector('span').textContent = 'close';
         }
     });
 
