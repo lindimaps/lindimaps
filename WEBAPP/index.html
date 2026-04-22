@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Pyjet në Zonat e Mbrojtura - ASIG</title>
+<link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
+<script src="https://js.arcgis.com/4.28/"></script>
+<style>
+  :root {
+    --primary: #004a87;
+    --secondary: #2d5a27;
+    --bg-light: #f8f9fa;
+  }
+  body,html,#v{margin:0;padding:0;height:100%;width:100%;font-family: sans-serif;overflow:hidden}
+  
+  #h{height:55px;background:var(--primary);color:#fff;display:flex;align-items:center;padding:0 20px;box-shadow:0 2px 10px rgba(0,0,0,0.2);z-index:10;position:relative;justify-content: space-between;}
+  #h h1{margin:0;font-size:1.1rem;text-transform:uppercase;letter-spacing:1px}
+
+  #m{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter: blur(4px);display:flex;justify-content:center;align-items:center;z-index:1000}
+  .mc{background:#fff;padding:40px;border-radius:16px;max-width:450px;text-align:center;box-shadow:0 15px 35px rgba(0,0,0,0.4);border: 1px solid rgba(255,255,255,0.1)}
+  .mc h2{color:var(--primary);margin-top:0}
+  .b{background:var(--primary);color:#fff;border:none;padding:12px 30px;border-radius:30px;cursor:pointer;margin-top:20px;font-weight:bold;transition: 0.3s;}
+  .b:hover{background:#003561;transform:scale(1.05)}
+
+  .esri-popup__content { background: var(--bg-light) !important; }
+  .s-box{background: #fff; padding:15px; border-radius:12px; border-left:5px solid var(--secondary); margin:10px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.05)}
+  .val{font-size:1.6rem; color:var(--secondary); font-weight:800; display:block}
+  .sub-val{font-size:0.75rem; color:#666; text-transform:uppercase; letter-spacing:0.5px}
+  
+  .list-container {margin-top:15px; background: white; border-radius: 10px; padding: 10px; border: 1px solid #eee;}
+  .list-title {font-size:0.85rem; font-weight:bold; color:var(--primary); border-bottom:1px solid #eee; padding-bottom:5px; margin-bottom:8px}
+  .li{display:flex;justify-content:space-between;align-items:center;padding:8px 5px;border-bottom:1px solid #f1f1f1;font-size:0.9rem}
+  .li:last-child{border-bottom:none}
+  .li span { color: #333; font-weight: 500; }
+  .li b { color: var(--secondary); }
+
+  .spin-container { text-align: center; padding: 20px; }
+  .spin{width:30px;height:30px;border:3px solid #ddd;border-top:3px solid var(--secondary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 10px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f1f1; }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+</style>
+</head>
+<body>
+  <div id="h">
+    <h1>Pyjet në Zonat e Mbrojtura</h1>
+    <img src="https://asig.gov.al/wp-content/uploads/2021/04/logo-asig.png" alt="ASIG" style="height:35px;">
+  </div>
+  
+  <div id="m">
+    <div class="mc">
+      <h2>Mirëseerdhët!</h2>
+      <p style="font-size: 1.1rem; line-height: 1.6;">Klikoni mbi një <b>Zonë të Mbrojtur</b> ose <b>Bashki</b> për të analizuar sipërfaqet pyjore.</p>
+      <div style="font-size: 0.9rem; color: #666; margin-top: 20px; font-style: italic;">
+        Krijuar nga produktet e shërbimit satelitor në <b>ASIG</b>.
+      </div>
+      <button class="b" onclick="document.getElementById('m').remove()">Fillo punën</button>
+    </div>
+  </div>
+
+  <div id="v"></div>
+
+  <script>
+    require([
+      "esri/config",
+      "esri/identity/IdentityManager",
+      "esri/WebMap",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer",
+      "esri/geometry/geometryEngine",
+      "esri/widgets/LayerList",
+      "esri/widgets/Expand"
+    ], (esriConfig, IdentityManager, WebMap, MapView, FeatureLayer, geometryEngine, LayerList, Expand) => {
+
+      // Linket e sherbimeve
+      const uZ = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/ZM/FeatureServer/0";
+      const uB = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Kufijt%C3%AB_e_Bashkive/FeatureServer/0";
+      const uP = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Pyje_Zonat_e_Mbrojtura/FeatureServer/0";
+
+      const pL = new FeatureLayer({ url: uP, title: "Pyjet (Satelitor)", outFields: ["*"] });
+      const zL = new FeatureLayer({ url: uZ, title: "Zonat e Mbrojtura", opacity: 0.6, outFields: ["*"] });
+      const bL = new FeatureLayer({ url: uB, title: "Kufijtë e Bashkive", opacity: 0.3, outFields: ["*"] });
+
+      const view = new MapView({
+        container: "v",
+        map: new WebMap({
+          basemap: "hybrid",
+          layers: [pL, zL, bL]
+        }),
+        center: [20.16, 41.15],
+        zoom: 8
+      });
+
+      view.ui.add(new Expand({
+        view: view,
+        content: new LayerList({ view: view }),
+        expandIconClass: "esri-icon-layers"
+      }), "top-right");
+
+      view.on("click", async (event) => {
+        const response = await view.hitTest(event);
+        const results = response.results.filter(r => r.graphic && (r.graphic.layer === zL || r.graphic.layer === bL));
+        
+        if (results.length > 0) {
+          const graphic = results[0].graphic;
+          const isZone = (graphic.layer === zL);
+          const attr = graphic.attributes;
+          
+          // Leximi i atributeve (ZM ka fusha te ndryshme shpeshhere)
+          const emri = isZone 
+            ? (attr.Emri || attr.ZONA_MBR || attr.NAME || attr.Emri_ZM || "Zonë e Mbrojtur")
+            : (attr.Emri || attr.EMRI_BASHK || attr.NAME || "Bashki");
+
+          view.popup.open({
+            title: emri,
+            location: event.mapPoint,
+            content: `<div class="spin-container"><div class="spin"></div><p>Duke analizuar të dhënat...</p></div>`
+          });
+
+          try {
+            const pyjeQuery = pL.createQuery();
+            pyjeQuery.geometry = graphic.geometry;
+            pyjeQuery.spatialRelationship = "intersects";
+            pyjeQuery.returnGeometry = true;
+            const forestRes = await pL.queryFeatures(pyjeQuery);
+            
+            let totalForestHa = 0;
+            let clippedForestParts = [];
+
+            forestRes.features.forEach(f => {
+              const intersection = geometryEngine.intersect(graphic.geometry, f.geometry);
+              if (intersection) {
+                const area = geometryEngine.geodesicArea(intersection, "hectares");
+                totalForestHa += area;
+                clippedForestParts.push(intersection);
+              }
+            });
+
+            const crossLayer = isZone ? bL : zL;
+            const crossRes = await crossLayer.queryFeatures({
+              geometry: graphic.geometry,
+              spatialRelationship: "intersects",
+              returnGeometry: true,
+              outFields: ["*"]
+            });
+            
+            let breakdownHtml = "";
+            crossRes.features.forEach(cf => {
+              const cfAttr = cf.attributes;
+              const cfName = isZone 
+                ? (cfAttr.EMRI_BASHK || cfAttr.Emri || cfAttr.NAME)
+                : (cfAttr.ZONA_MBR || cfAttr.Emri || cfAttr.NAME || cfAttr.Emri_ZM);
+              
+              let forestInUnit = 0;
+              clippedForestParts.forEach(p => {
+                const subInt = geometryEngine.intersect(cf.geometry, p);
+                if (subInt) forestInUnit += geometryEngine.geodesicArea(subInt, "hectares");
+              });
+
+              if (forestInUnit > 0.01) {
+                breakdownHtml += `
+                  <div class="li">
+                    <span>${cfName}</span>
+                    <b>${forestInUnit.toFixed(2)} ha</b>
+                  </div>`;
+              }
+            });
+
+            view.popup.content = `
+              <div class="s-box">
+                <span class="sub-val">Sipërfaqja Pyjore Total</span>
+                <span class="val">${totalForestHa.toFixed(2)} ha</span>
+              </div>
+              <div class="list-container">
+                <div class="list-title">${isZone ? "Sipas Bashkive:" : "Sipas Zonave të Mbrojtura:"}</div>
+                <div style="max-height: 200px; overflow-y:auto;">
+                  ${breakdownHtml || "Nuk u gjetën ndërprerje pyjore."}
+                </div>
+              </div>
+            `;
+          } catch (err) {
+            view.popup.content = "Gabim gjatë procesimit.";
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
