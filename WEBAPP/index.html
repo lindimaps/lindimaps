@@ -258,45 +258,46 @@ require([
 
     /**
      * MERR ZM-TE NGA TABELA E PYJEVE (FOREST LAYER)
-     * Përdorim returnDistinctValues për të marrë listën unike
+     * Përdorim kërkesë të drejtpërdrejtë për të gjithë emrat unikë
      */
     const populateZMList = async () => {
         const datalist = document.getElementById("zmList");
         
-        // Fushata që zakonisht përmbajnë emrat në këtë shërbim ASIG
-        const fieldName = "Emri_ZM"; 
-
-        const query = forestLayer.createQuery();
-        query.where = `${fieldName} IS NOT NULL`;
-        query.outFields = [fieldName];
-        query.returnDistinctValues = true;
-        query.returnGeometry = false;
+        // Emrat e fushave që mund të mbajnë emrin e ZM
+        const possibleFields = ["Emri_ZM", "ZM", "ZONA_MBR"];
+        const uniqueNames = new Set();
 
         try {
+            // Për efikasitet, marrim të dhënat vetëm për këto fusha
+            const query = forestLayer.createQuery();
+            query.where = "1=1";
+            query.outFields = possibleFields;
+            query.returnGeometry = false;
+            
             const results = await forestLayer.queryFeatures(query);
-            const names = results.features
-                .map(f => f.attributes[fieldName])
-                .filter(val => val && val.trim() !== "")
-                .sort();
+            
+            results.features.forEach(f => {
+                const attr = f.attributes;
+                // Kontrollojmë çdo fushë të mundshme për emrin
+                possibleFields.forEach(field => {
+                    const val = attr[field];
+                    if (val && val.toString().trim() !== "" && val !== "Null") {
+                        uniqueNames.add(val.toString().trim());
+                    }
+                });
+            });
 
+            const sortedNames = Array.from(uniqueNames).sort();
+            
             datalist.innerHTML = "";
-            names.forEach(name => {
+            sortedNames.forEach(name => {
                 const opt = document.createElement("option");
                 opt.value = name;
                 datalist.appendChild(opt);
             });
+
         } catch (err) {
-            console.error("Dështoi populllimi i listës nga forestLayer:", err);
-            // Fallback nëse Emri_ZM nuk ekziston si fushë, provojmë "ZM"
-            try {
-                query.outFields = ["ZM"];
-                const res2 = await forestLayer.queryFeatures(query);
-                res2.features.forEach(f => {
-                    const opt = document.createElement("option");
-                    opt.value = f.attributes["ZM"];
-                    datalist.appendChild(opt);
-                });
-            } catch (e2) {}
+            console.error("Gabim gjatë populllimit të listës:", err);
         }
     };
 
@@ -308,7 +309,7 @@ require([
             return;
         }
 
-        const filter = `Emri_ZM = '${val}' OR ZM = '${val}' OR Bashkia LIKE '%${val}%'`;
+        const filter = `Emri_ZM = '${val}' OR ZM = '${val}' OR ZONA_MBR = '${val}' OR Bashkia LIKE '%${val}%'`;
         forestLayer.definitionExpression = filter;
 
         const q = forestLayer.createQuery();
