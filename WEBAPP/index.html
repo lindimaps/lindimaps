@@ -66,20 +66,23 @@
   <script>
     require([
       "esri/config",
-      "esri/identity/IdentityManager",
       "esri/WebMap",
       "esri/views/MapView",
       "esri/layers/FeatureLayer",
       "esri/geometry/geometryEngine",
       "esri/widgets/LayerList",
       "esri/widgets/Expand"
-    ], (esriConfig, IdentityManager, WebMap, MapView, FeatureLayer, geometryEngine, LayerList, Expand) => {
+    ], (esriConfig, WebMap, MapView, FeatureLayer, geometryEngine, LayerList, Expand) => {
 
-      // Linket e sherbimeve
+      // Rregullimi i fontit për të shmangur gabimet në konsolë
+      esriConfig.fontsUrl = "https://static.arcgis.com/fonts";
+
+      // Shërbimet
       const uZ = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/ZM/FeatureServer/0";
       const uB = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Kufijt%C3%AB_e_Bashkive/FeatureServer/0";
       const uP = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Pyje_Zonat_e_Mbrojtura/FeatureServer/0";
 
+      // Krijimi i shtresave me outFields të plota për analizë
       const pL = new FeatureLayer({ url: uP, title: "Pyjet (Satelitor)", outFields: ["*"] });
       const zL = new FeatureLayer({ url: uZ, title: "Zonat e Mbrojtura", opacity: 0.6, outFields: ["*"] });
       const bL = new FeatureLayer({ url: uB, title: "Kufijtë e Bashkive", opacity: 0.3, outFields: ["*"] });
@@ -91,7 +94,10 @@
           layers: [pL, zL, bL]
         }),
         center: [20.16, 41.15],
-        zoom: 8
+        zoom: 8,
+        popup: {
+          autoOpenEnabled: false // E hapim vete popu-in pas analizes
+        }
       });
 
       view.ui.add(new Expand({
@@ -100,22 +106,26 @@
         expandIconClass: "esri-icon-layers"
       }), "top-right");
 
-      // Kur klikojmë mbi hartë
-      view.on("click", async (event) => {
-        // Përdorim opsionin include për të forcuar selektimin vetëm te këto shtresa
-        const response = await view.hitTest(event, { include: [zL, bL] });
-        
-        if (response.results.length > 0) {
-          // Gjejmë grafikun e parë që i përket njërës prej shtresave tona
-          const result = response.results.find(r => r.graphic && (r.graphic.layer === zL || r.graphic.layer === bL));
-          
-          if (!result) return;
+      let controller = null;
 
-          const graphic = result.graphic;
+      view.on("click", async (event) => {
+        if (controller) controller.abort();
+        controller = new AbortController();
+
+        // Përdorim hitTest me tolerancë për të kapur më mirë poligonet
+        const response = await view.hitTest(event, { 
+          include: [zL, bL]
+        });
+        
+        // Kontrollojmë rezultatet specifike të shtresave tona
+        const results = response.results.filter(r => r.type === "graphic" && (r.graphic.layer === zL || r.graphic.layer === bL));
+
+        if (results.length > 0) {
+          const graphic = results[0].graphic;
           const isZone = (graphic.layer === zL);
           const attr = graphic.attributes;
           
-          // Leximi i emrit nga atributet
+          // Gjetja e emrit korrekt nga atributet e ndryshme
           const emri = isZone 
             ? (attr.Emri || attr.ZONA_MBR || attr.NAME || attr.Emri_ZM || "Zonë e Mbrojtur")
             : (attr.Emri || attr.EMRI_BASHK || attr.NAME || "Bashki");
@@ -123,75 +133,74 @@
           view.popup.open({
             title: emri,
             location: event.mapPoint,
-            content: `<div class="spin-container"><div class="spin"></div><p>Duke analizuar të dhënat...</p></div>`
+            content: `<div class="spin-container"><div class="spin"></div><p>Duke analizuar sipërfaqet...</p></div>`
           });
 
           try {
-            // Analiza e pyjeve
+            // 1. Marrim gjeometrine e plote nese hitTest ktheu vetem nje pjese
+            const fullFeatureQuery = graphic.layer.createQuery();
+            fullFeatureQuery.objectIds = [graphic.attributes[graphic.layer.objectIdField]];
+            fullFeatureQuery.returnGeometry = true;
+            const fullRes = await graphic.layer.queryFeatures(fullFeatureQuery, { signal: controller.signal });
+            const fullGeometry = fullRes.features[0].geometry;
+
+            // 2. Query per pyjet brenda kesaj gjeometrie
             const pyjeQuery = pL.createQuery();
-            pyjeQuery.geometry = graphic.geometry;
+            pyjeQuery.geometry = fullGeometry;
             pyjeQuery.spatialRelationship = "intersects";
             pyjeQuery.returnGeometry = true;
-            const forestRes = await pL.queryFeatures(pyjeQuery);
+            const forestRes = await pL.queryFeatures(pyjeQuery, { signal: controller.signal });
             
-            let totalForestHa = 0;
-            let clippedForestParts = [];
+            let totalHa = 0;
+            let parts = [];
 
             forestRes.features.forEach(f => {
-              const intersection = geometryEngine.intersect(graphic.geometry, f.geometry);
+              const intersection = geometryEngine.intersect(fullGeometry, f.geometry);
               if (intersection) {
-                const area = geometryEngine.geodesicArea(intersection, "hectares");
-                totalForestHa += area;
-                clippedForestParts.push(intersection);
+                totalHa += geometryEngine.geodesicArea(intersection, "hectares");
+                parts.push(intersection);
               }
             });
 
-            // Analiza e kryqëzuar (Bashki/Zonë)
+            // 3. Analiza e kryqezuar
             const crossLayer = isZone ? bL : zL;
             const crossRes = await crossLayer.queryFeatures({
-              geometry: graphic.geometry,
+              geometry: fullGeometry,
               spatialRelationship: "intersects",
               returnGeometry: true,
               outFields: ["*"]
-            });
+            }, { signal: controller.signal });
             
-            let breakdownHtml = "";
+            let html = "";
             crossRes.features.forEach(cf => {
-              const cfAttr = cf.attributes;
               const cfName = isZone 
-                ? (cfAttr.EMRI_BASHK || cfAttr.Emri || cfAttr.NAME)
-                : (cfAttr.ZONA_MBR || cfAttr.Emri || cfAttr.NAME || cfAttr.Emri_ZM);
+                ? (cf.attributes.EMRI_BASHK || cf.attributes.Emri || "Nuk ka emër")
+                : (cf.attributes.ZONA_MBR || cf.attributes.Emri || cf.attributes.Emri_ZM || "Nuk ka emër");
               
-              let forestInUnit = 0;
-              clippedForestParts.forEach(p => {
+              let subHa = 0;
+              parts.forEach(p => {
                 const subInt = geometryEngine.intersect(cf.geometry, p);
-                if (subInt) forestInUnit += geometryEngine.geodesicArea(subInt, "hectares");
+                if (subInt) subHa += geometryEngine.geodesicArea(subInt, "hectares");
               });
 
-              if (forestInUnit > 0.01) {
-                breakdownHtml += `
-                  <div class="li">
-                    <span>${cfName}</span>
-                    <b>${forestInUnit.toFixed(2)} ha</b>
-                  </div>`;
+              if (subHa > 0.01) {
+                html += `<div class="li"><span>${cfName}</span><b>${subHa.toFixed(2)} ha</b></div>`;
               }
             });
 
             view.popup.content = `
               <div class="s-box">
-                <span class="sub-val">Sipërfaqja Pyjore Total</span>
-                <span class="val">${totalForestHa.toFixed(2)} ha</span>
+                <span class="sub-val">Sipërfaqja Pyjore</span>
+                <span class="val">${totalHa.toFixed(2)} ha</span>
               </div>
               <div class="list-container">
                 <div class="list-title">${isZone ? "Sipas Bashkive:" : "Sipas Zonave të Mbrojtura:"}</div>
-                <div style="max-height: 200px; overflow-y:auto;">
-                  ${breakdownHtml || "Nuk u gjetën ndërprerje pyjore."}
+                <div style="max-height: 180px; overflow-y:auto;">
+                  ${html || "Nuk u gjetën pyje në këtë zonë."}
                 </div>
-              </div>
-            `;
-          } catch (err) {
-            console.error("Gabim gjatë analizës:", err);
-            view.popup.content = "Gabim gjatë procesimit të të dhënave.";
+              </div>`;
+          } catch (e) {
+            if (e.name !== 'AbortError') view.popup.content = "Gabim gjatë llogaritjes.";
           }
         }
       });
