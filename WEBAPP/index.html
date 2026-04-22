@@ -135,9 +135,9 @@
 <div id="sidebar">
     <div class="search-container">
         <span class="material-symbols-rounded search-icon">search</span>
-        <input type="text" id="searchInput" list="zmList" class="search-input" placeholder="Shkruaj emrin e ZM...">
+        <input type="text" id="searchInput" list="zmList" class="search-input" placeholder="Shkruaj emrin e ZM ose Bashkisë...">
         <datalist id="zmList">
-            <!-- Popullluar dinamikisht -->
+            <!-- Populluar dinamikisht -->
         </datalist>
     </div>
 
@@ -149,7 +149,7 @@
         <div class="stat-grid" style="margin-top: 12px;">
             <div class="stat-box">
                 <span class="val" id="totalArea">---</span>
-                <span class="lab">Hektarë Pyje (Total)</span>
+                <span class="lab">Hektarë Pyje</span>
             </div>
             <div class="stat-box">
                 <span class="val" id="totalFeatures">---</span>
@@ -237,16 +237,15 @@ require([
         padding: { left: 340, top: 72 }
     });
 
-    // Kontrollet e UI
     view.ui.add(new Compass({ view }), "top-right");
     view.ui.add(new ScaleBar({ view, unit: "metric" }), "bottom-right");
     new LayerList({ container: "layerListDiv", view });
 
-    // Statistikat kërkohen vetëm një herë në fillim
-    const updateStats = async () => {
+    // Përditësimi i statistikave direkt nga tabela e atributeve
+    const updateStats = async (filter = "1=1") => {
         const query = forestLayer.createQuery();
-        query.where = "1=1";
-        query.outFields = ["Sip_ha", "Shape__Area", "AREA_HA"];
+        query.where = filter;
+        query.outFields = ["Sip_ha", "Shape__Area", "AREA_HA", "Emri_ZM", "ZM", "ZONA_MBR", "Bashkia", "EMRI_BASHK"];
         try {
             const res = await forestLayer.queryFeatures(query);
             let total = 0;
@@ -257,75 +256,69 @@ require([
     };
 
     /**
-     * MERR ZM-TE NGA TABELA E PYJEVE (FOREST LAYER)
-     * Përdorim kërkesë të drejtpërdrejtë për të gjithë emrat unikë
+     * Populllimi i listës direkt nga tabelat e atributeve (ZONA E MBROJTUR & BASHKIA)
      */
-    const populateZMList = async () => {
+    const populateSearchList = async () => {
         const datalist = document.getElementById("zmList");
-        
-        // Emrat e fushave që mund të mbajnë emrin e ZM
-        const possibleFields = ["Emri_ZM", "ZM", "ZONA_MBR"];
-        const uniqueNames = new Set();
+        // Bazuar në imazh, këto janë fushat kyçe
+        const fields = ["Emri_ZM", "ZM", "Bashkia", "EMRI_BASHK"];
+        const uniqueValues = new Set();
 
         try {
-            // Për efikasitet, marrim të dhënat vetëm për këto fusha
             const query = forestLayer.createQuery();
             query.where = "1=1";
-            query.outFields = possibleFields;
+            query.outFields = fields;
             query.returnGeometry = false;
             
             const results = await forestLayer.queryFeatures(query);
             
             results.features.forEach(f => {
-                const attr = f.attributes;
-                // Kontrollojmë çdo fushë të mundshme për emrin
-                possibleFields.forEach(field => {
-                    const val = attr[field];
+                fields.forEach(field => {
+                    const val = f.attributes[field];
                     if (val && val.toString().trim() !== "" && val !== "Null") {
-                        uniqueNames.add(val.toString().trim());
+                        uniqueValues.add(val.toString().trim());
                     }
                 });
             });
 
-            const sortedNames = Array.from(uniqueNames).sort();
-            
+            const sorted = Array.from(uniqueValues).sort();
             datalist.innerHTML = "";
-            sortedNames.forEach(name => {
+            sorted.forEach(item => {
                 const opt = document.createElement("option");
-                opt.value = name;
+                opt.value = item;
                 datalist.appendChild(opt);
             });
-
-        } catch (err) {
-            console.error("Gabim gjatë populllimit të listës:", err);
-        }
+        } catch (err) { console.error(err); }
     };
 
-    // Filtri dhe Zoom
+    // Kërkimi i drejtpërdrejtë dhe lidhja me statistikat
     document.getElementById("searchInput").addEventListener("input", async (e) => {
-        const val = e.target.value;
-        if (!val) {
-            forestLayer.definitionExpression = "1=1";
-            return;
+        const val = e.target.value.trim();
+        let filter = "1=1";
+        
+        if (val) {
+            // Lexon direkt nga fushat e tabelës ashtu siç shfaqen në popup/imazh
+            filter = `Emri_ZM = '${val}' OR ZM = '${val}' OR ZONA_MBR = '${val}' OR Bashkia = '${val}' OR EMRI_BASHK = '${val}'`;
         }
 
-        const filter = `Emri_ZM = '${val}' OR ZM = '${val}' OR ZONA_MBR = '${val}' OR Bashkia LIKE '%${val}%'`;
         forestLayer.definitionExpression = filter;
+        updateStats(filter); // Lidhje direkte: rezultati i kërkimit = shifrat në sidebar
 
-        const q = forestLayer.createQuery();
-        q.where = filter;
-        try {
-            const ext = await forestLayer.queryExtent(q);
-            if (ext.extent) view.goTo(ext.extent.expand(1.2));
-        } catch(e) {}
+        if (val) {
+            const q = forestLayer.createQuery();
+            q.where = filter;
+            try {
+                const ext = await forestLayer.queryExtent(q);
+                if (ext.extent) view.goTo(ext.extent.expand(1.4));
+            } catch(e) {}
+        }
     });
 
     view.when(() => {
         updateStats();
-        populateZMList();
+        populateSearchList();
     });
 
-    // Highlight në Hover
     let highlight;
     view.on("pointer-move", async (event) => {
         const response = await view.hitTest(event, { include: [forestLayer] });
