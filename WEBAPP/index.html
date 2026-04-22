@@ -148,8 +148,16 @@ require([
     zoom: 8,
     padding: { top: 70 },
     popup: { autoOpenEnabled: false, alignment: "top-center" },
+    highlightOptions: {
+      color: [0, 255, 255, 1],
+      haloOpacity: 0.9,
+      fillOpacity: 0.2
+    },
     ui: { components: ["attribution"] }
   });
+
+  // Variabel per te mbajtur referencen e selektimit
+  let highlightSelect;
 
   // Shtimi i Legjendes dhe Listes se Shtresave (Expandable)
   const layerList = new Expand({
@@ -186,13 +194,24 @@ require([
     };
   };
 
-  // Eventi i klikimit me UI Premium
+  // Eventi i klikimit me UI Premium dhe Highlight
   view.on("click", async (event) => {
     const response = await view.hitTest(event, { include: [forestLayer] });
     
+    // Pastrojme selektimin e meparshem nese ekziston
+    if (highlightSelect) {
+      highlightSelect.remove();
+    }
+
     if (response.results.length > 0) {
-      const attr = response.results[0].graphic.attributes;
+      const graphic = response.results[0].graphic;
+      const attr = graphic.attributes;
       const info = getForestInfo(attr);
+
+      // Aktivizojme highlight per elementin e klikuar
+      view.whenLayerView(forestLayer).then((layerView) => {
+        highlightSelect = layerView.highlight(graphic);
+      });
 
       view.popup.open({
         location: event.mapPoint,
@@ -228,6 +247,14 @@ require([
         view.popup.close();
     }
   });
+
+  // Heqim highlight kur mbyllet popup-i
+  view.popup.watch("visible", (visible) => {
+    if (!visible && highlightSelect) {
+      highlightSelect.remove();
+    }
+  });
+
 });
 </script>
 </body>
