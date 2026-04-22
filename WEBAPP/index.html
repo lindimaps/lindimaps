@@ -1,260 +1,343 @@
 <!DOCTYPE html>
 <html lang="sq">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Monitorimi i Pyjeve - ASIG</title>
-<link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-<script src="https://js.arcgis.com/4.28/"></script>
-<style>
-  :root { 
-    --primary: #0f172a; 
-    --secondary: #16a34a; 
-    --accent: #2563eb;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --glass: rgba(255, 255, 255, 0.85);
-  }
-  
-  body, html, #v { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Inter', sans-serif; background: #f1f5f9; overflow: hidden; }
-  
-  /* Header Modern */
-  #header { 
-    position: absolute; top: 15px; left: 15px; right: 15px;
-    height: 70px; background: var(--glass); 
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    display: flex; align-items: center; padding: 0 25px; 
-    justify-content: space-between; border-radius: 20px;
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); 
-    z-index: 100; border: 1px solid rgba(255,255,255,0.5);
-  }
-  
-  .brand { display: flex; align-items: center; gap: 15px; }
-  .brand-text h1 { margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--primary); letter-spacing: -0.02em; }
-  .brand-text p { margin: 0; font-size: 0.75rem; color: var(--secondary); font-weight: 600; text-transform: uppercase; }
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>Monitorimi i Pyjeve - ASIG Dashboard</title>
+    
+    <!-- API & Fonts -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script src="https://js.arcgis.com/4.28/"></script>
 
-  /* Popup Design Premium */
-  .modern-popup { padding: 5px; color: var(--text-main); }
-  .pop-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
-  .pop-icon { background: #f0fdf4; color: var(--secondary); padding: 10px; border-radius: 12px; display: flex; box-shadow: inset 0 0 0 1px rgba(22,163,74,0.1); }
-  .pop-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+    <style>
+        :root {
+            --primary: #064e3b;
+            --secondary: #10b981;
+            --accent: #3b82f6;
+            --bg-site: #f8fafc;
+            --panel-bg: rgba(255, 255, 255, 0.92);
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            --text-dark: #0f172a;
+            --text-light: #64748b;
+        }
 
-  .stat-card {
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-    padding: 22px; border-radius: 16px; color: white; margin-bottom: 15px;
-    box-shadow: 0 12px 20px -5px rgba(22, 163, 74, 0.3);
-    position: relative; overflow: hidden;
-  }
-  .stat-card::after { content: ""; position: absolute; top: -50%; right: -20%; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; }
-  .stat-label { font-size: 0.7rem; opacity: 0.9; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
-  .stat-val { font-size: 2rem; font-weight: 800; display: block; margin-top: 2px; }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-site); overflow: hidden; }
 
-  .data-grid { display: grid; gap: 10px; }
-  .data-item { background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0; transition: all 0.2s; }
-  .data-item:hover { border-color: var(--secondary); background: white; }
-  .item-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
-  .item-value { font-size: 0.9rem; color: var(--text-main); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        /* UI Shell */
+        #viewDiv { position: absolute; top: 0; bottom: 0; left: 0; right: 0; width: 100%; height: 100%; }
 
-  /* Intro Overlay */
-  #overlay { 
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px);
-    z-index: 1000; display: flex; justify-content: center; align-items: center; 
-  }
-  .card { background: white; padding: 45px; border-radius: 32px; max-width: 400px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-  .btn-start { 
-    background: var(--secondary); color: white; border: none; padding: 16px 40px; 
-    border-radius: 16px; cursor: pointer; font-size: 1rem; font-weight: 700; width: 100%; 
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(22, 163, 74, 0.4); }
+        #header {
+            position: absolute; top: 20px; left: 20px; right: 20px;
+            height: 72px; background: var(--panel-bg); backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: var(--card-shadow); z-index: 10;
+        }
 
-  /* ArcGIS Overrides per Pastrim */
-  .esri-ui-top-right { top: 100px !important; }
-  .esri-popup__main-container { border-radius: 24px !important; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2) !important; }
-  .esri-popup__button--zoom-to, .esri-popup__footer, .esri-popup__inline-actions-container { display: none !important; }
-  .esri-view-surface--inset-outline:focus::after { outline: none !important; }
-  
-  /* Widget Custom Styling */
-  .esri-widget { border-radius: 12px !important; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08) !important; }
-</style>
+        .brand { display: flex; align-items: center; gap: 16px; }
+        .brand img { height: 44px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
+        .brand-info h1 { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--primary); letter-spacing: -0.02em; }
+        .brand-info p { margin: 0; font-size: 0.7rem; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* Sidebar Stats */
+        #sidebar {
+            position: absolute; left: 20px; top: 108px; bottom: 30px; width: 340px;
+            background: var(--panel-bg); backdrop-filter: blur(12px);
+            border-radius: 24px; border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: var(--card-shadow); z-index: 10;
+            display: flex; flex-direction: column; padding: 24px; gap: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .section-title { font-size: 0.85rem; font-weight: 800; color: var(--text-dark); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        
+        .stat-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .stat-box { 
+            background: white; padding: 16px; border-radius: 16px; 
+            border: 1px solid #eef2f6; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .stat-box .val { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: block; }
+        .stat-box .lab { font-size: 0.7rem; color: var(--text-light); font-weight: 600; }
+
+        /* Search/Filter */
+        .search-container { position: relative; width: 100%; }
+        .search-input { 
+            width: 100%; padding: 12px 16px 12px 40px; border-radius: 12px; 
+            border: 1px solid #e2e8f0; font-family: inherit; font-size: 0.9rem;
+            outline: none; transition: border-color 0.2s;
+        }
+        .search-input:focus { border-color: var(--secondary); }
+        .search-icon { position: absolute; left: 12px; top: 12px; color: var(--text-light); font-size: 20px; }
+
+        /* Popup Styles */
+        .esri-popup__main-container { border-radius: 24px !important; overflow: hidden !important; }
+        .custom-popup { padding: 8px; }
+        .p-card { background: linear-gradient(135deg, #064e3b, #065f46); color: white; padding: 20px; border-radius: 16px; margin-bottom: 12px; }
+        .p-label { font-size: 0.7rem; opacity: 0.8; font-weight: 700; text-transform: uppercase; }
+        .p-value { font-size: 1.8rem; font-weight: 800; display: block; }
+        
+        .p-info-row { display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border-radius: 12px; margin-bottom: 8px; border: 1px solid #edf2f7; }
+        .p-info-icon { width: 36px; height: 36px; border-radius: 10px; background: white; display: flex; align-items: center; justify-content: center; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .p-info-text b { font-size: 0.65rem; color: var(--text-light); display: block; text-transform: uppercase; }
+        .p-info-text span { font-size: 0.95rem; font-weight: 600; color: var(--text-dark); }
+
+        /* Intro Overlay */
+        #welcome {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px); z-index: 2000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .welcome-card {
+            background: white; padding: 48px; border-radius: 32px;
+            max-width: 440px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        .btn-primary {
+            background: var(--primary); color: white; border: none;
+            padding: 16px 32px; border-radius: 14px; font-weight: 700;
+            cursor: pointer; width: 100%; margin-top: 24px; transition: all 0.2s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(6, 78, 59, 0.4); }
+
+        @media (max-width: 768px) {
+            #sidebar { display: none; }
+            #header { left: 10px; right: 10px; padding: 0 15px; }
+            .brand-info h1 { font-size: 0.9rem; }
+        }
+    </style>
 </head>
 <body>
 
+<div id="welcome">
+    <div class="welcome-card">
+        <div style="background: #ecfdf5; color: #059669; width: 80px; height: 80px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+            <span class="material-symbols-rounded" style="font-size: 44px;">nature_accent</span>
+        </div>
+        <h2 style="font-size: 1.75rem; font-weight: 800; color: var(--text-dark); margin-bottom: 12px;">Portal i Monitorimit</h2>
+        <p style="color: var(--text-light); line-height: 1.6; font-size: 1rem;">
+            Eksploroni pasuritë pyjore brenda zonave të mbrojtura të Shqipërisë. Të dhënat azhurnohen në kohë reale nga serverat e ASIG.
+        </p>
+        <button class="btn-primary" onclick="document.getElementById('welcome').style.opacity='0'; setTimeout(()=>document.getElementById('welcome').style.display='none', 300)">Fillo Eksplorimin</button>
+    </div>
+</div>
+
 <div id="header">
-  <div class="brand">
-    <img src="https://asig.gov.al/wp-content/uploads/2023/11/Logo_asig_vector.png" alt="ASIG" style="height: 42px;">
-    <div class="brand-text">
-      <h1>Pyjet brenda Zonave të Mbrojtura</h1>
-      <p>Monitorimi i Pasurive Kombëtare</p>
+    <div class="brand">
+        <img src="https://asig.gov.al/wp-content/uploads/2023/11/Logo_asig_vector.png" alt="ASIG">
+        <div class="brand-info">
+            <h1>Pyjet në Zonat e Mbrojtura</h1>
+            <p>Sistemi Kombëtar i Informacionit Gjeohapsinor</p>
+        </div>
     </div>
-  </div>
 </div>
 
-<div id="overlay">
-  <div class="card">
-    <div style="background: #f0fdf4; color: #16a34a; width: 80px; height: 80px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: inset 0 0 0 1px rgba(22,163,74,0.1);">
-        <span class="material-symbols-rounded" style="font-size: 40px;">forest</span>
+<div id="sidebar">
+    <div class="search-container">
+        <span class="material-symbols-rounded search-icon">search</span>
+        <input type="text" id="searchInput" list="zmList" class="search-input" placeholder="Shkruaj emrin e ZM...">
+        <datalist id="zmList">
+            <!-- Popullluar dinamikisht -->
+        </datalist>
     </div>
-    <h2 style="color:var(--primary); margin-bottom: 12px; font-weight: 800;">Analiza e Pyjeve</h2>
-    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 30px; line-height: 1.6;">
-        Mirësevini në platformën e monitorimit. Sipërfaqet llogariten automatikisht në <b>Hektarë (ha)</b>.
-    </p>
-    <button class="btn-start" onclick="document.getElementById('overlay').style.display='none'">Fillo Eksplorimin</button>
-  </div>
+
+    <div>
+        <div class="section-title">
+            <span class="material-symbols-rounded" style="font-size: 18px;">monitoring</span>
+            Përmbledhje Statistikore
+        </div>
+        <div class="stat-grid" style="margin-top: 12px;">
+            <div class="stat-box">
+                <span class="val" id="totalArea">---</span>
+                <span class="lab">Hektarë Pyje (Total)</span>
+            </div>
+            <div class="stat-box">
+                <span class="val" id="totalFeatures">---</span>
+                <span class="lab">Parcela të Monitoruara</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="flex: 1; overflow-y: auto;">
+        <div class="section-title">
+            <span class="material-symbols-rounded" style="font-size: 18px;">layers</span>
+            Kontrolli i Shtresave
+        </div>
+        <div id="layerListDiv" style="margin-top: 12px;"></div>
+    </div>
+
+    <div style="font-size: 0.65rem; color: var(--text-light); text-align: center; border-top: 1px solid #edf2f7; padding-top: 15px;">
+        © 2024 ASIG - Autoriteti Shtetëror për Informacionin Gjeohapsinor
+    </div>
 </div>
 
-<div id="v"></div>
+<div id="viewDiv"></div>
 
 <script>
 require([
-  "esri/config", "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", 
-  "esri/widgets/Expand", "esri/widgets/LayerList", "esri/widgets/Legend"
-], (esriConfig, Map, MapView, FeatureLayer, Expand, LayerList, Legend) => {
+    "esri/config", "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", 
+    "esri/widgets/LayerList", "esri/widgets/Compass", "esri/widgets/ScaleBar"
+], (esriConfig, Map, MapView, FeatureLayer, LayerList, Compass, ScaleBar) => {
 
-  // URL-te origjinale (Logjika e pandryshuar)
-  const zmUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/ZM/FeatureServer/0";
-  const bashkiUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Kufijt%C3%AB_e_Bashkive/FeatureServer/0";
-  const pyjeUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Pyje_Zonat_e_Mbrojtura/FeatureServer/0";
+    const pyjeUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Pyje_Zonat_e_Mbrojtura/FeatureServer/0";
+    const zmUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/ZM/FeatureServer/0";
+    const bashkiUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Kufijt%C3%AB_e_Bashkive/FeatureServer/0";
 
-  // Konfigurimi i shtresave me tituj te paster per Legjenden
-  const forestLayer = new FeatureLayer({ 
-    url: pyjeUrl, 
-    outFields: ["*"], 
-    popupEnabled: false,
-    title: "Sipërfaqet Pyjore"
-  });
-  
-  const zmLayer = new FeatureLayer({ 
-    url: zmUrl, 
-    opacity: 0.5,
-    title: "Zonat e Mbrojtura (ZM)"
-  });
-  
-  const bashkiLayer = new FeatureLayer({ 
-    url: bashkiUrl, 
-    opacity: 0.3,
-    title: "Kufijtë Administrativë"
-  });
-
-  const view = new MapView({
-    container: "v",
-    map: new Map({ 
-      basemap: "hybrid", 
-      layers: [bashkiLayer, zmLayer, forestLayer] 
-    }),
-    center: [20.16, 41.15],
-    zoom: 8,
-    padding: { top: 70 },
-    popup: { autoOpenEnabled: false, alignment: "top-center" },
-    highlightOptions: {
-      color: [0, 255, 255, 1],
-      haloOpacity: 0.9,
-      fillOpacity: 0.2
-    },
-    ui: { components: ["attribution"] }
-  });
-
-  // Variabel per te mbajtur referencen e selektimit
-  let highlightSelect;
-
-  // Shtimi i Legjendes dhe Listes se Shtresave (Expandable)
-  const layerList = new Expand({
-    view: view,
-    content: new LayerList({ view: view }),
-    expandIconClass: "esri-icon-layers",
-    expandTooltip: "Shtresat",
-    group: "top-right"
-  });
-
-  const legend = new Expand({
-    view: view,
-    content: new Legend({ view: view }),
-    expandIconClass: "esri-icon-legend",
-    expandTooltip: "Legjenda",
-    group: "top-right"
-  });
-
-  view.ui.add([layerList, legend], "top-right");
-
-  // Logjika e konvertimit (E rruajtur 100% siç ishte)
-  const getForestInfo = (a) => {
-    let rawArea = a.Sip_ha || a.Sip_Km2 || a.AREA_HA || a.Shape__Area || 0;
-    let finalArea = rawArea;
-
-    if (rawArea > 500000) { 
-      finalArea = rawArea / 10000; 
-    }
-
-    return {
-      zm: a.Emri_ZM || a.ZONA_MBR || a.ZM || "E paidentifikuar",
-      bashkia: a.Bashkia || a.EMRI_BASHK || a.BASHKIA || "E paidentifikuar",
-      siperfaqja: finalArea
+    const processData = (attr) => {
+        let area = attr.Sip_ha || attr.Sip_Km2 || attr.AREA_HA || attr.Shape__Area || 0;
+        if (area > 500000) area = area / 10000;
+        return {
+            name: attr.Emri_ZM || attr.ZONA_MBR || attr.ZM || "E paidentifikuar",
+            municipality: attr.Bashkia || attr.EMRI_BASHK || "E paidentifikuar",
+            area: area
+        };
     };
-  };
 
-  // Eventi i klikimit me UI Premium dhe Highlight
-  view.on("click", async (event) => {
-    const response = await view.hitTest(event, { include: [forestLayer] });
-    
-    // Pastrojme selektimin e meparshem nese ekziston
-    if (highlightSelect) {
-      highlightSelect.remove();
-    }
+    const forestLayer = new FeatureLayer({ 
+        url: pyjeUrl, 
+        title: "Sipërfaqet Pyjore",
+        outFields: ["*"],
+        popupTemplate: {
+            title: "Detajet e Parcelës",
+            content: (event) => {
+                const info = processData(event.graphic.attributes);
+                return `
+                    <div class="custom-popup">
+                        <div class="p-card">
+                            <span class="p-label">Sipërfaqja</span>
+                            <span class="p-value">${info.area.toLocaleString('sq-AL', {maximumFractionDigits: 2})} ha</span>
+                        </div>
+                        <div class="p-info-row">
+                            <div class="p-info-icon"><span class="material-symbols-rounded">apartment</span></div>
+                            <div class="p-info-text"><b>Bashkia</b><span>${info.municipality}</span></div>
+                        </div>
+                        <div class="p-info-row">
+                            <div class="p-info-icon"><span class="material-symbols-rounded">shield</span></div>
+                            <div class="p-info-text"><b>Zona e Mbrojtur</b><span>${info.name}</span></div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    });
 
-    if (response.results.length > 0) {
-      const graphic = response.results[0].graphic;
-      const attr = graphic.attributes;
-      const info = getForestInfo(attr);
+    const zmLayer = new FeatureLayer({ url: zmUrl, title: "Kufijtë e ZM", opacity: 0.4 });
+    const bashkiLayer = new FeatureLayer({ url: bashkiUrl, title: "Kufijtë e Bashkive", opacity: 0.2 });
 
-      // Aktivizojme highlight per elementin e klikuar
-      view.whenLayerView(forestLayer).then((layerView) => {
-        highlightSelect = layerView.highlight(graphic);
-      });
+    const map = new Map({
+        basemap: "hybrid",
+        layers: [bashkiLayer, zmLayer, forestLayer]
+    });
 
-      view.popup.open({
-        location: event.mapPoint,
-        content: `
-          <div class="modern-popup">
-            <div class="pop-header">
-                <div class="pop-icon"><span class="material-symbols-rounded">analytics</span></div>
-                <div class="pop-title">Analiza e Parcelës</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Sipërfaqja totale</span>
-                <span class="stat-val">${Number(info.siperfaqja).toLocaleString('sq-AL', {maximumFractionDigits: 2})} ha</span>
-            </div>
-            <div class="data-grid">
-              <div class="data-item">
-                <span class="item-label">Bashkia Administruese</span>
-                <div class="item-value">
-                    <span class="material-symbols-rounded" style="font-size:16px; color:var(--accent)">location_city</span>
-                    ${info.bashkia}
-                </div>
-              </div>
-              <div class="data-item">
-                <span class="item-label">Statusi i Mbrojtjes (ZM)</span>
-                <div class="item-value">
-                    <span class="material-symbols-rounded" style="font-size:16px; color:var(--secondary)">verified_user</span>
-                    ${info.zm}
-                </div>
-              </div>
-            </div>
-          </div>`
-      });
-    } else {
-        view.popup.close();
-    }
-  });
+    const view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [20.16, 41.15],
+        zoom: 8,
+        padding: { left: 340, top: 72 }
+    });
 
-  // Heqim highlight kur mbyllet popup-i
-  view.popup.watch("visible", (visible) => {
-    if (!visible && highlightSelect) {
-      highlightSelect.remove();
-    }
-  });
+    // Kontrollet e UI
+    view.ui.add(new Compass({ view }), "top-right");
+    view.ui.add(new ScaleBar({ view, unit: "metric" }), "bottom-right");
+    new LayerList({ container: "layerListDiv", view });
 
+    // Statistikat kërkohen vetëm një herë në fillim
+    const updateStats = async () => {
+        const query = forestLayer.createQuery();
+        query.where = "1=1";
+        query.outFields = ["Sip_ha", "Shape__Area", "AREA_HA"];
+        try {
+            const res = await forestLayer.queryFeatures(query);
+            let total = 0;
+            res.features.forEach(f => total += processData(f.attributes).area);
+            document.getElementById("totalArea").innerText = Math.round(total).toLocaleString('sq-AL');
+            document.getElementById("totalFeatures").innerText = res.features.length.toLocaleString('sq-AL');
+        } catch (e) { console.error(e); }
+    };
+
+    /**
+     * MERR ZM-TE NGA TABELA E PYJEVE (FOREST LAYER)
+     * Përdorim returnDistinctValues për të marrë listën unike
+     */
+    const populateZMList = async () => {
+        const datalist = document.getElementById("zmList");
+        
+        // Fushata që zakonisht përmbajnë emrat në këtë shërbim ASIG
+        const fieldName = "Emri_ZM"; 
+
+        const query = forestLayer.createQuery();
+        query.where = `${fieldName} IS NOT NULL`;
+        query.outFields = [fieldName];
+        query.returnDistinctValues = true;
+        query.returnGeometry = false;
+
+        try {
+            const results = await forestLayer.queryFeatures(query);
+            const names = results.features
+                .map(f => f.attributes[fieldName])
+                .filter(val => val && val.trim() !== "")
+                .sort();
+
+            datalist.innerHTML = "";
+            names.forEach(name => {
+                const opt = document.createElement("option");
+                opt.value = name;
+                datalist.appendChild(opt);
+            });
+        } catch (err) {
+            console.error("Dështoi populllimi i listës nga forestLayer:", err);
+            // Fallback nëse Emri_ZM nuk ekziston si fushë, provojmë "ZM"
+            try {
+                query.outFields = ["ZM"];
+                const res2 = await forestLayer.queryFeatures(query);
+                res2.features.forEach(f => {
+                    const opt = document.createElement("option");
+                    opt.value = f.attributes["ZM"];
+                    datalist.appendChild(opt);
+                });
+            } catch (e2) {}
+        }
+    };
+
+    // Filtri dhe Zoom
+    document.getElementById("searchInput").addEventListener("input", async (e) => {
+        const val = e.target.value;
+        if (!val) {
+            forestLayer.definitionExpression = "1=1";
+            return;
+        }
+
+        const filter = `Emri_ZM = '${val}' OR ZM = '${val}' OR Bashkia LIKE '%${val}%'`;
+        forestLayer.definitionExpression = filter;
+
+        const q = forestLayer.createQuery();
+        q.where = filter;
+        try {
+            const ext = await forestLayer.queryExtent(q);
+            if (ext.extent) view.goTo(ext.extent.expand(1.2));
+        } catch(e) {}
+    });
+
+    view.when(() => {
+        updateStats();
+        populateZMList();
+    });
+
+    // Highlight në Hover
+    let highlight;
+    view.on("pointer-move", async (event) => {
+        const response = await view.hitTest(event, { include: [forestLayer] });
+        if (highlight) highlight.remove();
+        if (response.results.length) {
+            const graphic = response.results[0].graphic;
+            const lv = await view.whenLayerView(forestLayer);
+            highlight = lv.highlight(graphic);
+            view.container.style.cursor = "pointer";
+        } else {
+            view.container.style.cursor = "default";
+        }
+    });
 });
 </script>
 </body>
