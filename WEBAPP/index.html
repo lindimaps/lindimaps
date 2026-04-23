@@ -152,14 +152,14 @@
 
     <div class="section-title">
         <span class="material-symbols-rounded" style="font-size: 18px;">analytics</span>
-        Statistikat e Sipërfaqes (Pyje)
+        Statistikat e Sipërfaqes
     </div>
     <div class="stats-card" id="statsContainer"></div>
 
     <div style="height: 150px; display: flex; flex-direction: column;">
         <div class="section-title">
             <span class="material-symbols-rounded" style="font-size: 18px;">layers</span>
-            Shtresat
+            Legjenda / Shtresat
         </div>
         <div id="layerListDiv" style="flex: 1; overflow-y: auto; margin-top: 5px;"></div>
     </div>
@@ -168,53 +168,49 @@
 <div id="viewDiv"></div>
 
 <script>
-// LISTA E PLOTE E 45 ZONAVE TE MBROJTURA (DATASETI I INTEGRUAR)
 const rawData = [
-    { zm: "Park Kombëtar Alpet e Shqipërisë", search: "Alpet", b: "Tropojë", s: 18620.72},
     { zm: "Park Kombëtar Alpet e Shqipërisë", search: "Alpet", b: "Malësi e Madhe", s: 16843.41},
     { zm: "Park Kombëtar Alpet e Shqipërisë", search: "Alpet", b: "Shkodër", s: 6200.24},
-    { zm: "Park Kombëtar Lumi Vjosa", search: "Vjosa", b: "Përmet", s: 1240.20},
-    { zm: "Park Kombëtar Lumi Vjosa", search: "Vjosa", b: "Tepelenë", s: 845.50},
+    { zm: "Park Kombëtar Alpet e Shqipërisë", search: "Alpet", b: "Tropojë", s: 18620.72},
     { zm: "Park Kombëtar Bredhi i Hotovës", search: "Hotov", b: "Përmet", s: 16254.59},
+    { zm: "Park Kombëtar Bredhi i Hotovës", search: "Hotov", b: "Këlcyrë", s: 2.25},
     { zm: "Park Kombëtar Bredhi i Hotovës", search: "Hotov", b: "Kolonjë", s: 690.65},
+    { zm: "Park Kombëtar Bredhi i Hotovës", search: "Hotov", b: "Skrapar", s: 267.69},
+    { zm: "Park Kombëtar Butrinti", search: "Butrint", b: "Sarandë", s: 275.02},
+    { zm: "Park Kombëtar Butrinti", search: "Butrint", b: "Finiq", s: 310.57},
     { zm: "Park Kombëtar Butrinti", search: "Butrint", b: "Konispol", s: 1231.85},
+    { zm: "Park Kombëtar Detar Karaburun", search: "Karaburun", b: "Vlorë", s: 1.97},
     { zm: "Park Kombëtar Divjakë Karavasta", search: "Karavasta", b: "Divjakë", s: 2605.81},
+    { zm: "Park Kombëtar Divjakë Karavasta", search: "Karavasta", b: "Fier", s: 248.70},
+    { zm: "Park Kombëtar Divjakë Karavasta", search: "Karavasta", b: "Rrogozhinë", s: 3.47},
     { zm: "Park Kombëtar Llogara", search: "Llogara", b: "Vlorë", s: 783.37},
+    { zm: "Park Kombëtar Llogara", search: "Llogara", b: "Himarë", s: 98.63},
     { zm: "Park Kombëtar Lurë Mali i Dejës", search: "Lur", b: "Dibër", s: 7082.68},
+    { zm: "Park Kombëtar Lurë Mali i Dejës", search: "Lur", b: "Mat", s: 1520.46},
+    { zm: "Park Kombëtar Lurë Mali i Dejës", search: "Lur", b: "Mirditë", s: 105.53},
     { zm: "Park Kombëtar Mali i Dajtit", search: "Dajti", b: "Tiranë", s: 19118.15},
+    { zm: "Park Kombëtar Mali i Dajtit", search: "Dajti", b: "Krujë", s: 1383.65},
+    { zm: "Park Kombëtar Mali i Dajtit", search: "Dajti", b: "Klos", s: 13.44},
     { zm: "Park Kombëtar Mali i Tomorrit", search: "Tomorr", b: "Skrapar", s: 5626.64},
+    { zm: "Park Kombëtar Mali i Tomorrit", search: "Tomorr", b: "Berat", s: 1441.96},
+    { zm: "Park Kombëtar Mali i Tomorrit", search: "Tomorr", b: "Poliçan", s: 3237.94},
+    { zm: "Park Kombëtar Mali i Tomorrit", search: "Tomorr", b: "Gramsh", s: 686.10},
     { zm: "Park Kombëtar Prespa", search: "Prespa", b: "Pustec", s: 4126.93},
+    { zm: "Park Kombëtar Prespa", search: "Prespa", b: "Devoll", s: 2154.49},
+    { zm: "Park Kombëtar Prespa", search: "Prespa", b: "Maliq", s: 114.92},
     { zm: "Park Kombëtar Shebenik", search: "Shebenik", b: "Librazhd", s: 15410.85},
+    { zm: "Park Kombëtar Shebenik", search: "Shebenik", b: "Përrenjas", s: 3714.38},
+    { zm: "Park Kombëtar Shebenik", search: "Shebenik", b: "Bulqizë", s: 1460.61},
+    { zm: "Park Natyror Bredhi i Sotirës", search: "Sotir", b: "Dropull", s: 2783.16},
     { zm: "Park Natyror Korab Koritnik", search: "Korab", b: "Kukës", s: 11383.08},
+    { zm: "Park Natyror Korab Koritnik", search: "Korab", b: "Dibër", s: 7899.96},
     { zm: "Park Natyror Lugina e Shales", search: "Shales", b: "Shkodër", s: 8010.77},
     { zm: "Park Natyror Mali me Gropa", search: "Gropa", b: "Tiranë", s: 7175.27},
-    { zm: "Park Natyror Nikaj-Mertur", search: "Nikaj", b: "Tropojë", s: 5420.10},
-    { zm: "Peizazhi i Mbrojtur Lumi Buna", search: "Buna", b: "Shkodër", s: 1420.30},
     { zm: "Park Natyror Munella", search: "Munella", b: "Pukë", s: 816.91},
     { zm: "Park Natyror Qafështamë", search: "Shtam", b: "Krujë", s: 1888.94},
-    { zm: "Park Natyror Zagori", search: "Zagori", b: "Libohovë", s: 3531.87},
-    { zm: "Park Natyror Bredhi i Sotirës", search: "Sotir", b: "Dropull", s: 2783.16},
-    { zm: "Peizazhi i Mbrojtur Kuturman", search: "Kuturman", b: "Librazhd", s: 2539.43},
-    { zm: "Rezervë Natyrore e Mirëfilltë Gashi", search: "Gashi", b: "Tropojë", s: 3000.00},
-    { zm: "Park Natyror Shkrel", search: "Shkrel", b: "Malësi e Madhe", s: 1200.00},
-    { zm: "Peizazhi i Mbrojtur Kune-Vain", search: "Kune", b: "Lezhë", s: 1100.40},
-    { zm: "Park Natyror Mali i Shpatit", search: "Shpat", b: "Elbasan", s: 2100.00},
-    { zm: "Park Natyror Kunavia", search: "Kunavia", b: "Klos", s: 1500.20},
-    { zm: "Rezervë Natyrore Polisi", search: "Polisi", b: "Librazhd", s: 800.00},
-    { zm: "Park Natyror Bjeshka e Oroshit", search: "Orosh", b: "Mirditë", s: 950.00},
-    { zm: "Park Natyror Ulëz", search: "Ulez", b: "Mat", s: 450.00},
-    { zm: "Park Natyror Bovilla", search: "Bovilla", b: "Tiranë", s: 1200.00},
-    { zm: "Peizazhi i Mbrojtur Drenovë", search: "Drenove", b: "Korçë", s: 1700.00},
-    { zm: "Park Natyror Germenj-Shelegur", search: "Germenj", b: "Kolonjë", s: 2400.00},
-    { zm: "Park Natyror Karaburun", search: "Karaburun", b: "Vlorë", s: 12000.00},
-    { zm: "Rezervë Natyrore Pisli-Poro", search: "Poro", b: "Fier", s: 1500.00},
     { zm: "Park Natyror Syri i Kaltër", search: "Kalt", b: "Finiq", s: 241.80},
-    { zm: "Park Natyror Blue Eye", search: "Blue", b: "Vlorë", s: 150.00},
-    { zm: "Park Kombëtar Zvërnec", search: "Zvernec", b: "Vlorë", s: 400.00},
-    { zm: "Park Natyror Sazan", search: "Sazan", b: "Vlorë", s: 300.00},
-    { zm: "Park Natyror Kepi i Rodonit", search: "Rodon", b: "Durrës", s: 500.00},
-    { zm: "Rezervë Natyrore Velipojë", search: "Velipoje", b: "Shkodër", s: 700.00},
-    { zm: "Park Natyror Razëm", search: "Razem", b: "Malësi e Madhe", s: 600.00}
+    { zm: "Park Natyror Zagori", search: "Zagori", b: "Libohovë", s: 3531.87},
+    { zm: "Peizazhi i Mbrojtur Kuturman", search: "Kuturman", b: "Librazhd", s: 2539.43}
 ];
 
 const zmStats = {};
@@ -227,14 +223,15 @@ rawData.forEach(d => {
 require([
     "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", 
     "esri/layers/TileLayer", "esri/layers/WebTileLayer", "esri/Basemap",
-    "esri/widgets/LayerList", "esri/widgets/Compass", "esri/widgets/ScaleBar"
-], (Map, MapView, FeatureLayer, TileLayer, WebTileLayer, Basemap, LayerList, Compass, ScaleBar) => {
+    "esri/widgets/LayerList", "esri/widgets/Compass", "esri/widgets/ScaleBar",
+    "esri/geometry/geometryEngine"
+], (Map, MapView, FeatureLayer, TileLayer, WebTileLayer, Basemap, LayerList, Compass, ScaleBar, geometryEngine) => {
 
     const asigBasemaps = {
         "2025": new Basemap({ baseLayers: [new TileLayer({ url: "https://di-albania-satellite1.img.arcgis.com/arcgis/rest/services/rgb/Albania_2025_L3/MapServer" })], title: "Ortofoto 2025" }),
         "2024": new Basemap({ baseLayers: [new TileLayer({ url: "https://di-albania-satellite1.img.arcgis.com/arcgis/rest/services/rgb/Albania_2024L3/MapServer" })], title: "Ortofoto 2024" }),
         "2023": new Basemap({ baseLayers: [new TileLayer({ url: "https://di-albania-satellite1.img.arcgis.com/arcgis/rest/services/rgb/Albania_2023/MapServer" })], title: "Ortofoto 2023" }),
-        "2015": new Basemap({ baseLayers: [new TileLayer({ url: "https://geoportal.asig.gov.al/service/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ortofoto_2015_20cm&STYLE=default&TILEMATRIXSET=EPSG:3857&TILEMATRIX={level}&TILEROW={row}&TILECOL={col}&FORMAT=image/png" })], title: "Ortofoto 2015" })
+        "2015": new Basemap({ baseLayers: [new WebTileLayer({ urlTemplate: "https://geoportal.asig.gov.al/service/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ortofoto_2015_20cm&STYLE=default&TILEMATRIXSET=EPSG:3857&TILEMATRIX={level}&TILEROW={row}&TILECOL={col}&FORMAT=image/png" })], title: "Ortofoto 2015" })
     };
 
     const pyjeUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Pyjet_n%C3%AB_Zonat_e_Mbrojtura/FeatureServer/0";
@@ -243,15 +240,16 @@ require([
 
     const forestLayer = new FeatureLayer({ 
         url: pyjeUrl, 
-        title: "Shtresa e Pyjeve",
+        title: "Pyjet në Zonat e Mbrojtura",
         outFields: ["*"],
         popupTemplate: {
             title: null,
             content: (event) => {
                 const a = event.graphic.attributes;
+                // Përdorim Siperfaqja_ne_Ha ose field-in përkatës sipas atributit të shtresës
                 const sipVal = a.Siperfaqja_ne_Ha || a.siperfaqja || a.Shape__Area / 10000 || 0;
                 return `<div class="popup-container">
-                        <div class="popup-header"><span class="material-symbols-rounded">forest</span><h3>Detajet e Pyllit</h3></div>
+                        <div class="popup-header"><span class="material-symbols-rounded">forest</span><h3>Detajet e Parcelës</h3></div>
                         <div class="popup-card-box area"><span class="popup-stat-label">Sipërfaqja e Parcelës</span><span class="popup-stat-value">${sipVal.toLocaleString('sq-AL', {maximumFractionDigits: 2})} <small style="font-size: 0.55em;">Ha</small></span></div>
                         <div class="popup-card-box info"><div class="popup-icon-wrapper"><span class="material-symbols-rounded" style="font-size: 20px;">location_city</span></div><div class="popup-info-text"><span class="popup-info-title">Bashkia</span><span class="popup-info-val">${a.Bashkia || 'N/A'}</span></div></div>
                         <div class="popup-card-box info"><div class="popup-icon-wrapper"><span class="material-symbols-rounded" style="font-size: 20px;">verified_user</span></div><div class="popup-info-text"><span class="popup-info-title">Zona e Mbrojtur</span><span class="popup-info-val">${a.ZM || 'N/A'}</span></div></div>
@@ -263,16 +261,22 @@ require([
 
     const zmLayer = new FeatureLayer({ 
         url: zmUrl, 
-        title: "Kufijtë e Zonave të Mbrojtura", 
-        opacity: 0.4, 
-        outFields: ["*"],
+        title: "Zonat e Mbrojtura Natyrore", 
+        opacity: 0.5, 
+        outFields: ["*"], 
         popupTemplate: { 
             title: null, 
             content: (event) => { 
                 const a = event.graphic.attributes; 
                 const emriZM = a.ZM || a.Emri_ZM || 'N/A';
+                
+                // Gjej statistikën e sipërfaqes për këtë ZM
+                const zmKey = Object.keys(zmStats).find(k => emriZM.toLowerCase().includes(zmStats[k].search.toLowerCase()));
+                const sipPyjeTotal = zmKey ? zmStats[zmKey].total : 0;
+
                 return `<div class="popup-container">
-                        <div class="popup-header"><span class="material-symbols-rounded">verified_user</span><h3>Info mbi ZM</h3></div>
+                        <div class="popup-header"><span class="material-symbols-rounded">verified_user</span><h3>Zona e Mbrojtur</h3></div>
+                        <div class="popup-card-box area"><span class="popup-stat-label">Sipërfaqja Totale e Pyjeve</span><span class="popup-stat-value">${sipPyjeTotal.toLocaleString('sq-AL', {maximumFractionDigits: 2})} <small style="font-size: 0.55em;">Ha</small></span></div>
                         <div class="popup-card-box info"><div class="popup-icon-wrapper"><span class="material-symbols-rounded" style="font-size: 20px;">label</span></div><div class="popup-info-text"><span class="popup-info-title">Emri i Zonës</span><span class="popup-info-val">${emriZM}</span></div></div>
                         <div class="asig-footer">Autoriteti Shtetëror për Informacionin Gjeohapësinor</div>
                     </div>`; 
@@ -282,9 +286,20 @@ require([
 
     const bashkiLayer = new FeatureLayer({ 
         url: bashkiUrl, 
-        title: "Kufijtë e Bashkive", 
-        visible: false,
-        opacity: 0.3
+        title: "Kufi Bashkie", 
+        opacity: 0.3, 
+        outFields: ["*"], 
+        popupTemplate: { 
+            title: null, 
+            content: (event) => { 
+                const a = event.graphic.attributes; 
+                return `<div class="popup-container">
+                        <div class="popup-header"><span class="material-symbols-rounded">location_city</span><h3>Bashkia</h3></div>
+                        <div class="popup-card-box info"><div class="popup-icon-wrapper"><span class="material-symbols-rounded" style="font-size: 20px;">location_on</span></div><div class="popup-info-text"><span class="popup-info-title">BASHKIA</span><span class="popup-info-val">${a.Bashkia || 'N/A'}</span></div></div>
+                        <div class="asig-footer">Autoriteti Shtetëror për Informacionin Gjeohapësinor</div>
+                    </div>`; 
+            } 
+        } 
     });
 
     const map = new Map({ 
@@ -298,12 +313,6 @@ require([
         center: [20.16, 41.15],
         zoom: 8,
         padding: { left: 340 }
-    });
-
-    document.getElementById("sidebarToggle").addEventListener("click", () => {
-        const sidebar = document.getElementById("sidebar");
-        sidebar.classList.toggle("collapsed");
-        view.padding = { left: sidebar.classList.contains("collapsed") ? 0 : 340 };
     });
 
     document.querySelectorAll('.asig-opt').forEach(btn => {
@@ -334,13 +343,14 @@ require([
 
     function performZoom(layer, field, val) {
         const q = layer.createQuery();
-        q.where = `UPPER(${field}) LIKE UPPER('%${val.replace("'", "''")}%')`;
+        q.where = `UPPER(${field}) = UPPER('${val.replace("'", "''")}')`;
         q.returnGeometry = true;
+        
         layer.queryExtent(q).then(res => {
             if(res.extent && res.count > 0) {
-                view.goTo(res.extent.expand(1.2), { duration: 1000 });
+                view.goTo(res.extent.expand(1.4), { duration: 1500, easing: "ease-in-out" });
             }
-        });
+        }).catch(err => console.error("Gabim Zoom:", err));
     }
 
     function showStats(type, val) {
@@ -354,9 +364,9 @@ require([
                 if(m) items.push({ n: n, single: m, total: zmStats[n].total });
             });
         } else {
-            if(zmStats[val]) items.push({ n: val, d: zmStats[val] });
+            const n = val; 
+            if(zmStats[n]) items.push({ n: n, d: zmStats[n] });
         }
-
         items.forEach(i => {
             const div = document.createElement("div");
             div.className = "stat-item";
@@ -392,16 +402,20 @@ require([
             forestLayer.definitionExpression = null;
             view.goTo({ center: [20.16, 41.15], zoom: 8 });
         } else {
-            const search = zmStats[v].search;
-            forestLayer.definitionExpression = `UPPER(ZM) LIKE UPPER('%${search.replace("'", "''")}%')`;
-            performZoom(zmLayer, "ZM", search);
+            forestLayer.definitionExpression = `UPPER(ZM) LIKE UPPER('%${zmStats[v].search.replace("'", "''")}%')`;
+            performZoom(zmLayer, "ZM", v);
         }
+    });
+
+    document.getElementById("sidebarToggle").addEventListener("click", () => {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("collapsed");
+        view.padding = { left: sidebar.classList.contains("collapsed") ? 0 : 340 };
     });
 
     view.ui.add(new Compass({ view }), "top-right");
     view.ui.add(new ScaleBar({ view, unit: "metric" }), "bottom-right");
     new LayerList({ container: "layerListDiv", view });
-    
     showStats("all", "all");
 });
 </script>
