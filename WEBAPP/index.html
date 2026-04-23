@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-    <title>Monitorimi i Pyjeve - ASIG</title>
+    <title>Pyjet në Zonat e Mbrojtura Natyrore</title>
     
     <!-- API & Fonts -->
     <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
@@ -17,7 +17,7 @@
             --accent: #3b82f6;
             --bg-site: #f8fafc;
             --panel-bg: rgba(255, 255, 255, 0.92);
-            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --text-dark: #0f172a;
             --text-light: #64748b;
         }
@@ -37,8 +37,8 @@
 
         .brand { display: flex; align-items: center; gap: 16px; width: 100%; }
         .brand img { height: 44px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }
-        .brand-info h1 { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--primary); letter-spacing: -0.02em; }
-        .brand-info p { margin: 0; font-size: 0.7rem; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+        .brand-info h1 { margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--primary); letter-spacing: -0.02em; }
+        .brand-info p { margin: 0; font-size: 0.65rem; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em; }
 
         #sidebar {
             position: absolute; left: 20px; top: 108px; bottom: 30px; width: 340px;
@@ -61,32 +61,57 @@
 
         .filter-container { display: flex; flex-direction: column; gap: 10px; }
         .filter-group { background: #fff; padding: 10px; border-radius: 14px; border: 1px solid #e2e8f0; }
-        .filter-label { font-size: 0.65rem; font-weight: 800; color: var(--text-light); text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .filter-label { font-size: 0.6rem; font-weight: 800; color: var(--text-light); text-transform: uppercase; margin-bottom: 5px; display: block; }
         select { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 0.75rem; color: var(--text-dark); outline: none; }
 
-        .stats-card { background: white; border-radius: 16px; padding: 12px; border: 1px solid #e2e8f0; overflow-y: auto; flex: 1; min-height: 150px; }
+        .stats-card { background: white; border-radius: 16px; padding: 12px; border: 1px solid #e2e8f0; overflow-y: auto; flex: 1; }
         .stat-item { padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
-        .stat-item:last-child { border: none; }
-        .stat-title { font-size: 0.8rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 4px; }
+        .stat-title { font-size: 0.75rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 6px; line-height: 1.2; }
         
-        .b-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; margin-bottom: 3px; color: var(--text-dark); }
-        .b-name { font-weight: 600; width: 40%; }
-        .b-area { color: var(--secondary); font-weight: 700; text-align: right; width: 35%; }
-        .b-perc { color: var(--text-light); font-size: 0.65rem; text-align: right; width: 25%; }
+        .b-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; margin-bottom: 4px; }
+        .b-name { font-weight: 600; color: var(--text-dark); }
+        .b-area-container { display: flex; align-items: center; gap: 8px; }
+        .b-area { color: var(--secondary); font-weight: 700; }
+        .b-perc { background: #f1f5f9; padding: 2px 6px; border-radius: 6px; color: var(--text-light); font-size: 0.65rem; font-weight: 700; min-width: 45px; text-align: right; }
 
-        .section-title { font-size: 0.8rem; font-weight: 800; color: var(--text-dark); text-transform: uppercase; display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+        .section-title { font-size: 0.75rem; font-weight: 800; color: var(--text-dark); text-transform: uppercase; display: flex; align-items: center; gap: 8px; margin-top: 5px; }
 
         /* Popup Styles */
-        .esri-popup__main-container { border-radius: 20px !important; }
-        .custom-popup { padding: 5px; }
-        .p-card { background: linear-gradient(135deg, #064e3b, #065f46); color: white; padding: 15px; border-radius: 14px; margin-bottom: 10px; }
-        .p-label { font-size: 0.65rem; opacity: 0.8; font-weight: 700; text-transform: uppercase; }
-        .p-value { font-size: 1.4rem; font-weight: 800; display: block; }
-        .p-info-row { display: flex; align-items: center; gap: 10px; padding: 8px; background: #f8fafc; border-radius: 10px; margin-bottom: 5px; border: 1px solid #edf2f7; font-size: 0.8rem; }
+        .popup-container { padding: 8px; min-width: 240px; }
+        .popup-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        .popup-header span { color: var(--primary); font-size: 26px; }
+        .popup-header h3 { margin: 0; font-size: 0.95rem; color: var(--primary); font-weight: 800; }
+
+        .popup-card-box { 
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); 
+            border: 1px solid #bbf7d0; 
+            padding: 12px; border-radius: 14px; 
+            margin-bottom: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .popup-card-box.area { text-align: center; flex-direction: column; gap: 4px; padding: 16px; }
+        .popup-card-box.info { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; }
+
+        .popup-icon-wrapper {
+            background: white; width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .popup-stat-label { font-size: 0.6rem; color: #166534; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: block; }
+        .popup-stat-value { font-size: 1.4rem; font-weight: 900; color: #064e3b; }
+        .popup-info-text { display: flex; flex-direction: column; }
+        .popup-info-title { font-size: 0.6rem; color: var(--text-light); font-weight: 700; text-transform: uppercase; }
+        .popup-info-val { font-size: 0.85rem; font-weight: 700; color: var(--text-dark); }
+
+        .asig-footer { font-size: 0.6rem; color: var(--text-light); border-top: 1px solid #f1f5f9; padding-top: 8px; margin-top: 10px; font-style: italic; text-align: center; }
 
         @media (max-width: 768px) {
             #sidebar { left: 10px; right: 10px; width: auto; top: 85px; bottom: 80px; }
-            #sidebar.collapsed { transform: translateY(120%); }
             .toggle-btn { bottom: 15px; left: 50%; transform: translateX(-50%); }
         }
     </style>
@@ -97,7 +122,7 @@
     <div class="brand">
         <img src="https://asig.gov.al/wp-content/uploads/2023/11/Logo_asig_vector.png" alt="ASIG">
         <div class="brand-info">
-            <h1>Pyjet në Zonat e Mbrojtura</h1>
+            <h1>Pyjet në Zonat e Mbrojtura Natyrore</h1>
             <p>Autoriteti Shtetëror për Informacionin Gjeohapësinor</p>
         </div>
     </div>
@@ -110,13 +135,13 @@
 <div id="sidebar">
     <div class="filter-container">
         <div class="filter-group">
-            <span class="filter-label">Filtro sipas Bashkisë</span>
+            <span class="filter-label">Filtro Bashkinë</span>
             <select id="bashkiaFilter">
                 <option value="all">Të gjitha Bashkitë</option>
             </select>
         </div>
         <div class="filter-group">
-            <span class="filter-label">Filtro sipas Zonës (ZM)</span>
+            <span class="filter-label">Filtro Zonën e Mbrojtur</span>
             <select id="zmFilter">
                 <option value="all">Të gjitha Zonat</option>
             </select>
@@ -125,23 +150,22 @@
 
     <div class="section-title">
         <span class="material-symbols-rounded" style="font-size: 18px;">analytics</span>
-        Shpërndarja Gjeografike (ha / %)
+        Statistikat e Sipërfaqes
     </div>
     <div class="stats-card" id="statsContainer"></div>
 
-    <div style="height: 180px; display: flex; flex-direction: column;">
+    <div style="height: 150px; display: flex; flex-direction: column;">
         <div class="section-title">
             <span class="material-symbols-rounded" style="font-size: 18px;">layers</span>
-            Legjenda e Shtresave
+            Legjenda / Shtresat
         </div>
-        <div id="layerListDiv" style="flex: 1; overflow-y: auto; margin-top: 8px;"></div>
+        <div id="layerListDiv" style="flex: 1; overflow-y: auto; margin-top: 5px;"></div>
     </div>
 </div>
 
 <div id="viewDiv"></div>
 
 <script>
-// Të dhënat e detajuara nga tabela juaj
 const rawData = [
     { zm: "Park Kombëtar Alpet e Shqipërisë", search: "Alpet", b: "Malësi e Madhe", s: 16843.41},
     { zm: "Park Kombëtar Alpet e Shqipërisë", search: "Alpet", b: "Shkodër", s: 6200.24},
@@ -164,7 +188,6 @@ const rawData = [
     { zm: "Park Kombëtar Lurë Mali i Dejës", search: "Lur", b: "Mirditë", s: 105.53},
     { zm: "Park Kombëtar Mali i Dajtit", search: "Dajti", b: "Tiranë", s: 19118.15},
     { zm: "Park Kombëtar Mali i Dajtit", search: "Dajti", b: "Krujë", s: 1383.65},
-    { zm: "Park Kombëtar Mali i Dajtit", search: "Dajti", b: "Mat", s: 0.96},
     { zm: "Park Kombëtar Mali i Dajtit", search: "Dajti", b: "Klos", s: 13.44},
     { zm: "Park Kombëtar Mali i Tomorrit", search: "Tomorr", b: "Skrapar", s: 5626.64},
     { zm: "Park Kombëtar Mali i Tomorrit", search: "Tomorr", b: "Berat", s: 1441.96},
@@ -179,23 +202,15 @@ const rawData = [
     { zm: "Park Natyror Bredhi i Sotirës", search: "Sotir", b: "Dropull", s: 2783.16},
     { zm: "Park Natyror Korab Koritnik", search: "Korab", b: "Kukës", s: 11383.08},
     { zm: "Park Natyror Korab Koritnik", search: "Korab", b: "Dibër", s: 7899.96},
-    { zm: "Park Natyror Lugina e Ulzës", search: "Ulz", b: "Mat", s: 1630.98},
     { zm: "Park Natyror Lugina e Shales", search: "Shales", b: "Shkodër", s: 8010.77},
     { zm: "Park Natyror Mali me Gropa", search: "Gropa", b: "Tiranë", s: 7175.27},
     { zm: "Park Natyror Munella", search: "Munella", b: "Pukë", s: 816.91},
     { zm: "Park Natyror Qafështamë", search: "Shtam", b: "Krujë", s: 1888.94},
     { zm: "Park Natyror Syri i Kaltër", search: "Kalt", b: "Finiq", s: 241.80},
     { zm: "Park Natyror Zagori", search: "Zagori", b: "Libohovë", s: 3531.87},
-    { zm: "Parka Kombëtari Lumi Vjosa", search: "Vjosa", b: "Gjirokastër", s: 5.72},
-    { zm: "Peizazhi i Mbrojtur Bredhi i Drenovës", search: "Drenov", b: "Korçë", s: 875.48},
-    { zm: "Peizazhi i Mbrojtur Bjeshka e Oroshit", search: "Orosh", b: "Mirditë", s: 241.98},
-    { zm: "Peizazhi i Mbrojtur Guri i Nikës", search: "Nikës", b: "Pogradec", s: 1147.51},
-    { zm: "Peizazhi i Mbrojtur Krastë Virion", search: "Krast", b: "Krujë", s: 501.95},
-    { zm: "Peizazhi i Mbrojtur Kuturman", search: "Kuturman", b: "Librazhd", s: 2539.43},
-    { zm: "Rezervat Natyror i Menaxhuar", search: "Rezervat", b: "Gjirokastër", s: 1028.15}
+    { zm: "Peizazhi i Mbrojtur Kuturman", search: "Kuturman", b: "Librazhd", s: 2539.43}
 ];
 
-// Grupimi i të dhënave për llogaritje
 const zmStats = {};
 rawData.forEach(d => {
     if(!zmStats[d.zm]) zmStats[d.zm] = { total: 0, bashkite: [], search: d.search };
@@ -205,39 +220,108 @@ rawData.forEach(d => {
 
 require([
     "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", 
-    "esri/widgets/LayerList", "esri/widgets/Compass", "esri/widgets/ScaleBar"
-], (Map, MapView, FeatureLayer, LayerList, Compass, ScaleBar) => {
+    "esri/widgets/LayerList", "esri/widgets/Compass", "esri/widgets/ScaleBar",
+    "esri/geometry/geometryEngine"
+], (Map, MapView, FeatureLayer, LayerList, Compass, ScaleBar, geometryEngine) => {
 
-    const pyjeUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Pyje_Zonat_e_Mbrojtura/FeatureServer/0";
-    const zmUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/ZM/FeatureServer/0";
-    const bashkiUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Kufijt%C3%AB_e_Bashkive/FeatureServer/0";
+    const pyjeUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Pyjet_n%C3%AB_Zonat_e_Mbrojtura/FeatureServer/0";
+    const bashkiUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Kufi_Bashkie/FeatureServer/0";
+    const zmUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Zonat_e_Mbrojtura_Natyrore/FeatureServer/0";
 
     const forestLayer = new FeatureLayer({ 
         url: pyjeUrl, 
-        title: "Sipërfaqet Pyjore",
+        title: "Pyjet në Zonat e Mbrojtura",
         outFields: ["*"],
         popupTemplate: {
-            title: "Detajet e Parcelës",
+            title: null,
             content: (event) => {
                 const a = event.graphic.attributes;
-                // Kthimi i siperfaqes ne popup
-                const sip = a.Sip_ha || a.Shape__Area / 10000 || 0;
-                return `<div class="custom-popup">
-                    <div class="p-card">
-                        <span class="p-label">Sipërfaqja e Parcelës</span>
-                        <span class="p-value">${sip.toLocaleString('sq-AL', {maximumFractionDigits:2})} ha</span>
+                const geom = event.graphic.geometry;
+                let sipVal = a.Siperfaqja_ne_Ha || geometryEngine.geodesicArea(geom, "hectares");
+
+                return `
+                    <div class="popup-container">
+                        <div class="popup-header">
+                            <span class="material-symbols-rounded">forest</span>
+                            <h3>Detajet e Parcelës</h3>
+                        </div>
+                        <div class="popup-card-box area">
+                            <span class="popup-stat-label">Sipërfaqja Aktuale</span>
+                            <span class="popup-stat-value">${sipVal.toLocaleString('sq-AL', {minimumFractionDigits: 2})} <small style="font-size: 0.55em;">Ha</small></span>
+                        </div>
+                        <div class="popup-card-box info">
+                            <div class="popup-icon-wrapper"><span class="material-symbols-rounded" style="font-size: 20px;">location_city</span></div>
+                            <div class="popup-info-text"><span class="popup-info-title">Bashkia</span><span class="popup-info-val">${a.Bashkia || 'N/A'}</span></div>
+                        </div>
+                        <div class="popup-card-box info">
+                            <div class="popup-icon-wrapper"><span class="material-symbols-rounded" style="font-size: 20px;">verified_user</span></div>
+                            <div class="popup-info-text"><span class="popup-info-title">Zona e Mbrojtur</span><span class="popup-info-val">${a.ZM || 'N/A'}</span></div>
+                        </div>
+                        <div class="asig-footer">Autoriteti Shtetëror për Informacionin Gjeohapësinor</div>
                     </div>
-                    <div class="p-info-row"><b>Bashkia:</b> <span>${a.Bashkia || a.EMRI_BASHK || "N/A"}</span></div>
-                    <div class="p-info-row"><b>Zona e Mbrojtur:</b> <span>${a.ZM || a.Emri_ZM || "N/A"}</span></div>
-                </div>`;
+                `;
             }
         }
     });
 
-    const zmLayer = new FeatureLayer({ url: zmUrl, title: "Kufijtë e ZM", opacity: 0.5 });
-    const bashkiLayer = new FeatureLayer({ url: bashkiUrl, title: "Kufijtë e Bashkive", opacity: 0.3 });
+    const zmLayer = new FeatureLayer({ 
+        url: zmUrl, 
+        title: "Zonat e Mbrojtura Natyrore", 
+        opacity: 0.5,
+        outFields: ["*"],
+        popupTemplate: { 
+            title: null,
+            content: (event) => {
+                const a = event.graphic.attributes;
+                // Përditësuar për të lexuar fushën 'ZM' si në tabelën e atributeve të userit
+                const emriZM = a.ZM || a.Emri_ZM || 'N/A';
+                return `
+                    <div class="popup-container">
+                        <div class="popup-header">
+                            <span class="material-symbols-rounded">verified_user</span>
+                            <h3>Zona e Mbrojtur</h3>
+                        </div>
+                        <div class="popup-card-box info">
+                            <div class="popup-icon-wrapper"><span class="material-symbols-rounded" style="font-size: 20px;">label</span></div>
+                            <div class="popup-info-text"><span class="popup-info-title">Emri ZM</span><span class="popup-info-val">${emriZM}</span></div>
+                        </div>
+                        <div class="asig-footer">Autoriteti Shtetëror për Informacionin Gjeohapësinor</div>
+                    </div>
+                `;
+            }
+        }
+    });
 
-    const map = new Map({ basemap: "hybrid", layers: [bashkiLayer, zmLayer, forestLayer] });
+    const bashkiLayer = new FeatureLayer({ 
+        url: bashkiUrl, 
+        title: "Kufi Bashkie", 
+        opacity: 0.3,
+        outFields: ["*"],
+        popupTemplate: { 
+            title: null,
+            content: (event) => {
+                const a = event.graphic.attributes;
+                return `
+                    <div class="popup-container">
+                        <div class="popup-header">
+                            <span class="material-symbols-rounded">location_city</span>
+                            <h3>Bashkia</h3>
+                        </div>
+                        <div class="popup-card-box info">
+                            <div class="popup-icon-wrapper"><span class="material-symbols-rounded" style="font-size: 20px;">location_on</span></div>
+                            <div class="popup-info-text"><span class="popup-info-title">BASHKIA</span><span class="popup-info-val">${a.Bashkia || 'N/A'}</span></div>
+                        </div>
+                        <div class="asig-footer">Autoriteti Shtetëror për Informacionin Gjeohapësinor</div>
+                    </div>
+                `;
+            }
+        }
+    });
+
+    const map = new Map({ 
+        basemap: "hybrid", 
+        layers: [bashkiLayer, zmLayer, forestLayer] 
+    });
 
     const view = new MapView({
         container: "viewDiv",
@@ -251,7 +335,6 @@ require([
     const bashkiaFilter = document.getElementById("bashkiaFilter");
     const statsContainer = document.getElementById("statsContainer");
 
-    // Populimi i filtrave
     const uniqueBashki = [...new Set(rawData.map(d => d.b))].sort();
     uniqueBashki.forEach(b => {
         const opt = document.createElement("option");
@@ -259,102 +342,104 @@ require([
         bashkiaFilter.appendChild(opt);
     });
 
-    Object.keys(zmStats).sort().forEach(name => {
+    const sortedZMNames = Object.keys(zmStats).sort();
+    sortedZMNames.forEach(name => {
         const opt = document.createElement("option");
-        opt.value = zmStats[name].search; opt.textContent = name;
+        opt.value = name;
+        opt.textContent = name;
         zmFilter.appendChild(opt);
     });
 
-    function showStats(type, value) {
-        statsContainer.innerHTML = "";
-        let displayList = [];
+    function performZoom(layer, field, val) {
+        const q = layer.createQuery();
+        q.where = `UPPER(${field}) = UPPER('${val}')`;
+        layer.queryExtent(q).then(res => {
+            if(res.extent && res.count > 0) {
+                view.goTo(res.extent.expand(1.5), { duration: 1200, easing: "ease-in-out" });
+            }
+        }).catch(err => console.error("Gabim në Zoom:", err));
+    }
 
-        if(value === "all") {
-            Object.keys(zmStats).forEach(name => {
-                displayList.push({ name: name, data: zmStats[name] });
-            });
+    function showStats(type, val) {
+        statsContainer.innerHTML = "";
+        let items = [];
+        if(val === "all") {
+            Object.keys(zmStats).forEach(n => items.push({ n: n, d: zmStats[n] }));
         } else if(type === "bashkia") {
-            Object.keys(zmStats).forEach(name => {
-                const match = zmStats[name].bashkite.find(b => b.emri === value);
-                if(match) displayList.push({ name: name, singleBashki: match, totalZM: zmStats[name].total });
+            Object.keys(zmStats).forEach(n => {
+                const m = zmStats[n].bashkite.find(b => b.emri === val);
+                if(m) items.push({ n: n, single: m, total: zmStats[n].total });
             });
         } else {
-            const name = Object.keys(zmStats).find(k => zmStats[k].search === value);
-            displayList.push({ name: name, data: zmStats[name] });
+            const n = val; 
+            if(zmStats[n]) items.push({ n: n, d: zmStats[n] });
         }
 
-        displayList.forEach(item => {
+        items.forEach(i => {
             const div = document.createElement("div");
             div.className = "stat-item";
-            let rowsHtml = "";
-
-            if(item.data) {
-                // Shfaqim te gjitha bashkite per kete ZM
-                rowsHtml = `<span class="stat-title">${item.name}</span>`;
-                item.data.bashkite.forEach(b => {
-                    const perc = ((b.sip / item.data.total) * 100).toFixed(1);
-                    rowsHtml += `<div class="b-row">
-                        <span class="b-name">${b.emri}</span>
-                        <span class="b-area">${b.sip.toLocaleString()} ha</span>
-                        <span class="b-perc">${perc}%</span>
-                    </div>`;
+            let html = `<span class="stat-title">${i.n}</span>`;
+            if(i.d) {
+                i.d.bashkite.forEach(b => {
+                    const perc = ((b.sip / i.d.total) * 100).toFixed(1);
+                    html += `
+                        <div class="b-row">
+                            <span class="b-name">${b.emri}</span>
+                            <div class="b-area-container">
+                                <span class="b-area">${b.sip.toLocaleString()} ha</span>
+                                <span class="b-perc">${perc}%</span>
+                            </div>
+                        </div>`;
                 });
             } else {
-                // Shfaqim vetem pjesen e bashkise se zgjedhur ne kete ZM
-                const perc = ((item.singleBashki.sip / item.totalZM) * 100).toFixed(1);
-                rowsHtml = `<span class="stat-title">${item.name}</span>
+                const perc = ((i.single.sip / i.total) * 100).toFixed(1);
+                html += `
                     <div class="b-row">
-                        <span class="b-name">${item.singleBashki.emri}</span>
-                        <span class="b-area">${item.singleBashki.sip.toLocaleString()} ha</span>
-                        <span class="b-perc">${perc}% e ZM</span>
+                        <span class="b-name">${i.single.emri}</span>
+                        <div class="b-area-container">
+                            <span class="b-area">${i.single.sip.toLocaleString()} ha</span>
+                            <span class="b-perc">${perc}%</span>
+                        </div>
                     </div>`;
             }
-            div.innerHTML = rowsHtml;
+            div.innerHTML = html;
             statsContainer.appendChild(div);
         });
     }
 
     bashkiaFilter.addEventListener("change", (e) => {
-        const val = e.target.value;
+        const v = e.target.value;
         zmFilter.value = "all";
-        showStats("bashkia", val);
-        
-        if(val === "all") {
-            view.goTo({ center: [20.16, 41.15], zoom: 8 });
-        } else {
-            const query = bashkiLayer.createQuery();
-            query.where = `EMRI_BASHK = '${val}' OR Bashkia = '${val}'`;
-            bashkiLayer.queryExtent(query).then(res => { if(res.extent) view.goTo(res.extent.expand(1.2)); });
-        }
+        showStats("bashkia", v);
+        forestLayer.definitionExpression = v === "all" ? "1=1" : `UPPER(Bashkia) = UPPER('${v}')`;
+        if(v !== "all") performZoom(bashkiLayer, "Bashkia", v);
+        else view.goTo({ center: [20.16, 41.15], zoom: 8 });
     });
 
     zmFilter.addEventListener("change", (e) => {
-        const val = e.target.value;
+        const v = e.target.value;
         bashkiaFilter.value = "all";
-        showStats("zm", val);
-
-        if(val === "all") {
+        showStats("zm", v);
+        if(v === "all") {
+            forestLayer.definitionExpression = "1=1";
             view.goTo({ center: [20.16, 41.15], zoom: 8 });
         } else {
-            const query = zmLayer.createQuery();
-            query.where = `Emri_ZM LIKE '%${val}%' OR ZM LIKE '%${val}%'`;
-            zmLayer.queryExtent(query).then(res => { if(res.extent) view.goTo(res.extent.expand(1.2)); });
+            forestLayer.definitionExpression = `UPPER(ZM) LIKE UPPER('%${zmStats[v].search}%')`;
+            // Provon të bëjë zoom duke përdorur fushën 'ZM'
+            performZoom(zmLayer, "ZM", v);
         }
     });
 
-    // Sidebar Toggle
-    const toggleBtn = document.getElementById("sidebarToggle");
-    const sidebar = document.getElementById("sidebar");
-    toggleBtn.addEventListener("click", () => {
+    document.getElementById("sidebarToggle").addEventListener("click", () => {
+        const sidebar = document.getElementById("sidebar");
         sidebar.classList.toggle("collapsed");
         view.padding = { left: sidebar.classList.contains("collapsed") ? 0 : 340 };
-        toggleBtn.querySelector('span').textContent = sidebar.classList.contains("collapsed") ? 'menu' : 'close';
     });
 
-    showStats("all", "all");
     view.ui.add(new Compass({ view }), "top-right");
     view.ui.add(new ScaleBar({ view, unit: "metric" }), "bottom-right");
     new LayerList({ container: "layerListDiv", view });
+    showStats("all", "all");
 });
 </script>
 </body>
