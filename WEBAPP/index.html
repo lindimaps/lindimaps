@@ -259,30 +259,33 @@ require([
         }
     });
 
-    const zmLayer = new FeatureLayer({ 
-        url: zmUrl, 
-        title: "Zonat e Mbrojtura Natyrore", 
-        opacity: 0.5, 
-        outFields: ["*"], 
-        popupTemplate: { 
-            title: null, 
-            content: (event) => { 
-                const a = event.graphic.attributes; 
-                const emriZM = a.ZM || a.Emri_ZM || 'N/A';
-                
-                // Gjej statistikën e sipërfaqes për këtë ZM
-                const zmKey = Object.keys(zmStats).find(k => emriZM.toLowerCase().includes(zmStats[k].search.toLowerCase()));
-                const sipPyjeTotal = zmKey ? zmStats[zmKey].total : 0;
-
-                return `<div class="popup-container">
+  const zmLayer = new FeatureLayer({ 
+    url: zmUrl, 
+    title: "Zonat e Mbrojtura Natyrore", 
+    opacity: 0.5, 
+    outFields: ["*"], 
+    popupTemplate: { 
+        title: null, 
+        content: (event) => { 
+            const a = event.graphic.attributes; 
+            const emriZM = a.ZM || a.Emri_ZM || 'N/A';
+            
+            return `<div class="popup-container">
                         <div class="popup-header"><span class="material-symbols-rounded">verified_user</span><h3>Zona e Mbrojtur</h3></div>
-                        <div class="popup-card-box area"><span class="popup-stat-label">Sipërfaqja Totale e Pyjeve</span><span class="popup-stat-value">${sipPyjeTotal.toLocaleString('sq-AL', {maximumFractionDigits: 2})} <small style="font-size: 0.55em;">Ha</small></span></div>
-                        <div class="popup-card-box info"><div class="popup-icon-wrapper"><span class="material-symbols-rounded" style="font-size: 20px;">label</span></div><div class="popup-info-text"><span class="popup-info-title">Emri i Zonës</span><span class="popup-info-val">${emriZM}</span></div></div>
+                        <div class="popup-card-box info">
+                            <div class="popup-icon-wrapper">
+                                <span class="material-symbols-rounded" style="font-size: 20px;">label</span>
+                            </div>
+                            <div class="popup-info-text">
+                                <span class="popup-info-title">Emri i Zonës</span>
+                                <span class="popup-info-val">${emriZM}</span>
+                            </div>
+                        </div>
                         <div class="asig-footer">Autoriteti Shtetëror për Informacionin Gjeohapësinor</div>
                     </div>`; 
-            } 
         } 
-    });
+    } 
+});
 
     const bashkiLayer = new FeatureLayer({ 
         url: bashkiUrl, 
