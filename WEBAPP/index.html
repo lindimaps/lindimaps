@@ -234,7 +234,7 @@ require([
         "2025": new Basemap({ baseLayers: [new TileLayer({ url: "https://di-albania-satellite1.img.arcgis.com/arcgis/rest/services/rgb/Albania_2025_L3/MapServer" })], title: "Ortofoto 2025" }),
         "2024": new Basemap({ baseLayers: [new TileLayer({ url: "https://di-albania-satellite1.img.arcgis.com/arcgis/rest/services/rgb/Albania_2024L3/MapServer" })], title: "Ortofoto 2024" }),
         "2023": new Basemap({ baseLayers: [new TileLayer({ url: "https://di-albania-satellite1.img.arcgis.com/arcgis/rest/services/rgb/Albania_2023/MapServer" })], title: "Ortofoto 2023" }),
-        "2015": new Basemap({ baseLayers: [new WebTileLayer({ urlTemplate: "https://geoportal.asig.gov.al/service/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ortofoto_2015_20cm&STYLE=default&TILEMATRIXSET=EPSG:3857&TILEMATRIX={level}&TILEROW={row}&TILECOL={col}&FORMAT=image/png" })], title: "Ortofoto 2015" })
+        "2015": new Basemap({ baseLayers: [new TileLayer({ url: "https://geoportal.asig.gov.al/service/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ortofoto_2015_20cm&STYLE=default&TILEMATRIXSET=EPSG:3857&TILEMATRIX={level}&TILEROW={row}&TILECOL={col}&FORMAT=image/png" })], title: "Ortofoto 2015" })
     };
 
     const pyjeUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Pyjet_n%C3%AB_Zonat_e_Mbrojtura/FeatureServer/0";
