@@ -232,6 +232,8 @@ require([
         url: pyjeUrl, 
         title: "Pyjet në Zonat e Mbrojtura",
         outFields: ["*"],
+        minScale: 0, // Detyron shtresën të mbetet e dukshme në çdo distancë
+        maxScale: 0, // Detyron shtresën të mbetet e dukshme pavarësisht zoom-it
         popupTemplate: {
             title: null,
             content: (event) => {
@@ -268,12 +270,13 @@ require([
         url: zmUrl, 
         title: "Zonat e Mbrojtura Natyrore", 
         opacity: 0.5,
+        minScale: 0,
+        maxScale: 0,
         outFields: ["*"],
         popupTemplate: { 
             title: null,
             content: (event) => {
                 const a = event.graphic.attributes;
-                // Përditësuar për të lexuar fushën 'ZM' si në tabelën e atributeve të userit
                 const emriZM = a.ZM || a.Emri_ZM || 'N/A';
                 return `
                     <div class="popup-container">
@@ -296,6 +299,8 @@ require([
         url: bashkiUrl, 
         title: "Kufi Bashkie", 
         opacity: 0.3,
+        minScale: 0,
+        maxScale: 0,
         outFields: ["*"],
         popupTemplate: { 
             title: null,
@@ -425,7 +430,6 @@ require([
             view.goTo({ center: [20.16, 41.15], zoom: 8 });
         } else {
             forestLayer.definitionExpression = `UPPER(ZM) LIKE UPPER('%${zmStats[v].search}%')`;
-            // Provon të bëjë zoom duke përdorur fushën 'ZM'
             performZoom(zmLayer, "ZM", v);
         }
     });
