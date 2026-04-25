@@ -29,6 +29,13 @@ transform-origin: center;
 }
 .logo-bg { transition: background-color 0.3s ease; }
 .logo-container:hover .logo-bg { background-color: #2563eb; }
+
+/* Auto-expanding textarea style */
+.process-textarea {
+  resize: none;
+  overflow: hidden;
+  min-height: 52px;
+}
 </style>
 </head>
 <body class="bg-[#f8fafc] min-h-screen pb-24 text-slate-900">
@@ -345,6 +352,12 @@ document.getElementById('log-hours').value = diff.toFixed(1);
 }
 };
 
+// --- AUTO EXPAND TEXTAREA ---
+window.autoExpand = (el) => {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+};
+
 // --- UI HELPERS ---
 window.showAlert = (msg) => {
 document.getElementById('alert-message').innerText = msg;
@@ -414,15 +427,31 @@ const container = document.getElementById('dynamic-fields-container');
 container.innerHTML = "";
 if(!actId) return;
 const act = configData.find(c => c.id === actId);
+if(!act) return;
+
 act.processes.forEach(p => {
 const val = valuesMap ? (valuesMap[p.label] || "") : "";
-const isNumber = p.type === 'number';
-const extra = isNumber ? `onkeydown="handleMathInput(event)"` : '';
-container.innerHTML += `<div class="space-y-1">
+const isText = p.type === 'text';
+
+if(isText) {
+  // Use textarea for text fields so it can expand
+  container.innerHTML += `<div class="space-y-1">
 <label class="text-[10px] font-extrabold text-slate-500 uppercase">${p.label}</label>
-<input type="text" data-label="${p.label}" data-original-type="${p.type}" value="${val}" ${extra} class="process-input w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm">
+<textarea data-label="${p.label}" data-original-type="${p.type}" oninput="autoExpand(this)" class="process-input process-textarea w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm focus:border-blue-300 focus:ring-1 focus:ring-blue-300 outline-none transition-all">${val}</textarea>
 </div>`;
+} else {
+  // Use input for numbers with math handling
+  container.innerHTML += `<div class="space-y-1">
+<label class="text-[10px] font-extrabold text-slate-500 uppercase">${p.label}</label>
+<input type="text" data-label="${p.label}" data-original-type="${p.type}" value="${val}" onkeydown="handleMathInput(event)" class="process-input w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm">
+</div>`;
+}
 });
+
+// Trigger expansion for pre-filled textareas
+setTimeout(() => {
+  document.querySelectorAll('.process-textarea').forEach(ta => autoExpand(ta));
+}, 50);
 };
 
 document.getElementById('save-log-btn').onclick = async () => {
@@ -543,7 +572,7 @@ document.getElementById('report-results').innerHTML = filtered.map(log => `
 <button onclick="deleteItem('logs', '${log.id}')" class="text-red-300 font-bold">&times;</button>
 </div>
 </div>
-<div class="grid grid-cols-2 gap-2 border-t pt-2 mt-2">${log.processes.map(p => `<div class="text-[10px]"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
+<div class="grid grid-cols-2 gap-2 border-t pt-2 mt-2">${log.processes.map(p => `<div class="text-[10px] break-words"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
 <div class="flex justify-between text-[10px] font-bold text-blue-600 mt-2">
 <span>${log.startTime || ''} - ${log.endTime || ''}</span>
 <span>Tot: ${log.hours} Orë</span>
@@ -589,7 +618,7 @@ let headerY = 28;
 docPDF.setFontSize(10);
 docPDF.setTextColor(51, 65, 85);
 docPDF.setFont("helvetica", "bold");
-docPDF.text("PARAMETRAT E RAPORTIT", 14, headerY);
+docPDF.text("RAPORTI I AKTIVITETEVE DITOR", 14, headerY);
 headerY += 5;
 
 docPDF.setFont("helvetica", "normal");
@@ -637,7 +666,13 @@ return row;
 docPDF.autoTable({
 startY: headerY + 2, head: headers, body: bodyData, theme: 'striped',
 headStyles: { fillColor: [59, 130, 246] },
-styles: { fontSize: 8 }
+styles: { fontSize: 7, cellPadding: 2, overflow: 'linebreak' },
+columnStyles: {
+  0: { cellWidth: 20 },
+  1: { cellWidth: 30 },
+  2: { cellWidth: 30 },
+  3: { cellWidth: 10 }
+}
 });
 
 const finalY = docPDF.lastAutoTable.finalY + 10;
@@ -655,22 +690,23 @@ if (!isNaN(val)) processSums[p.label] = (processSums[p.label] || 0) + val;
 });
 
 const statsBody = [
-['Total Raporte', filtered.length.toString()],
-['Aktivitete Unikë', uniqueActs.size.toString()],
+['Total Raporte (Rreshta)', filtered.length.toLocaleString()],
+['Aktivitete të Ndryshme', uniqueActs.size.toString()],
 ['Total Orë Pune', totalHours.toFixed(1)]
 ];
 
 orderedLabels.forEach(label => {
-if (processSums[label] > 0) statsBody.push([`Total ${label}`, processSums[label].toLocaleString()]);
+if (processSums[label] > 0) statsBody.push([`Total ${label} (Mbledhje Numerike)`, processSums[label].toLocaleString()]);
 });
 
 docPDF.autoTable({
 startY: finalY,
-head: [['Përmbledhja e Totaleve', 'Vlera']],
+head: [['Përmbledhja e Totaleve për filtrat e zgjedhur', 'Vlera']],
 body: statsBody,
 theme: 'grid',
 headStyles: { fillColor: [15, 23, 42] },
-styles: { fontSize: 9, fontStyle: 'bold' }
+styles: { fontSize: 9, fontStyle: 'bold' },
+margin: { left: 140 } // Position totals to the right
 });
 
 docPDF.save(`Raport_LindiMaps_${new Date().getTime()}.pdf`);
