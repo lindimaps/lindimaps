@@ -290,7 +290,7 @@ Rikthe / Importo (.JSON)
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, writeBatch, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, writeBatch, query, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -337,7 +337,6 @@ const getCleanId = (prefixedId) => {
   return prefixedId;
 };
 
-// --- FUNKSION PER DATEN DEFAULT ---
 const setTodayDate = () => {
     const today = new Date();
     const tzoffset = today.getTimezoneOffset() * 60000;
@@ -345,7 +344,6 @@ const setTodayDate = () => {
     document.getElementById('log-date').value = localISOTime;
 };
 
-// --- INITIALIZATION ---
 window.onload = () => {
     setTodayDate();
 };
@@ -403,6 +401,7 @@ window.switchTab = (tab) => {
 ['tab-log', 'tab-config', 'tab-reports', 'tab-trash'].forEach(t => document.getElementById(t).classList.replace('tab-active', 'text-slate-400'));
 document.getElementById(`view-${tab}`).classList.remove('hidden');
 document.getElementById(`tab-${tab}`).classList.replace('text-slate-400', 'tab-active');
+if(tab === 'reports') renderReportList();
 };
 
 onAuthStateChanged(auth, (user) => {
@@ -428,7 +427,7 @@ unsubscribes.forEach(unsub => unsub());
 unsubscribes = [];
 const filterAndClean = (snap) => snap.docs.filter(d => d.id.startsWith(userId + "_")).map(d => ({ id: getCleanId(d.id), ...d.data() }));
 
-const unsubConfig = onSnapshot(collection(db, getBaseCollectionPath('config')), snap => { configData = filterAndClean(snap); updateDropdowns(); renderConfigList(); });
+const unsubConfig = onSnapshot(collection(db, getBaseCollectionPath('config')), snap => { configData = filterAndClean(snap).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)); updateDropdowns(); renderConfigList(); });
 const unsubLogs = onSnapshot(collection(db, getBaseCollectionPath('logs')), snap => { logData = filterAndClean(snap).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)); renderReportList(); updateProcessFilterUI(); });
 const unsubOps = onSnapshot(collection(db, getBaseCollectionPath('operators')), snap => { operatorData = filterAndClean(snap); updateDropdowns(); renderOperatorList(); });
 const unsubTrash = onSnapshot(collection(db, getBaseCollectionPath('trash')), snap => { trashData = filterAndClean(snap); renderTrashList(); });
@@ -499,13 +498,28 @@ window.deleteItem = async (col, id) => {
 askConfirm("Fshije këtë element?", async () => {
 try {
 const secureId = getSecureId(id);
-const docSnap = await getDoc(doc(db, getBaseCollectionPath(col), secureId));
+const docRef = doc(db, getBaseCollectionPath(col), secureId);
+const docSnap = await getDoc(docRef);
 if (docSnap.exists()) {
 await setDoc(doc(db, getBaseCollectionPath('trash'), secureId), { ...docSnap.data(), originalCollection: col, deletedAt: Date.now() });
-await deleteDoc(doc(db, getBaseCollectionPath(col), secureId));
+await deleteDoc(docRef);
 }
 } catch (e) { showAlert("Gabim: " + e.message); }
 });
+};
+
+window.restoreItem = async (id, originalCollection) => {
+    try {
+        const secureId = getSecureId(id);
+        const trashRef = doc(db, getBaseCollectionPath('trash'), secureId);
+        const docSnap = await getDoc(trashRef);
+        if(docSnap.exists()){
+            const data = docSnap.data();
+            const { originalCollection: _, deletedAt: __, ...cleanData } = data;
+            await setDoc(doc(db, getBaseCollectionPath(originalCollection), secureId), cleanData);
+            await deleteDoc(trashRef);
+        }
+    } catch(e) { showAlert("Gabim: " + e.message); }
 };
 
 window.clearFilters = () => {
@@ -538,7 +552,6 @@ if(end) f = f.filter(l => l.date <= end);
 if(op) f = f.filter(l => l.operator === op);
 if(act) f = f.filter(l => l.actId === act);
 document.querySelectorAll('.rep-proc-filter').forEach(flt => { if(flt.value) f = f.filter(l => l.processes.find(p => p.label === flt.dataset.filterLabel && p.value === flt.value)); });
-// Sigurohemi që renditja të jetë absolutisht me të fundit lart (descending)
 return f.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
 };
 
@@ -604,7 +617,6 @@ document.getElementById('rep-op-select').innerHTML = `<option value="">Eksperti:
 document.getElementById('rep-act-select').innerHTML = `<option value="">Aktiviteti: Të gjithë</option>` + acts;
 };
 
-// --- CONFIG AND TRASH CRUD FULL LOGIC ---
 document.getElementById('add-act-btn').onclick = async () => {
     const name = document.getElementById('new-act-name').value.trim();
     const procStr = document.getElementById('new-act-processes').value.trim();
@@ -660,11 +672,10 @@ window.renderConfigList = () => {
     `).join("");
 };
 
-window.renderTrashList = () => document.getElementById('trash-results').innerHTML = trashData.map(t => `<div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center"><div><p class="text-[10px] font-black uppercase text-red-400">${t.originalCollection}</p><h4 class="font-bold text-slate-800">${t.name || t.actName || t.operator}</h4></div></div>`).join("");
+window.renderTrashList = () => document.getElementById('trash-results').innerHTML = trashData.map(t => `<div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center"><div><p class="text-[10px] font-black uppercase text-red-400">${t.originalCollection}</p><h4 class="font-bold text-slate-800">${t.name || t.actName || t.operator}</h4></div><button onclick="restoreItem('${t.id}', '${t.originalCollection}')" class="text-emerald-500 font-bold bg-emerald-50 px-3 py-2 rounded-lg text-xs uppercase">Rikthe</button></div>`).join("");
 
 window.emptyTrash = async () => { askConfirm("Jeni të sigurt që doni ta pastroni koshin përgjithmonë?", async () => { for(const item of trashData) await deleteDoc(doc(db, getBaseCollectionPath('trash'), getSecureId(item.id))); }); };
 
-// --- OPERATOR LOGIC WITH EDIT ---
 window.editOperator = (id) => {
     const op = operatorData.find(o => o.id === id);
     if(!op) return;
@@ -700,7 +711,6 @@ window.renderOperatorList = () => document.getElementById('operator-list').inner
     </div>
 </div>`).join("");
 
-// --- BACKUP & RESTORE LOGIC ---
 window.exportSystemData = () => {
     const dataStr = JSON.stringify({ configData, logData, operatorData }, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
