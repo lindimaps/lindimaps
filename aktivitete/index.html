@@ -8,7 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;800&display=swap');
 body { font-family: 'Plus Jakarta Sans', sans-serif; }
 .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
 .tab-active { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
@@ -117,6 +117,7 @@ Sistemi Aktivitete
 <div class="flex flex-col items-center gap-4">
 <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
 <p class="text-slate-900 font-black text-xs uppercase tracking-[0.3em]">LindiMaps</p>
+<p id="loading-progress" class="text-blue-600 font-bold text-sm hidden">Duke u përpunuar: 0%</p>
 </div>
 </div>
 
@@ -139,7 +140,7 @@ Sistemi Aktivitete
 </div>
 <div class="flex items-center gap-4">
 <button onclick="logout()" class="text-[10px] font-bold text-slate-400 uppercase hover:text-red-500">Dil</button>
-<span id="sync-status" class="text-[10px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full uppercase">Sistemi Aktiv</span>
+<span id="sync-status" class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-3 py-1 rounded-full uppercase">Hapësirë Private</span>
 </div>
 </header>
 
@@ -195,6 +196,35 @@ Ruaj në Cloud
 </div>
 
 <div id="view-config" class="hidden space-y-8">
+<!-- BACKUP & RESTORE SECTION -->
+<div class="glass-card rounded-[2rem] p-8 space-y-6 border-2 border-dashed border-blue-200 bg-blue-50/20">
+<div class="flex items-center gap-3">
+<div class="p-3 bg-blue-100 text-blue-600 rounded-2xl">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="stroke-current" stroke-width="2">
+<path d="M19 11V17C19 18.1046 18.1046 19 17 19H7C5.89543 19 5 18.1046 5 17V11" stroke-linecap="round"/>
+<path d="M12 2V14M12 14L8.5 10.5M12 14L15.5 10.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div>
+<div>
+<h2 class="text-lg font-extrabold text-slate-800">Ruajtja e Sigurt e të Dhënave (Backup)</h2>
+<p class="text-xs text-slate-500 font-medium">Eksportoni ose importoni të dhënat tuaja private. Ky funksion ju lejon të transferoni me siguri të dhënat tuaja të vjetra në këtë llogari të re private.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<button onclick="exportSystemData()" class="flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white p-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+Shkarko Backup (.JSON)
+</button>
+<div class="relative">
+<input type="file" id="backup-file-input" accept=".json" class="hidden" onchange="importSystemData(event)">
+<button onclick="document.getElementById('backup-file-input').click()" class="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+Rikthe / Importo (.JSON)
+</button>
+</div>
+</div>
+</div>
+
 <div class="glass-card rounded-[2rem] p-8 space-y-6">
 <div class="flex justify-between items-center">
 <h2 id="config-title" class="text-xl font-extrabold text-slate-800">Shto Aktivitet</h2>
@@ -254,7 +284,7 @@ Ruaj në Cloud
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, writeBatch, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -282,6 +312,31 @@ let logData = [];
 let operatorData = [];
 let trashData = [];
 let deleteCallback = null;
+let unsubscribes = [];
+
+// NEW SECURE ALGORITHM: Prefix-based isolation inside the existing allowed public path
+const getBaseCollectionPath = (collectionName) => {
+  return `artifacts/${appId}/public/data/${collectionName}`;
+};
+
+const getSecureId = (id) => {
+  const userId = auth.currentUser?.uid;
+  if (!userId) {
+    showAlert("Nuk jeni i identifikuar në sistem.");
+    throw new Error("Missing authenticated user UID");
+  }
+  // If id is already prefixed, return it. Otherwise prefix it.
+  if (id.startsWith(userId + "_")) return id;
+  return `${userId}_${id}`;
+};
+
+const getCleanId = (prefixedId) => {
+  const userId = auth.currentUser?.uid;
+  if (userId && prefixedId.startsWith(userId + "_")) {
+    return prefixedId.substring(userId.length + 1);
+  }
+  return prefixedId;
+};
 
 window.showAuthSection = (section) => {
 document.getElementById('login-section').classList.add('hidden');
@@ -387,37 +442,53 @@ document.getElementById('loading').classList.add('hidden');
 if (user) {
 document.getElementById('app-content').classList.remove('hidden');
 document.getElementById('auth-overlay').classList.add('hidden');
-startListening();
+startListening(user.uid);
 } else {
 document.getElementById('app-content').classList.add('hidden');
 document.getElementById('auth-overlay').classList.remove('hidden');
 showAuthSection('login');
+unsubscribes.forEach(unsub => unsub());
+unsubscribes = [];
 }
 });
 
 window.logout = () => signOut(auth);
 
-function startListening() {
-const base = `artifacts/${appId}/public/data`;
-onSnapshot(collection(db, base, 'config'), snap => {
-configData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+// Listening only to documents prefixed with user's ID in the public directory
+function startListening(userId) {
+unsubscribes.forEach(unsub => unsub());
+unsubscribes = [];
+
+const filterAndClean = (snap) => {
+  return snap.docs
+    .filter(d => d.id.startsWith(userId + "_"))
+    .map(d => ({ id: getCleanId(d.id), ...d.data() }));
+};
+
+const unsubConfig = onSnapshot(collection(db, getBaseCollectionPath('config')), snap => {
+configData = filterAndClean(snap);
 updateDropdowns();
 renderConfigList();
-});
-onSnapshot(collection(db, base, 'logs'), snap => {
-logData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}, err => console.error("Config error:", err));
+
+const unsubLogs = onSnapshot(collection(db, getBaseCollectionPath('logs')), snap => {
+logData = filterAndClean(snap);
 renderReportList();
 updateProcessFilterUI();
-});
-onSnapshot(collection(db, base, 'operators'), snap => {
-operatorData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}, err => console.error("Logs error:", err));
+
+const unsubOps = onSnapshot(collection(db, getBaseCollectionPath('operators')), snap => {
+operatorData = filterAndClean(snap);
 updateDropdowns();
 renderOperatorList();
-});
-onSnapshot(collection(db, base, 'trash'), snap => {
-trashData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}, err => console.error("Operators error:", err));
+
+const unsubTrash = onSnapshot(collection(db, getBaseCollectionPath('trash')), snap => {
+trashData = filterAndClean(snap);
 renderTrashList();
-});
+}, err => console.error("Trash error:", err));
+
+unsubscribes.push(unsubConfig, unsubLogs, unsubOps, unsubTrash);
 }
 
 // --- CORE FUNCTIONALITY ---
@@ -461,12 +532,17 @@ const operator = document.getElementById('log-operator-select').value;
 const hours = document.getElementById('log-hours').value;
 if(!actId || !date || !operator || !hours) return showAlert("Plotësoni fushat.");
 const processes = Array.from(document.querySelectorAll('.process-input')).map(i => ({ label: i.dataset.label, value: i.value }));
-const id = document.getElementById('log-edit-id').value || Date.now().toString();
-await setDoc(doc(db, `artifacts/${appId}/public/data/logs`, id), {
+const rawId = document.getElementById('log-edit-id').value || Date.now().toString();
+try {
+const secureId = getSecureId(rawId);
+await setDoc(doc(db, getBaseCollectionPath('logs'), secureId), {
 actId, actName: configData.find(c => c.id === actId).name, date, operator, hours: parseFloat(hours),
 startTime: document.getElementById('log-start-time').value, endTime: document.getElementById('log-end-time').value, processes
 });
 cancelLogEdit();
+} catch (error) {
+showAlert("Gabim gjatë ruajtjes: " + error.message);
+}
 };
 
 window.cancelLogEdit = () => {
@@ -501,16 +577,21 @@ document.getElementById('save-log-btn').innerText = "Zëvendëso";
 // --- TRASH & DELETE LOGIC ---
 window.deleteItem = async (col, id) => {
 askConfirm("A dëshironi ta fshini këtë element? Do të shkojë në kosh.", async () => {
-const docRef = doc(db, `artifacts/${appId}/public/data/${col}`, id);
+try {
+const secureId = getSecureId(id);
+const docRef = doc(db, getBaseCollectionPath(col), secureId);
 const docSnap = await getDoc(docRef);
 if (docSnap.exists()) {
 const data = docSnap.data();
-await setDoc(doc(db, `artifacts/${appId}/public/data/trash`, id), {
+await setDoc(doc(db, getBaseCollectionPath('trash'), secureId), {
 ...data,
 originalCollection: col,
 deletedAt: Date.now()
 });
 await deleteDoc(docRef);
+}
+} catch (error) {
+showAlert("Gabim gjatë fshirjes: " + error.message);
 }
 });
 };
@@ -518,10 +599,15 @@ await deleteDoc(docRef);
 window.restoreItem = async (id) => {
 const item = trashData.find(t => t.id === id);
 if(!item) return;
+try {
+const secureId = getSecureId(id);
 const { originalCollection, deletedAt, ...originalData } = item;
-await setDoc(doc(db, `artifacts/${appId}/public/data/${originalCollection}`, id), originalData);
-await deleteDoc(doc(db, `artifacts/${appId}/public/data/trash`, id));
+await setDoc(doc(db, getBaseCollectionPath(originalCollection), secureId), originalData);
+await deleteDoc(doc(db, getBaseCollectionPath('trash'), secureId));
 showAlert("Elementi u rikthye!");
+} catch (error) {
+showAlert("Gabim gjatë rikthimit: " + error.message);
+}
 };
 
 window.renderTrashList = () => {
@@ -541,8 +627,13 @@ document.getElementById('trash-results').innerHTML = trashData.length === 0
 
 window.emptyTrash = async () => {
 askConfirm("Kjo do të fshijë përgjithmonë të gjithë elementët në kosh. Vazhdo?", async () => {
+try {
 for(const item of trashData) {
-await deleteDoc(doc(db, `artifacts/${appId}/public/data/trash`, item.id));
+const secureId = getSecureId(item.id);
+await deleteDoc(doc(db, getBaseCollectionPath('trash'), secureId));
+}
+} catch (error) {
+showAlert("Gabim gjatë spastrimit: " + error.message);
 }
 });
 };
@@ -563,9 +654,14 @@ if(typeRaw === 'ora') type = 'ora';
 return { label, type };
 }).filter(p => p.label);
 
-const id = document.getElementById('edit-id').value || Date.now().toString();
-await setDoc(doc(db, `artifacts/${appId}/public/data/config`, id), { name, processes });
+const rawId = document.getElementById('edit-id').value || Date.now().toString();
+try {
+const secureId = getSecureId(rawId);
+await setDoc(doc(db, getBaseCollectionPath('config'), secureId), { name, processes });
 resetConfigForm();
+} catch (error) {
+showAlert("Gabim gjatë ruajtjes së aktivitetit: " + error.message);
+}
 };
 
 window.renderConfigList = () => {
@@ -614,8 +710,13 @@ document.getElementById('cancel-edit-btn').classList.add('hidden');
 document.getElementById('add-op-btn').onclick = async () => {
 const name = document.getElementById('new-op-name').value.trim();
 if(!name) return;
-await setDoc(doc(db, `artifacts/${appId}/public/data/operators`, Date.now().toString()), { name });
+try {
+const secureId = getSecureId(Date.now().toString());
+await setDoc(doc(db, getBaseCollectionPath('operators'), secureId), { name });
 document.getElementById('new-op-name').value = "";
+} catch (error) {
+showAlert("Gabim gjatë shtimit të ekspertit: " + error.message);
+}
 };
 
 function renderOperatorList() {
@@ -721,7 +822,129 @@ docPDF.autoTable({ startY: 25, head: headers, body: bodyData, theme: 'striped', 
 docPDF.save(`Raport_LindiMaps_${new Date().getTime()}.pdf`);
 };
 
-document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+// --- DATA BACKUP AND RESTORE FUNCTIONS ---
+window.exportSystemData = () => {
+try {
+const backupData = {
+appId: appId,
+exportedAt: new Date().toISOString(),
+config: configData,
+logs: logData,
+operators: operatorData,
+trash: trashData
+};
+const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+const downloadAnchor = document.createElement('a');
+downloadAnchor.setAttribute("href", dataStr);
+downloadAnchor.setAttribute("download", `LindiMaps_Private_Backup_${new Date().toISOString().slice(0,10)}.json`);
+document.body.appendChild(downloadAnchor);
+downloadAnchor.click();
+downloadAnchor.remove();
+showAlert("Të dhënat u eksportuan me sukses në formatin JSON!");
+} catch (e) {
+showAlert("Ndodhi një gabim gjatë eksportimit të të dhënave.");
+console.error(e);
+}
+};
+
+window.importSystemData = (event) => {
+const file = event.target.files[0];
+if (!file) return;
+const reader = new FileReader();
+reader.onload = async (e) => {
+try {
+const data = JSON.parse(e.target.result);
+if (!data.config || !data.logs || !data.operators) {
+return showAlert("Skedari nuk është i vlefshëm për sistemin LindiMaps.");
+}
+
+askConfirm(`Ky importim do të transferojë në llogarinë tuaj private: ${data.config.length} aktivitete, ${data.logs.length} regjistrime pune dhe ${data.operators.length} ekspertë. Dëshironi të vazhdoni?`, async () => {
+const progressText = document.getElementById('loading-progress');
+const loadingDiv = document.getElementById('loading');
+
+loadingDiv.classList.remove('hidden');
+progressText.classList.remove('hidden');
+progressText.innerText = "Përgatitja e të dhënave...";
+
+const totalItems = data.config.length + data.logs.length + data.operators.length + (data.trash ? data.trash.length : 0);
+let writtenCount = 0;
+
+const updateProgress = () => {
+  writtenCount++;
+  const percent = Math.round((writtenCount / totalItems) * 100);
+  progressText.innerText = `Duke u përpunuar: ${percent}%`;
+};
+
+// We group documents into Batches (up to 500 documents per batch) to maximize Firebase throughput.
+const commitBatch = async (items, collectionName, dataMapper) => {
+  let batch = writeBatch(db);
+  let count = 0;
+  
+  for (const item of items) {
+    const secureId = getSecureId(item.id);
+    const docRef = doc(db, getBaseCollectionPath(collectionName), secureId);
+    batch.set(docRef, dataMapper(item));
+    count++;
+    updateProgress();
+
+    if (count === 500) {
+      await batch.commit();
+      batch = writeBatch(db);
+      count = 0;
+    }
+  }
+  if (count > 0) {
+    await batch.commit();
+  }
+};
+
+try {
+  // 1. Restore Configs
+  await commitBatch(data.config, 'config', (c) => ({
+    name: c.name,
+    processes: c.processes
+  }));
+
+  // 2. Restore Operators
+  await commitBatch(data.operators, 'operators', (o) => ({
+    name: o.name
+  }));
+
+  // 3. Restore Logs
+  await commitBatch(data.logs, 'logs', (l) => ({
+    actId: l.actId,
+    actName: l.actName,
+    date: l.date,
+    operator: l.operator,
+    hours: parseFloat(l.hours),
+    startTime: l.startTime || "",
+    endTime: l.endTime || "",
+    processes: l.processes
+  }));
+
+  // 4. Restore Trash if present
+  if (data.trash && data.trash.length > 0) {
+    await commitBatch(data.trash, 'trash', (t) => t);
+  }
+
+  loadingDiv.classList.add('hidden');
+  progressText.classList.add('hidden');
+  showAlert("Të dhënat u importuan dhe u ruajtën me sukses në hapësirën tuaj private cloud!");
+  event.target.value = ''; // Reset input
+} catch (error) {
+  loadingDiv.classList.add('hidden');
+  progressText.classList.add('hidden');
+  showAlert("Dështoi ngarkimi në Cloud: " + error.message);
+  console.error(error);
+}
+});
+
+} catch (err) {
+showAlert("Gabim gjatë leximit të skedarit.");
+console.error(err);
+}
+};
+reader.readAsText(file);
+};
 </script>
 </body>
-</html>
