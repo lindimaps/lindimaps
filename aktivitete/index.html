@@ -240,8 +240,12 @@ Rikthe / Importo (.JSON)
 <div id="config-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 
 <div class="glass-card rounded-[2rem] p-8 space-y-6 border-t-4 border-slate-900">
+<div class="flex justify-between items-center">
 <h2 class="text-xl font-extrabold text-slate-800">Ekspertët</h2>
+<button id="cancel-op-btn" class="hidden text-xs font-bold text-red-500 uppercase" onclick="resetOpForm()">Anulo</button>
+</div>
 <div class="flex gap-2">
+<input id="edit-op-id" type="hidden">
 <input id="new-op-name" type="text" placeholder="Emri i Ekspertit" class="flex-1 p-4 rounded-xl bg-slate-50 border-none font-bold">
 <button id="add-op-btn" class="bg-slate-900 text-white px-6 rounded-xl font-bold">Shto</button>
 </div>
@@ -335,7 +339,6 @@ const getCleanId = (prefixedId) => {
 
 // --- FUNKSION PER DATEN DEFAULT ---
 const setTodayDate = () => {
-    // Format YYYY-MM-DD local timezone
     const today = new Date();
     const tzoffset = today.getTimezoneOffset() * 60000;
     const localISOTime = (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
@@ -407,7 +410,7 @@ document.getElementById('loading').classList.add('hidden');
 if (user) {
 document.getElementById('app-content').classList.remove('hidden');
 document.getElementById('auth-overlay').classList.add('hidden');
-document.getElementById('sync-status').innerText = user.email; // Kthimi i emailit
+document.getElementById('sync-status').innerText = user.email;
 startListening(user.uid);
 } else {
 document.getElementById('app-content').classList.add('hidden');
@@ -472,7 +475,7 @@ document.getElementById('log-act-select').value = "";
 document.getElementById('dynamic-fields-container').innerHTML = "";
 document.getElementById('cancel-log-edit').classList.add('hidden');
 document.getElementById('save-log-btn').innerText = "Ruaj në Cloud";
-setTodayDate(); // Rikthejmë datën e sotme kur anulojmë/ruajmë modifikimin
+setTodayDate(); 
 };
 
 window.editLogEntry = (id) => {
@@ -510,8 +513,8 @@ window.clearFilters = () => {
     document.getElementById('rep-end').value = '';
     document.getElementById('rep-op-select').value = '';
     document.getElementById('rep-act-select').value = '';
-    updateProcessFilterUI(); // Pastron filtrat dinamikë vizualisht
-    renderReportList(); // Shfaq të gjithë listën pa asnjë filtër aktiv
+    updateProcessFilterUI(); 
+    renderReportList(); 
 };
 
 window.updateProcessFilterUI = () => {
@@ -535,7 +538,8 @@ if(end) f = f.filter(l => l.date <= end);
 if(op) f = f.filter(l => l.operator === op);
 if(act) f = f.filter(l => l.actId === act);
 document.querySelectorAll('.rep-proc-filter').forEach(flt => { if(flt.value) f = f.filter(l => l.processes.find(p => p.label === flt.dataset.filterLabel && p.value === flt.value)); });
-return f;
+// Sigurohemi që renditja të jetë absolutisht me të fundit lart (descending)
+return f.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
 };
 
 window.renderReportList = () => {
@@ -543,7 +547,10 @@ document.getElementById('report-results').innerHTML = getFilteredLogs().map(log 
 <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm">
 <div class="flex justify-between items-start">
 <div><span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded uppercase">${log.actName}</span><h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator} | ${log.date}</h4></div>
-<button onclick="editLogEntry('${log.id}')" class="text-blue-500 text-[10px] font-bold uppercase bg-blue-50 px-2 py-1 rounded">Edito</button>
+<div class="flex gap-2">
+    <button onclick="editLogEntry('${log.id}')" class="text-blue-500 text-[10px] font-bold uppercase bg-blue-50 px-2 py-1 rounded">Edito</button>
+    <button onclick="deleteItem('logs', '${log.id}')" class="text-red-500 text-[10px] font-bold uppercase bg-red-50 px-2 py-1 rounded">Fshi</button>
+</div>
 </div>
 <div class="grid grid-cols-2 gap-2 border-t pt-2 mt-2">${log.processes.map(p => `<div class="text-[10px]"><b>${p.label}:</b> ${p.value}</div>`).join("")}</div>
 </div>`).join("");
@@ -564,7 +571,6 @@ activities.forEach(act => {
     const actLogs = filtered.filter(l => l.actId === act.id);
     if(actLogs.length === 0) return;
     
-    // Krijon një faqe/ndarje të re në PDF për secilin aktivitet
     if (hasAddedTable) {
         docPDF.addPage();
         startY = 15;
@@ -658,9 +664,41 @@ window.renderTrashList = () => document.getElementById('trash-results').innerHTM
 
 window.emptyTrash = async () => { askConfirm("Jeni të sigurt që doni ta pastroni koshin përgjithmonë?", async () => { for(const item of trashData) await deleteDoc(doc(db, getBaseCollectionPath('trash'), getSecureId(item.id))); }); };
 
-document.getElementById('add-op-btn').onclick = async () => { const name = document.getElementById('new-op-name').value.trim(); if(name) { await setDoc(doc(db, getBaseCollectionPath('operators'), getSecureId(Date.now().toString())), { name }); document.getElementById('new-op-name').value = ""; } };
+// --- OPERATOR LOGIC WITH EDIT ---
+window.editOperator = (id) => {
+    const op = operatorData.find(o => o.id === id);
+    if(!op) return;
+    document.getElementById('edit-op-id').value = op.id;
+    document.getElementById('new-op-name').value = op.name;
+    document.getElementById('add-op-btn').innerText = 'Ruaj';
+    document.getElementById('cancel-op-btn').classList.remove('hidden');
+};
 
-window.renderOperatorList = () => document.getElementById('operator-list').innerHTML = operatorData.map(o => `<div class="bg-blue-50 px-4 py-2 rounded-xl flex items-center gap-3"><span class="text-xs font-bold text-blue-700">${o.name}</span><button onclick="deleteItem('operators', '${o.id}')" class="text-red-400 font-bold hover:text-red-600">&times;</button></div>`).join("");
+window.resetOpForm = () => {
+    document.getElementById('edit-op-id').value = '';
+    document.getElementById('new-op-name').value = '';
+    document.getElementById('add-op-btn').innerText = 'Shto';
+    document.getElementById('cancel-op-btn').classList.add('hidden');
+};
+
+document.getElementById('add-op-btn').onclick = async () => { 
+    const name = document.getElementById('new-op-name').value.trim(); 
+    const editId = document.getElementById('edit-op-id').value;
+    if(name) { 
+        const idToSave = editId || Date.now().toString();
+        await setDoc(doc(db, getBaseCollectionPath('operators'), getSecureId(idToSave)), { name, timestamp: Date.now() }); 
+        resetOpForm();
+    } 
+};
+
+window.renderOperatorList = () => document.getElementById('operator-list').innerHTML = operatorData.map(o => `
+<div class="bg-blue-50 px-4 py-2 rounded-xl flex items-center gap-3">
+    <span class="text-xs font-bold text-blue-700">${o.name}</span>
+    <div class="flex gap-2">
+        <button onclick="editOperator('${o.id}')" class="text-blue-500 font-bold hover:text-blue-700 text-[10px] uppercase">Edito</button>
+        <button onclick="deleteItem('operators', '${o.id}')" class="text-red-400 font-bold hover:text-red-600 text-[10px] uppercase">Fshi</button>
+    </div>
+</div>`).join("");
 
 // --- BACKUP & RESTORE LOGIC ---
 window.exportSystemData = () => {
@@ -700,7 +738,7 @@ window.importSystemData = (event) => {
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('loading-progress').classList.add('hidden');
             showAlert("Të dhënat u importuan me sukses!");
-            event.target.value = ''; // Reset input
+            event.target.value = ''; 
         } catch (err) {
             document.getElementById('loading').classList.add('hidden');
             showAlert("Gabim në importim: Skedari nuk është i vlefshëm.");
