@@ -307,6 +307,27 @@ document.getElementById('save-log-btn').onclick = async () => { const actId = do
 
 window.cancelLogEdit = () => { document.getElementById('log-edit-id').value = ""; document.getElementById('log-hours').value = ""; document.getElementById('log-start-time').value = ""; document.getElementById('log-end-time').value = ""; document.getElementById('log-act-select').value = ""; document.getElementById('dynamic-fields-container').innerHTML = ""; document.getElementById('cancel-log-edit').classList.add('hidden'); document.getElementById('save-log-btn').innerText = "Ruaj në Cloud"; setTodayDate(); }; 
 window.editLogEntry = (id) => { const log = logData.find(l => l.id === id); if(!log) return; switchTab('log'); document.getElementById('log-edit-id').value = id; document.getElementById('log-date').value = log.date; document.getElementById('log-operator-select').value = log.operator; document.getElementById('log-act-select').value = log.actId; document.getElementById('log-hours').value = log.hours; document.getElementById('log-start-time').value = log.startTime || ""; document.getElementById('log-end-time').value = log.endTime || ""; const vals = {}; log.processes.forEach(p => vals[p.label] = p.value); generateProcessFields(vals); document.getElementById('cancel-log-edit').classList.remove('hidden'); document.getElementById('save-log-btn').innerText = "Zëvendëso"; }; 
+
+window.duplicateLogEntry = (id) => {
+    const log = logData.find(l => l.id === id);
+    if(!log) return;
+    switchTab('log');
+    document.getElementById('log-edit-id').value = ""; // Pastrohet ID në mënyrë që të ruhet si rekord i ri
+    document.getElementById('log-date').value = log.date;
+    document.getElementById('log-operator-select').value = log.operator;
+    document.getElementById('log-act-select').value = log.actId;
+    document.getElementById('log-hours').value = log.hours;
+    document.getElementById('log-start-time').value = log.startTime || "";
+    document.getElementById('log-end-time').value = log.endTime || "";
+    
+    const vals = {};
+    log.processes.forEach(p => vals[p.label] = p.value);
+    generateProcessFields(vals);
+    
+    document.getElementById('cancel-log-edit').classList.remove('hidden');
+    document.getElementById('save-log-btn').innerText = "Ruaj në Cloud";
+};
+
 window.deleteItem = async (col, id) => { askConfirm("Fshije këtë element?", async () => { try { const secureId = getSecureId(id); const docRef = doc(db, getBaseCollectionPath(col), secureId); const docSnap = await getDoc(docRef); if (docSnap.exists()) { await setDoc(doc(db, getBaseCollectionPath('trash'), secureId), { ...docSnap.data(), originalCollection: col, deletedAt: Date.now() }); await deleteDoc(docRef); } } catch (e) { showAlert("Gabim: " + e.message); } }); }; 
 window.restoreItem = async (id, originalCollection) => { try { const secureId = getSecureId(id); const trashRef = doc(db, getBaseCollectionPath('trash'), secureId); const docSnap = await getDoc(trashRef); if(docSnap.exists()){ const data = docSnap.data(); const { originalCollection: _, deletedAt: __, ...cleanData } = data; await setDoc(doc(db, getBaseCollectionPath(originalCollection), secureId), cleanData); await deleteDoc(trashRef); } } catch(e) { showAlert("Gabim: " + e.message); } }; 
 
@@ -404,6 +425,7 @@ window.renderReportList = () => {
                             </div>
                         </div> 
                         <div class="flex gap-2"> 
+                            <button onclick="duplicateLogEntry('${log.id}')" class="text-emerald-500 text-[10px] font-bold uppercase bg-emerald-50 px-2 py-1 rounded" title="Shto një aktivitet të ngjashëm">Kopjo</button> 
                             <button onclick="editLogEntry('${log.id}')" class="text-blue-500 text-[10px] font-bold uppercase bg-blue-50 px-2 py-1 rounded">Edito</button> 
                             <button onclick="deleteItem('logs', '${log.id}')" class="text-red-500 text-[10px] font-bold uppercase bg-red-50 px-2 py-1 rounded">Fshi</button> 
                         </div> 
