@@ -334,6 +334,56 @@ window.getFilteredLogs = () => {
     return f.sort((a, b) => new Date(b.date) - new Date(a.date) || (b.timestamp || 0) - (a.timestamp || 0)); 
 }; 
 
+window.editLogDateInline = async (logId) => {
+    const log = logData.find(l => l.id === logId);
+    if(!log) return;
+    const newVal = prompt('Ndrysho datën (YYYY-MM-DD):', log.date || '');
+    if(newVal !== null && newVal !== log.date) {
+        log.date = newVal;
+        try { await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(logId)), log); } 
+        catch(e) { showAlert("Gabim: " + e.message); }
+    }
+};
+
+window.editLogTimeInline = async (logId) => {
+    const log = logData.find(l => l.id === logId);
+    if(!log) return;
+    const newStart = prompt('Ndrysho orën e fillimit (HH:MM):', log.startTime || '');
+    if(newStart === null) return;
+    const newEnd = prompt('Ndrysho orën e mbarimit (HH:MM):', log.endTime || '');
+    if(newEnd === null) return;
+    
+    let newHours = log.hours;
+    if (newStart && newEnd) {
+        const startTime = new Date(`1970-01-01T${newStart}:00`);
+        const endTime = new Date(`1970-01-01T${newEnd}:00`);
+        let diff = (endTime - startTime) / (1000 * 60 * 60);
+        if (diff < 0) diff += 24;
+        newHours = parseFloat(diff.toFixed(1));
+    }
+    
+    log.startTime = newStart;
+    log.endTime = newEnd;
+    log.hours = newHours;
+    
+    try { await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(logId)), log); } 
+    catch(e) { showAlert("Gabim: " + e.message); }
+};
+
+window.editProcessInline = async (logId, label) => {
+    const log = logData.find(l => l.id === logId);
+    if(!log) return;
+    const procIndex = log.processes.findIndex(p => p.label === label);
+    if(procIndex === -1) return;
+    const oldVal = log.processes[procIndex].value;
+    const newVal = prompt(`Ndrysho "${label}":`, oldVal);
+    if(newVal !== null && newVal !== oldVal) {
+        log.processes[procIndex].value = newVal;
+        try { await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(logId)), log); } 
+        catch(e) { showAlert("Gabim: " + e.message); }
+    }
+};
+
 window.renderReportList = () => { 
     const logs = getFilteredLogs(); 
     let html = ""; 
@@ -348,14 +398,17 @@ window.renderReportList = () => {
                         <div>
                             <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded uppercase">${log.actName}</span>
                             <h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator}</h4>
-                            <div class="mt-1 text-[10px] font-bold text-slate-500 bg-slate-100 inline-block px-2 py-0.5 rounded">⏰ ${log.hours} orë</div>
+                            <div class="mt-1 text-[10px] font-bold text-slate-500 flex flex-wrap gap-2">
+                                <span class="bg-slate-100 px-2 py-0.5 rounded cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors" onclick="editLogDateInline('${log.id}')" title="Kliko për të edituar datën">📅 ${log.date}</span>
+                                <span class="bg-slate-100 px-2 py-0.5 rounded cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors" onclick="editLogTimeInline('${log.id}')" title="Kliko për të edituar orarin">⏰ ${log.startTime || '--:--'} - ${log.endTime || '--:--'} (${log.hours} orë)</span>
+                            </div>
                         </div> 
                         <div class="flex gap-2"> 
                             <button onclick="editLogEntry('${log.id}')" class="text-blue-500 text-[10px] font-bold uppercase bg-blue-50 px-2 py-1 rounded">Edito</button> 
                             <button onclick="deleteItem('logs', '${log.id}')" class="text-red-500 text-[10px] font-bold uppercase bg-red-50 px-2 py-1 rounded">Fshi</button> 
                         </div> 
                     </div> 
-                    <div class="grid grid-cols-1 gap-2 border-t pt-3 mt-3">${log.processes.map(p => `<div class="text-[11px]"><b class="text-slate-400 uppercase text-[9px]">${p.label}:</b><br>${p.value}</div>`).join("")}</div> 
+                    <div class="grid grid-cols-1 gap-2 border-t pt-3 mt-3">${log.processes.map(p => `<div class="text-[11px] p-2 -m-2 rounded-lg hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-200 transition-all" onclick="editProcessInline('${log.id}', '${p.label.replace(/'/g, "\\'")}')" title="Kliko për të edituar vlerën"><b class="text-slate-400 uppercase text-[9px]">${p.label}:</b><br>${p.value}</div>`).join("")}</div> 
                   </div>`; 
     }); 
     document.getElementById('report-results').innerHTML = html; 
