@@ -319,8 +319,13 @@ window.getFilteredLogs = () => {
     const op = document.getElementById('rep-op-select').value; 
     const act = document.getElementById('rep-act-select').value; 
     let f = [...logData]; 
-    if (start) f = f.filter(l => l.date >= start); 
-    if (end) f = f.filter(l => l.date <= end); 
+    if (start && end) { 
+        f = f.filter(l => l.date >= start && l.date <= end); 
+    } else if (start) { 
+        f = f.filter(l => l.date === start); 
+    } else if (end) { 
+        f = f.filter(l => l.date === end); 
+    } 
     if (op && op !== "") f = f.filter(l => l.operator === op); 
     if (act && act !== "") f = f.filter(l => l.actId === act); 
     document.querySelectorAll('.rep-proc-filter').forEach(flt => { 
