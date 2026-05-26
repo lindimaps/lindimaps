@@ -319,8 +319,13 @@ window.getFilteredLogs = () => {
     const op = document.getElementById('rep-op-select').value; 
     const act = document.getElementById('rep-act-select').value; 
     let f = [...logData]; 
-    if (start) f = f.filter(l => l.date >= start); 
-    if (end) f = f.filter(l => l.date <= end); 
+    if (start && end) { 
+        f = f.filter(l => l.date >= start && l.date <= end); 
+    } else if (start) { 
+        f = f.filter(l => l.date === start); 
+    } else if (end) { 
+        f = f.filter(l => l.date === end); 
+    } 
     if (op && op !== "") f = f.filter(l => l.operator === op); 
     if (act && act !== "") f = f.filter(l => l.actId === act); 
     document.querySelectorAll('.rep-proc-filter').forEach(flt => { 
@@ -338,7 +343,20 @@ window.renderReportList = () => {
             html += `<div class="text-center my-6 font-black text-slate-500 uppercase tracking-widest text-sm border-t border-b border-slate-200 py-2">${log.date}</div>`; 
             lastDate = log.date; 
         } 
-        html += ` <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm"> <div class="flex justify-between items-start"> <div><span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded uppercase">${log.actName}</span><h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator}</h4></div> <div class="flex gap-2"> <button onclick="editLogEntry('${log.id}')" class="text-blue-500 text-[10px] font-bold uppercase bg-blue-50 px-2 py-1 rounded">Edito</button> <button onclick="deleteItem('logs', '${log.id}')" class="text-red-500 text-[10px] font-bold uppercase bg-red-50 px-2 py-1 rounded">Fshi</button> </div> </div> <div class="grid grid-cols-1 gap-2 border-t pt-3 mt-3">${log.processes.map(p => `<div class="text-[11px]"><b class="text-slate-400 uppercase text-[9px]">${p.label}:</b><br>${p.value}</div>`).join("")}</div> </div>`; 
+        html += ` <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm"> 
+                    <div class="flex justify-between items-start"> 
+                        <div>
+                            <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded uppercase">${log.actName}</span>
+                            <h4 class="font-bold text-slate-800 text-sm mt-1">${log.operator}</h4>
+                            <div class="mt-1 text-[10px] font-bold text-slate-500 bg-slate-100 inline-block px-2 py-0.5 rounded">⏰ ${log.hours} orë</div>
+                        </div> 
+                        <div class="flex gap-2"> 
+                            <button onclick="editLogEntry('${log.id}')" class="text-blue-500 text-[10px] font-bold uppercase bg-blue-50 px-2 py-1 rounded">Edito</button> 
+                            <button onclick="deleteItem('logs', '${log.id}')" class="text-red-500 text-[10px] font-bold uppercase bg-red-50 px-2 py-1 rounded">Fshi</button> 
+                        </div> 
+                    </div> 
+                    <div class="grid grid-cols-1 gap-2 border-t pt-3 mt-3">${log.processes.map(p => `<div class="text-[11px]"><b class="text-slate-400 uppercase text-[9px]">${p.label}:</b><br>${p.value}</div>`).join("")}</div> 
+                  </div>`; 
     }); 
     document.getElementById('report-results').innerHTML = html; 
 }; 
