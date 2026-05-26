@@ -436,7 +436,65 @@ window.renderReportList = () => {
     document.getElementById('report-results').innerHTML = html; 
 }; 
 
-window.exportToPDF = () => { const { jsPDF } = window.jspdf; const docPDF = new jsPDF('l', 'mm', 'a4'); const filtered = getFilteredLogs(); const actId = document.getElementById('rep-act-select').value; const activities = actId ? [configData.find(c => c.id === actId)] : configData; let startY = 15; let hasAddedTable = false; activities.forEach(act => { if(!act) return; const actLogs = filtered.filter(l => l.actId === act.id); if(actLogs.length === 0) return; if (hasAddedTable) { docPDF.addPage(); startY = 15; } docPDF.setFontSize(14); docPDF.text(`Aktiviteti: ${act.name}`, 14, startY); const headers = [['Data', 'Eksperti', 'Orë', ...act.processes.map(p => p.label)]]; const body = actLogs.map(l => [l.date, l.operator, l.hours, ...act.processes.map(p => l.processes.find(pr => pr.label === p.label)?.value || '-')]); docPDF.autoTable({ startY: startY + 5, head: headers, body: body, theme: 'striped', styles: { fontSize: 8 }, headStyles: { fillColor: [59, 130, 246] } }); startY = docPDF.lastAutoTable.finalY + 15; hasAddedTable = true; }); docPDF.save(`Raport_LindiMaps_${new Date().getTime()}.pdf`); }; 
+window.exportToPDF = () => {
+    const { jsPDF } = window.jspdf;
+    const docPDF = new jsPDF('l', 'mm', 'a4');
+    const filtered = getFilteredLogs();
+    const actId = document.getElementById('rep-act-select').value;
+    const activities = actId ? [configData.find(c => c.id === actId)] : configData;
+
+    // Gjetja e vlerave të filtrave nga DOM
+    const startDate = document.getElementById('rep-start').value;
+    const endDate = document.getElementById('rep-end').value;
+    const opValue = document.getElementById('rep-op-select').value;
+
+    // Formatimi i tekstit të filtrave
+    let periodStr = 'Periudha: Te gjitha datat';
+    if (startDate && endDate) periodStr = `Periudha: Nga ${startDate} deri ne ${endDate}`;
+    else if (startDate) periodStr = `Periudha: Nga ${startDate} e ne vazhdim`;
+    else if (endDate) periodStr = `Periudha: Deri ne ${endDate}`;
+
+    const expertStr = `Eksperti: ${opValue ? opValue : 'Te gjithe'}`;
+
+    // Shtimi i titullit dhe filtrave në krye të PDF
+    docPDF.setFontSize(16);
+    docPDF.text('Raporti i Aktiviteteve', 14, 15);
+    docPDF.setFontSize(10);
+    docPDF.setTextColor(100);
+    docPDF.text(periodStr, 14, 22);
+    docPDF.text(expertStr, 14, 27);
+
+    // Kërkimi për filtra shtesë dinamikë
+    let dynamicFiltersStr = [];
+    document.querySelectorAll('.rep-proc-filter').forEach(flt => {
+        if(flt.value && flt.value !== "") dynamicFiltersStr.push(`${flt.dataset.filterLabel}: ${flt.value}`);
+    });
+
+    let startY = 32;
+    if (dynamicFiltersStr.length > 0) {
+        docPDF.text(`Filtrat shtese: ${dynamicFiltersStr.join(', ')}`, 14, startY);
+        startY += 5;
+    } else {
+        startY = 32;
+    }
+    docPDF.setTextColor(0);
+
+    let hasAddedTable = false;
+    activities.forEach(act => {
+        if(!act) return;
+        const actLogs = filtered.filter(l => l.actId === act.id);
+        if(actLogs.length === 0) return;
+        if (hasAddedTable) { docPDF.addPage(); startY = 15; }
+        docPDF.setFontSize(14);
+        docPDF.text(`Aktiviteti: ${act.name}`, 14, startY);
+        const headers = [['Data', 'Eksperti', 'Orë', ...act.processes.map(p => p.label)]];
+        const body = actLogs.map(l => [l.date, l.operator, l.hours, ...act.processes.map(p => l.processes.find(pr => pr.label === p.label)?.value || '-')]);
+        docPDF.autoTable({ startY: startY + 5, head: headers, body: body, theme: 'striped', styles: { fontSize: 8 }, headStyles: { fillColor: [59, 130, 246] } });
+        startY = docPDF.lastAutoTable.finalY + 15;
+        hasAddedTable = true;
+    });
+    docPDF.save(`Raport_LindiMaps_${new Date().getTime()}.pdf`);
+};
 
 window.updateDropdowns = () => { const acts = configData.map(c => `<option value="${c.id}">${c.name}</option>`).join(""); const ops = operatorData.map(o => `<option value="${o.name}">${o.name}</option>`).join(""); document.getElementById('log-act-select').innerHTML = `<option value="">-- Zgjidh --</option>` + acts; document.getElementById('log-operator-select').innerHTML = `<option value="">-- Zgjidh --</option>` + ops; document.getElementById('rep-op-select').innerHTML = `<option value="">Eksperti: Të gjithë</option>` + ops; document.getElementById('rep-act-select').innerHTML = `<option value="">Aktiviteti: Të gjithë</option>` + acts; }; 
 
