@@ -94,6 +94,30 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 </div> 
 </div> 
 
+<!-- GREETING WELCOME POPUP -->
+<div id="welcome-popup" class="hidden fixed inset-0 z-[700] bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-500 opacity-0">
+  <div class="bg-white/95 border border-white/20 rounded-[2.5rem] p-8 max-w-md w-full text-center space-y-6 shadow-2xl transform scale-95 transition-all duration-500 relative overflow-hidden">
+    <div class="absolute -top-12 -left-12 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
+    <div class="absolute -bottom-12 -right-12 w-24 h-24 bg-teal-500/10 rounded-full blur-xl"></div>
+    
+    <div class="flex justify-center">
+      <div class="h-16 w-16 bg-slate-50 rounded-2xl flex items-center justify-center shadow-inner border border-slate-100">
+        <span id="welcome-icon" class="text-3xl">✨</span>
+      </div>
+    </div>
+    <div class="space-y-2">
+      <h3 id="welcome-greeting" class="text-2xl font-black text-slate-800 tracking-tight"></h3>
+      <p class="text-[10px] uppercase tracking-[0.2em] font-extrabold text-blue-500">Mendimi i Ditës</p>
+    </div>
+    <div class="bg-slate-50/60 border border-slate-100/50 p-5 rounded-2xl italic text-slate-600 font-medium text-sm leading-relaxed">
+      "<span id="welcome-quote"></span>"
+    </div>
+    <button onclick="closeWelcomePopup()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-black transition-all shadow-lg active:scale-[0.98] duration-300">
+      Fillo Punën
+    </button>
+  </div>
+</div>
+
 <div id="loading" class="fixed inset-0 bg-white/95 z-[300] flex items-center justify-center"> 
 <div class="flex flex-col items-center gap-4"> 
 <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div> 
@@ -297,8 +321,56 @@ document.getElementById('confirm-yes-btn').onclick = () => { if(deleteCallback) 
 
 window.switchTab = (tab) => { ['view-log', 'view-config', 'view-reports', 'view-trash'].forEach(v => document.getElementById(v).classList.add('hidden')); ['tab-log', 'tab-config', 'tab-reports', 'tab-trash'].forEach(t => document.getElementById(t).classList.replace('tab-active', 'text-slate-400')); document.getElementById(`view-${tab}`).classList.remove('hidden'); document.getElementById(`tab-${tab}`).classList.replace('text-slate-400', 'tab-active'); if(tab === 'reports') { document.getElementById('rep-start').value = getToday(); renderReportList(); } }; 
 
-onAuthStateChanged(auth, (user) => { document.getElementById('loading').classList.add('hidden'); if (user) { document.getElementById('app-content').classList.remove('hidden'); document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('sync-status').innerText = user.email; startListening(user.uid); } else { document.getElementById('app-content').classList.add('hidden'); document.getElementById('auth-overlay').classList.remove('hidden'); showAuthSection('login'); unsubscribes.forEach(unsub => unsub()); unsubscribes = []; } }); 
-window.logout = () => signOut(auth); 
+onAuthStateChanged(auth, (user) => { document.getElementById('loading').classList.add('hidden'); if (user) { document.getElementById('app-content').classList.remove('hidden'); document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('sync-status').innerText = user.email; startListening(user.uid); showWelcomeGreeting(); } else { document.getElementById('app-content').classList.add('hidden'); document.getElementById('auth-overlay').classList.remove('hidden'); showAuthSection('login'); unsubscribes.forEach(unsub => unsub()); unsubscribes = []; } }); 
+window.logout = () => { sessionStorage.removeItem('welcomeShown'); signOut(auth); }; 
+
+window.showWelcomeGreeting = () => {
+    if (sessionStorage.getItem('welcomeShown')) return;
+    sessionStorage.setItem('welcomeShown', 'true');
+    
+    const hours = new Date().getHours();
+    let greeting = "Mirëmëngjesi";
+    let icon = "☀️";
+    
+    if (hours >= 12 && hours < 18) {
+        greeting = "Mirëdita";
+        icon = "🌤️";
+    } else if (hours >= 18 || hours < 5) {
+        greeting = "Mirëmbrëma";
+        icon = "🌙";
+    }
+    
+    const quotes = [
+        "Çdo ditë është një mundësi e re për të shkëlqyer dhe për të krijuar diçka të mrekullueshme!",
+        "Suksesi është shuma e përpjekjeve të vogla që përsëriten ditë pas dite.",
+        "Besimi te vetja është hapi i parë drejt çdo arritjeje të madhe.",
+        "Mos e numëro kohën, bëje kohën të numërohet për ty!",
+        "Fokusohu te progresi i sotëm, sado i vetëm apo i thjeshtë të duket ai.",
+        "Sfidat e sotme janë gurët e themelit për suksesin e të nesërmes.",
+        "Punoni me pasion dhe lëreni punën tuaj të shkëlqejë vetë!"
+    ];
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    
+    document.getElementById('welcome-greeting').innerText = greeting + "!";
+    document.getElementById('welcome-icon').innerText = icon;
+    document.getElementById('welcome-quote').innerText = randomQuote;
+    
+    const popup = document.getElementById('welcome-popup');
+    popup.classList.remove('hidden');
+    setTimeout(() => {
+        popup.classList.remove('opacity-0');
+        popup.querySelector('div').classList.remove('scale-95');
+    }, 50);
+};
+
+window.closeWelcomePopup = () => {
+    const popup = document.getElementById('welcome-popup');
+    popup.classList.add('opacity-0');
+    popup.querySelector('div').classList.add('scale-95');
+    setTimeout(() => {
+        popup.classList.add('hidden');
+    }, 500);
+};
 
 function startListening(userId) { unsubscribes.forEach(unsub => unsub()); unsubscribes = []; const filterAndClean = (snap) => snap.docs.filter(d => d.id.startsWith(userId + "_")).map(d => ({ id: getCleanId(d.id), ...d.data() })); const unsubConfig = onSnapshot(collection(db, getBaseCollectionPath('config')), snap => { configData = filterAndClean(snap).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)); updateDropdowns(); renderConfigList(); }); const unsubLogs = onSnapshot(collection(db, getBaseCollectionPath('logs')), snap => { logData = filterAndClean(snap).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)); renderReportList(); updateProcessFilterUI(); }); const unsubOps = onSnapshot(collection(db, getBaseCollectionPath('operators')), snap => { operatorData = filterAndClean(snap); updateDropdowns(); renderOperatorList(); }); const unsubTrash = onSnapshot(collection(db, getBaseCollectionPath('trash')), snap => { trashData = filterAndClean(snap); renderTrashList(); }); unsubscribes.push(unsubConfig, unsubLogs, unsubOps, unsubTrash); } 
 
