@@ -107,7 +107,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </div>
     <div class="space-y-2">
       <h3 id="welcome-greeting" class="text-2xl font-black text-slate-800 tracking-tight"></h3>
-      <p class="text-[10px] uppercase tracking-[0.2em] font-extrabold text-blue-500">Shprehja e Ditës</p>
+      <p class="text-[10px] uppercase tracking-[0.2em] font-extrabold text-blue-500">Mendimi i Ditës</p>
     </div>
     <div class="bg-slate-50/60 border border-slate-100/50 p-5 rounded-2xl italic text-slate-600 font-medium text-sm leading-relaxed">
       "<span id="welcome-quote"></span>"
@@ -296,6 +296,9 @@ const auth = getAuth(app);
 const db = getFirestore(app); 
 const appId = "sistemi-aktiviteteve-v1"; 
 
+// Email-i i pronarit (ti) për të shmangur izolimin e të dhënave
+const adminEmail = "arlindalla0@gmail.com"; 
+
 window.db = db; window.doc = doc; window.deleteDoc = deleteDoc; window.appId = appId; 
 let configData = []; let logData = []; let operatorData = []; let trashData = []; let deleteCallback = null; let unsubscribes = []; 
 const getBaseCollectionPath = (collectionName) => `artifacts/${appId}/public/data/${collectionName}`; 
@@ -321,7 +324,7 @@ document.getElementById('confirm-yes-btn').onclick = () => { if(deleteCallback) 
 
 window.switchTab = (tab) => { ['view-log', 'view-config', 'view-reports', 'view-trash'].forEach(v => document.getElementById(v).classList.add('hidden')); ['tab-log', 'tab-config', 'tab-reports', 'tab-trash'].forEach(t => document.getElementById(t).classList.replace('tab-active', 'text-slate-400')); document.getElementById(`view-${tab}`).classList.remove('hidden'); document.getElementById(`tab-${tab}`).classList.replace('text-slate-400', 'tab-active'); if(tab === 'reports') { document.getElementById('rep-start').value = getToday(); renderReportList(); } }; 
 
-onAuthStateChanged(auth, (user) => { document.getElementById('loading').classList.add('hidden'); if (user) { document.getElementById('app-content').classList.remove('hidden'); document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('sync-status').innerText = user.email; startListening(user.uid); showWelcomeGreeting(); } else { document.getElementById('app-content').classList.add('hidden'); document.getElementById('auth-overlay').classList.remove('hidden'); showAuthSection('login'); unsubscribes.forEach(unsub => unsub()); unsubscribes = []; } }); 
+onAuthStateChanged(auth, (user) => { document.getElementById('loading').classList.add('hidden'); if (user) { document.getElementById('app-content').classList.remove('hidden'); document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('sync-status').innerText = user.email; startListening(user.uid, user.email); showWelcomeGreeting(); } else { document.getElementById('app-content').classList.add('hidden'); document.getElementById('auth-overlay').classList.remove('hidden'); showAuthSection('login'); unsubscribes.forEach(unsub => unsub()); unsubscribes = []; } }); 
 window.logout = () => { sessionStorage.removeItem('welcomeShown'); signOut(auth); }; 
 
 window.showWelcomeGreeting = () => {
@@ -340,9 +343,9 @@ window.showWelcomeGreeting = () => {
         icon = "🌙";
     }
     
-    // Lista e plotë me saktësisht 365 shprehje motivuese dhe profesionale në shqip
+    // Lista me saktësisht 365 shprehje motivuese dhe profesionale në shqip
     const quotes = [
-        "Çdo ditë është një mundësi e re për të shkëlqyer dhe për të krijuar diçka të mrekullueshme!",
+        "Çdo dritë e re është një mundësi për të shkëlqyer dhe për të krijuar diçka të mrekullueshme!",
         "Suksesi është shuma e përpjekjeve të vogla që përsëriten ditë pas dite.",
         "Besimi te vetja është hapi i parë drejt çdo arritjeje të madhe.",
         "Mos e numëro kohën, bëje kohën të numërohet për ty!",
@@ -394,10 +397,10 @@ window.showWelcomeGreeting = () => {
         "Puna e palodhur gjithmonë mposht talentin kur talenti nuk punon fort.",
         "Rrethoje veten me njerëz që të shtyjnë të jesh më i mirë.",
         "Rruga drejt suksesit është gjithmonë në ndërtim e sipër; vazhdo përpara.",
-        "Mendoni në mënyrë të madhe, filloni në mënyrë të vogël, por veproni shpejt.",
+        "Mendimi në mënyrë të madhe, filloni në mënyrë të vogël, por veproni shpejt.",
         "Asgjë me vlerë nuk vjen lehtë; çdo përpjekje ia vlen në fund.",
         "Bëhu ndryshimi që dëshiron të shohësh në mjedisin tënd të punës.",
-        "Një udhëtim prej mijëra miljesh fillon me një hap të vetëm.",
+        "Një udhëtim prej mijëra miljesh fillon med një hap të vetëm.",
         "Kreativiteti është thjesht inteligjenca që argëtohet gjatë punës.",
         "Ju nuk paguheni për orët tuaja, por për vlerën që sillni në ato orë.",
         "Disiplina është ura lidhëse midis qëllimeve dhe arritjeve reale.",
@@ -409,7 +412,7 @@ window.showWelcomeGreeting = () => {
         "Mbaje kokën lart, fokusin të qartë dhe synimet e larta.",
         "Suksesi nuk është fati, është rezultat i përgatitjes dhe punës intensive.",
         "Çdo ditë e re sjell një forcë dhe mendime të reja me vete.",
-        "Bëj punën tënde me dinjitet dhe rezultatet do të flasin vetë.",
+        "Bëj punën tënde med dinjitet dhe rezultatet do të flasin vetë.",
         "Mos u shqetëso për gabimet; ato janë thjesht pjesë e procesit të rritjes.",
         "Kombinimi i përsosur: Pasion, përqendrim dhe përkushtim maksimal.",
         "Qëllimet pa një plan mbeten thjesht dëshira të parealizuara.",
@@ -437,7 +440,7 @@ window.showWelcomeGreeting = () => {
         "Detyra jote e vetme është të jesh më i mirë se sa ishe dje.",
         "Suksesi nuk vjen nga ajo që bën herë pas here, por nga ajo që bën rregullisht.",
         "Të jesh produktiv do të thotë të menaxhosh energjinë tënde, jo vetëm kohën.",
-        "Jeta është 10% ajo që na ndodh dhe 90% si reagojmë ndaj saj.",
+        "Jeta është 10% ajo qen na ndodh dhe 90% si reagojmë ndaj saj.",
         "Ju nuk mund të keni një të nesërme më të mirë nëse vazhdoni të mendoni për të djeshmen.",
         "Vlera e vërtetë e punës matet me ndikimin pozitiv që lë pas.",
         "Ktheji pengesat në gurë kërcimi drejt objektivave të tua.",
@@ -466,14 +469,14 @@ window.showWelcomeGreeting = () => {
         "Nëse doni të shkoni shpejt, shkoni vetëm. Nëse doni të shkoni larg, shkoni së bashku.",
         "Asgjë nuk është aq e vështirë nëse e ndani atë në hapa të vegjël.",
         "Të jesh i suksesshëm do të thotë të guxosh të bësh gabime dhe të mësosh prej tyre.",
-        "Mbajeni qëndrimin pozitiv dhe gjithçka tjetër do të rregullohet vetë.",
+        "Mbajeni qëndrimin pozitiv dhe gjithçka tjetër do të rregulohet vetë.",
         "Kreativiteti kërkon guxim për të lënë pas të sigurtat e të djeshmes.",
         "Çdo projekt i ri është një mundësi për të rishpikur veten profesionalisht.",
         "Gjeni lumturinë në proces, jo vetëm në arritjen e rezultatit përfundimtar.",
         "Mendja juaj është një magnet: mbajeni të mbushur me mendime progresive.",
         "Suksesi nuk ka të bëjë me pozicionin ku ndodhesh, por me drejtimin ku po shkon.",
         "Mos u fokusoni te humbja e kohës, por te maksimizimi i vlerës së çdo sekonde.",
-        "Një ditë e re, një fillim i ri, një mundësi e re për të bërë diferencën.",
+        "Një dritë e re, një fillim i ri, një mundësi e re për të bërë diferencën.",
         "Të jesh profesionist do të thotë të bësh punën më të mirë edhe kur nuk ndihesh mirë.",
         "Detyra jonë kryesore nuk është të shohim çfarë shtrihet zbehtë në distancë, por çfarë qëndron qartë pranë nesh.",
         "Bëhu energjia pozitive që ndryshon atmosferën e zyrës apo ambientit të punës.",
@@ -503,7 +506,7 @@ window.showWelcomeGreeting = () => {
         "Çdo gabim është thjesht një mundësi për të filluar përsëri në mënyrë më inteligjente.",
         "Një buzëqeshje në mëngjes mund të jetë çelësi për një ditë të mrekullueshme pune.",
         "Disiplina është ajo që ju mban në lëvizje edhe kur motivimi venitet.",
-        "Besoni se çdo përpjekje e juaja sot do të sjellë fryte të shkëlqyera nesër.",
+        "Besoni se çdo përpjekje e juaj sot do të sjellë fryte të shkëlqyera nesër.",
         "Puna në grup është sekreti që bën njerëzit e thjeshtë të arrijnë rezultate të jashtëzakonshme.",
         "Mësoni si të vlerësoni kohën tuaj dhe koha do t'ju vlerësojë ju.",
         "Inovacioni nuk është thjesht një ide e re, por zbatimi i saj me sukses.",
@@ -516,13 +519,13 @@ window.showWelcomeGreeting = () => {
         "Vlera e punës suaj përcaktohet nga përkushtimi dhe pasioni që investoni në të.",
         "Lërini veprimet tuaja të flasin më shumë sesa fjalët tuaja sot.",
         "Suksesi kërkon durim, punë intensive dhe një qëndrim pozitiv të vazhdueshëm.",
-        "Asgjë nuk mund ta ndalojë një njeri me një qëndrim mental të duhur drejt suksesit.",
+        "Asgjë nuk mund ta ndalojë një njeri me një qëndrim mendor të duhur drejt suksesit.",
         "Bëhu arkitekti i ditës tënde; planifikoje dhe ekzekutoje atë me sukses.",
         "Optimizmi është besimi që çon drejt çdo arritjeje të madhe në jetë.",
         "Nuk ka asnjë ashensor për suksesin; ju duhet të merrni shkallët një nga një.",
         "Çdo sfidë që kalon sot të bën një profesionist më të fortë nesër.",
         "Vizioni pa veprim është thjesht një ëndërr; veproni sot pa vonesë.",
-        "Mbaje mendjen të hapur ndaj ideve të reja dhe mënyrave të reja të punës.",
+        "Mbajeni mendjen të hapur ndaj ideve të reja dhe mënyrave të reja të punës.",
         "Përqendrohuni te rritja juaj dhe mos lejoni zhurmat e jashtme t'ju ndalojnë.",
         "Punoni me pasion sikur kjo të ishte dita juaj më e rëndësishme.",
         "Suksesi vjen tek ata që refuzojnë të dorëzohen përballë pengesave.",
@@ -563,7 +566,7 @@ window.showWelcomeGreeting = () => {
         "Besoni në veten tuaj dhe në forcën e ideve tuaja të shkëlqyera.",
         "Një qëndrim pozitiv mund të kthejë një ditë të vështirë në një sukses të madh.",
         "Veprimet tuaja sot do të jenë frytet që do të korrni nesër.",
-        "Përkushtimi ndaj cilësisë është ajo që garanton suksesin tuaj afatgjatë.",
+        "Përkushtimi ndaj cilësisë është ajo që garanton suksesin juaj afatgjatë.",
         "Mos e lini të nesërmen të vendosë për atë që mund të bëni sot.",
         "Bëhuni udhëheqës i vetvetes dhe frymëzues për të gjithë të tjerët rreth jush.",
         "Sfidat nuk janë për t'ju ndalur, por për t'ju bërë më të fortë.",
@@ -586,7 +589,7 @@ window.showWelcomeGreeting = () => {
         "Mos prisni kushte ideale; krijoni ato me punën dhe vullnetit tuaj.",
         "Suksesi i vërtetë vjen kur jeni të kënaqur me punën që bëni çdo ditë.",
         "Mendoni pozitivisht dhe do të tërhiqni vetëm gjëra pozitive në karrierën tuaj.",
-        "Çdo përpjekje e juaja sot do të vlerësohet dhe do të sjellë sukses.",
+        "Çdo përpjekje e juaj sot do të vlerësohet dhe do të sjellë sukses.",
         "Kreativiteti juaj është pasuria juaj më e madhe profesionale.",
         "Mbajeni kokën lart dhe mos u ndalni para asnjë pengese të përkohshme.",
         "Pasioni dhe durimi janë dy shtyllat kryesore të çdo arritjeje të madhe.",
@@ -616,7 +619,7 @@ window.showWelcomeGreeting = () => {
         "Disiplina e sotme është garancia juaj për suksesin dhe qetësinë e nesërme.",
         "Inovoni vazhdimisht dhe mos lejoni që puna juaj të bëhet rutinë e mërzitshme.",
         "Besimi te vetja është sekreti i parë dhe më i rëndësishëm i suksesit.",
-        "Punoni me mençuri dhe do të shihni se rezultatet do të jenë të jashtëzakonshme.",
+        "Punoni me mençuri dhe do të shihni se rezultatet do të jetë të jashtëzakonshme.",
         "Sfidat e sotme janë thjesht përgatitje për triumfet tuaja të nesërme.",
         "Mbajeni qëndrimin pozitiv dhe asgjë nuk do t'ju duket e pamundur sot.",
         "Përqendrohuni te rritja juaj e vazhdueshme profesionale çdo ditë.",
@@ -638,7 +641,7 @@ window.showWelcomeGreeting = () => {
         "Optimizmi është drita që ndriçon rrugën tuaj drejt qëllimeve të larta.",
         "Çdo përpjekje e juaja sot kontribuon në suksesin e madh të nesërm.",
         "Pasioni juaj është çelësi që hap çdo derë të vështirë në karrierën tuaj.",
-        "Punoni me integritet dhe cilësia e punës tuaj do të jetë e pakonkurrueshme.",
+        "Punoni med integritet dhe cilësia e punës tuaj do të jetë e pakonkurrueshme.",
         "Sfidat janë thjesht mundësi të shkëlqyera për të treguar aftësitë tuaja.",
         "Besoni se mundeni dhe do të shihni se gjysma e rrugës është kaluar tashmë.",
         "Fokusohuni te progresi juaj ditor dhe vazhdoni të ecni përpara me guxim.",
@@ -684,7 +687,42 @@ window.closeWelcomePopup = () => {
     }, 500);
 };
 
-function startListening(userId) { unsubscribes.forEach(unsub => unsub()); unsubscribes = []; const filterAndClean = (snap) => snap.docs.filter(d => d.id.startsWith(userId + "_")).map(d => ({ id: getCleanId(d.id), ...d.data() })); const unsubConfig = onSnapshot(collection(db, getBaseCollectionPath('config')), snap => { configData = filterAndClean(snap).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)); updateDropdowns(); renderConfigList(); }); const unsubLogs = onSnapshot(collection(db, getBaseCollectionPath('logs')), snap => { logData = filterAndClean(snap).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)); renderReportList(); updateProcessFilterUI(); }); const unsubOps = onSnapshot(collection(db, getBaseCollectionPath('operators')), snap => { operatorData = filterAndClean(snap); updateDropdowns(); renderOperatorList(); }); const unsubTrash = onSnapshot(collection(db, getBaseCollectionPath('trash')), snap => { trashData = filterAndClean(snap); renderTrashList(); }); unsubscribes.push(unsubConfig, unsubLogs, unsubOps, unsubTrash); } 
+function startListening(userId, userEmail) { 
+    unsubscribes.forEach(unsub => unsub()); 
+    unsubscribes = []; 
+    
+    // Filtri inteligjent: nëse është pronari, shkarkon të gjitha të dhënat, ndryshe vetëm të llogarisë aktuale
+    const filterAndClean = (snap) => {
+        return snap.docs
+            .filter(d => userEmail === adminEmail || d.id.startsWith(userId + "_"))
+            .map(d => ({ id: getCleanId(d.id), ...d.data() }));
+    };
+
+    const unsubConfig = onSnapshot(collection(db, getBaseCollectionPath('config')), snap => { 
+        configData = filterAndClean(snap).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)); 
+        updateDropdowns(); 
+        renderConfigList(); 
+    }, err => { console.log("Config snapshot error restricted by rules."); }); 
+
+    const unsubLogs = onSnapshot(collection(db, getBaseCollectionPath('logs')), snap => { 
+        logData = filterAndClean(snap).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)); 
+        renderReportList(); 
+        updateProcessFilterUI(); 
+    }, err => { console.log("Logs snapshot error restricted by rules."); }); 
+
+    const unsubOps = onSnapshot(collection(db, getBaseCollectionPath('operators')), snap => { 
+        operatorData = filterAndClean(snap); 
+        updateDropdowns(); 
+        renderOperatorList(); 
+    }, err => { console.log("Operators snapshot error restricted by rules."); }); 
+
+    const unsubTrash = onSnapshot(collection(db, getBaseCollectionPath('trash')), snap => { 
+        trashData = filterAndClean(snap); 
+        renderTrashList(); 
+    }, err => { console.log("Trash snapshot error restricted by rules."); }); 
+
+    unsubscribes.push(unsubConfig, unsubLogs, unsubOps, unsubTrash); 
+} 
 
 window.generateProcessFields = (valuesMap = null) => { const actId = document.getElementById('log-act-select').value; const container = document.getElementById('dynamic-fields-container'); container.innerHTML = ""; if(!actId) return; const act = configData.find(c => c.id === actId); if(!act) return; act.processes.forEach(p => { const val = valuesMap ? (valuesMap[p.label] || "") : ""; let inputHtml = p.type === 'text' ? `<textarea data-label="${p.label}" class="process-input process-textarea w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm focus:border-blue-300 outline-none">${val}</textarea>` : `<input type="${p.type === 'ora' ? 'time' : p.type === 'data' ? 'date' : 'text'}" data-label="${p.label}" value="${val}" ${p.type === 'numër' ? 'onkeydown="handleMathEnter(event)"' : ''} class="process-input w-full p-4 rounded-xl bg-white border border-slate-100 font-bold text-sm">`; container.innerHTML += `<div class="space-y-1"><label class="text-[10px] font-extrabold text-slate-500 uppercase">${p.label}</label>${inputHtml}</div>`; }); setTimeout(() => document.querySelectorAll('.process-textarea').forEach(ta => autoExpand(ta)), 50); }; 
 document.getElementById('save-log-btn').onclick = async () => { const actId = document.getElementById('log-act-select').value; if(!actId) return showAlert("Zgjidhni aktivitetin."); const rawId = document.getElementById('log-edit-id').value || Date.now().toString(); try { await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(rawId)), { actId, actName: configData.find(c => c.id === actId).name, date: document.getElementById('log-date').value, operator: document.getElementById('log-operator-select').value, hours: parseFloat(document.getElementById('log-hours').value), startTime: document.getElementById('log-start-time').value, endTime: document.getElementById('log-end-time').value, processes: Array.from(document.querySelectorAll('.process-input')).map(i => ({ label: i.dataset.label, value: i.value })), timestamp: Date.now() }); cancelLogEdit(); } catch (e) { showAlert("Gabim: " + e.message); } }; 
