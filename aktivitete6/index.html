@@ -18,6 +18,9 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 .logo-bg { transition: background-color 0.3s ease; } 
 .logo-container:hover .logo-bg { background-color: #2563eb; } 
 .process-textarea { resize: vertical; min-height: 52px; width: 100%; } 
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
 </style> 
 </head> 
 <body class="bg-[#f8fafc] min-h-screen pb-24 text-slate-900"> 
@@ -159,6 +162,9 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
                 <span id="session-hours" class="text-3xl font-black text-white tracking-tighter drop-shadow-md">0h 0m</span>
             </div>
             <span id="session-login-time" class="text-[11px] font-bold text-blue-100 opacity-80 border-t border-white/20 pt-2 w-full mt-1 block">Logimi i fundit: --:--</span>
+            <div id="session-history-container" class="w-full mt-3 text-[10px] bg-black/10 rounded-lg p-2 max-h-24 overflow-y-auto flex flex-col gap-1 custom-scrollbar">
+                <!-- Historia mbushet nga JS -->
+            </div>
         </div>
     </div>
 </div>
@@ -267,8 +273,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 <div class="bg-white rounded-[2rem] p-6 md:p-8 space-y-6 shadow-xl shadow-slate-200/40 border border-slate-100 hover:shadow-2xl transition-shadow"> 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> 
 <div class="grid grid-cols-2 gap-3"> 
-<input id="rep-start" type="date" class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60 font-bold text-[10px] focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"> 
-<input id="rep-end" type="date" class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60 font-bold text-[10px] focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"> 
+<input id="rep-start" type="date" onchange="validateReportDates()" class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60 font-bold text-[10px] focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"> 
+<input id="rep-end" type="date" onchange="validateReportDates()" class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60 font-bold text-[10px] focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"> 
 </div> 
 <div class="grid grid-cols-2 gap-3"> 
 <select id="rep-op-select" class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60 font-bold text-[10px] focus:ring-2 focus:ring-blue-500/20 outline-none transition-all appearance-none cursor-pointer"></select> 
@@ -364,10 +370,20 @@ const ALBANIAN_QUOTES = [
     "Ju jeni krijuesi i fatit tuaj.", "Çdo sfidë është një mundësi e fshehur.", "Kurrë nuk humbas. Unë ose fitoj ose mësoj.", "Vendosmëria sot çon në sukses nesër.", "Një buzëqeshje dhe vullneti i hekurt thyejnë çdo mur.", "Puna flet më shumë se fjalët.", "Kushtojini vëmendje detajeve, ato bëjnë diferencën.", "Një ditë pa mësuar diçka të re është një ditë e humbur.", "Mundësitë u shfaqen atyre që janë të përgatitur.", "Merrni rreziqe; nëse fitoni, do të jeni të lumtur; nëse humbni, do të jeni të mençur.",
     "Karakteri juaj formohet në momentet e vështirësisë.", "Mos lejoni mendjet e vogla t'ju bindin se ëndrrat tuaja janë shumë të mëdha.", "Përgjegjësia është çmimi i madhështisë.", "Çfarë nuk të vret, të bën më të fortë.", "Vërtetësia e suksesit qëndron në përkushtimin tuaj.", "E ardhmja u përket atyre që besojnë në bukurinë e ëndrrave të tyre.", "Fokusohu në zgjidhje, jo në problem.", "Mjafton një ide e vogël për të ndryshuar gjithçka.", "Koha juaj është e kufizuar, mos e harxhoni duke jetuar jetën e dikujt tjetër.", "Mos lejoni askënd t'ju thotë se çfarë mund dhe nuk mund të bëni.",
     "Fitorja më e madhe është të fitosh mbi veten tënde.", "Zgjidhni të jeni optimistë, ndihet më mirë.", "Mos prisni udhëheqës; bëjeni vetë, person pas personi.", "Kush nuk rrezikon asgjë, nuk ka asgjë.", "Në mes të çdo vështirësie fshihet mundësia.", "Një mijë fjalë nuk lënë të njëjtën mbresë si një veprim i vetëm.", "Mos kini frikë të hiqni dorë nga e mira për të shkuar te e shkëlqyera.", "Besimi është çelësi thelbësor i çdo arritjeje.", "Suksesi nuk ka sekrete; është rezultat i përgatitjes, punës së palodhur dhe mësimit nga dështimi.", "Gjithçka që mendja e njeriut mund të konceptojë dhe besojë, mund ta arrijë.",
-    "Mos e krahasoni veten me askënd tjetër përveç personit që ishit dje.", "Është gjithmonë herët për t'u dorëzuar.", "Suksesi është aftësia për të kaluar nga dështimi në dështim pa humbur entuziazmin.", "Ditët tuaja më të mira janë përpara, jo prapa jush.", "Ju jeni arkitekti i jetës suaj.", "Bëjeni punën tuaj me aq pasion sikur bota të varej prej saj.", "Një njeri me guxim përbën shumicën.", "Ndryshimi është i vetmi ligj i qëndrueshëm i jetës.", "Mendja është si një parashutë; funksionon vetëm kur është e hapur.", "Puna në heshtje lejon që suksesi të bëjë zhurmën."
+    "Mos e krahasoni veten me askënd tjetër përveç personit që ishit dje.", "Është gjithmonë herët për t'u dorëzuar.", "Suksesi është aftësia për të kaluar nga dështimi në dështim pa humbur entuziazmin.", "Ditët tuaja më të mira është përpara, jo prapa jush.", "Ju jeni arkitekti i jetës suaj.", "Bëjeni punën tuaj me aq pasion sikur bota të varej prej saj.", "Një njeri me guxim përbën shumicën.", "Ndryshimi është i vetmi ligj i qëndrueshëm i jetës.", "Mendja është si një parashutë; funksionon vetëm kur është e hapur.", "Puna në heshtje lejon që suksesi të bëjë zhurmën."
 ];
 
 let sessionInterval;
+
+window.validateReportDates = () => {
+    const start = document.getElementById('rep-start').value;
+    const end = document.getElementById('rep-end').value;
+    if (start && end && new Date(end) < new Date(start)) {
+        showAlert("Data pasardhëse nuk mund të jetë më e vogël se data paraardhëse.");
+        document.getElementById('rep-end').value = start;
+        updateProcessFilterUI();
+    }
+};
 
 window.handleCheckIn = async (user) => {
     const hour = new Date().getHours();
@@ -388,13 +404,17 @@ window.handleCheckIn = async (user) => {
 
         let checkInTime = Date.now();
         let totalBaseMin = 0;
+        let history = [];
 
         if (!sessionSnap.exists()) {
-            await setDoc(sessionRef, { date: today, userEmail: user.email, currentCheckIn: checkInTime, totalMinutes: 0 });
+            history = [{ in: checkInTime, out: null }];
+            await setDoc(sessionRef, { date: today, userEmail: user.email, currentCheckIn: checkInTime, totalMinutes: 0, history });
         } else {
             const data = sessionSnap.data();
+            history = data.history || [];
             if (!data.currentCheckIn) {
-                await setDoc(sessionRef, { ...data, currentCheckIn: checkInTime });
+                history.push({ in: checkInTime, out: null });
+                await setDoc(sessionRef, { ...data, currentCheckIn: checkInTime, history });
             } else {
                 checkInTime = data.currentCheckIn;
             }
@@ -414,7 +434,6 @@ window.handleCheckIn = async (user) => {
             const m = totalMinNow % 60;
             document.getElementById('session-hours').innerText = `${h}h ${m}m`;
             
-            // Azhurno listën live nëse tab-i i orarit është i hapur
             if (!document.getElementById('view-sessions').classList.contains('hidden')) {
                 renderSessionList();
             }
@@ -467,7 +486,11 @@ window.logout = async () => {
                 if (data.currentCheckIn) {
                     const sessionMins = Math.floor((Date.now() - data.currentCheckIn) / 60000);
                     const newTotal = (data.totalMinutes || 0) + sessionMins;
-                    await setDoc(sessionRef, { ...data, totalMinutes: newTotal, currentCheckIn: null });
+                    let history = data.history || [];
+                    if (history.length > 0 && history[history.length - 1].out === null) {
+                        history[history.length - 1].out = Date.now();
+                    }
+                    await setDoc(sessionRef, { ...data, totalMinutes: newTotal, currentCheckIn: null, history });
                 }
             }
         } catch(e) {
@@ -487,11 +510,24 @@ function startListening(userId) {
     const unsubOps = onSnapshot(collection(db, getBaseCollectionPath('operators')), snap => { operatorData = filterAndClean(snap); updateDropdowns(); renderOperatorList(); }); 
     const unsubTrash = onSnapshot(collection(db, getBaseCollectionPath('trash')), snap => { trashData = filterAndClean(snap); renderTrashList(); }); 
     
-    // Lista e re për Orarin e Punës
     const unsubSessions = onSnapshot(collection(db, getBaseCollectionPath('work_sessions')), snap => { 
         sessionData = filterAndClean(snap).sort((a,b) => new Date(b.date) - new Date(a.date)); 
         if(!document.getElementById('view-sessions').classList.contains('hidden')) {
             renderSessionList();
+        }
+        
+        const todayStr = getToday();
+        const todaySession = sessionData.find(s => s.date === todayStr);
+        if (todaySession && todaySession.history) {
+            const historyHtml = todaySession.history.map(h => {
+                const inTime = new Date(h.in).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
+                const outTime = h.out ? new Date(h.out).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}) : '<span class="animate-pulse text-emerald-400">Aktiv</span>';
+                return `<div class="flex justify-between border-b border-white/10 py-1.5 last:border-0"><span class="text-blue-100">In: ${inTime}</span><span class="text-cyan-200 font-bold">Out: ${outTime}</span></div>`;
+            }).join('');
+            const container = document.getElementById('session-history-container');
+            if(container) {
+                container.innerHTML = historyHtml;
+            }
         }
     });
 
@@ -601,38 +637,75 @@ window.editProcessInline = async (logId, label) => {
     }
 };
 
+window.generateLogItemHtml = (log) => {
+    return ` <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"> 
+                <div class="flex justify-between items-start"> 
+                    <div>
+                        <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg uppercase tracking-wider">${log.actName}</span>
+                        <h4 class="font-bold text-slate-800 text-sm mt-2">${log.operator}</h4>
+                        <div class="mt-2 text-[10px] font-bold text-slate-500 flex flex-wrap gap-2">
+                            <span class="bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-md cursor-pointer hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all shadow-sm" onclick="editLogDateInline('${log.id}')" title="Kliko për të edituar datën">📅 ${log.date}</span>
+                            <span class="bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-md cursor-pointer hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all shadow-sm" onclick="editLogTimeInline('${log.id}')" title="Kliko për të edituar orarin">⏰ ${log.startTime || '--:--'} - ${log.endTime || '--:--'} (${log.hours} orë)</span>
+                        </div>
+                    </div> 
+                    <div class="flex gap-2 opacity-80 group-hover:opacity-100 transition-opacity"> 
+                        <button onclick="duplicateLogEntry('${log.id}')" class="text-emerald-600 text-[10px] font-bold uppercase bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors" title="Shto një aktivitet të ngjashëm">Kopjo</button> 
+                        <button onclick="editLogEntry('${log.id}')" class="text-blue-600 text-[10px] font-bold uppercase bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">Edito</button> 
+                        <button onclick="deleteItem('logs', '${log.id}')" class="text-red-500 text-[10px] font-bold uppercase bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors">Fshi</button> 
+                    </div> 
+                </div> 
+                <div class="grid grid-cols-1 gap-2 border-t border-slate-100 pt-4 mt-4">${log.processes.map(p => `<div class="text-[11px] p-2.5 -m-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-200 transition-all" onclick="editProcessInline('${log.id}', '${p.label.replace(/'/g, "\\'")}')" title="Kliko për të edituar vlerën"><b class="text-slate-400 uppercase text-[9px] tracking-wider">${p.label}:</b><br><span class="text-slate-700 font-semibold">${p.value}</span></div>`).join("")}</div> 
+              </div>`;
+};
+
 window.renderReportList = () => { 
     const logs = getFilteredLogs(); 
     let html = ""; 
-    let lastDate = ""; 
-    logs.forEach(log => { 
-        if (log.date !== lastDate) { 
-            html += `<div class="text-center my-6 font-black text-slate-400 uppercase tracking-widest text-sm py-2 flex items-center gap-4"><div class="flex-1 h-px bg-slate-200"></div><span>${log.date}</span><div class="flex-1 h-px bg-slate-200"></div></div>`; 
-            lastDate = log.date; 
-        } 
-        html += ` <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"> 
-                    <div class="flex justify-between items-start"> 
-                        <div>
-                            <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg uppercase tracking-wider">${log.actName}</span>
-                            <h4 class="font-bold text-slate-800 text-sm mt-2">${log.operator}</h4>
-                            <div class="mt-2 text-[10px] font-bold text-slate-500 flex flex-wrap gap-2">
-                                <span class="bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-md cursor-pointer hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all shadow-sm" onclick="editLogDateInline('${log.id}')" title="Kliko për të edituar datën">📅 ${log.date}</span>
-                                <span class="bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-md cursor-pointer hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all shadow-sm" onclick="editLogTimeInline('${log.id}')" title="Kliko për të edituar orarin">⏰ ${log.startTime || '--:--'} - ${log.endTime || '--:--'} (${log.hours} orë)</span>
-                            </div>
-                        </div> 
-                        <div class="flex gap-2 opacity-80 group-hover:opacity-100 transition-opacity"> 
-                            <button onclick="duplicateLogEntry('${log.id}')" class="text-emerald-600 text-[10px] font-bold uppercase bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors" title="Shto një aktivitet të ngjashëm">Kopjo</button> 
-                            <button onclick="editLogEntry('${log.id}')" class="text-blue-600 text-[10px] font-bold uppercase bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">Edito</button> 
-                            <button onclick="deleteItem('logs', '${log.id}')" class="text-red-500 text-[10px] font-bold uppercase bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors">Fshi</button> 
-                        </div> 
-                    </div> 
-                    <div class="grid grid-cols-1 gap-2 border-t border-slate-100 pt-4 mt-4">${log.processes.map(p => `<div class="text-[11px] p-2.5 -m-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-200 transition-all" onclick="editProcessInline('${log.id}', '${p.label.replace(/'/g, "\\'")}')" title="Kliko për të edituar vlerën"><b class="text-slate-400 uppercase text-[9px] tracking-wider">${p.label}:</b><br><span class="text-slate-700 font-semibold">${p.value}</span></div>`).join("")}</div> 
-                  </div>`; 
-    }); 
+    const start = document.getElementById('rep-start').value; 
+    const end = document.getElementById('rep-end').value; 
+
+    if (start && end) {
+        let currDate = new Date(start);
+        const endDate = new Date(end);
+        let dateRange = [];
+        while (currDate <= endDate) {
+            dateRange.push(currDate.toISOString().split('T')[0]);
+            currDate.setDate(currDate.getDate() + 1);
+        }
+        dateRange.sort((a, b) => new Date(b) - new Date(a));
+
+        dateRange.forEach(dateStr => {
+            const logsForDate = logs.filter(l => l.date === dateStr);
+            html += `<div class="text-center my-6 font-black text-slate-400 uppercase tracking-widest text-sm py-2 flex items-center gap-4"><div class="flex-1 h-px bg-slate-200"></div><span>${dateStr}</span><div class="flex-1 h-px bg-slate-200"></div></div>`;
+            if (logsForDate.length === 0) {
+                html += `<div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm text-center"><p class="text-slate-400 font-bold text-sm">Nuk ka aktivitet për këtë datë</p></div>`;
+            } else {
+                logsForDate.forEach(log => {
+                    html += generateLogItemHtml(log);
+                });
+            }
+        });
+    } else {
+        let lastDate = ""; 
+        logs.forEach(log => { 
+            if (log.date !== lastDate) { 
+                html += `<div class="text-center my-6 font-black text-slate-400 uppercase tracking-widest text-sm py-2 flex items-center gap-4"><div class="flex-1 h-px bg-slate-200"></div><span>${log.date}</span><div class="flex-1 h-px bg-slate-200"></div></div>`; 
+                lastDate = log.date; 
+            } 
+            html += generateLogItemHtml(log);
+        }); 
+
+        if(logs.length === 0 && (start || end)) {
+            const d = start || end;
+            html += `<div class="text-center my-6 font-black text-slate-400 uppercase tracking-widest text-sm py-2 flex items-center gap-4"><div class="flex-1 h-px bg-slate-200"></div><span>${d}</span><div class="flex-1 h-px bg-slate-200"></div></div>`;
+            html += `<div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm text-center"><p class="text-slate-400 font-bold text-sm">Nuk ka aktivitet</p></div>`;
+        } else if(logs.length === 0) {
+            html += `<div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm text-center"><p class="text-slate-400 font-bold text-sm">Nuk ka rezultate</p></div>`;
+        }
+    }
     document.getElementById('report-results').innerHTML = html; 
 }; 
 
-// Funksioni për të afishuar evidencën e orarit
 window.renderSessionList = () => {
     if(sessionData.length === 0) {
         document.getElementById('sessions-results').innerHTML = '<p class="text-center text-slate-500 font-bold text-sm py-10">Nuk ka të dhëna për orarin tuaj të punës ende.</p>';
@@ -670,7 +743,6 @@ window.renderSessionList = () => {
     document.getElementById('sessions-results').innerHTML = html;
 };
 
-// Eksporti në Excel për Evidencën e Orarit
 window.exportSessionsExcel = () => {
     let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">`;
     html += `<head><meta charset="utf-8"></head><body>`;
@@ -678,7 +750,7 @@ window.exportSessionsExcel = () => {
     html += `<table border="1" style="border-collapse:collapse; font-family: sans-serif; font-size: 12px; margin-bottom: 20px;">`;
     
     html += `<tr style="background-color: #3b82f6; color: white; font-weight: bold; height: 35px;">`;
-    html += `<th style="padding: 8px;">Data</th><th style="padding: 8px;">Përdoruesi</th><th style="padding: 8px;">Totali Orëve</th><th style="padding: 8px;">Statusi</th></tr>`;
+    html += `<th style="padding: 8px;">Data</th><th style="padding: 8px;">Përdoruesi</th><th style="padding: 8px;">Totali Orëve</th><th style="padding: 8px;">Statusi</th><th style="padding: 8px;">Intervalet (Hyrje - Dalje)</th></tr>`;
 
     sessionData.forEach(s => {
         let currentMins = s.totalMinutes || 0;
@@ -692,11 +764,21 @@ window.exportSessionsExcel = () => {
         const h = Math.floor(currentMins / 60);
         const m = currentMins % 60;
 
+        let intervalsText = "-";
+        if (s.history && s.history.length > 0) {
+            intervalsText = s.history.map(hist => {
+                const inTime = new Date(hist.in).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
+                const outTime = hist.out ? new Date(hist.out).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}) : 'Aktiv';
+                return `H: ${inTime} - D: ${outTime}`;
+            }).join(" | ");
+        }
+
         html += `<tr style="height: 30px;">`;
         html += `<td style="padding: 8px; text-align: center; font-weight: bold;">${s.date}</td>`;
         html += `<td style="padding: 8px;">${s.userEmail}</td>`;
         html += `<td style="padding: 8px; text-align: center; font-weight: bold;">${h}h ${m}m</td>`;
         html += `<td style="padding: 8px; text-align: center; color: ${status === 'Aktiv' ? 'green' : 'gray'};">${status}</td>`;
+        html += `<td style="padding: 8px; text-align: left; font-size: 11px;">${intervalsText}</td>`;
         html += `</tr>`;
     });
 
