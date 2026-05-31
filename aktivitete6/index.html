@@ -287,10 +287,19 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 <button onclick="clearFilters()" class="bg-amber-500 hover:bg-amber-600 text-white p-4 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all active:scale-95">Pastro Filtrat</button> 
 </div> 
 
-<!-- Paneli për zgjedhjen e fushave që do printohen -->
-<div id="print-columns-container" class="hidden mt-2 mb-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-    <h3 class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest mb-3">Përzgjidh fushat për printim (PDF / Excel)</h3>
-    <div id="print-columns-list" class="flex flex-wrap gap-2"></div>
+<!-- Paneli për zgjedhjen e fushave që do printohen (Tani Expand/Collapse) -->
+<div id="print-columns-container" class="hidden mt-2 mb-2 bg-blue-50/50 rounded-xl border border-blue-100 overflow-hidden">
+    <div class="p-3 cursor-pointer flex justify-between items-center hover:bg-blue-100/50 transition-colors" onclick="togglePrintColumns()">
+        <h3 class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest">Përzgjidh fushat për printim (PDF / Excel)</h3>
+        <svg id="print-columns-chevron" class="w-4 h-4 text-blue-600 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+    </div>
+    <div id="print-columns-content" class="p-4 pt-2 hidden border-t border-blue-100/50">
+        <div class="flex flex-wrap gap-2 mb-3 pb-3 border-b border-blue-100/50">
+            <button onclick="toggleAllPrintColumns(true)" class="text-[9px] font-extrabold bg-blue-600 text-white px-3 py-1.5 rounded-lg shadow-sm hover:bg-blue-700 transition-colors uppercase tracking-wider">Ndez Të Gjitha</button>
+            <button onclick="toggleAllPrintColumns(false)" class="text-[9px] font-extrabold bg-slate-500 text-white px-3 py-1.5 rounded-lg shadow-sm hover:bg-slate-600 transition-colors uppercase tracking-wider">Fik Të Gjitha</button>
+        </div>
+        <div id="print-columns-list" class="flex flex-wrap gap-2"></div>
+    </div>
 </div>
 
 <div class="grid grid-cols-2 gap-3"> 
@@ -571,7 +580,25 @@ window.restoreItem = async (id, originalCollection) => { try { const secureId = 
 
 window.clearFilters = () => { document.getElementById('rep-start').value = ''; document.getElementById('rep-end').value = ''; document.getElementById('rep-op-select').value = ''; document.getElementById('rep-act-select').value = ''; updateProcessFilterUI(); renderReportList(); }; 
 
-// NDRYSHIM: Zgjedhja dinamike e kolonave për printim (Edhe kur janë "Të gjitha" aktivitetet)
+// JS Logjika për Panelin e Fushave Printimit
+window.togglePrintColumns = () => {
+    const content = document.getElementById('print-columns-content');
+    const chevron = document.getElementById('print-columns-chevron');
+    content.classList.toggle('hidden');
+    chevron.classList.toggle('rotate-180');
+};
+
+window.toggleAllPrintColumns = (state) => {
+    document.querySelectorAll('.print-col-cbx').forEach(cb => cb.checked = state);
+};
+
+// Funksion i ri për të sinkronizuar checkboxet me të njëjtin emër tek panelet e ndryshme
+window.syncCheckboxes = (el) => {
+    document.querySelectorAll('.print-col-cbx').forEach(cb => {
+        if(cb.value === el.value) cb.checked = el.checked;
+    });
+};
+
 window.updateProcessFilterUI = () => { 
     const actId = document.getElementById('rep-act-select').value; 
     const filterContainer = document.getElementById('rep-dynamic-filters'); 
@@ -592,37 +619,54 @@ window.updateProcessFilterUI = () => {
         }
     }
 
-    // Checkboxes per Printim tregohen gjithmone
+    // Checkboxes per Printim tregohen gjithmone te ndara sipas aktivitetit
     if(printPanel) {
         printPanel.classList.remove('hidden');
         let colsHtml = `
-            <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
-                <input type="checkbox" class="print-col-cbx accent-blue-600" value="Data" checked> Data
-            </label>
-            <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
-                <input type="checkbox" class="print-col-cbx accent-blue-600" value="Eksperti" checked> Eksperti
-            </label>
-            <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
-                <input type="checkbox" class="print-col-cbx accent-blue-600" value="Orë" checked> Orë
-            </label>
+            <div class="w-full mb-3">
+                <h4 class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-2 pb-1 border-b border-blue-100/50">Të Përgjithshme</h4>
+                <div class="flex flex-wrap gap-2">
+                    <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
+                        <input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="Data" checked> Data
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
+                        <input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="Eksperti" checked> Eksperti
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
+                        <input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="Orë" checked> Orë
+                    </label>
+                </div>
+            </div>
         `;
         
-        let processLabels = new Set();
         if (act) {
-            if(act.processes) act.processes.forEach(p => processLabels.add(p.label));
+            if(act.processes && act.processes.length > 0) {
+                colsHtml += `<div class="w-full mb-3"><h4 class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest mb-2 pb-1 border-b border-blue-100/50">${act.name}</h4><div class="flex flex-wrap gap-2">`;
+                let printedThisAct = new Set();
+                act.processes.forEach(p => {
+                    if(!printedThisAct.has(p.label)) {
+                        printedThisAct.add(p.label);
+                        colsHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"><input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="${p.label}" checked> ${p.label}</label>`;
+                    }
+                });
+                colsHtml += `</div></div>`;
+            }
         } else {
-            // Mbledhim te gjitha proceset nga te gjitha aktivitetet
             configData.forEach(c => {
-                if(c.processes) c.processes.forEach(p => processLabels.add(p.label));
+                if(c.processes && c.processes.length > 0) {
+                    colsHtml += `<div class="w-full mb-3"><h4 class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest mb-2 pb-1 border-b border-blue-100/50">${c.name}</h4><div class="flex flex-wrap gap-2">`;
+                    let printedThisAct = new Set();
+                    c.processes.forEach(p => {
+                        if(!printedThisAct.has(p.label)) {
+                            printedThisAct.add(p.label);
+                            colsHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"><input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="${p.label}" checked> ${p.label}</label>`;
+                        }
+                    });
+                    colsHtml += `</div></div>`;
+                }
             });
         }
 
-        processLabels.forEach(label => {
-            colsHtml += `
-            <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
-                <input type="checkbox" class="print-col-cbx accent-blue-600" value="${label}" checked> ${label}
-            </label>`;
-        });
         printList.innerHTML = colsHtml;
     }
 }; 
@@ -804,7 +848,6 @@ window.renderSessionList = () => {
     document.getElementById('sessions-results').innerHTML = html;
 };
 
-// NDRYSHIM: Itinerari shtohet në kolonën e Excel-it
 window.exportSessionsExcel = () => {
     let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">`;
     html += `<head><meta charset="utf-8"></head><body>`;
