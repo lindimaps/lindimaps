@@ -286,6 +286,14 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 <button onclick="renderReportList()" class="bg-slate-900 hover:bg-black text-white p-4 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-slate-900/20 transition-all active:scale-95">Filtro</button> 
 <button onclick="clearFilters()" class="bg-amber-500 hover:bg-amber-600 text-white p-4 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all active:scale-95">Pastro Filtrat</button> 
 </div> 
+
+<!-- SHTESA: Paneli për zgjedhjen e fushave që do printohen -->
+<div id="print-columns-container" class="hidden mt-2 mb-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+    <h3 class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest mb-3">Përzgjidh fushat për printim (PDF / Excel)</h3>
+    <div id="print-columns-list" class="flex flex-wrap gap-2"></div>
+</div>
+<!-- /SHTESA -->
+
 <div class="grid grid-cols-2 gap-3"> 
 <button onclick="exportToPDF()" class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-500/30 transition-all active:scale-95">Shkarko PDF</button> 
 <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/30 transition-all active:scale-95">Shkarko Excel</button> 
@@ -370,7 +378,7 @@ const ALBANIAN_QUOTES = [
     "Ju jeni krijuesi i fatit tuaj.", "Çdo sfidë është një mundësi e fshehur.", "Kurrë nuk humbas. Unë ose fitoj ose mësoj.", "Vendosmëria sot çon në sukses nesër.", "Një buzëqeshje dhe vullneti i hekurt thyejnë çdo mur.", "Puna flet më shumë se fjalët.", "Kushtojini vëmendje detajeve, ato bëjnë diferencën.", "Një ditë pa mësuar diçka të re është një ditë e humbur.", "Mundësitë u shfaqen atyre që janë të përgatitur.", "Merrni rreziqe; nëse fitoni, do të jeni të lumtur; nëse humbni, do të jeni të mençur.",
     "Karakteri juaj formohet në momentet e vështirësisë.", "Mos lejoni mendjet e vogla t'ju bindin se ëndrrat tuaja janë shumë të mëdha.", "Përgjegjësia është çmimi i madhështisë.", "Çfarë nuk të vret, të bën më të fortë.", "Vërtetësia e suksesit qëndron në përkushtimin tuaj.", "E ardhmja u përket atyre që besojnë në bukurinë e ëndrrave të tyre.", "Fokusohu në zgjidhje, jo në problem.", "Mjafton një ide e vogël për të ndryshuar gjithçka.", "Koha juaj është e kufizuar, mos e harxhoni duke jetuar jetën e dikujt tjetër.", "Mos lejoni askënd t'ju thotë se çfarë mund dhe nuk mund të bëni.",
     "Fitorja më e madhe është të fitosh mbi veten tënde.", "Zgjidhni të jeni optimistë, ndihet më mirë.", "Mos prisni udhëheqës; bëjeni vetë, person pas personi.", "Kush nuk rrezikon asgjë, nuk ka asgjë.", "Në mes të çdo vështirësie fshihet mundësia.", "Një mijë fjalë nuk lënë të njëjtën mbresë si një veprim i vetëm.", "Mos kini frikë të hiqni dorë nga e mira për të shkuar te e shkëlqyera.", "Besimi është çelësi thelbësor i çdo arritjeje.", "Suksesi nuk ka sekrete; është rezultat i përgatitjes, punës së palodhur dhe mësimit nga dështimi.", "Gjithçka që mendja e njeriut mund të konceptojë dhe besojë, mund ta arrijë.",
-    "Mos e krahasoni veten me askënd tjetër përveç personit që ishit dje.", "Është gjithmonë herët për t'u dorëzuar.", "Suksesi është aftësia për të kaluar nga dështimi në dështim pa humbur entuziazmin.", "Ditët tuaja më të mira është përpara, jo prapa jush.", "Ju jeni arkitekti i jetës suaj.", "Bëjeni punën tuaj me aq pasion sikur bota të varej prej saj.", "Një njeri me guxim përbën shumicën.", "Ndryshimi është i vetmi ligj i qëndrueshëm i jetës.", "Mendja është si një parashutë; funksionon vetëm kur është e hapur.", "Puna në heshtje lejon që suksesi të bëjë zhurmën."
+    "Mos e krahasoni veten me askënd tjetër përveç personit që ishit dje.", "Është gjithmonë herët për t'u dorëzuar.", "Suksesi është aftësia për të kaluar nga dështimi në dështim pa humbur entuziazmin.", "Ditët tuaja më të mira janë përpara, jo prapa jush.", "Ju jeni arkitekti i jetës suaj.", "Bëjeni punën tuaj me aq pasion sikur bota të varej prej saj.", "Një njeri me guxim përbën shumicën.", "Ndryshimi është i vetmi ligj i qëndrueshëm i jetës.", "Mendja është si një parashutë; funksionon vetëm kur është e hapur.", "Puna në heshtje lejon që suksesi të bëjë zhurmën."
 ];
 
 let sessionInterval;
@@ -564,7 +572,52 @@ window.deleteItem = async (col, id) => { askConfirm("Fshije këtë element?", as
 window.restoreItem = async (id, originalCollection) => { try { const secureId = getSecureId(id); const trashRef = doc(db, getBaseCollectionPath('trash'), secureId); const docSnap = await getDoc(trashRef); if(docSnap.exists()){ const data = docSnap.data(); const { originalCollection: _, deletedAt: __, ...cleanData } = data; await setDoc(doc(db, getBaseCollectionPath(originalCollection), secureId), cleanData); await deleteDoc(trashRef); } } catch(e) { showAlert("Gabim: " + e.message); } }; 
 
 window.clearFilters = () => { document.getElementById('rep-start').value = ''; document.getElementById('rep-end').value = ''; document.getElementById('rep-op-select').value = ''; document.getElementById('rep-act-select').value = ''; updateProcessFilterUI(); renderReportList(); }; 
-window.updateProcessFilterUI = () => { const actId = document.getElementById('rep-act-select').value; const filterContainer = document.getElementById('rep-dynamic-filters'); filterContainer.innerHTML = ""; if(!actId) return; const act = configData.find(c => c.id === actId); if(!act) return; act.processes.forEach(p => { const vals = [...new Set(logData.filter(l => l.actId === actId).flatMap(l => l.processes).filter(proc => proc.label === p.label).map(proc => proc.value).filter(v => v))].sort(); filterContainer.innerHTML += `<div class="flex flex-col"><label class="text-[8px] font-bold text-slate-400 uppercase ml-1">${p.label}</label><select data-filter-label="${p.label}" class="rep-proc-filter p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-[10px] font-bold appearance-none cursor-pointer"><option value="">Të gjitha</option>${vals.map(v => `<option value="${v}">${v}</option>`).join("")}</select></div>`; }); }; 
+
+window.updateProcessFilterUI = () => { 
+    const actId = document.getElementById('rep-act-select').value; 
+    const filterContainer = document.getElementById('rep-dynamic-filters'); 
+    filterContainer.innerHTML = ""; 
+    
+    const printPanel = document.getElementById('print-columns-container');
+    const printList = document.getElementById('print-columns-list');
+
+    if(!actId) {
+        if(printPanel) printPanel.classList.add('hidden');
+        return; 
+    }
+
+    const act = configData.find(c => c.id === actId); 
+    if(!act) return; 
+
+    // Ndërtimi i filtrave normalë
+    act.processes.forEach(p => { 
+        const vals = [...new Set(logData.filter(l => l.actId === actId).flatMap(l => l.processes).filter(proc => proc.label === p.label).map(proc => proc.value).filter(v => v))].sort(); 
+        filterContainer.innerHTML += `<div class="flex flex-col"><label class="text-[8px] font-bold text-slate-400 uppercase ml-1">${p.label}</label><select data-filter-label="${p.label}" class="rep-proc-filter p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-[10px] font-bold appearance-none cursor-pointer"><option value="">Të gjitha</option>${vals.map(v => `<option value="${v}">${v}</option>`).join("")}</select></div>`; 
+    }); 
+
+    // Ndërtimi i checkboxes për Printim
+    if(printPanel) {
+        printPanel.classList.remove('hidden');
+        let colsHtml = `
+            <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
+                <input type="checkbox" class="print-col-cbx accent-blue-600" value="Data" checked> Data
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
+                <input type="checkbox" class="print-col-cbx accent-blue-600" value="Eksperti" checked> Eksperti
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
+                <input type="checkbox" class="print-col-cbx accent-blue-600" value="Orë" checked> Orë
+            </label>
+        `;
+        act.processes.forEach(p => {
+            colsHtml += `
+            <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
+                <input type="checkbox" class="print-col-cbx accent-blue-600" value="${p.label}" checked> ${p.label}
+            </label>`;
+        });
+        printList.innerHTML = colsHtml;
+    }
+}; 
 
 window.getFilteredLogs = () => { 
     const start = document.getElementById('rep-start').value; 
@@ -750,7 +803,7 @@ window.exportSessionsExcel = () => {
     html += `<table border="1" style="border-collapse:collapse; font-family: sans-serif; font-size: 12px; margin-bottom: 20px;">`;
     
     html += `<tr style="background-color: #3b82f6; color: white; font-weight: bold; height: 35px;">`;
-    html += `<th style="padding: 8px;">Data</th><th style="padding: 8px;">Përdoruesi</th><th style="padding: 8px;">Totali Orëve</th><th style="padding: 8px;">Statusi</th><th style="padding: 8px;">Intervalet (Hyrje - Dalje)</th></tr>`;
+    html += `<th style="padding: 8px;">Data</th><th style="padding: 8px;">Përdoruesi</th><th style="padding: 8px;">Totali Orëve</th><th style="padding: 8px;">Statusi</th></tr>`;
 
     sessionData.forEach(s => {
         let currentMins = s.totalMinutes || 0;
@@ -764,21 +817,11 @@ window.exportSessionsExcel = () => {
         const h = Math.floor(currentMins / 60);
         const m = currentMins % 60;
 
-        let intervalsText = "-";
-        if (s.history && s.history.length > 0) {
-            intervalsText = s.history.map(hist => {
-                const inTime = new Date(hist.in).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
-                const outTime = hist.out ? new Date(hist.out).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}) : 'Aktiv';
-                return `H: ${inTime} - D: ${outTime}`;
-            }).join(" | ");
-        }
-
         html += `<tr style="height: 30px;">`;
         html += `<td style="padding: 8px; text-align: center; font-weight: bold;">${s.date}</td>`;
         html += `<td style="padding: 8px;">${s.userEmail}</td>`;
         html += `<td style="padding: 8px; text-align: center; font-weight: bold;">${h}h ${m}m</td>`;
         html += `<td style="padding: 8px; text-align: center; color: ${status === 'Aktiv' ? 'green' : 'gray'};">${status}</td>`;
-        html += `<td style="padding: 8px; text-align: left; font-size: 11px;">${intervalsText}</td>`;
         html += `</tr>`;
     });
 
@@ -793,47 +836,118 @@ window.exportSessionsExcel = () => {
     URL.revokeObjectURL(url);
 };
 
-window.exportToPDF = () => { const { jsPDF } = window.jspdf; const docPDF = new jsPDF('l', 'mm', 'a4'); const filtered = getFilteredLogs(); const actId = document.getElementById('rep-act-select').value; const activities = actId ? [configData.find(c => c.id === actId)] : configData; let startY = 15; let hasAddedTable = false; activities.forEach(act => { if(!act) return; const actLogs = filtered.filter(l => l.actId === act.id); if(actLogs.length === 0) return; if (hasAddedTable) { docPDF.addPage(); startY = 15; } docPDF.setFontSize(14); docPDF.text(`Aktiviteti: ${act.name}`, 14, startY); const headers = [['Data', 'Eksperti', 'Orë', ...act.processes.map(p => p.label)]]; const body = actLogs.map(l => [l.date, l.operator, l.hours, ...act.processes.map(p => l.processes.find(pr => pr.label === p.label)?.value || '-')]); docPDF.autoTable({ startY: startY + 5, head: headers, body: body, theme: 'striped', styles: { fontSize: 8 }, headStyles: { fillColor: [59, 130, 246] } }); startY = docPDF.lastAutoTable.finalY + 15; hasAddedTable = true; }); docPDF.save(`Raport_LindiMaps_${new Date().getTime()}.pdf`); }; 
+window.exportToPDF = () => { 
+    const { jsPDF } = window.jspdf; 
+    const docPDF = new jsPDF('l', 'mm', 'a4'); 
+    const filtered = getFilteredLogs(); 
+    const actId = document.getElementById('rep-act-select').value; 
+    const activities = actId ? [configData.find(c => c.id === actId)] : configData; 
+    
+    let activeCols = null;
+    const printContainer = document.getElementById('print-columns-container');
+    if (actId && printContainer && !printContainer.classList.contains('hidden')) {
+        const cbx = document.querySelectorAll('.print-col-cbx:checked');
+        activeCols = Array.from(cbx).map(c => c.value);
+        if(activeCols.length === 0) {
+            showAlert("Ju lutem zgjidhni të paktën një fushë për printim.");
+            return;
+        }
+    }
+
+    let startY = 15; 
+    let hasAddedTable = false; 
+    activities.forEach(act => { 
+        if(!act) return; 
+        const actLogs = filtered.filter(l => l.actId === act.id); 
+        if(actLogs.length === 0) return; 
+        if (hasAddedTable) { docPDF.addPage(); startY = 15; } 
+        docPDF.setFontSize(14); 
+        docPDF.text(`Aktiviteti: ${act.name}`, 14, startY); 
+        
+        let allHeaders = ['Data', 'Eksperti', 'Orë', ...act.processes.map(p => p.label)];
+        let finalHeaders = activeCols ? allHeaders.filter(h => activeCols.includes(h)) : allHeaders;
+        const headers = [finalHeaders]; 
+        
+        const body = actLogs.map(l => {
+            const rowData = { 'Data': l.date, 'Eksperti': l.operator, 'Orë': l.hours };
+            act.processes.forEach(p => {
+                rowData[p.label] = l.processes.find(pr => pr.label === p.label)?.value || '-';
+            });
+            return finalHeaders.map(h => rowData[h]);
+        });
+        
+        docPDF.autoTable({ startY: startY + 5, head: headers, body: body, theme: 'striped', styles: { fontSize: 8 }, headStyles: { fillColor: [59, 130, 246] } }); 
+        startY = docPDF.lastAutoTable.finalY + 15; hasAddedTable = true; 
+    }); 
+    
+    if(!hasAddedTable) {
+        showAlert("Nuk ka të dhëna për tu printuar.");
+        return;
+    }
+    
+    docPDF.save(`Raport_LindiMaps_${new Date().getTime()}.pdf`); 
+}; 
 
 window.exportToExcel = () => {
     const filtered = getFilteredLogs();
     const actId = document.getElementById('rep-act-select').value;
     const activities = actId ? [configData.find(c => c.id === actId)] : configData;
     
+    let activeCols = null;
+    const printContainer = document.getElementById('print-columns-container');
+    if (actId && printContainer && !printContainer.classList.contains('hidden')) {
+        const cbx = document.querySelectorAll('.print-col-cbx:checked');
+        activeCols = Array.from(cbx).map(c => c.value);
+        if(activeCols.length === 0) {
+            showAlert("Ju lutem zgjidhni të paktën një fushë për printim.");
+            return;
+        }
+    }
+    
     let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">`;
     html += `<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Raporti</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>`;
     
+    let hasData = false;
     activities.forEach(act => {
         if(!act) return;
         const actLogs = filtered.filter(l => l.actId === act.id);
         if(actLogs.length === 0) return;
+        
+        hasData = true;
+        let allHeaders = ['Data', 'Eksperti', 'Orë', ...act.processes.map(p => p.label)];
+        let finalHeaders = activeCols ? allHeaders.filter(h => activeCols.includes(h)) : allHeaders;
         
         html += `<h3 style="font-family: sans-serif; color: #1e293b; margin-top: 20px;">Aktiviteti: ${act.name}</h3>`;
         html += `<table border="1" style="border-collapse:collapse; font-family: sans-serif; font-size: 11px; margin-bottom: 20px;">`;
         
         // Header
         html += `<tr style="background-color: #3b82f6; color: white; font-weight: bold; height: 30px;">`;
-        html += `<th style="padding: 5px;">Data</th><th style="padding: 5px;">Eksperti</th><th style="padding: 5px;">Orë</th>`;
-        act.processes.forEach(p => {
-            html += `<th style="padding: 5px;">${p.label}</th>`;
+        finalHeaders.forEach(h => {
+            html += `<th style="padding: 5px;">${h}</th>`;
         });
         html += `</tr>`;
         
         // Trupi i tabelës
         actLogs.forEach(l => {
-            html += `<tr style="height: 25px;">`;
-            html += `<td style="padding: 5px; text-align: center;">${l.date || ''}</td>`;
-            html += `<td style="padding: 5px;">${l.operator || ''}</td>`;
-            html += `<td style="padding: 5px; text-align: center;">${l.hours || '0'}</td>`;
+            const rowData = { 'Data': l.date || '', 'Eksperti': l.operator || '', 'Orë': l.hours || '0' };
             act.processes.forEach(p => {
-                const val = l.processes.find(pr => pr.label === p.label)?.value || '-';
-                html += `<td style="padding: 5px;">${val}</td>`;
+                rowData[p.label] = l.processes.find(pr => pr.label === p.label)?.value || '-';
+            });
+            
+            html += `<tr style="height: 25px;">`;
+            finalHeaders.forEach(h => {
+                html += `<td style="padding: 5px;${h==='Data'||h==='Orë' ? ' text-align: center;' : ''}">${rowData[h]}</td>`;
             });
             html += `</tr>`;
         });
         
         html += `</table><br/>`;
     });
+    
+    if(!hasData) {
+        showAlert("Nuk ka të dhëna për tu printuar.");
+        return;
+    }
     
     html += `</body></html>`;
     
