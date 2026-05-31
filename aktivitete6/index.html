@@ -287,12 +287,11 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 <button onclick="clearFilters()" class="bg-amber-500 hover:bg-amber-600 text-white p-4 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all active:scale-95">Pastro Filtrat</button> 
 </div> 
 
-<!-- SHTESA: Paneli për zgjedhjen e fushave që do printohen -->
+<!-- Paneli për zgjedhjen e fushave që do printohen -->
 <div id="print-columns-container" class="hidden mt-2 mb-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
     <h3 class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest mb-3">Përzgjidh fushat për printim (PDF / Excel)</h3>
     <div id="print-columns-list" class="flex flex-wrap gap-2"></div>
 </div>
-<!-- /SHTESA -->
 
 <div class="grid grid-cols-2 gap-3"> 
 <button onclick="exportToPDF()" class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-500/30 transition-all active:scale-95">Shkarko PDF</button> 
@@ -302,7 +301,6 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 <div id="report-results" class="space-y-4"></div> 
 </div> 
 
-<!-- TABI I RI PËR ORARIN / SESIONET -->
 <div id="view-sessions" class="hidden space-y-6"> 
 <div class="flex justify-between items-center px-4 bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100"> 
 <h2 class="text-xl font-black text-slate-800">Evidenca e Orarit</h2> 
@@ -573,6 +571,7 @@ window.restoreItem = async (id, originalCollection) => { try { const secureId = 
 
 window.clearFilters = () => { document.getElementById('rep-start').value = ''; document.getElementById('rep-end').value = ''; document.getElementById('rep-op-select').value = ''; document.getElementById('rep-act-select').value = ''; updateProcessFilterUI(); renderReportList(); }; 
 
+// NDRYSHIM: Zgjedhja dinamike e kolonave për printim (Edhe kur janë "Të gjitha" aktivitetet)
 window.updateProcessFilterUI = () => { 
     const actId = document.getElementById('rep-act-select').value; 
     const filterContainer = document.getElementById('rep-dynamic-filters'); 
@@ -581,21 +580,19 @@ window.updateProcessFilterUI = () => {
     const printPanel = document.getElementById('print-columns-container');
     const printList = document.getElementById('print-columns-list');
 
-    if(!actId) {
-        if(printPanel) printPanel.classList.add('hidden');
-        return; 
+    let act = null;
+    if(actId) {
+        act = configData.find(c => c.id === actId); 
+        if(act) {
+            // Filtrat normal të search
+            act.processes.forEach(p => { 
+                const vals = [...new Set(logData.filter(l => l.actId === actId).flatMap(l => l.processes).filter(proc => proc.label === p.label).map(proc => proc.value).filter(v => v))].sort(); 
+                filterContainer.innerHTML += `<div class="flex flex-col"><label class="text-[8px] font-bold text-slate-400 uppercase ml-1">${p.label}</label><select data-filter-label="${p.label}" class="rep-proc-filter p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-[10px] font-bold appearance-none cursor-pointer"><option value="">Të gjitha</option>${vals.map(v => `<option value="${v}">${v}</option>`).join("")}</select></div>`; 
+            }); 
+        }
     }
 
-    const act = configData.find(c => c.id === actId); 
-    if(!act) return; 
-
-    // Ndërtimi i filtrave normalë
-    act.processes.forEach(p => { 
-        const vals = [...new Set(logData.filter(l => l.actId === actId).flatMap(l => l.processes).filter(proc => proc.label === p.label).map(proc => proc.value).filter(v => v))].sort(); 
-        filterContainer.innerHTML += `<div class="flex flex-col"><label class="text-[8px] font-bold text-slate-400 uppercase ml-1">${p.label}</label><select data-filter-label="${p.label}" class="rep-proc-filter p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-[10px] font-bold appearance-none cursor-pointer"><option value="">Të gjitha</option>${vals.map(v => `<option value="${v}">${v}</option>`).join("")}</select></div>`; 
-    }); 
-
-    // Ndërtimi i checkboxes për Printim
+    // Checkboxes per Printim tregohen gjithmone
     if(printPanel) {
         printPanel.classList.remove('hidden');
         let colsHtml = `
@@ -609,10 +606,21 @@ window.updateProcessFilterUI = () => {
                 <input type="checkbox" class="print-col-cbx accent-blue-600" value="Orë" checked> Orë
             </label>
         `;
-        act.processes.forEach(p => {
+        
+        let processLabels = new Set();
+        if (act) {
+            if(act.processes) act.processes.forEach(p => processLabels.add(p.label));
+        } else {
+            // Mbledhim te gjitha proceset nga te gjitha aktivitetet
+            configData.forEach(c => {
+                if(c.processes) c.processes.forEach(p => processLabels.add(p.label));
+            });
+        }
+
+        processLabels.forEach(label => {
             colsHtml += `
             <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
-                <input type="checkbox" class="print-col-cbx accent-blue-600" value="${p.label}" checked> ${p.label}
+                <input type="checkbox" class="print-col-cbx accent-blue-600" value="${label}" checked> ${label}
             </label>`;
         });
         printList.innerHTML = colsHtml;
@@ -796,6 +804,7 @@ window.renderSessionList = () => {
     document.getElementById('sessions-results').innerHTML = html;
 };
 
+// NDRYSHIM: Itinerari shtohet në kolonën e Excel-it
 window.exportSessionsExcel = () => {
     let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">`;
     html += `<head><meta charset="utf-8"></head><body>`;
@@ -803,7 +812,7 @@ window.exportSessionsExcel = () => {
     html += `<table border="1" style="border-collapse:collapse; font-family: sans-serif; font-size: 12px; margin-bottom: 20px;">`;
     
     html += `<tr style="background-color: #3b82f6; color: white; font-weight: bold; height: 35px;">`;
-    html += `<th style="padding: 8px;">Data</th><th style="padding: 8px;">Përdoruesi</th><th style="padding: 8px;">Totali Orëve</th><th style="padding: 8px;">Statusi</th></tr>`;
+    html += `<th style="padding: 8px;">Data</th><th style="padding: 8px;">Përdoruesi</th><th style="padding: 8px;">Totali Orëve</th><th style="padding: 8px;">Statusi</th><th style="padding: 8px;">Itinerari (In - Out)</th></tr>`;
 
     sessionData.forEach(s => {
         let currentMins = s.totalMinutes || 0;
@@ -817,11 +826,23 @@ window.exportSessionsExcel = () => {
         const h = Math.floor(currentMins / 60);
         const m = currentMins % 60;
 
+        let historyStr = "";
+        if (s.history && s.history.length > 0) {
+            historyStr = s.history.map(hist => {
+                const inTime = new Date(hist.in).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
+                const outTime = hist.out ? new Date(hist.out).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}) : 'Aktiv';
+                return `[${inTime} - ${outTime}]`;
+            }).join(' | ');
+        } else {
+            historyStr = "-";
+        }
+
         html += `<tr style="height: 30px;">`;
         html += `<td style="padding: 8px; text-align: center; font-weight: bold;">${s.date}</td>`;
         html += `<td style="padding: 8px;">${s.userEmail}</td>`;
         html += `<td style="padding: 8px; text-align: center; font-weight: bold;">${h}h ${m}m</td>`;
         html += `<td style="padding: 8px; text-align: center; color: ${status === 'Aktiv' ? 'green' : 'gray'};">${status}</td>`;
+        html += `<td style="padding: 8px; font-size: 11px; color: #475569;">${historyStr}</td>`;
         html += `</tr>`;
     });
 
@@ -845,7 +866,7 @@ window.exportToPDF = () => {
     
     let activeCols = null;
     const printContainer = document.getElementById('print-columns-container');
-    if (actId && printContainer && !printContainer.classList.contains('hidden')) {
+    if (printContainer && !printContainer.classList.contains('hidden')) {
         const cbx = document.querySelectorAll('.print-col-cbx:checked');
         activeCols = Array.from(cbx).map(c => c.value);
         if(activeCols.length === 0) {
@@ -895,7 +916,7 @@ window.exportToExcel = () => {
     
     let activeCols = null;
     const printContainer = document.getElementById('print-columns-container');
-    if (actId && printContainer && !printContainer.classList.contains('hidden')) {
+    if (printContainer && !printContainer.classList.contains('hidden')) {
         const cbx = document.querySelectorAll('.print-col-cbx:checked');
         activeCols = Array.from(cbx).map(c => c.value);
         if(activeCols.length === 0) {
