@@ -340,6 +340,33 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 <select id="log-act-select" onchange="generateProcessFields()" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 text-slate-700 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer"></select> 
 </div> 
 <div id="dynamic-fields-container" class="space-y-4 pt-4 border-t border-slate-100"></div> 
+
+<!-- SEKSIONI I RI: NGARKIMI I DOKUMENTEVE DHE FOTOVE PËR SHKRESAT (SISTEMI REALE) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+    <div class="space-y-2"> 
+        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Ngarko Dokument</label> 
+        <div class="relative flex items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-4 bg-slate-50 hover:bg-slate-100/50 hover:border-blue-400/50 transition-all cursor-pointer">
+            <input id="log-document" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" onchange="handleFileProcessing(event, 'doc')" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+            <div id="log-doc-status" class="flex flex-col items-center gap-1.5 text-center pointer-events-none">
+                <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span class="text-xs font-bold text-slate-500">Kliko ose tërhiq dokumentin</span>
+                <span class="text-[10px] text-slate-400 font-medium">(PDF, DOC, EXCEL, TXT)</span>
+            </div>
+        </div>
+    </div>
+    <div class="space-y-2"> 
+        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Ngarko Foto</label> 
+        <div class="relative flex items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-4 bg-slate-50 hover:bg-slate-100/50 hover:border-blue-400/50 transition-all cursor-pointer">
+            <input id="log-photo" type="file" accept="image/*" onchange="handleFileProcessing(event, 'photo')" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+            <div id="log-photo-status" class="flex flex-col items-center gap-1.5 text-center pointer-events-none">
+                <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <span class="text-xs font-bold text-slate-500">Kliko ose tërhiq foton</span>
+                <span class="text-[10px] text-slate-400 font-medium">(PNG, JPG, JPEG)</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="pt-6 border-t border-slate-100 space-y-6"> 
 <div class="grid grid-cols-2 gap-4"> 
 <div class="space-y-2"> 
@@ -572,6 +599,11 @@ const appId = "sistemi-aktiviteteve-v1";
 window.db = db; window.doc = doc; window.deleteDoc = deleteDoc; window.appId = appId; 
 let configData = []; let logData = []; let operatorData = []; let trashData = []; let sessionData = []; let deleteCallback = null; let unsubscribes = []; 
 
+// VARIABLAT E REJA PËR RUAYTJEN E DOKUMENTEVE / FOTOVE GJATË KRIJIMIT TË AKTIVITETIT
+let currentBase64Doc = null;
+let currentBase64DocName = null;
+let currentBase64Photo = null;
+
 // VARIABLAT E INTEGRUARA PËR PUSHIMET (SISTEMI I DYTË)
 let selectedYear = new Date().getFullYear();
 let currentVacationDate = new Date(selectedYear, new Date().getMonth(), 1);
@@ -624,6 +656,80 @@ window.previewSignupPhoto = (event) => {
         img.src = e.target.result;
     };
     reader.readAsDataURL(file);
+};
+
+// Funksioni i ri për të përpunuar skedarët e bashkëngjitur gjatë krijimit të aktivitetit
+window.handleFileProcessing = (event, type) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    if (type === 'doc') {
+        currentBase64DocName = file.name;
+        document.getElementById('log-doc-status').innerHTML = `
+            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span class="text-xs font-bold text-blue-600 truncate max-w-[200px]">${file.name}</span>
+            <button onclick="clearUploadedFile(event, 'doc')" class="text-[9px] text-red-500 font-bold uppercase mt-1">Largo</button>
+        `;
+        reader.onload = (e) => {
+            currentBase64Doc = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    } else if (type === 'photo') {
+        document.getElementById('log-photo-status').innerHTML = `
+            <div class="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
+            <span class="text-xs font-bold text-slate-500">Duke u përpunuar...</span>
+        `;
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 500; // Kompresim optimal për ruajtje efikase
+                let scaleSize = 1;
+                if (img.width > MAX_WIDTH) {
+                    scaleSize = MAX_WIDTH / img.width;
+                }
+                canvas.width = img.width * scaleSize;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                currentBase64Photo = canvas.toDataURL('image/jpeg', 0.7);
+                
+                document.getElementById('log-photo-status').innerHTML = `
+                    <img src="${currentBase64Photo}" class="h-10 w-10 object-cover rounded-lg shadow-sm border border-slate-200">
+                    <span class="text-xs font-bold text-emerald-600">Foto u ngarkua!</span>
+                    <button onclick="clearUploadedFile(event, 'photo')" class="text-[9px] text-red-500 font-bold uppercase mt-1">Largo</button>
+                `;
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+window.clearUploadedFile = (event, type) => {
+    if(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    if (type === 'doc') {
+        currentBase64Doc = null;
+        currentBase64DocName = null;
+        document.getElementById('log-document').value = '';
+        document.getElementById('log-doc-status').innerHTML = `
+            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span class="text-xs font-bold text-slate-500">Kliko ose tërhiq dokumentin</span>
+            <span class="text-[10px] text-slate-400 font-medium">(PDF, DOC, EXCEL, TXT)</span>
+        `;
+    } else if (type === 'photo') {
+        currentBase64Photo = null;
+        document.getElementById('log-photo').value = '';
+        document.getElementById('log-photo-status').innerHTML = `
+            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <span class="text-xs font-bold text-slate-500">Kliko ose tërhiq foton</span>
+            <span class="text-[10px] text-slate-400 font-medium">(PNG, JPG, JPEG)</span>
+        `;
+    }
 };
 
 // Funksioni për të përditësuar foton nga Profili
@@ -918,7 +1024,7 @@ window.switchTab = (tab) => {
 
 const ALBANIAN_QUOTES = [
     "Besoni në veten tuaj dhe në gjithçka që jeni.", "Suksesi nuk është përfundimtar, dështimi nuk është fatal.", "Mënyra për të filluar është të lini së foluri dhe të filloni të bëni.", "Mos e shikoni orën; bëni atë që bën ajo. Vazhdoni.", "Sekreti i ecjes përpara është të fillosh.", "Gjithmonë duket e pamundur derisa të bëhet.", "Mundësitë nuk ndodhin, ju i krijoni ato.", "Dallimi midis të zakonshmes dhe të jashtëzakonshmes është ajo pak 'ekstra'.", "E vetmja mënyrë për të bërë punë të shkëlqyer është të duash atë që bën.", "Suksesi u vjen atyre që janë shumë të zënë për ta kërkuar atë.", 
-    "Nuk ka asnjë ashensor për suksesin. Duhet të merrni shkallët.", "Gjithçka që keni dashur ndonjëherë është në anën tjetër të frikës.", "Nëse nuk sfidon veten, nuk mund të ndryshosh veten.", "Një udhëtim prej një mijë miljesh fillon met një hap të vetëm.", "Qëndrimi juaj përcakton lartësinë tuaj.", "Vështirësitë shpesh përgatisin njerëz të zakonshëm për një fat të jashtëzakonshëm.", "Dita e sotme është një mundësi për të ndërtuar të nesërmen që dëshironi.", "Nuk ka asgjë të pamundur, vetë fjala thotë 'Unë jam i mundur'!", "Dështimi është thjesht mundësia për të filluar përsëri në mjedis më inteligjent.", "Investimi në dituri paguan interesin më të mirë.", 
+    "Nuk ka asnjë ashensor për suksesin. Duhet të merrni shkallët.", "Gjithçka që keni dashur ndonjëherë është në anën tjetër të frikës.", "Nëse nuk sfidon veten, nuk mund të ndryshosh veten.", "Një udhëtim prej një mijë miljesh fillon met një hap të vetëm.", "Qëndrimi juaj përcakton lartësinë tuaj.", "Vështirësitë shpesh përgatisin njerëz të zakonshëm për një fat të jashtëzakonshëm.", "Dita e sotme është një mudësi për të ndërtuar të nesërmen që dëshironi.", "Nuk ka asgjë të pamundur, vetë fjala thotë 'Unë jam i mundur'!", "Dështimi është thjesht mundësia për të filluar përsëri në mjedis më inteligjent.", "Investimi në dituri paguan interesin më të mirë.", 
     "Motivimi është ai që ju fillon. Zakoni është ai që ju mban në ecje.", "Bëj diçka sot për të cilën vetja jote e së ardhmes do të të falënderojë.", "E vetmja kufizim për realizimin e së nesërmes do të jenë dyshimet tona të së sotmes.", "Gjërat e mëdha nuk vijnë kurrë nga zonat e rehatisë.", "Ëndërro sikur do të jetosh përgjithmonë, jeto sikur do të vdesësh sot.", "Çdo mëngjes lindim sërish. Ajo çfarë bëjmë sot ka më shumë rëndësi.", "Suksesi është shuma e përpjekjeve të vogla, të përsëritura ditë pas dite.", "Kurrë nuk është vonë të jesh ai që mund të kishe qenë.", "Mbani sytë te yjet dhe këmbët në tokë.", "Guximi është zotërim i frikës – jo mungesë frike.",
     "Rruga drejt suksesit dhe rruga drejt dështimit janë pothuajse saktësisht të njëjta.", "Mos lejoni që dje të marrë shumë nga sot.", "Mësoni sikur do të jetoni përgjithmonë, jetoni sikur do të vdesni nesër.", "Përqendrohuni te mundësitë tuaja për sukses, jo te potenciali për dështim.", "Bëj çfarë mundesh, met atë që ke, aty ku je.", "Ajo që ne arrijmë së brendshmi do të ndryshojë realitetin e jashtëm.", "Nuk jeni kurrë shumë i vjetër për të vendosur një qëllim tjetër ose për të ëndërruar një ëndërr të re.", "Ndryshimi fillon në fund të zonës suaj të rehatisë.", "Çdo problem është një dhuratë, pa probleme ne nuk do të rriteshim.", "Kufiri i vetëm për lartësinë e arritjeve tuaja është shtrirja e ëndrrave tuaja.",
     "Beso se mundesh dhe je në gjysmë të rrugës.", "Nuk ka rëndësi sa ngadalë ecni, për sa kohë që nuk ndaleni.", "Puna e palodhur e mposht talentin kur talenti nuk punon shumë.", "Vepro sikur ajo që bën të ketë rëndësi. Sepse ka.", "Një synim pa një plan është thjesht një dëshirë.", "Nenterzimi i suksesit vjen nga përkushtimi.", "Zbulimi më i madh është se njerëzit mund ta ndryshojnë jetën e tyre duke ndryshuar qëndrimin.", "Ne jemi ajo që bëjmë në mënyrë të përsëritur. Përsosmëria nuk është një act, por një zakon.", "Fillo aty ku je. Përdor atë që ke. Bëj atë që mundesh.", "Rregulli i artë i punës: Duajeni atë që bëni.",
@@ -1139,10 +1245,86 @@ function startListening(userId) {
 } 
 
 window.generateProcessFields = (valuesMap = null) => { const actId = document.getElementById('log-act-select').value; const container = document.getElementById('dynamic-fields-container'); container.innerHTML = ""; if(!actId) return; const act = configData.find(c => c.id === actId); if(!act) return; act.processes.forEach(p => { const val = valuesMap ? (valuesMap[p.label] || "") : ""; let inputHtml = p.type === 'text' ? `<textarea data-label="${p.label}" class="process-input process-textarea w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all">${val}</textarea>` : `<input type="${p.type === 'ora' ? 'time' : p.type === 'data' ? 'date' : 'text'}" data-label="${p.label}" value="${val}" ${p.type === 'numër' ? 'onkeydown="handleMathEnter(event)"' : ''} class="process-input w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all">`; container.innerHTML += `<div class="space-y-1"><label class="text-[10px] font-extrabold text-slate-500 uppercase ml-1">${p.label}</label>${inputHtml}</div>`; }); setTimeout(() => document.querySelectorAll('.process-textarea').forEach(ta => autoExpand(ta)), 50); }; 
-document.getElementById('save-log-btn').onclick = async () => { const actId = document.getElementById('log-act-select').value; if(!actId) return showAlert("Zgjidhni aktivitetin."); const rawId = document.getElementById('log-edit-id').value || Date.now().toString(); try { await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(rawId)), { actId, actName: configData.find(c => c.id === actId).name, date: document.getElementById('log-date').value, operator: document.getElementById('log-operator-select').value, hours: parseFloat(document.getElementById('log-hours').value), startTime: document.getElementById('log-start-time').value, endTime: document.getElementById('log-end-time').value, processes: Array.from(document.querySelectorAll('.process-input')).map(i => ({ label: i.dataset.label, value: i.value })), timestamp: Date.now() }); cancelLogEdit(); } catch (e) { showAlert("Gabim: " + e.message); } }; 
 
-window.cancelLogEdit = () => { document.getElementById('log-edit-id').value = ""; document.getElementById('log-hours').value = ""; document.getElementById('log-start-time').value = ""; document.getElementById('log-end-time').value = ""; document.getElementById('log-act-select').value = ""; document.getElementById('dynamic-fields-container').innerHTML = ""; document.getElementById('cancel-log-edit').classList.add('hidden'); document.getElementById('save-log-btn').innerText = "Ruaj në Cloud"; setTodayDate(); }; 
-window.editLogEntry = (id) => { const log = logData.find(l => l.id === id); if(!log) return; switchTab('log'); document.getElementById('log-edit-id').value = id; document.getElementById('log-date').value = log.date; document.getElementById('log-operator-select').value = log.operator; document.getElementById('log-act-select').value = log.actId; document.getElementById('log-hours').value = log.hours; document.getElementById('log-start-time').value = log.startTime || ""; document.getElementById('log-end-time').value = log.endTime || ""; const vals = {}; log.processes.forEach(p => vals[p.label] = p.value); generateProcessFields(vals); document.getElementById('cancel-log-edit').classList.remove('hidden'); document.getElementById('save-log-btn').innerText = "Zëvendëso"; }; 
+// Krijimi dhe Ruajtja me Cloud duke marrë parasysh dokumentet dhe fotot e ngarkuara
+document.getElementById('save-log-btn').onclick = async () => { 
+    const actId = document.getElementById('log-act-select').value; 
+    if(!actId) return showAlert("Zgjidhni aktivitetin."); 
+    const rawId = document.getElementById('log-edit-id').value || Date.now().toString(); 
+    try { 
+        await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(rawId)), { 
+            actId, 
+            actName: configData.find(c => c.id === actId).name, 
+            date: document.getElementById('log-date').value, 
+            operator: document.getElementById('log-operator-select').value, 
+            hours: parseFloat(document.getElementById('log-hours').value), 
+            startTime: document.getElementById('log-start-time').value, 
+            endTime: document.getElementById('log-end-time').value, 
+            processes: Array.from(document.querySelectorAll('.process-input')).map(i => ({ label: i.dataset.label, value: i.value })), 
+            // Integrimi i vlerave të fushave të reja
+            attachedDoc: currentBase64Doc,
+            attachedDocName: currentBase64DocName,
+            attachedPhoto: currentBase64Photo,
+            timestamp: Date.now() 
+        }); 
+        cancelLogEdit(); 
+    } catch (e) { 
+        showAlert("Gabim: " + e.message); 
+    } 
+}; 
+
+window.cancelLogEdit = () => { 
+    document.getElementById('log-edit-id').value = ""; 
+    document.getElementById('log-hours').value = ""; 
+    document.getElementById('log-start-time').value = ""; 
+    document.getElementById('log-end-time').value = ""; 
+    document.getElementById('log-act-select').value = ""; 
+    document.getElementById('dynamic-fields-container').innerHTML = ""; 
+    document.getElementById('cancel-log-edit').classList.add('hidden'); 
+    document.getElementById('save-log-btn').innerText = "Ruaj në Cloud"; 
+    // Pastrojmë fushat e ngarkuara të skedarëve
+    clearUploadedFile(null, 'doc');
+    clearUploadedFile(null, 'photo');
+    setTodayDate(); 
+}; 
+
+window.editLogEntry = (id) => { 
+    const log = logData.find(l => l.id === id); 
+    if(!log) return; 
+    switchTab('log'); 
+    document.getElementById('log-edit-id').value = id; 
+    document.getElementById('log-date').value = log.date; 
+    document.getElementById('log-operator-select').value = log.operator; 
+    document.getElementById('log-act-select').value = log.actId; 
+    document.getElementById('log-hours').value = log.hours; 
+    document.getElementById('log-start-time').value = log.startTime || ""; 
+    document.getElementById('log-end-time').value = log.endTime || ""; 
+    const vals = {}; 
+    log.processes.forEach(p => vals[p.label] = p.value); 
+    generateProcessFields(vals); 
+    
+    // Ngarkojmë sërish skedarët në kujtesë në rast editimi
+    if(log.attachedDoc) {
+        currentBase64Doc = log.attachedDoc;
+        currentBase64DocName = log.attachedDocName || "dokument-i-ngarkuar";
+        document.getElementById('log-doc-status').innerHTML = `
+            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span class="text-xs font-bold text-blue-600 truncate max-w-[200px]">${currentBase64DocName}</span>
+            <button onclick="clearUploadedFile(event, 'doc')" class="text-[9px] text-red-500 font-bold uppercase mt-1">Largo</button>
+        `;
+    }
+    if(log.attachedPhoto) {
+        currentBase64Photo = log.attachedPhoto;
+        document.getElementById('log-photo-status').innerHTML = `
+            <img src="${currentBase64Photo}" class="h-10 w-10 object-cover rounded-lg shadow-sm border border-slate-200">
+            <span class="text-xs font-bold text-emerald-600">Foto u ngarkua!</span>
+            <button onclick="clearUploadedFile(event, 'photo')" class="text-[9px] text-red-500 font-bold uppercase mt-1">Largo</button>
+        `;
+    }
+
+    document.getElementById('cancel-log-edit').classList.remove('hidden'); 
+    document.getElementById('save-log-btn').innerText = "Zëvendëso"; 
+}; 
 
 window.duplicateLogEntry = (id) => {
     const log = logData.find(l => l.id === id);
@@ -1160,6 +1342,25 @@ window.duplicateLogEntry = (id) => {
     log.processes.forEach(p => vals[p.label] = p.value);
     generateProcessFields(vals);
     
+    // Kopjojmë gjithashtu dokumentet dhe fotot ekzistuese në objektin e ri
+    if(log.attachedDoc) {
+        currentBase64Doc = log.attachedDoc;
+        currentBase64DocName = log.attachedDocName;
+        document.getElementById('log-doc-status').innerHTML = `
+            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span class="text-xs font-bold text-blue-600 truncate max-w-[200px]">${currentBase64DocName}</span>
+            <button onclick="clearUploadedFile(event, 'doc')" class="text-[9px] text-red-500 font-bold uppercase mt-1">Largo</button>
+        `;
+    }
+    if(log.attachedPhoto) {
+        currentBase64Photo = log.attachedPhoto;
+        document.getElementById('log-photo-status').innerHTML = `
+            <img src="${currentBase64Photo}" class="h-10 w-10 object-cover rounded-lg shadow-sm border border-slate-200">
+            <span class="text-xs font-bold text-emerald-600">Foto u ngarkua!</span>
+            <button onclick="clearUploadedFile(event, 'photo')" class="text-[9px] text-red-500 font-bold uppercase mt-1">Largo</button>
+        `;
+    }
+
     document.getElementById('cancel-log-edit').classList.remove('hidden');
     document.getElementById('save-log-btn').innerText = "Ruaj në Cloud";
 };
@@ -1378,7 +1579,46 @@ window.editProcessInline = async (logId, label) => {
     }
 };
 
+// Funksione të reja për shkarkimin e dokumenteve dhe fotove nga Raportet
+window.downloadLogFile = (base64, filename) => {
+    if(!base64) return;
+    const a = document.createElement("a");
+    a.href = base64;
+    a.download = filename || "dokument";
+    a.click();
+};
+
+window.viewAttachedPhoto = (base64) => {
+    if(!base64) return;
+    const win = window.open();
+    win.document.write(`<body style="margin:0; display:flex; justify-content:center; align-items:center; background:#0f172a;"><img src="${base64}" style="max-width:100%; max-height:100vh; border-radius:8px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);"></body>`);
+};
+
 window.generateLogItemHtml = (log) => {
+    // Shtimi i butonave të shkarkimit dhe vizualizimit në HTML e Raporteve
+    let attachmentButtons = "";
+    if (log.attachedDoc || log.attachedPhoto) {
+        attachmentButtons = `<div class="flex flex-wrap gap-2 pt-3 border-t border-slate-100/60 mt-3">`;
+        if (log.attachedDoc) {
+            const docName = log.attachedDocName || "Dokument";
+            attachmentButtons += `
+                <button onclick="downloadLogFile('${log.attachedDoc}', '${docName.replace(/'/g, "\\'")}')" class="flex items-center gap-1.5 text-[10px] font-black text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition-all shadow-sm" title="Shkarko skedarin e bashkëngjitur">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Skedar: ${docName}
+                </button>
+            `;
+        }
+        if (log.attachedPhoto) {
+            attachmentButtons += `
+                <button onclick="viewAttachedPhoto('${log.attachedPhoto}')" class="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-xl transition-all shadow-sm" title="Shiko foton në madhësi të plotë">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    Shfaq Foton
+                </button>
+            `;
+        }
+        attachmentButtons += `</div>`;
+    }
+
     return ` <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"> 
                 <div class="flex justify-between items-start"> 
                     <div>
@@ -1396,6 +1636,7 @@ window.generateLogItemHtml = (log) => {
                     </div> 
                 </div> 
                 <div class="grid grid-cols-1 gap-2 border-t border-slate-100 pt-4 mt-4">${log.processes.map(p => `<div class="text-[11px] p-2.5 -m-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-200 transition-all" onclick="editProcessInline('${log.id}', '${p.label.replace(/'/g, "\\'")}')" title="Kliko për të edituar vlerën"><b class="text-slate-400 uppercase text-[9px] tracking-wider">${p.label}:</b><br><span class="text-slate-700 font-semibold">${p.value}</span></div>`).join("")}</div> 
+                ${attachmentButtons}
               </div>`;
 };
 
