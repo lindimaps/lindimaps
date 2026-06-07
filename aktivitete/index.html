@@ -366,7 +366,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, writeBatch, query, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"; 
 
-const firebaseConfig = { apiKey: "AIzaSyBk3Wi9DsGp9egY8qQnxeEdM9qlTZIodw0", authDomain: "sistemi-aktiviteteve.firebaseapp.com", projectId: "sistemi-aktiviteteve", storageBucket: "sistemi-aktiviteteve.firebasestorage.app", messagingSenderId: "289905439492", appId: "1:289905439492:web:4e7e52e13a8379a74b9651", measurementId: "G-W2F0WT24XJ" }; 
+// KONFIGURIMI I RI I FIREBASE
+const firebaseConfig = {
+  apiKey: "AIzaSyAVTLaOuHZI0zyH-QLUixIFTak05E5uoDw",
+  authDomain: "ruajaktivitetin.firebaseapp.com",
+  projectId: "ruajaktivitetin",
+  storageBucket: "ruajaktivitetin.firebasestorage.app",
+  messagingSenderId: "842516820364",
+  appId: "1:842516820364:web:b50729dbc3cf16c23fa6a9",
+  measurementId: "G-NN4KHF988G"
+};
 const app = initializeApp(firebaseConfig); 
 const auth = getAuth(app); 
 const db = getFirestore(app); 
@@ -374,7 +383,14 @@ const appId = "sistemi-aktiviteteve-v1";
 
 window.db = db; window.doc = doc; window.deleteDoc = deleteDoc; window.appId = appId; 
 let configData = []; let logData = []; let operatorData = []; let trashData = []; let sessionData = []; let deleteCallback = null; let unsubscribes = []; 
-const getBaseCollectionPath = (collectionName) => `artifacts/${appId}/public/data/${collectionName}`; 
+
+// LLOGJIKA E RE PËR PATHIN E PRIVATE FIRESTORE
+const getBaseCollectionPath = (collectionName) => {
+    const userId = auth.currentUser?.uid;
+    if (!userId) throw new Error("Missing authenticated user UID");
+    return `artifacts/${appId}/users/${userId}/${collectionName}`;
+};
+
 const getSecureId = (id) => { const userId = auth.currentUser?.uid; if (!userId) throw new Error("Missing authenticated user UID"); if (id.startsWith(userId + "_")) return id; return `${userId}_${id}`; }; 
 const getCleanId = (prefixedId) => { const userId = auth.currentUser?.uid; if (userId && prefixedId.startsWith(userId + "_")) return prefixedId.substring(userId.length + 1); return prefixedId; }; 
 const getToday = () => new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0]; 
