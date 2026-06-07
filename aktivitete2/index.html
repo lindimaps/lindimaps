@@ -113,14 +113,14 @@ nav#side-menu button.tab-btn:hover {
 </div> 
 </div> 
 
-<div id="custom-alert" class="hidden fixed inset-0 z-[500] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all"> 
+<div id="custom-alert" class="hidden fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all"> 
 <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center space-y-6 shadow-2xl border border-slate-100"> 
 <p id="alert-message" class="font-bold text-slate-800 text-lg"></p> 
 <button onclick="closeAlert()" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-bold transition-colors">Kuptova</button> 
 </div> 
 </div> 
 
-<div id="confirm-modal" class="hidden fixed inset-0 z-[600] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all"> 
+<div id="confirm-modal" class="hidden fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all"> 
 <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center space-y-6 shadow-2xl border border-slate-100"> 
 <div class="space-y-2"> 
 <h3 class="text-xl font-extrabold text-slate-800">A jeni i sigurt?</h3> 
@@ -155,9 +155,18 @@ nav#side-menu button.tab-btn:hover {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
         <div class="flex flex-col items-center gap-4 text-center mt-2">
-            <div id="modal-photo" class="h-28 w-28 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 shadow-inner border border-blue-100 bg-cover bg-center">
-                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-            </div>
+            
+            <!-- Fusha e ndryshimit të fotos së profilit nga modal-i -->
+            <label class="relative cursor-pointer group">
+                <div id="modal-photo" class="h-28 w-28 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 shadow-inner border border-blue-100 bg-cover bg-center overflow-hidden">
+                    <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </div>
+                <input type="file" accept="image/*" class="hidden" onchange="updateProfilePhoto(event)">
+                <div class="absolute inset-0 bg-slate-900/50 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="text-[9px] text-white font-extrabold uppercase tracking-wider">Ndrysho</span>
+                </div>
+            </label>
+
             <div>
                 <div id="modal-fullname" class="text-xl font-black text-slate-800 min-h-[28px]">Emër Mbiemër</div>
                 <p id="modal-email" class="text-sm font-bold text-blue-600 mt-1">email@example.com</p>
@@ -527,6 +536,48 @@ window.previewSignupPhoto = (event) => {
     };
     reader.readAsDataURL(file);
 };
+
+// Funksioni për të përditësuar foton nga Profili
+window.updateProfilePhoto = async (event) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    document.getElementById('loading').classList.remove('hidden');
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = async () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 250;
+            let scaleSize = 1;
+            if (img.width > MAX_WIDTH) {
+                scaleSize = MAX_WIDTH / img.width;
+            }
+            canvas.width = img.width * scaleSize;
+            canvas.height = img.height * scaleSize;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const newBase64 = canvas.toDataURL('image/jpeg', 0.8);
+            
+            try {
+                const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info');
+                await setDoc(docRef, { photoBase64: newBase64 }, { merge: true });
+                await refreshProfile(user);
+                showAlert("Fotoja e profilit u përditësua me sukses!");
+            } catch(err) {
+                showAlert("Gabim në ruajtjen e fotos: " + err.message);
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+
 
 window.openProfileModal = () => document.getElementById('profile-modal').classList.remove('hidden');
 window.closeProfileModal = () => document.getElementById('profile-modal').classList.add('hidden');
