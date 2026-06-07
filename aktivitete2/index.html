@@ -133,9 +133,24 @@ nav#side-menu button.tab-btn:hover {
 </div> 
 </div> 
 
-<!-- PROFILE MODAL I RI PËR TË SHFAQUR TË DHËNAT -->
+<!-- MODALI PËR FSHIRJEN E LLOGARISË (DELETE ACCOUNT) -->
+<div id="delete-account-modal" class="hidden fixed inset-0 z-[700] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center space-y-6 shadow-2xl border border-slate-100">
+        <div class="space-y-2">
+            <h3 class="text-xl font-extrabold text-red-600">Fshi Llogarinë!</h3>
+            <p class="text-slate-500 font-medium text-sm">Ky veprim është i pakthyeshëm. Të gjitha të dhënat tuaja do të fshihen. Për të vazhduar, ju lutem shkruani fjalëkalimin tuaj.</p>
+        </div>
+        <input type="password" id="delete-account-password" placeholder="Fjalëkalimi juaj" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-red-500 outline-none transition-all">
+        <div class="flex gap-3">
+            <button onclick="closeDeleteAccountModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-4 rounded-xl font-bold transition-colors">Anulo</button>
+            <button onclick="confirmDeleteAccount()" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-red-500/30 transition-colors">Fshi</button>
+        </div>
+    </div>
+</div>
+
+<!-- PROFILE MODAL I RI PËR TË SHFAQUR DHE EDITUAR TË DHËNAT -->
 <div id="profile-modal" class="hidden fixed inset-0 z-[600] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all"> 
-    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full space-y-6 shadow-2xl border border-slate-100 relative"> 
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full space-y-6 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar"> 
         <button onclick="closeProfileModal()" class="absolute top-4 right-4 p-2 bg-slate-50 hover:bg-slate-100 rounded-full text-slate-500 transition-colors">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
@@ -168,6 +183,10 @@ nav#side-menu button.tab-btn:hover {
                     <span id="modal-phone" class="text-sm font-bold text-slate-700">I papërcaktuar</span>
                 </div>
             </div>
+        </div>
+        <!-- BUTONI PËR FSHIRJEN E LLOGARISË -->
+        <div class="pt-4 border-t border-slate-100 mt-4 text-center">
+            <button onclick="openDeleteAccountModal()" class="text-[10px] font-extrabold text-red-500 uppercase tracking-wider hover:text-red-700 transition-colors">Fshi Llogarinë Përgjithmonë</button>
         </div>
     </div> 
 </div>
@@ -449,7 +468,7 @@ nav#side-menu button.tab-btn:hover {
 <script type="module"> 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"; 
 import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, writeBatch, query, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"; 
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"; 
 
 // KONFIGURIMI I RI I FIREBASE
 const firebaseConfig = {
@@ -570,6 +589,73 @@ window.sendLoggedResetLink = async () => {
     }
 };
 
+// LLOGJIKA PËR FSHIRJEN E LLOGARISË ME PASSWORD
+window.openDeleteAccountModal = () => {
+    document.getElementById('delete-account-password').value = '';
+    document.getElementById('delete-account-modal').classList.remove('hidden');
+};
+window.closeDeleteAccountModal = () => {
+    document.getElementById('delete-account-modal').classList.add('hidden');
+};
+window.confirmDeleteAccount = async () => {
+    const user = auth.currentUser;
+    if(!user) return;
+    const password = document.getElementById('delete-account-password').value;
+    if(!password) return showAlert("Ju lutem shkruani fjalëkalimin për të konfirmuar.");
+
+    document.getElementById('loading').classList.remove('hidden');
+    try {
+        const credential = EmailAuthProvider.credential(user.email, password);
+        await reauthenticateWithCredential(user, credential);
+        
+        // Fshijmë profilin nga Firestore (opsionale, por mban databazën pastër)
+        try {
+            await deleteDoc(doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info'));
+        } catch(e) {
+            console.log("Profile delete skipped or failed: ", e);
+        }
+
+        await deleteUser(user);
+        closeDeleteAccountModal();
+        closeProfileModal();
+        showAlert("Llogaria u fshi me sukses përgjithmonë.");
+    } catch(error) {
+        console.error(error);
+        showAlert("Gabim: Fjalëkalimi i pasaktë ose ndodhi një problem.");
+    } finally {
+        document.getElementById('loading').classList.add('hidden');
+    }
+};
+
+// FUNKSIONI PËR TË BËRË FUSHAT TË EDITUESHME (TOGGLE)
+window.makeEditable = (field, val1, val2) => {
+    if (field === 'fullname') {
+        document.getElementById('modal-fullname').innerHTML = `
+            <div class="flex gap-2 mt-2 justify-center">
+                <input type="text" id="edit-name" value="${val1}" class="w-20 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
+                <input type="text" id="edit-surname" value="${val2}" class="w-20 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
+                <button onclick="saveProfileData('fullname')" class="bg-blue-600 text-white px-2 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 shadow-sm">Ruaj</button>
+            </div>
+        `;
+    } else if (field === 'institution') {
+        document.getElementById('modal-institution-container').innerHTML = `
+            <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Institucioni</span>
+            <div class="flex gap-2 mt-1">
+                <input type="text" id="edit-institution" value="${val1}" class="flex-1 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
+                <button onclick="saveProfileData('institution')" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 transition-colors shadow-sm">Ruaj</button>
+            </div>
+        `;
+    } else if (field === 'phone') {
+        document.getElementById('modal-phone-container').innerHTML = `
+            <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Numër Telefoni</span>
+            <div class="flex gap-2 mt-1">
+                <input type="text" id="edit-phone" value="${val1}" class="flex-1 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
+                <button onclick="saveProfileData('phone')" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-emerald-700 transition-colors shadow-sm">Ruaj</button>
+            </div>
+        `;
+    }
+};
+
 window.saveProfileData = async (field) => {
     const user = auth.currentUser;
     if (!user) return;
@@ -615,16 +701,17 @@ window.refreshProfile = async (user) => {
             // Name / Surname logic
             if (fullName) {
                 document.getElementById('sidebar-name').innerText = fullName;
-                document.getElementById('modal-fullname').innerHTML = fullName;
-            } else {
-                document.getElementById('sidebar-name').innerText = user.email.split('@')[0];
                 document.getElementById('modal-fullname').innerHTML = `
-                    <div class="flex gap-2 mt-2 justify-center">
-                        <input type="text" id="edit-name" placeholder="Emri" class="w-20 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
-                        <input type="text" id="edit-surname" placeholder="Mbiemri" class="w-20 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
-                        <button onclick="saveProfileData('fullname')" class="bg-blue-600 text-white px-2 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 shadow-sm">Ruaj</button>
+                    <div class="flex items-center gap-2 justify-center">
+                        <span class="text-xl font-black text-slate-800">${fullName}</span>
+                        <button onclick="makeEditable('fullname', '${pData.name || ''}', '${pData.surname || ''}')" class="text-blue-500 hover:text-blue-700 bg-slate-50 p-1.5 rounded-lg shadow-sm border border-slate-100 transition-colors" title="Edito Emrin">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5z"></path></svg>
+                        </button>
                     </div>
                 `;
+            } else {
+                document.getElementById('sidebar-name').innerText = user.email.split('@')[0];
+                makeEditable('fullname', '', '');
             }
 
             document.getElementById('modal-email').innerText = pData.email || user.email;
@@ -632,33 +719,35 @@ window.refreshProfile = async (user) => {
             // Institution logic
             if (pData.institution) {
                 document.getElementById('modal-institution-container').innerHTML = `
-                    <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Institucioni</span>
-                    <span id="modal-institution" class="text-sm font-bold text-slate-700">${pData.institution}</span>
-                `;
-            } else {
-                document.getElementById('modal-institution-container').innerHTML = `
-                    <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Institucioni</span>
-                    <div class="flex gap-2 mt-1">
-                        <input type="text" id="edit-institution" placeholder="Shto Institucionin" class="flex-1 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
-                        <button onclick="saveProfileData('institution')" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 transition-colors shadow-sm">Ruaj</button>
+                    <div class="flex justify-between items-center w-full">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Institucioni</span>
+                            <span id="modal-institution" class="text-sm font-bold text-slate-700">${pData.institution}</span>
+                        </div>
+                        <button onclick="makeEditable('institution', '${pData.institution.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700 bg-white p-1.5 rounded-lg shadow-sm border border-slate-100 transition-colors" title="Edito Institucionin">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5z"></path></svg>
+                        </button>
                     </div>
                 `;
+            } else {
+                makeEditable('institution', '');
             }
 
             // Phone logic
             if (pData.phone) {
                 document.getElementById('modal-phone-container').innerHTML = `
-                    <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Numër Telefoni</span>
-                    <span id="modal-phone" class="text-sm font-bold text-slate-700">${pData.phone}</span>
-                `;
-            } else {
-                document.getElementById('modal-phone-container').innerHTML = `
-                    <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Numër Telefoni</span>
-                    <div class="flex gap-2 mt-1">
-                        <input type="text" id="edit-phone" placeholder="Shto Numrin" class="flex-1 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
-                        <button onclick="saveProfileData('phone')" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-emerald-700 transition-colors shadow-sm">Ruaj</button>
+                    <div class="flex justify-between items-center w-full">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Numër Telefoni</span>
+                            <span id="modal-phone" class="text-sm font-bold text-slate-700">${pData.phone}</span>
+                        </div>
+                        <button onclick="makeEditable('phone', '${pData.phone.replace(/'/g, "\\'")}')" class="text-emerald-500 hover:text-emerald-700 bg-white p-1.5 rounded-lg shadow-sm border border-slate-100 transition-colors" title="Edito Numrin">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5z"></path></svg>
+                        </button>
                     </div>
                 `;
+            } else {
+                makeEditable('phone', '');
             }
             
             if (pData.photoBase64) {
@@ -670,30 +759,10 @@ window.refreshProfile = async (user) => {
         } else {
             // Nese asnjë e dhënë nuk ekziston
             document.getElementById('sidebar-name').innerText = user.email.split('@')[0];
-            document.getElementById('modal-fullname').innerHTML = `
-                <div class="flex gap-2 mt-2 justify-center">
-                    <input type="text" id="edit-name" placeholder="Emri" class="w-20 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
-                    <input type="text" id="edit-surname" placeholder="Mbiemri" class="w-20 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
-                    <button onclick="saveProfileData('fullname')" class="bg-blue-600 text-white px-2 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 shadow-sm">Ruaj</button>
-                </div>
-            `;
+            makeEditable('fullname', '', '');
             document.getElementById('modal-email').innerText = user.email;
-            
-            document.getElementById('modal-institution-container').innerHTML = `
-                <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Institucioni</span>
-                <div class="flex gap-2 mt-1">
-                    <input type="text" id="edit-institution" placeholder="Shto Institucionin" class="flex-1 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
-                    <button onclick="saveProfileData('institution')" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 transition-colors shadow-sm">Ruaj</button>
-                </div>
-            `;
-
-            document.getElementById('modal-phone-container').innerHTML = `
-                <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Numër Telefoni</span>
-                <div class="flex gap-2 mt-1">
-                    <input type="text" id="edit-phone" placeholder="Shto Numrin" class="flex-1 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
-                    <button onclick="saveProfileData('phone')" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-emerald-700 transition-colors shadow-sm">Ruaj</button>
-                </div>
-            `;
+            makeEditable('institution', '');
+            makeEditable('phone', '');
         }
     } catch(e) {
         console.error("Profile fetch error", e);
