@@ -2016,4 +2016,205 @@ window.deleteSingleTrashItem = async (id) => { askConfirm("Jeni të sigurt që d
 window.editOperator = (id) => { const op = operatorData.find(o => o.id === id); if(!op) return; document.getElementById('edit-op-id').value = op.id; document.getElementById('new-op-name').value = op.name; document.getElementById('add-op-btn').innerText = 'Ruaj'; document.getElementById('cancel-op-btn').classList.remove('hidden'); };
 window.resetOpForm = () => { document.getElementById('edit-op-id').value = ''; document.getElementById('new-op-name').value = ''; document.getElementById('add-op-btn').innerText = 'Shto'; document.getElementById('cancel-op-btn').classList.add('hidden'); };
 document.getElementById('add-op-btn').onclick = async () => { const name = document.getElementById('new-op-name').value.trim(); const editId = document.getElementById('edit-op-id').value; if(name) { const idToSave = editId || Date.now().toString(); await setDoc(doc(db, getBaseCollectionPath('operators'), getSecureId(idToSave)), { name, timestamp: Date.now() }); resetOpForm(); } };
-window.renderOperatorList = () => document.getElementById('operator-list').innerHTML = operatorData.map(o => ` <div class="bg-white border border-slate-200/60 shadow-sm px-4 py-3 rounded-2xl flex items-center gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all"> <span class="text-xs font-bold text-slate-700">${o.name}</span> <div class="flex gap-2 ml-2 border-l border-slate-100 pl-3"> <button onclick="editOperator('${o.id}')" class="text-blue-500 font-bold hover:text-blue-700 text-[10px] uppercase transition-colors">Edito</button> <button onclick="deleteItem('operators', '${o.id}')" class="text-red-400 font-bold hover
+window.renderOperatorList = () => document.getElementById('operator-list').innerHTML = operatorData.map(o => ` <div class="bg-white border border-slate-200/60 shadow-sm px-4 py-3 rounded-2xl flex items-center gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all"> <span class="text-xs font-bold text-slate-700">${o.name}</span> <div class="flex gap-2 ml-2 border-l border-slate-100 pl-3"> <button onclick="editOperator('${o.id}')" class="text-blue-500 font-bold hover:text-blue-700 text-[10px] uppercase transition-colors">Edito</button> <button onclick="deleteItem('operators', '${o.id}')" class="text-red-400 font-bold hover:text-red-600 text-[10px] uppercase transition-colors">Fshi</button> </div> </div>`).join("");
+
+/* ==========================================
+LLOGJIKA E PËRDITËSUAR E BACKUP-it (IMPORT & EXPORT)
+========================================== */
+
+window.exportSystemData = async () => {
+document.getElementById('loading').classList.remove('hidden');
+try {
+const user = auth.currentUser;
+if (!user) throw new Error("Përdoruesi nuk është i identifikuar.");
+
+// Marrim të gjitha të dhënat e pushimeve vjetore për vitet 2024-2035
+const yearsData = {};
+for (let y = 2024; y <= 2035; y++) {
+const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(y));
+const snap = await getDoc(docRef);
+if (snap.exists()) {
+yearsData[y] = snap.data();
+}
+}
+
+const backupObj = {
+configData,
+logData,
+operatorData,
+vacationYears: yearsData,
+exportedAt: Date.now(),
+version: "2.0"
+};
+
+const dataStr = JSON.stringify(backupObj, null, 2);
+const blob = new Blob([dataStr], { type: "application/json" });
+const url = URL.createObjectURL(blob);
+const a = document.createElement("a");
+a.href = url;
+a.download = `LindiMaps_Full_Backup_${new Date().toISOString().split('T')[0]}.json`;
+a.click();
+URL.revokeObjectURL(url);
+} catch (err) {
+showAlert("Gabim gjatë shkarkimit të backup: " + err.message);
+} finally {
+document.getElementById('loading').classList.add('hidden');
+}
+};
+
+window.importSystemData = (event) => {
+const file = event.target.files[0];
+if (!file) return;
+const reader = new FileReader();
+reader.onload = async (e) => {
+try {
+const data = JSON.parse(e.target.result);
+document.getElementById('loading').classList.remove('hidden');
+document.getElementById('loading-progress').classList.remove('hidden');
+document.getElementById('loading-progress').innerText = "Duke importuar...";
+
+const user = auth.currentUser;
+if (!user) throw new Error("Përdoruesi nuk është i identifikuar.");
+
+// Ruajmë struktura/aktivitete pa dublikuar asgjë në Firebase
+const processCollection = async (arr, colName) => {
+if (arr && Array.isArray(arr)) {
+for (const item of arr) {
+const secureId = getSecureId(item.id);
+await setDoc(doc(db, getBaseCollectionPath(colName), secureId), item);
+}
+}
+};
+
+const configsToImport = data.configData || data.config || [];
+const logsToImport = data.logData || data.logs || [];
+const operatorsToImport = data.operatorData || data.operators || [];
+
+await processCollection(configsToImport, 'config');
+await processCollection(logsToImport, 'logs');
+await processCollection(operatorsToImport, 'operators');
+
+// Importojmë dhe shkrijmë (merge) pushimet vjetore pa fshirë të dhënat ekzistuese
+if (data.vacationYears && typeof data.vacationYears === 'object') {
+for (const [year, backupYearData] of Object.entries(data.vacationYears)) {
+const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(year));
+const snap = await getDoc(docRef);
+
+let mergedYearData = { ...backupYearData };
+if (snap.exists()) {
+const existingData = snap.data();
+
+// Bashkojmë vlerat për të shmangur dublikimet ose mbivendosjet e paqëllimshme
+const mergedSelected = Array.from(new Set([
+...(existingData.selected || []),
+...(backupYearData.selected || [])
+])).sort();
+
+const mergedMedical = Array.from(new Set([
+...(existingData.medical || []),
+...(backupYearData.medical || [])
+])).sort();
+
+const mergedMovable = {
+...(existingData.movableDates || {}),
+...(backupYearData.movableDates || {})
+};
+
+mergedYearData = {
+allowance: existingData.allowance ?? backupYearData.allowance ?? 28,
+selected: mergedSelected,
+medical: mergedMedical,
+movableDates: mergedMovable,
+manualCarryover: existingData.manualCarryover !== undefined ? existingData.manualCarryover : backupYearData.manualCarryover
+};
+}
+await setDoc(docRef, mergedYearData);
+}
+}
+
+// Rifreskojmë kalendarin e pushimeve nëse është i hapur akti i duhur
+if (!document.getElementById('view-vacations').classList.contains('hidden')) {
+fetchVacationYearData();
+}
+
+document.getElementById('loading').classList.add('hidden');
+document.getElementById('loading-progress').classList.add('hidden');
+showAlert("Të dhënat dhe pushimet u importuan me sukses!");
+event.target.value = '';
+} catch (err) {
+document.getElementById('loading').classList.add('hidden');
+document.getElementById('loading-progress').classList.add('hidden');
+showAlert("Gabim në importim: Skedari nuk është i vlefshëm.");
+}
+};
+reader.readAsText(file);
+};
+
+window.toggleMenu = () => {
+const menu = document.getElementById('side-menu');
+const overlay = document.getElementById('menu-overlay');
+menu.classList.toggle('-translate-x-full');
+overlay.classList.toggle('hidden');
+};
+
+
+/* ==========================================
+LIGJIKA E INTEGRUAR E PUSHIMEVE (SISTEMI 2)
+========================================== */
+
+const getHolidaysForYear = (yr = selectedYear) => {
+const year = yr;
+const defaults = {
+'Bajrami i Madh': year === 2026 ? `${year}-03-20` : `${year}-03-31`,
+'Pashkët Katolike': year === 2026 ? `${year}-04-05` : `${year}-04-20`,
+'Pashkët Ortodokse': year === 2026 ? `${year}-04-12` : `${year}-04-12`,
+'Kurban Bajrami': year === 2026 ? `${year}-05-27` : `${year}-06-07`
+};
+const currentMovable = yr === selectedYear ? { ...defaults, ...(vacationYearData.movableDates || {}) } : defaults;
+let baseHolidays = {
+[`${year}-01-01`]: 'Viti i Ri', [`${year}-01-02`]: 'Viti i Ri',
+[`${year}-03-14`]: 'Dita e Verës', [`${year}-03-22`]: 'Dita e Nevruzit',
+[`${year}-05-01`]: 'Dita e Punës', [`${year}-09-05`]: 'Nënë Tereza',
+[`${year}-11-22`]: 'Dita e Alfabetit', [`${year}-11-28`]: 'Pavarësia',
+[`${year}-11-29`]: 'Çlirimi', [`${year}-12-08`]: 'Dita e Rinisë',
+[`${year}-12-25`]: 'Krishtlindjet'
+};
+Object.entries(currentMovable).forEach(([name, date]) => { if(date) baseHolidays[date] = name; });
+let finalHolidays = { ...baseHolidays };
+Object.entries(baseHolidays).sort().forEach(([dateStr, name]) => {
+const date = new Date(dateStr);
+const dayOfWeek = date.getDay();
+if (dayOfWeek === 0 || dayOfWeek === 6) {
+let nextWorkDay = new Date(date);
+let offset = (dayOfWeek === 0) ? 1 : 2;
+nextWorkDay.setDate(date.getDate() + offset);
+let nextStr = nextWorkDay.toISOString().split('T')[0];
+while (finalHolidays[nextStr]) { nextWorkDay.setDate(nextWorkDay.getDate() + 1); nextStr = nextWorkDay.toISOString().split('T')[0]; }
+finalHolidays[nextStr] = `${name} (Shtyrë)`;
+}
+});
+return finalHolidays;
+};
+
+window.renderVacationSelectors = () => {
+let html = "";
+// Shigjeta Majtas për të kaluar vit pas viti pafundësisht prapa
+html += `<button onclick="setVacationYear(${selectedYear - 1})" class="p-2 text-slate-400 hover:text-blue-600 transition-colors flex items-center justify-center" title="Viti i kaluar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m15 18-6-6 6-6"/></svg></button>`;
+
+// Generon butonat rrëshqitës dinamikë rreth vitit aktual të zgjedhur
+[-2, -1, 0, 1, 2].forEach(offset => {
+const y = selectedYear + offset;
+if (y >= 2024) { // Kufiri i poshtëm që përkon me fillimin e databazës
+html += `<button onclick="setVacationYear(${y})" class="px-3.5 py-1.5 rounded-xl text-[10px] font-black transition-all ${selectedYear === y ? 'bg-white text-blue-600 shadow-sm font-bold' : 'text-slate-400 uppercase'}" style="min-width: 45px;">${y}</button>`;
+}
+});
+
+// Shigjeta Djathtas për të kaluar vit pas viti pafundësisht përpara
+html += `<button onclick="setVacationYear(${selectedYear + 1})" class="p-2 text-slate-400 hover:text-blue-600 transition-colors flex items-center justify-center" title="Viti i ardhshëm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m9 18 6-6-6-6"/></svg></button>`;
+
+document.getElementById('vacation-year-selector').innerHTML = html;
+};
+
+window.setVacationYear = (year) => {
+if (year < 2024) year = 2024; // Mbron llogaritjen historike të mbartjes
+selectedYear = year
