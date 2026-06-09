@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASIG Explorer - Monitorimi i Sipërfaqeve</title>
+    <!-- Ngarkimi i Chart.js dhe i shtojcës për etiketa (datalabels) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <!-- Ngarkimi i SheetJS për të lexuar skedarët Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --panel-bg: rgba(17, 25, 40, 0.75);
+            --border-color: rgba(255, 255, 255, 0.125);
+            --accent-glow: 0 0 15px rgba(0, 212, 255, 0.4);
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #00d4ff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1400px;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .glass-panel {
+            background-color: var(--panel-bg);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            box-shadow: var(--accent-glow);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        h1, h2 {
+            margin-top: 0;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        /* Stilet e Listës së Bashkive */
+        .mun-list-container {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .mun-list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .mun-list-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        .mun-list-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .mun-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255, 0.03);
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: 0.2s;
+            gap: 10px;
+        }
+
+        .mun-item:hover {
+            background: rgba(255,255,255, 0.08);
+            border-color: var(--border-color);
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        input[type="checkbox"] {
+            accent-color: var(--accent);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 0;
+            background: transparent;
+            flex-shrink: 0;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* Inputet për emrat e bashkive */
+        .name-input {
+            background: transparent;
+            border: 1px dashed transparent;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            flex: 1;
+            width: 100%;
+            padding: 4px 6px;
+            border-radius: 4px;
+            outline: none;
+            transition: all 0.2s;
+            min-width: 0;
+            text-overflow: ellipsis;
+        }
+        .name-input:hover {
+            border-color: rgba(255,255,255,0.2);
+        }
+        .name-input:focus {
+            border-color: var(--accent);
+            background: rgba(0,0,0,0.3);
+        }
+
+        .val-input {
+            width: 80px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            color: var(--accent);
+            padding: 6px;
+            border-radius: 6px;
+            text-align: right;
+            font-family: monospace;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+            flex-shrink: 0;
+        }
+        .val-input:focus {
+            border-color: var(--accent);
+        }
+
+        /* Zona e Grafikut dhe Kontrollet */
+        .chart-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .chart-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .radio-label, .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .radio-label input[type="radio"], .checkbox-label input[type="checkbox"] {
+            accent-color: var(--accent);
+            width: 16px;
+            height: 16px;
+        }
+
+        .select-control {
+            background: #111928;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .select-control:focus {
+            border-color: var(--accent);
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Butonat */
+        .btn-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        button {
+            flex: 1;
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: var(--accent);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border-color: var(--text-muted);
+            color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            background: var(--text-muted);
+            color: var(--bg-color);
+            box-shadow: none;
+        }
+
+        .btn-dashed {
+            border-style: dashed;
+            color: #4ade80;
+            border-color: #4ade80;
+        }
+        
+        .btn-dashed:hover {
+            background: #4ade80;
+            color: var(--bg-color);
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+        }
+
+        /* Seksioni i Statistikave */
+        .stats-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(0,0,0,0.2);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+        }
+
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* Optimizimi i Plotë për Printim (PDF) */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0;
+            }
+            .dashboard-container {
+                display: block;
+                width: 100%;
+                max-width: 100%;
+            }
+            .sidebar, .btn-container, .chart-controls {
+                display: none !important;
+            }
+            .glass-panel {
+                background: white !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            h1 {
+                color: black !important;
+                text-shadow: none !important;
+                border-bottom: 2px solid black !important;
+                text-align: center;
+                font-size: 1.8rem !important;
+                margin-bottom: 30px !important;
+                padding-bottom: 15px !important;
+            }
+            .chart-wrapper {
+                height: 550px !important;
+                width: 100% !important;
+                margin-bottom: 30px !important;
+            }
+            .stats-box {
+                margin-top: 30px !important;
+                display: flex !important;
+                justify-content: space-around !important;
+                gap: 20px !important;
+            }
+            .stat-card {
+                background: #f8f9fa !important;
+                border: 1px solid #dee2e6 !important;
+                flex: 1;
+                border-radius: 8px !important;
+                padding: 15px !important;
+            }
+            .stat-card .value {
+                color: black !important;
+                font-size: 1.8rem !important;
+            }
+            .stat-card .label {
+                color: #495057 !important;
+                font-size: 0.9rem !important;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 20mm 15mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar - Lista e Bashkive me mundësi modifikimi dhe ngarkimi -->
+        <div class="glass-panel sidebar">
+            <h1>Zgjedhjet & Editimi</h1>
+            <div class="mun-list-container" id="munList">
+                <!-- Do të injektohen nga Javascript -->
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn-secondary" onclick="selectAll(true)">Të Gjitha</button>
+                <button class="btn-secondary" onclick="selectAll(false)">Pastro</button>
+            </div>
+            
+            <!-- Butoni i ri për ngarkimin e Excel / CSV -->
+            <div class="btn-container" style="margin-top: 12px;">
+                <input type="file" id="excelUpload" accept=".xlsx, .xls, .csv" style="display: none;" onchange="handleExcelUpload(event)">
+                <button class="btn-secondary btn-dashed" onclick="document.getElementById('excelUpload').click()">📁 Ngarko Të Dhëna (Excel/CSV)</button>
+            </div>
+        </div>
+
+        <!-- Seksioni Kryesor - Grafiku dhe Paneli i Kontrollit të Avancuar -->
+        <div class="glass-panel chart-section">
+            <h1 style="width: 100%;">Raporti Grafik - ASIG Explorer</h1>
+            
+            <div class="chart-controls">
+                <!-- Mënyra e Shfaqjes -->
+                <div class="control-group">
+                    <span class="control-title">Shfaqja e të Dhënave</span>
+                    <div class="control-row">
+                        <label class="radio-label">
+                            <input type="radio" name="displayMode" value="value" checked onchange="updateChart()"> 
+                            Ha
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="displayMode" value="percentage" onchange="updateChart()"> 
+                            Përqindje (%)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Konfigurimi i Etiketave (Labels) -->
+                <div class="control-group">
+                    <span class="control-title">Etiketat mbi Grafik</span>
+                    <div class="control-row">
+                        <label class="checkbox-label" style="margin-right: 5px;">
+                            <input type="checkbox" id="showLabels" checked onchange="updateChart()">
+                            Shfaq
+                        </label>
+                        <select id="labelFont" class="select-control" onchange="updateChart()" title="Stili i shkrimit">
+                            <option value="Segoe UI" selected>Segoe UI</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Courier New">Courier New</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Impact">Impact</option>
+                        </select>
+                        <select id="labelSize" class="select-control" onchange="updateChart()" title="Madhësia e shkrimit">
+                            <option value="11">11px</option>
+                            <option value="13" selected>13px</option>
+                            <option value="15">15px</option>
+                            <option value="17">17px</option>
+                            <option value="20">20px</option>
+                        </select>
+                        <div class="color-picker-wrapper" title="Ngjyra e shkrimit">
+                            <input type="color" id="labelColor" value="#ffffff" onchange="updateChart()">
+                            <span>Ngjyra</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Konfigurimi i Legjendës -->
+                <div class="control-group">
+                    <span class="control-title">Konfigurimi i Legjendës</span>
+                    <div class="control-row">
+                        <select id="legendPosition" class="select-control" onchange="updateChart()" title="Pozicioni i legjendës">
+                            <option value="right" selected>Djathtas</option>
+                            <option value="left">Majtas</option>
+                            <option value="top">Lart</option>
+                            <option value="bottom">Poshtë</option>
+                            <option value="hide">Fshihe</option>
+                        </select>
+                        <select id="legendShape" class="select-control" onchange="updateChart()" title="Forma e pikave të legjendës">
+                            <option value="circle" selected>Rreth</option>
+                            <option value="rect">Katror</option>
+                            <option value="rectRounded">Katror i rrumbullakosur</option>
+                            <option value="triangle">Trekëndësh</option>
+                            <option value="star">Yll</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="areaChart"></canvas>
+            </div>
+
+            <div class="stats-box">
+                <div class="stat-card">
+                    <div class="label">Total Sipërfaqe</div>
+                    <div class="value" id="totalArea">0.0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Elementë (Bashki)</div>
+                    <div class="value" id="totalCount">0</div>
+                </div>
+            </div>
+
+            <div class="btn-container" style="justify-content: flex-end; width: 100%; gap: 16px;">
+                <button class="btn-secondary" onclick="downloadChart()" style="max-width: 250px;">📸 Shkarko si Foto</button>
+                <button onclick="window.print()" style="max-width: 250px;">🖨️ Printo Raportin / PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Të dhënat fillestare (let në vend të const që të lejohet mbishkrimi nga Excel)
+        let rawData = [
+            {"name": "Mallakastër", "value": 0.1},
+            {"name": "Rrogozhinë", "value": 3.5},
+            {"name": "Memaliaj", "value": 18.2},
+            {"name": "Himarë", "value": 120},
+            {"name": "Selenicë", "value": 125},
+            {"name": "Lezhë", "value": 134.3},
+            {"name": "Dejës", "value": 153.3},
+            {"name": "Maliq", "value": 210.2},
+            {"name": "Sarandë", "value": 275},
+            {"name": "Durrës", "value": 346.3},
+            {"name": "Kurbin", "value": 538.6},
+            {"name": "Finiq", "value": 554.4},
+            {"name": "Elbasan", "value": 584},
+            {"name": "Tepelenë", "value": 755},
+            {"name": "Pukë", "value": 836.9},
+            {"name": "Konispol", "value": 1231.9},
+            {"name": "Fier", "value": 1314.1},
+            {"name": "Delvinë", "value": 1436.3},
+            {"name": "Berat", "value": 1442},
+            {"name": "Gramsh", "value": 1446.8},
+            {"name": "Kolonjë", "value": 1524.7},
+            {"name": "Gjirokastër", "value": 1613.4},
+            {"name": "Këlcyrë", "value": 1930.2},
+            {"name": "Klos", "value": 1938.1},
+            {"name": "Mirditë", "value": 2526.6},
+            {"name": "Divjakë", "value": 2605.8},
+            {"name": "Korçë", "value": 2628.3},
+            {"name": "Devoll", "value": 2895},
+            {"name": "Fushë Arrëz", "value": 2959.7},
+            {"name": "Mat", "value": 3159.5},
+            {"name": "Libohovë", "value": 3533.7},
+            {"name": "Poliçan", "value": 3544.7},
+            {"name": "Pogradec", "value": 3649.1},
+            {"name": "Dropull", "value": 3817.8},
+            {"name": "Pustec", "value": 4126.9},
+            {"name": "Prrenjas", "value": 5390.9},
+            {"name": "Krujë", "value": 5551.2},
+            {"name": "Skrapar", "value": 6093},
+            {"name": "Vlorë", "value": 6290.8},
+            {"name": "Bulqizë", "value": 6640},
+            {"name": "Kukës", "value": 13589},
+            {"name": "Shkodër", "value": 14811.4},
+            {"name": "Dibër", "value": 14946.1},
+            {"name": "Përmet", "value": 16281.8},
+            {"name": "Malësi e Madhe", "value": 18217.7},
+            {"name": "Tropojë", "value": 18624.6},
+            {"name": "Librazhd", "value": 19209.9},
+            {"name": "Tiranë", "value": 26544.6}
+        ];
+
+        let pieChart;
+        // Regjistro shtojcën për shfaqjen e etiketave direkt mbi grafik
+        Chart.register(ChartDataLabels);
+
+        // Funksion për të konvertuar HSL në format HEX për Color Picker
+        function hslToHex(h, s, l) {
+            l /= 100;
+            const a = s * Math.min(l, 1 - l) / 100;
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+
+        function initData() {
+            // Shtojmë një ngjyrë të paracaktuar të bukur (HEX) për çdo element
+            rawData.forEach((item, index) => {
+                if (!item.color) {
+                    const hue = (index * 137.508) % 360; // Shpërndarje e rregullt ngjyrash
+                    item.color = hslToHex(hue, 70, 50);
+                }
+            });
+        }
+
+        function initList() {
+            const container = document.getElementById('munList');
+            container.innerHTML = ''; 
+            
+            rawData.forEach((item, index) => {
+                // Si parazgjedhje, zgjedhim 10 të fundit që janë vlerat më domethënëse për ta mbajtur grafikun të pastër në fillim
+                const isChecked = index >= rawData.length - 10 ? 'checked' : ''; 
+
+                const div = document.createElement('div');
+                div.className = 'mun-item';
+                div.innerHTML = `
+                    <div class="item-left">
+                        <input type="checkbox" id="chk_${index}" value="${index}" ${isChecked} onchange="updateChart()">
+                        <input type="color" value="${item.color}" id="color_${index}" onchange="updateItemData(${index}, 'color')" title="Ndrysho Ngjyrën">
+                        <input type="text" class="name-input" value="${item.name}" id="name_${index}" oninput="updateItemData(${index}, 'name')" title="Modifiko Emrin">
+                    </div>
+                    <input type="number" class="val-input" value="${item.value}" min="0" step="0.1" id="val_${index}" oninput="updateItemData(${index}, 'value')" title="Modifiko Vlerën">
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Funksioni që ndryshon të dhënat kur përdoruesi ndryshon emrin, vlerën ose ngjyrën
+        function updateItemData(index, type) {
+            if (type === 'color') {
+                rawData[index].color = document.getElementById(`color_${index}`).value;
+            } else if (type === 'value') {
+                const newVal = parseFloat(document.getElementById(`val_${index}`).value);
+                rawData[index].value = isNaN(newVal) ? 0 : newVal;
+            } else if (type === 'name') {
+                rawData[index].name = document.getElementById(`name_${index}`).value;
+            }
+            updateChart();
+        }
+
+        function selectAll(state) {
+            const checkboxes = document.querySelectorAll('.mun-list-container input[type="checkbox"]');
+            checkboxes.forEach(chk => chk.checked = state);
+            updateChart();
+        }
+
+        // Leximi i skedarit Excel / CSV
+        function handleExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const json = XLSX.utils.sheet_to_json(worksheet, {header: 1}); // Array me rreshta dhe kolona
+
+                    if (json.length > 0) {
+                        const newRawData = [];
+                        let startIdx = 0;
+                        
+                        // Nëse rreshti i parë përmban tekst (titujt e kolonave), kaloje atë
+                        if (json[0].length >= 2 && isNaN(parseFloat(json[0][1]))) {
+                            startIdx = 1;
+                        }
+
+                        for (let i = startIdx; i < json.length; i++) {
+                            const row = json[i];
+                            // Kontrollo nëse rreshti ka të paktën 2 kolona: [Emri, Vlera]
+                            if (row.length >= 2 && row[0] !== undefined) {
+                                const val = parseFloat(row[1]);
+                                newRawData.push({
+                                    name: row[0].toString(),
+                                    value: isNaN(val) ? 0 : val
+                                });
+                            }
+                        }
+
+                        if (newRawData.length > 0) {
+                            rawData = newRawData; // Mbishkruaj të dhënat
+                            initData(); // Gjenero ngjyrat për të dhënat e reja
+                            initList(); // Ndërto përsëri listën e majtë
+                            
+                            // Selekto të gjitha nga parazgjedhja kur ngarkojmë listë të re
+                            selectAll(true); 
+                        } else {
+                            alert("Nuk u gjetën të dhëna të vlefshme. Sigurohuni që Exceli të ketë dy kolona: Kolona A për Emrin dhe Kolona B për Vlerën numerike.");
+                        }
+                    }
+                } catch(error) {
+                    alert("Ndodhi një gabim gjatë leximit të skedarit: " + error.message);
+                }
+                
+                // Pastro inputin e skedarit që të mund të ngarkohet prapë i njëjti nëse duhet
+                document.getElementById('excelUpload').value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updateChart() {
+            // Lexo cilat bashki janë përzgjedhur aktualisht
+            const checkboxes = document.querySelectorAll('.mun-list-container input[type="checkbox"]:checked');
+            const selectedIndices = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            const selectedData = selectedIndices.map(idx => rawData[idx]);
+            
+            // Llogarit Statistikat (Sipërfaqen totale dhe numrin e bashkive)
+            const totalVal = selectedData.reduce((sum, item) => sum + item.value, 0);
+            document.getElementById('totalArea').textContent = totalVal.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+            document.getElementById('totalCount').textContent = selectedData.length;
+
+            // Lexo kontrollet e reja vizuale
+            const displayMode = document.querySelector('input[name="displayMode"]:checked').value;
+            const showLabels = document.getElementById('showLabels').checked;
+            const labelFont = document.getElementById('labelFont').value;
+            const labelSize = parseInt(document.getElementById('labelSize').value);
+            const labelColor = document.getElementById('labelColor').value;
+            
+            const legendPosition = document.getElementById('legendPosition').value;
+            const legendShape = document.getElementById('legendShape').value;
+
+            // Krijo listat e të dhënave për Chart.js
+            const labels = selectedData.map(item => item.name);
+            const dataValues = selectedData.map(item => item.value);
+            const bgColors = selectedData.map(item => item.color);
+
+            // Formatuesi i etiketave mbi grafik
+            const datalabelsFormatter = (value, context) => {
+                const total = context.chart._metasets[0].total;
+                if (total === 0) return null;
+                const percNum = (value / total) * 100;
+                
+                // Nëse përqindja është nën 2.5%, e fshehim etiketën e asaj fete që të mos krijohet mbivendosje e shëmtuar teksti
+                if (percNum < 2.5) return null;
+                
+                return displayMode === 'percentage' 
+                    ? percNum.toFixed(1) + '%' 
+                    : value.toLocaleString();
+            };
+
+            const legendDisplay = legendPosition !== 'hide';
+
+            if (pieChart) {
+                // Përditëso strukturën ekzistuese të grafikut
+                pieChart.data.labels = labels;
+                pieChart.data.datasets[0].data = dataValues;
+                pieChart.data.datasets[0].backgroundColor = bgColors;
+                
+                // Rifresko stilin e shkrimit dhe të etiketave
+                pieChart.options.plugins.datalabels.display = showLabels;
+                pieChart.options.plugins.datalabels.formatter = datalabelsFormatter;
+                pieChart.options.plugins.datalabels.font.family = labelFont;
+                pieChart.options.plugins.datalabels.font.size = labelSize;
+                pieChart.options.plugins.datalabels.color = labelColor;
+
+                // Rifresko legjendën
+                pieChart.options.plugins.legend.display = legendDisplay;
+                if (legendDisplay) {
+                    pieChart.options.plugins.legend.position = legendPosition;
+                    pieChart.options.plugins.legend.labels.pointStyle = legendShape;
+                }
+                
+                pieChart.options.plugins.tooltip.callbacks.label = getTooltipCallback(displayMode);
+                pieChart.update();
+            } else {
+                // Krijimi i grafikut për herë të parë
+                const ctx = document.getElementById('areaChart').getContext('2d');
+                pieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: dataValues,
+                            backgroundColor: bgColors,
+                            borderWidth: 1.5,
+                            borderColor: '#111928'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: 10
+                        },
+                        plugins: {
+                            datalabels: {
+                                display: showLabels,
+                                color: labelColor,
+                                font: {
+                                    weight: 'bold',
+                                    size: labelSize,
+                                    family: labelFont
+                                },
+                                textStrokeColor: 'rgba(0,0,0,0.85)',
+                                textStrokeWidth: 3,
+                                formatter: datalabelsFormatter
+                            },
+                            legend: {
+                                display: legendDisplay,
+                                position: legendPosition,
+                                labels: {
+                                    color: '#e2e8f0',
+                                    font: { family: 'Segoe UI', size: 12 },
+                                    padding: 15,
+                                    usePointStyle: true,
+                                    pointStyle: legendShape
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: getTooltipCallback(displayMode)
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Përshtatja automatike e ngjyrave të legjendës kur shkojmë te printimi
+            window.matchMedia('print').addEventListener('change', mql => {
+                if(pieChart) {
+                    pieChart.options.plugins.legend.labels.color = mql.matches ? '#000000' : '#e2e8f0';
+                    pieChart.update();
+                }
+            });
+        }
+
+        // Krijuesi i tekstit të mjetit informues (Tooltip)
+        function getTooltipCallback(mode) {
+            return function(context) {
+                let label = context.label || '';
+                if (label) {
+                    label += ': ';
+                }
+                const val = context.parsed;
+                if (mode === 'percentage') {
+                    const total = context.chart._metasets[0].total;
+                    const percentage = total > 0 ? ((val / total) * 100).toFixed(2) + '%' : '0%';
+                    label += percentage;
+                } else {
+                    label += val.toLocaleString();
+                }
+                return label;
+            };
+        }
+
+        // Funksioni për shkarkimin e grafikut si Foto (PNG) me cilësi të plotë
+        function downloadChart() {
+            const canvas = document.getElementById('areaChart');
+            
+            // Krijojmë një canvas të përkohshëm për të shtuar një sfond të plotë profesional të errët (që të mos dalë transparent në PNG)
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const ctx = tempCanvas.getContext('2d');
+            
+            // Shtojmë sfondin e bukur të errët të aplikacionit
+            ctx.fillStyle = '#0b0f19';
+            ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            
+            // Vizatojmë grafikun mbi sfond
+            ctx.drawImage(canvas, 0, 0);
+            
+            // Gjenerojmë shkarkimin e fotos
+            const link = document.createElement('a');
+            link.download = 'asig_raport_grafik.png';
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Nisja e aplikacionit
+        window.onload = () => {
+            initData();
+            initList();
+            updateChart();
+        };
+    </script>
+</body>
+</html>
