@@ -7,6 +7,9 @@
     <!-- Ngarkimi i Chart.js dhe i shtojcës për etiketa (datalabels) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <!-- SHTUAR E RE: Libraria për leximin e skedarëve Excel (SheetJS) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <style>
         :root {
             --bg-color: #0b0f19;
@@ -72,7 +75,7 @@
 
         /* Stilet e Listës së Bashkive */
         .mun-list-container {
-            max-height: 70vh;
+            max-height: 55vh;
             overflow-y: auto;
             padding-right: 10px;
         }
@@ -120,6 +123,25 @@
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        /* Stili për editimin e emrit të bashkive */
+        .name-input {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-family: inherit;
+            width: 100%;
+            outline: none;
+            padding: 4px;
+            border-radius: 4px;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        .name-input:focus, .name-input:hover {
+            border-color: var(--border-color);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         input[type="checkbox"] {
@@ -213,6 +235,7 @@
             cursor: pointer;
             font-weight: 500;
             font-size: 0.9rem;
+            transition: opacity 0.3s;
         }
         
         .radio-label input[type="radio"], .checkbox-label input[type="checkbox"] {
@@ -243,6 +266,7 @@
             gap: 6px;
             font-size: 0.8rem;
             color: var(--text-muted);
+            transition: opacity 0.3s;
         }
 
         .chart-wrapper {
@@ -252,7 +276,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 12px; /* Shtuar për të pasur qoshe të buta nëse ndryshojmë sfondin */
+            border-radius: 12px;
             transition: background-color 0.3s ease;
         }
 
@@ -403,6 +427,26 @@
         <!-- Sidebar - Lista e Bashkive me mundësi modifikimi -->
         <div class="glass-panel sidebar">
             <h1>Zgjedhjet & Editimi</h1>
+            
+            <!-- E RE: Seksioni i ngarkimit të Excel-it pa prekur strukturën tjetër -->
+            <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);">
+                <span class="control-title" style="display:block; margin-bottom:10px;">Ngarko Të Dhëna nga Excel</span>
+                <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="width:100%; font-size: 0.85rem; margin-bottom: 10px;" onchange="handleExcelUpload(event)">
+                
+                <!-- Këtu zgjidhen kolonat pasi ngarkoni exelin -->
+                <div id="excelMapping" style="display:none; flex-direction:column; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <label style="font-size: 0.85rem; width: 60px;">Emërtimi:</label>
+                        <select id="colName" class="select-control" style="flex:1;"></select>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <label style="font-size: 0.85rem; width: 60px;">Vlera:</label>
+                        <select id="colValue" class="select-control" style="flex:1;"></select>
+                    </div>
+                    <button class="btn-secondary" onclick="applyExcel()" style="padding: 8px; font-size: 0.85rem; margin-top: 5px;">Apliko Të Dhënat e Reja</button>
+                </div>
+            </div>
+
             <div class="mun-list-container" id="munList">
                 <!-- Do të injektohen nga Javascript -->
             </div>
@@ -418,7 +462,23 @@
             
             <div class="chart-controls">
                 
-                <!-- Titulli i Grafikut (E RE) -->
+                <!-- E RE: Tipi i Grafikut -->
+                <div class="control-group">
+                    <span class="control-title">Tipi i Grafikut</span>
+                    <div class="control-row">
+                        <select id="chartType" class="select-control" style="width: 100%; max-width: 200px;" onchange="updateChart()" title="Zgjidhni llojin e grafikut">
+                            <option value="pie" selected>Pie (Rrethor)</option>
+                            <option value="doughnut">Doughnut (Unazë)</option>
+                            <option value="bar">Column (Shtyllë Vertikale)</option>
+                            <option value="horizontalBar">Bar (Shtyllë Horizontale)</option>
+                            <option value="polarArea">Polar Area (Zona Polare)</option>
+                            <option value="line">Line (Vijë)</option>
+                            <option value="radar">Radar</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Titulli i Grafikut -->
                 <div class="control-group">
                     <span class="control-title">Titulli i Grafikut</span>
                     <div class="control-row">
@@ -440,7 +500,7 @@
                     </div>
                 </div>
 
-                <!-- Sfondi dhe Konturet (E RE) -->
+                <!-- Sfondi dhe Konturet (Me opsionin Me/Pa Konture) -->
                 <div class="control-group">
                     <span class="control-title">Ngjyrat e Grafikut</span>
                     <div class="control-row">
@@ -448,10 +508,29 @@
                             <input type="color" id="chartBgColor" value="#0b0f19" onchange="updateChart()">
                             <span>Sfondi</span>
                         </div>
-                        <div class="color-picker-wrapper" title="Ngjyra e vijave ndarëse të fetave (outlines)">
+                        <label class="checkbox-label" style="margin-left: 5px;" title="Aktivizo ose çaktivizo vijat ndarëse të fetave">
+                            <input type="checkbox" id="showOutlines" checked onchange="updateChart()">
+                            Me Konture
+                        </label>
+                        <div class="color-picker-wrapper" title="Ngjyra e vijave ndarëse të fetave (outlines)" id="outlineColorWrapper">
                             <input type="color" id="sliceBorderColor" value="#111928" onchange="updateChart()">
-                            <span>Konturet</span>
+                            <span>Ngjyra e Konturit</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Përfshirja / Grupimi (E RE: Mundëson formimin e 100% të totalit) -->
+                <div class="control-group">
+                    <span class="control-title">Përfshirja (Grupimi 100%)</span>
+                    <div class="control-row">
+                        <label class="radio-label" title="Shfaq në grafik vetëm bashkitë e zgjedhura (Përzgjedhja)">
+                            <input type="radio" name="groupingMode" value="selected" checked onchange="updateChart()"> 
+                            Përzgjedhja
+                        </label>
+                        <label class="radio-label" title="Përfshin të gjitha! Bashkitë e pazgjedhura grupohen si 'Të Tjerat' (Totali = 100%)">
+                            <input type="radio" name="groupingMode" value="grouped" onchange="updateChart()"> 
+                            Të Gjitha (Grupimi)
+                        </label>
                     </div>
                 </div>
 
@@ -461,7 +540,7 @@
                     <div class="control-row">
                         <label class="radio-label">
                             <input type="radio" name="displayMode" value="value" checked onchange="updateChart()"> 
-                            Ha
+                            Vlerë
                         </label>
                         <label class="radio-label">
                             <input type="radio" name="displayMode" value="percentage" onchange="updateChart()"> 
@@ -470,7 +549,7 @@
                     </div>
                 </div>
 
-                <!-- Konfigurimi i Etiketave dhe Shkrimit (E ZGJERUAR) -->
+                <!-- Konfigurimi i Etiketave dhe Shkrimit -->
                 <div class="control-group">
                     <span class="control-title">Stili i Shkrimit & Etiketat</span>
                     <div class="control-row">
@@ -508,7 +587,7 @@
                     </div>
                 </div>
 
-                <!-- Konfigurimi i Legjendës (E ZGJERUAR) -->
+                <!-- Konfigurimi i Legjendës -->
                 <div class="control-group">
                     <span class="control-title">Konfigurimi i Legjendës</span>
                     <div class="control-row">
@@ -545,11 +624,11 @@
 
             <div class="stats-box">
                 <div class="stat-card">
-                    <div class="label">Total Sipërfaqe (Ha)</div>
+                    <div class="label">Total Vlera</div>
                     <div class="value" id="totalArea">0.0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="label">Numri i Bashkive</div>
+                    <div class="label">Elementë në Grafik</div>
                     <div class="value" id="totalCount">0</div>
                 </div>
             </div>
@@ -618,6 +697,85 @@
         // Regjistro shtojcën për shfaqjen e etiketave direkt mbi grafik
         Chart.register(ChartDataLabels);
 
+        // FUNKSIONET E REJA PER EXCEL
+        let uploadedExcelRows = [];
+
+        function handleExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1}); // Lexo si matricë për të kapur headers lehtë
+
+                if (jsonData.length > 0) {
+                    const headers = jsonData[0];
+                    uploadedExcelRows = jsonData.slice(1); // Heqim rreshtin e parë (titujt)
+
+                    const colNameSelect = document.getElementById('colName');
+                    const colValueSelect = document.getElementById('colValue');
+                    
+                    colNameSelect.innerHTML = '';
+                    colValueSelect.innerHTML = '';
+
+                    headers.forEach((header, index) => {
+                        const optName = document.createElement('option');
+                        optName.value = index;
+                        optName.text = header || `Kolona ${index+1}`;
+                        colNameSelect.appendChild(optName);
+
+                        const optVal = document.createElement('option');
+                        optVal.value = index;
+                        optVal.text = header || `Kolona ${index+1}`;
+                        colValueSelect.appendChild(optVal);
+                    });
+
+                    // Nëse ka më shumë se 1 kolonë, automatikisht zgjedhim kolonën e dytë për Vlera
+                    if(headers.length > 1) {
+                        colValueSelect.selectedIndex = 1;
+                    }
+
+                    document.getElementById('excelMapping').style.display = 'flex';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function applyExcel() {
+            const nameIdx = parseInt(document.getElementById('colName').value);
+            const valIdx = parseInt(document.getElementById('colValue').value);
+
+            // Zbrazim të dhënat e vjetra duke ruajtur lidhjen e array-t origjinal
+            rawData.length = 0; 
+            
+            uploadedExcelRows.forEach(row => {
+                const rawName = row[nameIdx];
+                const rawVal = parseFloat(row[valIdx]);
+                
+                if (rawName !== undefined && !isNaN(rawVal)) {
+                    rawData.push({
+                        name: String(rawName).trim(),
+                        value: rawVal
+                    });
+                }
+            });
+
+            // Rifreskojmë dritaren me të dhënat e reja
+            initData();
+            initList();
+            updateChart();
+            
+            // Fshehim panelin dhe pastrojmë inputin e skedarit
+            document.getElementById('excelMapping').style.display = 'none';
+            document.getElementById('excelFile').value = '';
+            alert("Të dhënat u ngarkuan me sukses!");
+        }
+        // FUNDI I FUNKSIONEVE TE EXCEL
+
         // Funksion për të konvertuar HSL në format HEX për Color Picker
         function hslToHex(h, s, l) {
             l /= 100;
@@ -644,7 +802,8 @@
             
             rawData.forEach((item, index) => {
                 // Si parazgjedhje, zgjedhim 10 të fundit që janë vlerat më domethënëse për ta mbajtur grafikun të pastër në fillim
-                const isChecked = index >= rawData.length - 10 ? 'checked' : ''; 
+                // Në rastin e ngarkimit të excel do jenë deri ne 10
+                const isChecked = (rawData.length <= 15 || index >= rawData.length - 10) ? 'checked' : ''; 
 
                 const div = document.createElement('div');
                 div.className = 'mun-item';
@@ -652,7 +811,7 @@
                     <div class="item-left">
                         <input type="checkbox" id="chk_${index}" value="${index}" ${isChecked} onchange="updateChart()">
                         <input type="color" value="${item.color}" id="color_${index}" onchange="updateItemData(${index}, 'color')">
-                        <label for="chk_${index}">${item.name}</label>
+                        <input type="text" class="name-input" value="${item.name}" id="name_${index}" oninput="updateItemData(${index}, 'name')" title="Kliko për të ndryshuar emrin">
                     </div>
                     <input type="number" class="val-input" value="${item.value}" min="0" step="0.1" id="val_${index}" oninput="updateItemData(${index}, 'value')">
                 `;
@@ -660,13 +819,15 @@
             });
         }
 
-        // Funksioni që ndryshon të dhënat kur përdoruesi ndryshon vlerat ose ngjyrën
+        // Funksioni që ndryshon të dhënat kur përdoruesi ndryshon vlerat ose ngjyrën ose emrin
         function updateItemData(index, type) {
             if (type === 'color') {
                 rawData[index].color = document.getElementById(`color_${index}`).value;
             } else if (type === 'value') {
                 const newVal = parseFloat(document.getElementById(`val_${index}`).value);
                 rawData[index].value = isNaN(newVal) ? 0 : newVal;
+            } else if (type === 'name') {
+                rawData[index].name = document.getElementById(`name_${index}`).value;
             }
             updateChart();
         }
@@ -678,19 +839,43 @@
         }
 
         function updateChart() {
-            // Lexo cilat bashki janë përzgjedhur aktualisht
-            const checkboxes = document.querySelectorAll('.mun-list-container input[type="checkbox"]:checked');
-            const selectedIndices = Array.from(checkboxes).map(cb => parseInt(cb.value));
-            const selectedData = selectedIndices.map(idx => rawData[idx]);
+            // Llogaritja e Zgjedhjeve dhe Grupimit
+            const checkboxes = document.querySelectorAll('.mun-list-container input[type="checkbox"]');
+            const selectedData = [];
+            let othersValue = 0; // Vlera për "Të Tjerat" (bashkitë e pazgjedhura)
+
+            checkboxes.forEach((cb, index) => {
+                if (cb.checked) {
+                    selectedData.push(rawData[index]);
+                } else {
+                    if(rawData[index]) othersValue += rawData[index].value;
+                }
+            });
+
+            // Nëse përdoruesi kërkon që të grupsojë të pazgjedhurat për të formuar 100% totalin
+            const groupingMode = document.querySelector('input[name="groupingMode"]:checked').value;
+            if (groupingMode === 'grouped' && othersValue > 0) {
+                selectedData.push({
+                    name: "Të Tjerat",
+                    value: othersValue,
+                    color: "#475569" // Një ngjyrë gri neutrale dhe profesionale për grupimin
+                });
+            }
             
-            // Llogarit Statistikat
+            // Llogarit Statistikat e reja
             const totalVal = selectedData.reduce((sum, item) => sum + item.value, 0);
             document.getElementById('totalArea').textContent = totalVal.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
             document.getElementById('totalCount').textContent = selectedData.length;
 
-            // Lexo vlerat e reja vizuale (Sfondi & Konturet & Titulli)
+            // Lexo vlerat vizuale (Sfondi & Konturet & Titulli)
             const chartBgColor = document.getElementById('chartBgColor').value;
+            const showOutlines = document.getElementById('showOutlines').checked;
             const sliceBorderColor = document.getElementById('sliceBorderColor').value;
+            
+            // Fsheh ngjyrën e konturit nëse konturet çaktivizohen
+            document.getElementById('outlineColorWrapper').style.opacity = showOutlines ? '1' : '0.4';
+            document.getElementById('sliceBorderColor').disabled = !showOutlines;
+            const finalBorderWidth = showOutlines ? 1.5 : 0;
             
             const chartTitleText = document.getElementById('chartTitle').value;
             const titlePosition = document.getElementById('titlePosition').value;
@@ -710,6 +895,34 @@
             const legendShape = document.getElementById('legendShape').value;
             const legendSize = parseInt(document.getElementById('legendSize').value);
 
+            // E RE: Merr tipin e grafikut dhe konfiguro aksat
+            const selectedChartType = document.getElementById('chartType').value;
+            const isHorizontal = selectedChartType === 'horizontalBar';
+            const actualType = isHorizontal ? 'bar' : selectedChartType; // Horizontal Bar në Chart.js > 3 bëhet me 'bar' dhe indexAxis: 'y'
+            
+            // Konfigurimi i aksave (Scales) në varësi të tipit të grafikut
+            let chartScales = {};
+            if (['bar', 'line', 'horizontalBar'].includes(selectedChartType)) {
+                chartScales = {
+                    x: {
+                        ticks: { color: labelColor, font: {family: labelFont} },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    },
+                    y: {
+                        ticks: { color: labelColor, font: {family: labelFont} },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    }
+                };
+            } else if (['radar', 'polarArea'].includes(selectedChartType)) {
+                chartScales = {
+                    r: {
+                        ticks: { color: labelColor, backdropColor: 'transparent', font: {family: labelFont} },
+                        grid: { color: 'rgba(255,255,255,0.2)' },
+                        pointLabels: { color: labelColor, font: {family: labelFont, size: labelSize} }
+                    }
+                };
+            }
+
             // Krijo listat e të dhënave për Chart.js
             const labels = selectedData.map(item => item.name);
             const dataValues = selectedData.map(item => item.value);
@@ -717,144 +930,117 @@
 
             // Formatuesi i etiketave mbi grafik
             const datalabelsFormatter = (value, context) => {
+                if (['bar', 'line', 'horizontalBar'].includes(selectedChartType)) {
+                    // Për kolonat ose vijat tregojmë thjesht vlerën
+                    return displayMode === 'percentage' ? '' : value.toLocaleString();
+                }
+
                 const total = context.chart._metasets[0].total;
                 if (total === 0) return null;
                 const percNum = (value / total) * 100;
                 
-                // Nëse përqindja është nën 2.5%, e fshehim etiketën e asaj fete që të mos krijohet mbivendosje e shëmtuar teksti
-                if (percNum < 2.5) return null;
+                // Nëse përqindja është nën 2.5%, e fshehim etiketën e asaj fete që të mos krijohet mbivendosje e shëmtuar teksti (për rrethorët)
+                if (percNum < 2.5 && ['pie', 'doughnut', 'polarArea'].includes(selectedChartType)) return null;
                 
                 return displayMode === 'percentage' 
                     ? percNum.toFixed(1) + '%' 
-                    : value.toLocaleString() + ' Ha';
+                    : value.toLocaleString();
             };
 
             const legendDisplay = legendPosition !== 'hide';
 
+            // NDRYSHIM I RENDESISHEM: E prishim grafikun e vjetër dhe e rikrijojmë që t'i përshtatet ndryshimit të tipit (nga Rrethor në Shtyllë, etj.) pa u prishur vizualisht
             if (pieChart) {
-                // Përditëso strukturën ekzistuese të grafikut
-                pieChart.data.labels = labels;
-                pieChart.data.datasets[0].data = dataValues;
-                pieChart.data.datasets[0].backgroundColor = bgColors;
-                pieChart.data.datasets[0].borderColor = sliceBorderColor; // Përditëso konturin e fetave
-                
-                // Rifresko titullin e grafikut
-                pieChart.options.plugins.title.display = chartTitleText.trim().length > 0;
-                pieChart.options.plugins.title.text = chartTitleText;
-                pieChart.options.plugins.title.position = titlePosition;
-                pieChart.options.plugins.title.color = labelColor;
-                pieChart.options.plugins.title.font.size = titleSize;
-                pieChart.options.plugins.title.font.family = labelFont;
+                pieChart.destroy();
+            }
 
-                // Rifresko stilin e shkrimit dhe të etiketave
-                pieChart.options.plugins.datalabels.display = showLabels;
-                pieChart.options.plugins.datalabels.formatter = datalabelsFormatter;
-                pieChart.options.plugins.datalabels.font.family = labelFont;
-                pieChart.options.plugins.datalabels.font.size = labelSize;
-                pieChart.options.plugins.datalabels.color = labelColor;
-
-                // Rifresko legjendën
-                pieChart.options.plugins.legend.display = legendDisplay;
-                if (legendDisplay) {
-                    pieChart.options.plugins.legend.position = legendPosition;
-                    pieChart.options.plugins.legend.labels.pointStyle = legendShape;
-                    pieChart.options.plugins.legend.labels.font.family = labelFont;
-                    pieChart.options.plugins.legend.labels.font.size = legendSize;
-                    pieChart.options.plugins.legend.labels.color = labelColor;
-                }
-                
-                pieChart.options.plugins.tooltip.callbacks.label = getTooltipCallback(displayMode);
-                pieChart.update();
-            } else {
-                // Krijimi i grafikut për herë të parë
-                const ctx = document.getElementById('areaChart').getContext('2d');
-                pieChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: dataValues,
-                            backgroundColor: bgColors,
-                            borderWidth: 1.5,
-                            borderColor: sliceBorderColor
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        layout: {
-                            padding: 10
+            const ctx = document.getElementById('areaChart').getContext('2d');
+            pieChart = new Chart(ctx, {
+                type: actualType,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Vlera', // Përdoret për Bar dhe Line
+                        data: dataValues,
+                        backgroundColor: bgColors,
+                        borderWidth: finalBorderWidth,
+                        borderColor: sliceBorderColor,
+                        indexAxis: isHorizontal ? 'y' : 'x',
+                        tension: 0.3, // Për t'i bërë grafiqet "Line" me lakore të lëmuar
+                        fill: selectedChartType === 'radar' || selectedChartType === 'polarArea' // Radar & Polar mbushin sfondin natyrshëm
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: 10 },
+                    scales: chartScales,
+                    plugins: {
+                        title: {
+                            display: chartTitleText.trim().length > 0,
+                            text: chartTitleText,
+                            position: titlePosition,
+                            color: labelColor,
+                            font: { family: labelFont, size: titleSize, weight: 'bold' },
+                            padding: { top: 10, bottom: 20 }
                         },
-                        plugins: {
-                            title: {
-                                display: chartTitleText.trim().length > 0,
-                                text: chartTitleText,
-                                position: titlePosition,
+                        datalabels: {
+                            display: showLabels,
+                            color: labelColor,
+                            font: { weight: 'bold', size: labelSize, family: labelFont },
+                            textStrokeColor: 'rgba(0,0,0,0.85)',
+                            textStrokeWidth: 3,
+                            formatter: datalabelsFormatter
+                        },
+                        legend: {
+                            display: legendDisplay,
+                            position: legendPosition,
+                            labels: {
                                 color: labelColor,
-                                font: {
-                                    family: labelFont,
-                                    size: titleSize,
-                                    weight: 'bold'
-                                },
-                                padding: { top: 10, bottom: 20 }
-                            },
-                            datalabels: {
-                                display: showLabels,
-                                color: labelColor,
-                                font: {
-                                    weight: 'bold',
-                                    size: labelSize,
-                                    family: labelFont
-                                },
-                                textStrokeColor: 'rgba(0,0,0,0.85)',
-                                textStrokeWidth: 3,
-                                formatter: datalabelsFormatter
-                            },
-                            legend: {
-                                display: legendDisplay,
-                                position: legendPosition,
-                                labels: {
-                                    color: labelColor,
-                                    font: { family: labelFont, size: legendSize },
-                                    padding: 15,
-                                    usePointStyle: true,
-                                    pointStyle: legendShape
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: getTooltipCallback(displayMode)
-                                }
+                                font: { family: labelFont, size: legendSize },
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyle: legendShape
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: getTooltipCallback(displayMode, selectedChartType)
                             }
                         }
                     }
-                });
-            }
+                }
+            });
             
             // Përshtatja automatike e ngjyrave kur shkojmë te printimi
             window.matchMedia('print').addEventListener('change', mql => {
                 if(pieChart) {
                     pieChart.options.plugins.legend.labels.color = mql.matches ? '#000000' : labelColor;
                     pieChart.options.plugins.title.color = mql.matches ? '#000000' : labelColor;
+                    
+                    if(pieChart.options.scales.x) pieChart.options.scales.x.ticks.color = mql.matches ? '#000000' : labelColor;
+                    if(pieChart.options.scales.y) pieChart.options.scales.y.ticks.color = mql.matches ? '#000000' : labelColor;
+                    
                     pieChart.update();
                 }
             });
         }
 
-        // Krijuesi i tekstit të mjetit informues (Tooltip)
-        function getTooltipCallback(mode) {
+        // Krijuesi i tekstit të mjetit informues (Tooltip) përshtatur me tipet e grafeve
+        function getTooltipCallback(mode, chartType) {
             return function(context) {
-                let label = context.label || '';
+                let label = context.dataset.label || context.label || '';
                 if (label) {
                     label += ': ';
                 }
-                const val = context.parsed;
-                if (mode === 'percentage') {
+                const val = context.parsed.y !== undefined && chartType !== 'horizontalBar' ? context.parsed.y : (context.parsed.x !== undefined && chartType === 'horizontalBar' ? context.parsed.x : context.parsed);
+                
+                if (mode === 'percentage' && ['pie', 'doughnut', 'polarArea'].includes(chartType)) {
                     const total = context.chart._metasets[0].total;
                     const percentage = total > 0 ? ((val / total) * 100).toFixed(2) + '%' : '0%';
                     label += percentage;
                 } else {
-                    label += val.toLocaleString() + ' Ha';
+                    label += val.toLocaleString();
                 }
                 return label;
             };
@@ -880,7 +1066,7 @@
             
             // Gjenerojmë shkarkimin e fotos
             const link = document.createElement('a');
-            link.download = 'asig_raport_grafik.png';
+            link.download = 'raport_grafik.png';
             link.href = tempCanvas.toDataURL('image/png');
             link.click();
         }
