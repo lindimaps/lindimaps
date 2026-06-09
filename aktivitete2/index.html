@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>LindiMaps Systems - Aktivitete dhe Leje</title>
+<!-- Skripti për të aplikuar Dark Mode menjëherë para se të ngarkohet faqja për të shmangur blicin e bardhë -->
 <script>
 if (localStorage.getItem('darkMode') === 'on') {
     document.documentElement.classList.add('dark-mode');
@@ -48,7 +49,7 @@ border: none !important;
 input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 
 /* =========================================
-   DARK MODE OVERRIDES (Përmirësuar Kontrasti)
+   DARK MODE OVERRIDES (Shtohet pa ndryshuar HTML)
 ========================================= */
 .dark-mode body, .dark-mode.bg-\[\#f8fafc\] { background-color: #0f172a !important; color: #f1f5f9 !important; }
 .dark-mode .bg-white { background-color: #1e293b !important; border-color: #334155 !important; }
@@ -56,16 +57,17 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 .dark-mode .bg-slate-100 { background-color: #334155 !important; border-color: #475569 !important; color: #f8fafc !important; }
 .dark-mode .bg-slate-900 { background-color: #3b82f6 !important; color: #ffffff !important; }
 .dark-mode .text-slate-900, .dark-mode .text-slate-800 { color: #f8fafc !important; }
-.dark-mode .text-slate-700, .dark-mode .text-slate-600 { color: #e2e8f0 !important; }
-.dark-mode label, .dark-mode .text-slate-500, .dark-mode .text-slate-400 { color: #cbd5e1 !important; } /* Bërë më e çelët */
+.dark-mode .text-slate-700, .dark-mode .text-slate-600 { color: #cbd5e1 !important; }
+.dark-mode .text-slate-500 { color: #94a3b8 !important; }
+.dark-mode .text-slate-400 { color: #64748b !important; }
 .dark-mode .border-slate-100, .dark-mode .border-slate-200\/60, .dark-mode .border-slate-200 { border-color: #334155 !important; }
 .dark-mode nav#side-menu { background-color: rgba(15, 23, 42, 0.95) !important; border-color: rgba(51, 65, 85, 0.8) !important; }
 .dark-mode nav#side-menu button.tab-btn { color: #cbd5e1 !important; }
 .dark-mode nav#side-menu button.tab-btn:hover { background: rgba(255,255,255,0.05) !important; }
 .dark-mode .tab-active { background: rgba(59, 130, 246, 0.2) !important; color: #93c5fd !important; }
 .dark-mode .glass-card { background: rgba(30, 41, 59, 0.9) !important; border-color: rgba(51, 65, 85, 0.8) !important; }
-.dark-mode input, .dark-mode select, .dark-mode textarea { background-color: #0f172a !important; border-color: #475569 !important; color: #f8fafc !important; } /* Theksuar kufijtë */
-.dark-mode input:focus, .dark-mode select:focus, .dark-mode textarea:focus { border-color: #60a5fa !important; background-color: #1e293b !important; } /* Fokus i dallueshëm */
+.dark-mode input, .dark-mode select, .dark-mode textarea { background-color: #0f172a !important; border-color: #334155 !important; color: #f8fafc !important; }
+.dark-mode input:focus, .dark-mode select:focus, .dark-mode textarea:focus { border-color: #3b82f6 !important; background-color: #1e293b !important; }
 .dark-mode .shadow-xl, .dark-mode .shadow-lg, .dark-mode .shadow-2xl { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important; }
 .dark-mode .bg-blue-50, .dark-mode .bg-blue-50\/50, .dark-mode .bg-blue-50\/70 { background-color: rgba(59, 130, 246, 0.1) !important; border-color: rgba(59, 130, 246, 0.2) !important; }
 .dark-mode .bg-emerald-50, .dark-mode .bg-emerald-50\/50 { background-color: rgba(16, 185, 129, 0.1) !important; border-color: rgba(16, 185, 129, 0.2) !important; }
@@ -80,6 +82,7 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 </head>
 <body class="bg-[#f8fafc] min-h-screen pb-24 text-slate-900">
 
+<!-- AUTHENTICATION OVERLAY -->
 <div id="auth-overlay" class="fixed inset-0 z-[400] bg-white flex items-center justify-center p-6 hidden">
 <div class="max-w-md w-full space-y-6 overflow-y-auto max-h-[90vh] custom-scrollbar p-2">
 <div class="flex items-center gap-3 logo-container justify-center mb-6">
@@ -112,6 +115,7 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 <div id="signup-section" class="hidden space-y-3">
 <h2 class="text-center font-extrabold text-slate-800 text-xl mb-4">Regjistrohu</h2>
 
+<!-- Fusha e ngarkimit të Fotos / Logos -->
 <div class="flex justify-center mb-2">
 <label class="relative cursor-pointer group">
 <div id="signup-photo-preview" class="h-20 w-20 rounded-full bg-slate-50 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden hover:border-blue-400 transition-colors">
@@ -171,6 +175,7 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 </div>
 </div>
 
+<!-- MODALI I ATTACHMENTS (FOTO/PDF) -->
 <div id="attachment-modal" class="hidden fixed inset-0 z-[999] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
 <div class="bg-white rounded-[2rem] w-full max-w-2xl h-[80vh] flex flex-col overflow-hidden shadow-2xl relative">
 <div class="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50">
@@ -178,6 +183,7 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 <button onclick="closeAttachmentModal()" class="p-2 bg-white rounded-full text-slate-500 hover:bg-slate-200 transition-colors shadow-sm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
 </div>
 <div class="flex-1 bg-slate-100 overflow-hidden relative flex items-center justify-center p-2" id="attachment-modal-content">
+<!-- Përmbajtja (Foto ose Iframe) ngarkohet këtu -->
 </div>
 <div class="p-4 bg-white border-t border-slate-100 flex justify-end gap-3">
 <button id="attachment-download-btn" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-blue-700 shadow-md transition-colors flex items-center gap-2"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Shkarko Dokumentin</button>
@@ -185,6 +191,7 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 </div>
 </div>
 
+<!-- MODALI PËR FSHIRJEN E LLOGARISË -->
 <div id="delete-account-modal" class="hidden fixed inset-0 z-[700] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
 <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center space-y-6 shadow-2xl border border-slate-100">
 <div class="space-y-2">
@@ -199,6 +206,7 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 </div>
 </div>
 
+<!-- PROFILE MODAL I RI -->
 <div id="profile-modal" class="hidden fixed inset-0 z-[600] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
 <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full space-y-6 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
 <button onclick="closeProfileModal()" class="absolute top-4 right-4 p-2 bg-slate-50 hover:bg-slate-100 rounded-full text-slate-500 transition-colors">
@@ -276,8 +284,10 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 </div>
 </header>
 
+<!-- OVERLAY I MENUSË -->
 <div id="menu-overlay" onclick="toggleMenu()" class="fixed inset-0 bg-slate-900/10 backdrop-blur-[2px] z-[60] hidden transition-all duration-300"></div>
 
+<!-- MENUJA ANËSORE GEMINI STYLE + GLASSMORPHISM MENU -->
 <nav id="side-menu" class="fixed top-0 left-0 h-full w-[280px] z-[70] transform -translate-x-full transition-transform duration-300 ease-in-out bg-white/60 backdrop-blur-2xl border-r border-white/60 flex flex-col pt-4 px-3 gap-1 shadow-2xl">
 <div class="flex items-center px-4 py-2 mb-6 cursor-pointer hover:bg-white/40 rounded-full transition-colors w-fit" onclick="toggleMenu()">
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#444746" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -287,10 +297,6 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 <button onclick="switchTab('log'); toggleMenu()" id="tab-log" class="tab-btn flex items-center gap-4 w-full text-left px-4 py-3.5 text-[14px] font-medium transition-all rounded-full hover:bg-white/60 tab-active">
 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
 Regjistrim
-</button>
-<button onclick="switchTab('chat'); toggleMenu()" id="tab-chat" class="tab-btn flex items-center gap-4 w-full text-left px-4 py-3.5 text-[14px] font-medium transition-all rounded-full hover:bg-white/60 text-slate-400">
-<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-Mesazhet
 </button>
 <button onclick="switchTab('config'); toggleMenu()" id="tab-config" class="tab-btn flex items-center gap-4 w-full text-left px-4 py-3.5 text-[14px] font-medium transition-all rounded-full hover:bg-white/60 text-slate-400">
 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -305,6 +311,7 @@ Raporte
 Orari
 </button>
 
+<!-- ELEMENTET E INTEGRUARA TË SISTEMIT TË DYTË -->
 <button onclick="switchTab('vacations'); toggleMenu()" id="tab-vacations" class="tab-btn flex items-center gap-4 w-full text-left px-4 py-3.5 text-[14px] font-medium transition-all rounded-full hover:bg-white/60 text-slate-400">
 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
 Pushimet & Lejet
@@ -319,7 +326,9 @@ Konfiguro Festat
 Koshi
 </button>
 
+<!-- SEKSIONI I PËRDORUESIT NË FUND -->
 <div class="mt-auto mb-4 border-t border-slate-200/50 pt-4 flex flex-col gap-2 px-2">
+<!-- DARK MODE TOGGLE BUTTON -->
 <button onclick="toggleDarkMode()" class="flex items-center gap-4 text-slate-600 font-medium hover:bg-slate-100 px-4 py-3.5 rounded-full transition-colors w-full text-left text-[14px]">
 <svg id="icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
 <svg id="icon-sun" class="hidden w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -344,6 +353,7 @@ Dil nga Sistemi
 
 <main class="max-w-3xl mx-auto p-4 md:p-8 space-y-8">
 
+<!-- BANNER PËRSHËNDETËS -->
 <div id="greeting-banner" class="hidden relative overflow-hidden rounded-[2rem] p-6 md:p-8 shadow-2xl border border-blue-400/30 bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-500 text-white transition-all transform hover:scale-[1.01] duration-500">
 <div class="absolute top-0 right-0 -mr-20 -mt-20 w-72 h-72 rounded-full bg-white opacity-10 blur-3xl animate-pulse"></div>
 <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-56 h-56 rounded-full bg-cyan-300 opacity-20 blur-2xl"></div>
@@ -372,39 +382,7 @@ Koha e Punës Sot
 </div>
 </div>
 
-<div id="view-chat" class="hidden h-[80vh] flex bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden">
-    <div id="chat-user-list" class="w-full md:w-1/3 border-r border-slate-100 flex flex-col h-full bg-slate-50/50">
-        <div class="p-4 border-b border-slate-100 bg-white">
-            <h2 class="text-lg font-black text-slate-800">Përdoruesit</h2>
-        </div>
-        <div id="chat-users-container" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
-            </div>
-    </div>
-    <div id="chat-window" class="hidden md:flex flex-col w-full md:w-2/3 h-full bg-white relative">
-        <div class="p-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50 shadow-sm z-10">
-            <button onclick="closeChatMobile()" class="md:hidden p-2 bg-white rounded-xl shadow-sm text-slate-500 hover:text-slate-800 border border-slate-200"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg></button>
-            <div id="chat-active-user-avatar" class="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 bg-cover bg-center"></div>
-            <div>
-                <h3 id="chat-active-user-name" class="font-black text-slate-800 text-sm">Zgjidh një përdorues</h3>
-            </div>
-        </div>
-        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/30 custom-scrollbar flex flex-col">
-            <div class="m-auto text-slate-400 font-bold text-sm text-center">Zgjidhni një person nga lista për të filluar bisedën.</div>
-        </div>
-        <div class="p-4 border-t border-slate-100 bg-white space-y-3 relative z-10">
-            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                <button onclick="sendQuickMessage('📄 Kërko Raport')" class="whitespace-nowrap px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-[10px] font-bold uppercase transition-colors shadow-sm">📄 Kërko Raport</button>
-                <button onclick="sendQuickMessage('🤝 Kërko Takim')" class="whitespace-nowrap px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-[10px] font-bold uppercase transition-colors shadow-sm">🤝 Kërko Takim</button>
-                <button onclick="sendQuickMessage('✔️ Konfirmo')" class="whitespace-nowrap px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg text-[10px] font-bold uppercase transition-colors shadow-sm">✔️ Konfirmo</button>
-            </div>
-            <div class="flex gap-2">
-                <input type="text" id="chat-input" placeholder="Shkruaj një mesazh..." onkeydown="if(event.key === 'Enter') sendChatMessage()" class="flex-1 p-3.5 rounded-xl bg-slate-50 border border-slate-200/60 font-bold focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm shadow-inner">
-                <button onclick="sendChatMessage()" class="bg-blue-600 hover:bg-blue-700 text-white p-3.5 rounded-xl shadow-md transition-all active:scale-95"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></button>
-            </div>
-        </div>
-    </div>
-</div>
-
+<!-- PAMJA 1: REGJISTRIM AKTIVITETI -->
 <div id="view-log" class="space-y-6">
 <div class="bg-white rounded-[2rem] p-6 md:p-8 shadow-xl shadow-slate-200/50 space-y-6 border border-slate-100 transition-all hover:shadow-2xl hover:shadow-slate-200/60">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -428,12 +406,13 @@ Koha e Punës Sot
 <input type="file" id="log-file-input" accept="image/*,application/pdf" multiple class="hidden" onchange="handleLogAttachment(event)">
 <button onclick="document.getElementById('log-file-input').click()" class="w-full bg-slate-100 text-slate-600 p-3 rounded-xl text-[10px] font-bold uppercase hover:bg-slate-200 transition-colors flex items-center justify-center gap-2 shadow-sm">📎 Bashkëngjit Dokumente (Foto/PDF)</button>
 <div id="log-files-preview" class="hidden mt-2 flex flex-col gap-2">
+<!-- Previews will be added here dynamically -->
 </div>
 </div>
 </div>
 
 <div class="pt-6 border-t border-slate-100 space-y-6">
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="grid grid-cols-2 gap-4">
 <div class="space-y-2">
 <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Ora Fillimit</label>
 <input id="log-start-time" type="time" onchange="calculateHours()" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 text-slate-700 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all">
@@ -454,6 +433,7 @@ Koha e Punës Sot
 </div>
 </div>
 
+<!-- PAMJA 2: STRUKTURA (KONFIGURIMI) -->
 <div id="view-config" class="hidden space-y-8">
 <div class="bg-white rounded-[2rem] p-6 md:p-8 space-y-6 shadow-xl shadow-slate-200/40 border border-slate-100 hover:shadow-2xl transition-shadow">
 <div class="flex justify-between items-center">
@@ -512,6 +492,7 @@ Koha e Punës Sot
 </div>
 </div>
 
+<!-- PAMJA 3: RAPORTE -->
 <div id="view-reports" class="hidden space-y-6">
 <div class="bg-white rounded-[2rem] p-6 md:p-8 space-y-6 shadow-xl shadow-slate-200/40 border border-slate-100 hover:shadow-2xl transition-shadow">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -552,6 +533,7 @@ Koha e Punës Sot
 <div id="report-results" class="space-y-4"></div>
 </div>
 
+<!-- PAMJA 4: ORARI -->
 <div id="view-sessions" class="hidden space-y-6">
 <div class="flex justify-between items-center px-4 bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100">
 <h2 class="text-xl font-black text-slate-800">Evidenca e Orarit</h2>
@@ -560,6 +542,7 @@ Koha e Punës Sot
 <div id="sessions-results" class="space-y-4"></div>
 </div>
 
+<!-- PAMJA INTEGRUESE 5: PUSHIMET & LEJET (SISTEMI I DYTË) -->
 <div id="view-vacations" class="hidden space-y-6">
 <div class="flex flex-wrap justify-between items-center bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm gap-4">
 <h2 class="text-xl font-black text-slate-800">Kalendari i Lejeve</h2>
@@ -616,6 +599,7 @@ Koha e Punës Sot
 </div>
 </div>
 
+<!-- PAMJA INTEGRUESE 6: KONFIGURIMI I FESTAVE TË LËVIZSHME (SISTEMI I DYTË) -->
 <div id="view-vacation-config" class="hidden space-y-6">
 <div class="bg-white rounded-[2rem] p-6 md:p-8 space-y-6 shadow-xl border border-slate-100">
 <h2 class="text-xl font-black text-slate-800">Festat e Lëvizshme</h2>
@@ -623,6 +607,7 @@ Koha e Punës Sot
 </div>
 </div>
 
+<!-- PAMJA 7: KOSHI -->
 <div id="view-trash" class="hidden space-y-6">
 <div class="flex justify-between items-center px-4 bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100">
 <h2 class="text-xl font-black text-slate-800">Koshi i Fshirjes</h2>
@@ -657,11 +642,6 @@ const appId = "sistemi-aktiviteteve-v1";
 
 window.db = db; window.doc = doc; window.deleteDoc = deleteDoc; window.appId = appId;
 let configData = []; let logData = []; let operatorData = []; let trashData = []; let sessionData = []; let deleteCallback = null; let unsubscribes = [];
-
-// VARIABLAT E CHAT-it
-let chatUsers = [];
-let activeChatUserId = null;
-let chatUnsubscribe = null;
 
 // VARIABLAT E INTEGRUARA PËR PUSHIMET (SISTEMI I DYTË)
 let selectedYear = new Date().getFullYear();
@@ -941,27 +921,12 @@ document.getElementById('loading').classList.add('hidden');
 }
 };
 
-window.updatePublicProfile = async (user, fullName, photoBase64) => {
-    try {
-        await setDoc(doc(db, `artifacts/${appId}/public_users`, user.uid), {
-            uid: user.uid,
-            email: user.email,
-            name: fullName || user.email.split('@')[0],
-            photoBase64: photoBase64 || null,
-            lastActive: Date.now()
-        }, { merge: true });
-    } catch(e) { console.error("Public profile sync error", e); }
-};
-
 window.refreshProfile = async (user) => {
 try {
 const profileSnap = await getDoc(doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info'));
-let pData = {};
-let fullName = "";
-
 if (profileSnap.exists()) {
-pData = profileSnap.data();
-fullName = (pData.name && pData.surname) ? `${pData.name} ${pData.surname}` : "";
+const pData = profileSnap.data();
+const fullName = (pData.name && pData.surname) ? `${pData.name} ${pData.surname}` : "";
 
 if (fullName) {
 document.getElementById('sidebar-name').innerText = fullName;
@@ -1025,9 +990,6 @@ document.getElementById('modal-email').innerText = user.email;
 makeEditable('institution', '');
 makeEditable('phone', '');
 }
-
-window.updatePublicProfile(user, fullName, pData.photoBase64);
-
 } catch(e) {
 console.error("Profile fetch error", e);
 document.getElementById('sidebar-name').innerText = user.email.split('@')[0];
@@ -1044,8 +1006,8 @@ document.getElementById('confirm-yes-btn').onclick = () => { if(deleteCallback) 
 
 window.switchTab = (tab) => {
 localStorage.setItem('savedTab', tab); // RUAJTJA E TABIT NË LOCALSTORAGE
-['view-log', 'view-chat', 'view-config', 'view-reports', 'view-sessions', 'view-vacations', 'view-vacation-config', 'view-trash'].forEach(v => document.getElementById(v).classList.add('hidden'));
-['tab-log', 'tab-chat', 'tab-config', 'tab-reports', 'tab-sessions', 'tab-vacations', 'tab-vacation-config', 'tab-trash'].forEach(t => document.getElementById(t).classList.replace('tab-active', 'text-slate-400'));
+['view-log', 'view-config', 'view-reports', 'view-sessions', 'view-vacations', 'view-vacation-config', 'view-trash'].forEach(v => document.getElementById(v).classList.add('hidden'));
+['tab-log', 'tab-config', 'tab-reports', 'tab-sessions', 'tab-vacations', 'tab-vacation-config', 'tab-trash'].forEach(t => document.getElementById(t).classList.replace('tab-active', 'text-slate-400'));
 document.getElementById(`view-${tab}`).classList.remove('hidden');
 document.getElementById(`tab-${tab}`).classList.replace('text-slate-400', 'tab-active');
 if(tab === 'reports') { document.getElementById('rep-start').value = getToday(); renderReportList(); }
@@ -1146,100 +1108,6 @@ console.error("Gabim në regjistrimin e sesionit: ", e);
 }
 };
 
-// Funksionet Për Chat-in Publik
-window.renderChatUsers = () => {
-    const container = document.getElementById('chat-users-container');
-    if(!container) return;
-    container.innerHTML = chatUsers.map(u => `
-        <div onclick="openChatWith('${u.uid}', '${u.name.replace(/'/g, "\\'")}', '${u.photoBase64 || ''}')" class="flex items-center gap-3 p-3 rounded-xl hover:bg-white cursor-pointer border border-transparent hover:border-slate-100 transition-all ${activeChatUserId === u.uid ? 'bg-white shadow-sm border-slate-100' : ''}">
-            <div class="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 bg-cover bg-center flex-shrink-0" style="background-image: url('${u.photoBase64 || ''}')">
-                ${!u.photoBase64 ? '<svg class="w-full h-full text-blue-300 p-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>' : ''}
-            </div>
-            <div class="flex flex-col overflow-hidden">
-                <span class="font-bold text-slate-800 text-sm truncate">${u.name}</span>
-            </div>
-        </div>
-    `).join('');
-};
-
-window.openChatWith = (uid, name, photoUrl) => {
-    activeChatUserId = uid;
-    document.getElementById('chat-active-user-name').innerText = name;
-    document.getElementById('chat-active-user-avatar').style.backgroundImage = `url('${photoUrl}')`;
-    
-    // Mobile UI switch
-    if (window.innerWidth < 768) {
-        document.getElementById('chat-user-list').classList.add('hidden');
-        document.getElementById('chat-window').classList.remove('hidden');
-        document.getElementById('chat-window').classList.add('flex');
-    } else {
-        document.getElementById('chat-window').classList.remove('hidden');
-    }
-
-    renderChatUsers(); // update active state
-    loadChatMessages(uid);
-};
-
-window.closeChatMobile = () => {
-    document.getElementById('chat-user-list').classList.remove('hidden');
-    document.getElementById('chat-window').classList.add('hidden');
-    document.getElementById('chat-window').classList.remove('flex');
-    activeChatUserId = null;
-    if(chatUnsubscribe) chatUnsubscribe();
-};
-
-window.getChatRoomId = (uid1, uid2) => {
-    return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
-};
-
-window.loadChatMessages = (otherUid) => {
-    if(chatUnsubscribe) chatUnsubscribe();
-    const roomId = getChatRoomId(auth.currentUser.uid, otherUid);
-    const q = query(collection(db, `artifacts/${appId}/global_chats/${roomId}/messages`));
-    
-    chatUnsubscribe = onSnapshot(q, snap => {
-        const msgs = snap.docs.map(d => d.data()).sort((a, b) => a.timestamp - b.timestamp);
-        const container = document.getElementById('chat-messages');
-        container.innerHTML = msgs.map(m => {
-            const isMe = m.senderId === auth.currentUser.uid;
-            const time = new Date(m.timestamp).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
-            return `
-                <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-                    <div class="max-w-[75%] px-4 py-2.5 rounded-2xl text-sm font-medium ${isMe ? 'bg-blue-600 text-white rounded-br-sm shadow-sm' : 'bg-white border border-slate-100 text-slate-700 rounded-bl-sm shadow-sm'}">
-                        ${m.text}
-                    </div>
-                    <span class="text-[9px] font-bold text-slate-400 mt-1 mx-1">${time}</span>
-                </div>
-            `;
-        }).join('');
-        container.scrollTop = container.scrollHeight;
-    });
-};
-
-window.sendChatMessage = async () => {
-    const input = document.getElementById('chat-input');
-    const text = input.value.trim();
-    if(!text || !activeChatUserId) return;
-    
-    input.value = '';
-    const roomId = getChatRoomId(auth.currentUser.uid, activeChatUserId);
-    
-    try {
-        await setDoc(doc(collection(db, `artifacts/${appId}/global_chats/${roomId}/messages`)), {
-            senderId: auth.currentUser.uid,
-            text: text,
-            timestamp: Date.now()
-        });
-    } catch(e) {
-        showAlert("Gabim në dërgimin e mesazhit: " + e.message);
-    }
-};
-
-window.sendQuickMessage = (text) => {
-    document.getElementById('chat-input').value = text;
-    sendChatMessage();
-};
-
 onAuthStateChanged(auth, async (user) => {
 if (user) {
 document.getElementById('app-content').classList.remove('hidden');
@@ -1269,7 +1137,6 @@ unsubscribes = [];
 document.getElementById('greeting-banner').classList.add('hidden');
 document.getElementById('loading').classList.add('hidden');
 if(sessionInterval) clearInterval(sessionInterval);
-if(chatUnsubscribe) chatUnsubscribe();
 }
 });
 
@@ -1315,12 +1182,6 @@ const unsubConfig = onSnapshot(collection(db, getBaseCollectionPath('config')), 
 const unsubLogs = onSnapshot(collection(db, getBaseCollectionPath('logs')), snap => { logData = filterAndClean(snap).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)); renderReportList(); updateProcessFilterUI(); });
 const unsubOps = onSnapshot(collection(db, getBaseCollectionPath('operators')), snap => { operatorData = filterAndClean(snap); updateDropdowns(); renderOperatorList(); });
 const unsubTrash = onSnapshot(collection(db, getBaseCollectionPath('trash')), snap => { trashData = filterAndClean(snap); renderTrashList(); });
-
-// Chat Public Users Listener
-const unsubPublicUsers = onSnapshot(collection(db, `artifacts/${appId}/public_users`), snap => {
-    chatUsers = snap.docs.map(d => d.data()).filter(u => u.uid !== auth.currentUser.uid);
-    renderChatUsers();
-});
 
 // Sinkronizimi i plotë dhe i vazhdueshëm në kohë reale i të gjithë viteve të pushimeve
 const unsubYears = onSnapshot(collection(db, `artifacts/${appId}/users/${userId}/years`), snap => {
@@ -1378,7 +1239,7 @@ container.innerHTML = historyHtml;
 }
 });
 
-unsubscribes.push(unsubConfig, unsubLogs, unsubOps, unsubTrash, unsubPublicUsers, unsubYears, unsubSessions);
+unsubscribes.push(unsubConfig, unsubLogs, unsubOps, unsubTrash, unsubYears, unsubSessions);
 }
 
 window.generateProcessFields = (valuesMap = null) => { const actId = document.getElementById('log-act-select').value; const container = document.getElementById('dynamic-fields-container'); container.innerHTML = ""; if(!actId) return; const act = configData.find(c => c.id === actId); if(!act) return; act.processes.forEach(p => { const val = valuesMap ? (valuesMap[p.label] || "") : ""; let inputHtml = p.type === 'text' ? `<textarea data-label="${p.label}" class="process-input process-textarea w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all">${val}</textarea>` : `<input type="${p.type === 'ora' ? 'time' : p.type === 'data' ? 'date' : 'text'}" data-label="${p.label}" value="${val}" ${p.type === 'numër' ? 'onkeydown="handleMathEnter(event)"' : ''} class="process-input w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all">`; container.innerHTML += `<div class="space-y-1"><label class="text-[10px] font-extrabold text-slate-500 uppercase ml-1">${p.label}</label>${inputHtml}</div>`; }); setTimeout(() => document.querySelectorAll('.process-textarea').forEach(ta => autoExpand(ta)), 50); };
@@ -1949,7 +1810,7 @@ return;
 }
 
 let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">`;
-html += `<head><meta charset="utf-8"></head><body>`;
+html += `<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Raporti</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>`;
 
 let hasData = false;
 activities.forEach(act => {
@@ -2217,4 +2078,684 @@ document.getElementById('vacation-year-selector').innerHTML = html;
 
 window.setVacationYear = (year) => {
 if (year < 2024) year = 2024; // Mbron llogaritjen historike të mbartjes
-selectedYear = year
+selectedYear = year;
+currentVacationDate = new Date(year, currentVacationDate.getMonth(), 1);
+renderVacationSelectors();
+fetchVacationYearData();
+};
+
+window.fetchVacationYearData = async () => {
+const user = auth.currentUser;
+if (!user) return;
+
+// Monitorim në kohë reale i vitit të zgjedhur
+const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(selectedYear));
+const snap = await getDoc(docRef);
+if (snap.exists()) {
+const data = snap.data();
+vacationYearData = {
+allowance: data.allowance ?? 28,
+selected: data.selected || [],
+medical: data.medical || [],
+movableDates: data.movableDates || {},
+manualCarryover: (data.manualCarryover !== undefined && data.manualCarryover !== "") ? data.manualCarryover : null
+};
+} else {
+vacationYearData = { allowance: 28, selected: [], medical: [], movableDates: {}, manualCarryover: null };
+}
+
+// Llogaritja e Carryover si zinxhir i pandryshuar
+let chainValue = 0;
+for (let y = 2024; y < selectedYear; y++) {
+const preRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(y));
+const preSnap = await getDoc(preRef);
+if (preSnap.exists()) {
+const data = preSnap.data();
+const currentYearStart = (data.manualCarryover !== undefined && data.manualCarryover !== null && data.manualCarryover !== "") ? Number(data.manualCarryover) : chainValue;
+chainValue = Math.max(0, (currentYearStart + (Number(data.allowance) || 28)) - (data.selected || []).length);
+} else {
+chainValue += 28;
+}
+}
+calculatedCarryover = chainValue;
+
+// Ruajmë gjithashtu në cache lokal për koordinimin e raporteve
+window.allYearsVacationData = window.allYearsVacationData || {};
+window.allYearsVacationData[selectedYear] = vacationYearData;
+
+updateVacationUI();
+};
+
+const updateVacationUI = () => {
+document.getElementById('carryover-label').innerText = `Mbartur nga ${selectedYear-1}`;
+document.getElementById('allowance-label').innerText = `Leja ${selectedYear}`;
+
+document.getElementById('v-manual-carryover').value = vacationYearData.manualCarryover ?? "";
+document.getElementById('v-manual-carryover').placeholder = calculatedCarryover;
+document.getElementById('v-allowance').value = vacationYearData.allowance;
+
+const activeCarryover = (vacationYearData.manualCarryover !== null) ? Number(vacationYearData.manualCarryover) : calculatedCarryover;
+const allowanceVal = Number(vacationYearData.allowance) || 28;
+const totalRemaining = (allowanceVal + activeCarryover) - vacationYearData.selected.length;
+const carryoverRemaining = Math.max(0, activeCarryover - vacationYearData.selected.length);
+const usedInYear = vacationYearData.selected.length;
+
+document.getElementById('v-used').innerText = usedInYear;
+document.getElementById('v-medical').innerText = vacationYearData.medical?.length || 0;
+
+const remEl = document.getElementById('v-remaining');
+remEl.innerText = totalRemaining;
+if(totalRemaining < 0) {
+remEl.className = "text-2xl font-black text-red-500";
+} else {
+remEl.className = "text-2xl font-black text-emerald-600";
+}
+
+const subtextEl = document.getElementById('v-subtext');
+if(usedInYear < activeCarryover) {
+subtextEl.innerText = `mbetur ${selectedYear - 1} (${carryoverRemaining} ditë)`;
+} else {
+subtextEl.innerText = `mbetur ${selectedYear} (${totalRemaining} ditë)`;
+}
+
+renderVacationCalendar();
+renderVacationSideTab();
+};
+
+window.saveVacationYearConfig = async () => {
+const user = auth.currentUser;
+if (!user) return;
+
+const manCarry = document.getElementById('v-manual-carryover').value;
+const allow = document.getElementById('v-allowance').value;
+
+const updateData = {
+manualCarryover: manCarry === "" ? null : Number(manCarry),
+allowance: allow === "" ? 28 : Number(allow)
+};
+
+const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(selectedYear));
+await setDoc(docRef, updateData, { merge: true });
+fetchVacationYearData();
+};
+
+window.setVacationMode = (mode) => {
+selectionMode = mode;
+document.getElementById('mode-vacation-btn').className = `px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all ${mode === 'vacation' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400'}`;
+document.getElementById('mode-medical-btn').className = `px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all ${mode === 'medical' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-400'}`;
+};
+
+window.changeVacationMonth = (offset) => {
+currentVacationDate = new Date(currentVacationDate.getFullYear(), currentVacationDate.getMonth() + offset, 1);
+renderVacationCalendar();
+};
+
+/* ==========================================
+LLOGJIKA E PËRDITËSUAR E FSHIRJES SË DITËVE ME KOSH
+========================================== */
+window.toggleVacationDay = async (dStr) => {
+const user = auth.currentUser;
+if(!user) return;
+
+const isWkd = [0, 6].includes(new Date(dStr).getDay());
+const hols = getHolidaysForYear();
+if (hols[dStr] || isWkd) return;
+
+const isVacation = vacationYearData.selected.includes(dStr);
+const isMedical = vacationYearData.medical?.includes(dStr);
+
+if (isVacation || isMedical) {
+const type = isVacation ? 'selected' : 'medical';
+const label = isVacation ? 'lejen' : 'raportin mjekësor';
+
+askConfirm(`Dëshironi të hiqni datën ${dStr}? Ky veprim do ta kalojë këtë element në koshin e fshirjes.`, async () => {
+const next = vacationYearData[type].filter(i => i !== dStr);
+const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(selectedYear));
+
+// 1. Përditësojmë dokumentin vjetor në Firestore
+await setDoc(docRef, { ...vacationYearData, [type]: next }, { merge: true });
+
+// 2. Krijojmë dokumentin përkatës në Koshin e Fshirjes (Trash)
+const trashId = `${selectedYear}_${type}_${dStr}`;
+const secureTrashId = getSecureId(trashId);
+await setDoc(doc(db, getBaseCollectionPath('trash'), secureTrashId), {
+id: trashId,
+originalCollection: 'Pushime & Leje',
+name: `${type === 'selected' ? 'Leje' : 'Raport'}: ${dStr} (${selectedYear})`,
+deletedAt: Date.now(),
+year: selectedYear,
+type: type,
+date: dStr
+});
+
+fetchVacationYearData();
+});
+} else {
+const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(selectedYear));
+if (selectionMode === 'vacation') {
+const next = [...vacationYearData.selected, dStr].sort();
+await setDoc(docRef, { ...vacationYearData, selected: next }, { merge: true });
+} else {
+const next = [...(vacationYearData.medical || []), dStr].sort();
+await setDoc(docRef, { ...vacationYearData, medical: next }, { merge: true });
+}
+fetchVacationYearData();
+}
+};
+
+const renderVacationCalendar = () => {
+document.getElementById('v-month-title').innerText = new Intl.DateTimeFormat('sq-AL', { month: 'long', year: 'numeric' }).format(currentVacationDate);
+
+let html = "";
+// Ditët e javës
+['Hën', 'Mar', 'Mër', 'Enj', 'Pre', 'Sht', 'Die'].forEach(d => {
+html += `<div class="text-center text-[10px] font-black text-slate-300 mb-4">${d}</div>`;
+});
+
+const y = currentVacationDate.getFullYear();
+const m = currentVacationDate.getMonth();
+const dInM = new Date(y, m + 1, 0).getDate();
+const first = new Date(y, m, 1).getDay();
+const shift = first === 0 ? 6 : first - 1;
+
+for (let i = 0; i < shift; i++) {
+html += `<div></div>`;
+}
+
+const hols = getHolidaysForYear();
+
+for (let d = 1; d <= dInM; d++) {
+const dStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+const isHol = hols[dStr];
+const isSel = vacationYearData.selected.includes(dStr);
+const isMed = vacationYearData.medical?.includes(dStr);
+const isWkd = [0, 6].includes(new Date(dStr).getDay());
+
+let cellClass = "bg-white border-slate-100 text-slate-600 shadow-sm";
+let labelText = "";
+
+if (isHol) {
+cellClass = "bg-red-50 text-red-500 font-bold border-red-100";
+labelText = `<span class="text-[5px] uppercase truncate w-full px-1 text-center font-bold">${isHol}</span>`;
+} else if (isWkd) {
+cellClass = "bg-slate-50 text-slate-200 border-transparent cursor-default";
+} else if (isSel) {
+cellClass = "bg-blue-600 text-white shadow-lg border-blue-600";
+labelText = `<span class="text-[5px] uppercase font-bold">Leje</span>`;
+} else if (isMed) {
+cellClass = "bg-orange-500 text-white shadow-lg border-orange-500";
+labelText = `<span class="text-[5px] uppercase font-bold">Raport</span>`;
+}
+
+html += `
+<div onclick="toggleVacationDay('${dStr}')" class="h-12 md:h-16 rounded-2xl border flex flex-col items-center justify-center cursor-pointer transition-all ${cellClass}">
+<span class="text-sm font-black">${d}</span>
+${labelText}
+</div>
+`;
+}
+
+document.getElementById('v-calendar-grid').innerHTML = html;
+};
+
+window.setVacationSideTab = (tab) => {
+activeVacationSideTab = tab;
+document.getElementById('tab-v-selected').className = `flex-1 py-3 text-[9px] font-black uppercase rounded-xl ${tab === 'selected' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`;
+document.getElementById('tab-v-holidays').className = `flex-1 py-3 text-[9px] font-black uppercase rounded-xl ${tab === 'holidays' ? 'bg-white text-red-600 shadow-sm' : 'text-slate-400'}`;
+renderVacationSideTab();
+};
+
+const renderVacationSideTab = () => {
+const container = document.getElementById('v-side-content');
+let html = "";
+
+if (activeVacationSideTab === 'selected') {
+html += `<button onclick="generateVacationPDF()" class="w-full mb-4 bg-slate-900 text-white py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-lg">Shkarko Raportin</button>`;
+
+const activeCarryover = (vacationYearData.manualCarryover !== null) ? Number(vacationYearData.manualCarryover) : calculatedCarryover;
+
+const list = [
+...vacationYearData.selected.map((d, i) => ({ date: d, type: 'vacation', idx: i })),
+...(vacationYearData.medical || []).map(d => ({ date: d, type: 'medical' }))
+].sort((a, b) => b.date.localeCompare(a.date));
+
+if (list.length === 0) {
+html += `<p class="text-center text-xs font-bold text-slate-400 py-12">Nuk ka ditë të regjistruara për këtë vit.</p>`;
+} else {
+list.forEach(item => {
+const subText = item.type === 'medical' ? 'Raport Mjekësor' : item.idx < activeCarryover ? `Mbartje ${selectedYear-1}` : `Buxheti ${selectedYear}`;
+html += `
+<div class="flex justify-between items-center p-3 rounded-2xl ${item.type === 'medical' ? 'bg-orange-50 border border-orange-100' : item.idx < activeCarryover ? 'bg-blue-50/50 border border-blue-100' : 'bg-slate-50'}">
+<div class="flex flex-col">
+<span class="text-xs font-black text-slate-700">${item.date}</span>
+<span class="text-[8px] font-bold uppercase ${item.type === 'medical' ? 'text-orange-400' : 'text-slate-400'}">${subText}</span>
+</div>
+<button onclick="toggleVacationDay('${item.date}')" class="p-2 text-slate-300 hover:text-red-500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+</div>
+`;
+});
+}
+} else {
+const hols = getHolidaysForYear();
+html += `<p class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-2">Festat e Lëvizshme</p>`;
+
+['Bajrami i Madh', 'Pashkët Katolike', 'Pashkët Ortodokse', 'Kurban Bajrami'].forEach(name => {
+const currentVal = Object.entries(hols).find(([d, n]) => n === name)?.[0] || '';
+html += `
+<div class="p-4 bg-slate-50 rounded-3xl border border-slate-100 space-y-2">
+<span class="text-[10px] font-black uppercase text-slate-800 block">${name}</span>
+<input type="date" value="${currentVal}" onchange="saveMovableHolidayInline('${name}', this.value)" class="w-full p-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 bg-white outline-none">
+</div>
+`;
+});
+
+html += `<p class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-2 mt-6">Festat zyrtare</p>`;
+Object.entries(hols).sort().forEach(([d, n]) => {
+html += `
+<div class="flex items-center gap-3 p-3 rounded-2xl bg-red-50/40">
+<div class="text-[10px] font-black text-red-300 w-8">${d.split('-')[2]}</div>
+<div class="flex flex-col">
+<span class="text-[9px] font-black uppercase text-slate-700">${n}</span>
+<span class="text-[8px] font-bold text-slate-300 uppercase">${d}</span>
+</div>
+</div>
+`;
+});
+}
+
+container.innerHTML = html;
+};
+
+window.saveMovableHolidayInline = async (name, value) => {
+const user = auth.currentUser;
+if(!user) return;
+const updated = { ...(vacationYearData.movableDates || {}) };
+updated[name] = value;
+const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(selectedYear));
+await setDoc(docRef, { movableDates: updated }, { merge: true });
+fetchVacationYearData();
+};
+
+window.renderMovableHolidaysInputs = () => {
+const container = document.getElementById('movable-holidays-inputs');
+const hols = getHolidaysForYear();
+let html = "";
+['Bajrami i Madh', 'Pashkët Katolike', 'Pashkët Ortodokse', 'Kurban Bajrami'].forEach(name => {
+const currentVal = Object.entries(hols).find(([d, n]) => n === name)?.[0] || '';
+html += `
+<div class="p-4 bg-slate-50 rounded-3xl border border-slate-100 space-y-2">
+<span class="text-[11px] font-black uppercase text-slate-800 block">${name}</span>
+<input type="date" value="${currentVal}" onchange="saveMovableHolidayInline('${name}', this.value)" class="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 bg-white outline-none">
+</div>
+`;
+});
+container.innerHTML = html;
+};
+
+window.generateVacationPDF = () => {
+const { jsPDF } = window.jspdf;
+const docPDF = new jsPDF();
+docPDF.setFillColor(15, 23, 42);
+docPDF.rect(0, 0, 210, 40, 'F');
+docPDF.setTextColor(255, 255, 255);
+docPDF.setFontSize(22);
+docPDF.setFont("helvetica", "bold");
+docPDF.text("LINDIMAPS SYSTEMS", 20, 25);
+
+docPDF.setFontSize(10);
+docPDF.text(`RAPORTI I LEJEVE DHE RAPORTEVE - VITI ${selectedYear}`, 20, 32);
+
+docPDF.setTextColor(0, 0, 0);
+docPDF.setFontSize(11);
+docPDF.text(`Përdoruesi: ${auth.currentUser?.email}`, 20, 55);
+docPDF.text(`Data e gjenerimit: ${new Date().toLocaleDateString('sq-AL')}`, 20, 62);
+
+const activeCarryover = (vacationYearData.manualCarryover !== null) ? Number(vacationYearData.manualCarryover) : calculatedCarryover;
+
+const tableRows = [
+...vacationYearData.selected.map((date, index) => [
+date, new Intl.DateTimeFormat('sq-AL', { weekday: 'long' }).format(new Date(date)),
+index < activeCarryover ? `Leje (Mbartur ${selectedYear - 1})` : `Leje (Buxheti ${selectedYear})`
+]),
+...(vacationYearData.medical || []).map((date) => [
+date, new Intl.DateTimeFormat('sq-AL', { weekday: 'long' }).format(new Date(date)),
+"Raport Mjekësor"
+])
+].sort((a, b) => a[0].localeCompare(b[0]));
+
+docPDF.autoTable({ startY: 75, head: [['Data', 'Dita', 'Lloji']], body: tableRows, theme: 'grid', headStyles: { fillColor: [59, 130, 246] } });
+
+const finalY = docPDF.lastAutoTable.finalY + 15;
+docPDF.setFontSize(12); docPDF.setFont("helvetica", "bold"); docPDF.text("PËRMBLEDHJA E BILANCIT:", 20, finalY);
+docPDF.setFont("helvetica", "normal"); docPDF.setFontSize(10);
+docPDF.text(`Mbartur nga ${selectedYear - 1}: ${activeCarryover} ditë`, 20, finalY + 8);
+docPDF.text(`Buxheti i vitit ${selectedYear}: ${Number(vacationYearData.allowance) || 28} ditë`, 20, finalY + 14);
+docPDF.text(`Gjithësej shfrytëzuar (Leje): ${vacationYearData.selected.length} ditë`, 20, finalY + 20);
+docPDF.text(`Gjithësej Raporte Mjekësore: ${vacationYearData.medical?.length || 0} ditë`, 20, finalY + 26);
+
+const totalRemaining = ((Number(vacationYearData.allowance) || 28) + activeCarryover) - vacationYearData.selected.length;
+const carryoverRemaining = Math.max(0, activeCarryover - vacationYearData.selected.length);
+
+docPDF.setFont("helvetica", "bold");
+docPDF.text(`MBETJA ${selectedYear - 1}: ${carryoverRemaining} ditë`, 20, finalY + 36);
+docPDF.text(`MBETJA TOTALE ${selectedYear}: ${totalRemaining} ditë`, 20, finalY + 42);
+docPDF.save(`Raport_Pushimeve_${selectedYear}.pdf`);
+};
+
+/* ==========================================
+FUNKSIONET E REJA PËR MULTIPLE DOKUMENTE (FOTO/PDF) DHE COMPRESS
+========================================== */
+window.currentLogAttachments = []; // Array to store multiple attachments {type, data, name}
+
+window.handleLogAttachment = async (event) => {
+const files = event.target.files;
+if (!files || files.length === 0) return;
+
+document.getElementById('loading').classList.remove('hidden');
+
+for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    
+    // Compression per Imazhet
+    if (file.type.startsWith('image/')) {
+        await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    // Resize per compress: max width/height 1200px
+                    let width = img.width;
+                    let height = img.height;
+                    const MAX_DIM = 1200;
+                    
+                    if (width > height) {
+                        if (width > MAX_DIM) {
+                            height *= MAX_DIM / width;
+                            width = MAX_DIM;
+                        }
+                    } else {
+                        if (height > MAX_DIM) {
+                            width *= MAX_DIM / height;
+                            height = MAX_DIM;
+                        }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Compress quality 0.7
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    window.currentLogAttachments.push({
+                        type: 'photo',
+                        data: compressedBase64,
+                        name: file.name
+                    });
+                    resolve();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    } else if (file.type === 'application/pdf') {
+        // Kontroll madhesie per PDF (p.sh. max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            showAlert(`Skedari PDF '${file.name}' është shumë i madh. Maksimumi 2MB.`);
+            continue;
+        }
+        
+        await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                window.currentLogAttachments.push({
+                    type: 'pdf',
+                    data: e.target.result,
+                    name: file.name
+                });
+                resolve();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+}
+
+document.getElementById('loading').classList.add('hidden');
+renderLogAttachmentsPreview();
+// Reset input so the same files can be selected again if needed
+event.target.value = '';
+};
+
+window.renderLogAttachmentsPreview = () => {
+    const previewContainer = document.getElementById('log-files-preview');
+    if (window.currentLogAttachments.length === 0) {
+        previewContainer.classList.add('hidden');
+        previewContainer.innerHTML = '';
+        return;
+    }
+    
+    previewContainer.classList.remove('hidden');
+    let html = '';
+    window.currentLogAttachments.forEach((att, index) => {
+        const isPhoto = att.type === 'photo';
+        const iconStr = isPhoto ? '📷' : '📄';
+        const bgClass = isPhoto ? 'bg-blue-50 border-blue-100 text-blue-600' : 'bg-indigo-50 border-indigo-100 text-indigo-600';
+        
+        html += `
+        <div class="flex items-center justify-between ${bgClass} p-2 rounded-lg border">
+            <span class="text-[10px] font-bold truncate flex-1">${iconStr} ${att.name || 'Dokument'}</span>
+            <button onclick="removeTempAttachment(${index})" class="text-red-500 hover:text-red-700 ml-2 p-1" title="Hiq"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 6L6 18M6 6l12 12"></path></svg></button>
+        </div>`;
+    });
+    previewContainer.innerHTML = html;
+};
+
+window.removeTempAttachment = (index) => {
+    window.currentLogAttachments.splice(index, 1);
+    renderLogAttachmentsPreview();
+};
+
+window.clearLogAttachments = () => {
+    window.currentLogAttachments = [];
+    document.getElementById('log-file-input').value = '';
+    renderLogAttachmentsPreview();
+};
+
+window.viewAttachment = (logId, attIndex) => {
+const log = logData.find(l => l.id === logId);
+if (!log) return;
+
+// Fallback logic for old structure
+let attachments = [];
+if(log.attachments && log.attachments.length > 0) {
+    attachments = log.attachments;
+} else {
+    if (log.attachedPhoto) attachments.push({ type: 'photo', data: log.attachedPhoto, name: 'Foto' });
+    if (log.attachedPdf) attachments.push({ type: 'pdf', data: log.attachedPdf, name: 'PDF' });
+}
+
+const att = attachments[attIndex];
+if(!att) return;
+
+const contentDiv = document.getElementById('attachment-modal-content');
+const title = document.getElementById('attachment-modal-title');
+const downloadBtn = document.getElementById('attachment-download-btn');
+
+contentDiv.innerHTML = '';
+
+if (att.type === 'photo' || att.data.startsWith('data:image')) {
+title.innerText = att.name || 'Foto e Bashkëngjitur';
+contentDiv.innerHTML = `<img src="${att.data}" class="max-w-full max-h-full object-contain rounded-xl">`;
+} else if (att.type === 'pdf') {
+title.innerText = att.name || 'PDF e Bashkëngjitur';
+contentDiv.innerHTML = `<iframe src="${att.data}" class="w-full h-full border-0 rounded-xl"></iframe>`;
+}
+
+downloadBtn.onclick = () => downloadAttachment(logId, attIndex);
+document.getElementById('attachment-modal').classList.remove('hidden');
+};
+
+window.closeAttachmentModal = () => {
+document.getElementById('attachment-modal').classList.add('hidden');
+document.getElementById('attachment-modal-content').innerHTML = '';
+};
+
+window.downloadAttachment = (logId, attIndex) => {
+const log = logData.find(l => l.id === logId);
+if (!log) return;
+
+let attachments = [];
+if(log.attachments && log.attachments.length > 0) {
+    attachments = log.attachments;
+} else {
+    if (log.attachedPhoto) attachments.push({ type: 'photo', data: log.attachedPhoto, name: 'Foto' });
+    if (log.attachedPdf) attachments.push({ type: 'pdf', data: log.attachedPdf, name: 'PDF' });
+}
+
+const att = attachments[attIndex];
+if(!att) return;
+
+const a = document.createElement("a");
+a.href = att.data;
+a.download = att.name || `Dokument_Aktiviteti_${log.date}.${att.type === 'photo' ? 'jpg' : 'pdf'}`;
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+};
+
+window.removeLogAttachment = async (logId, attIndex) => {
+askConfirm(`Jeni të sigurt që doni të hiqni këtë dokument nga ky aktivitet? Kjo nuk do të fshijë vetë aktivitetin.`, async () => {
+const log = logData.find(l => l.id === logId);
+if (!log) return;
+
+let attachments = [];
+if(log.attachments && log.attachments.length > 0) {
+    attachments = [...log.attachments];
+} else {
+    if (log.attachedPhoto) attachments.push({ type: 'photo', data: log.attachedPhoto, name: 'Foto' });
+    if (log.attachedPdf) attachments.push({ type: 'pdf', data: log.attachedPdf, name: 'PDF' });
+}
+
+if(attachments[attIndex]) {
+    attachments.splice(attIndex, 1);
+}
+
+log.attachments = attachments;
+// Clear old singular fields if they exist to migrate fully to array
+log.attachedPhoto = null;
+log.attachedPdf = null;
+
+try {
+await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(logId)), log, { merge: true });
+showAlert(`Dokumenti u hoq me sukses.`);
+renderReportList();
+} catch(e) {
+showAlert("Gabim në fshirjen e bashkëngjitjes: " + e.message);
+}
+});
+};
+/* =========================================
+   LLOGJIKA E CHAT-IT TË INTEGRUAR
+========================================= */
+window.toggleChat = () => {
+    const chatWindow = document.getElementById('chat-window');
+    chatWindow.classList.toggle('hidden');
+    if (!chatWindow.classList.contains('hidden')) {
+        const msgs = document.getElementById('chat-messages');
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+};
+
+let chatUnsubscribe = null;
+
+const startChatListener = () => {
+    const chatRef = collection(db, `artifacts/${appId}/global_chat`);
+    const q = query(chatRef, orderBy("timestamp", "asc"), limit(100));
+    
+    chatUnsubscribe = onSnapshot(q, (snapshot) => {
+        const container = document.getElementById('chat-messages');
+        if(!container) return;
+        container.innerHTML = '';
+        
+        const currentUserEmail = auth.currentUser?.email;
+        
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            const isMe = currentUserEmail === data.senderEmail;
+            const time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}) : '';
+            
+            const msgHtml = `
+            <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} animate-fade-in-up">
+                <span class="text-[9px] text-slate-400 font-bold mb-1 mx-1 uppercase tracking-wider">${data.senderName} • ${time}</span>
+                <div class="px-4 py-2.5 max-w-[85%] text-sm font-medium shadow-sm ${isMe ? 'bg-blue-600 text-white rounded-2xl rounded-br-sm' : 'bg-white border border-slate-200 text-slate-700 rounded-2xl rounded-bl-sm'}">
+                    ${data.text}
+                </div>
+            </div>`;
+            container.innerHTML += msgHtml;
+        });
+        container.scrollTop = container.scrollHeight;
+    });
+};
+
+window.sendChatMessage = async () => {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    const user = auth.currentUser;
+    
+    if (!text || !user) return;
+    input.value = ''; // Pastro fushën menjëherë
+    
+    try {
+        const chatRef = collection(db, `artifacts/${appId}/global_chat`);
+        const senderName = document.getElementById('sidebar-name').innerText || user.email.split('@')[0];
+        
+        await addDoc(chatRef, {
+            text: text,
+            senderEmail: user.email,
+            senderName: senderName,
+            timestamp: serverTimestamp()
+        });
+    } catch (error) {
+        showAlert("Gabim në dërgimin e mesazhit. Kontrolloni lidhjen e internetit.");
+    }
+};
+
+// Aktivizo dëgjuesin e chat-it automatikisht kur përdoruesi logohet
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        startChatListener();
+    } else if (chatUnsubscribe) {
+        chatUnsubscribe();
+    }
+});
+</script>
+    <div id="lindi-chat-widget" class="fixed bottom-6 right-6 z-[999]">
+  <button onclick="toggleChat()" class="bg-slate-900 hover:bg-blue-600 text-white rounded-full p-4 shadow-2xl shadow-blue-500/30 transition-all hover:scale-110 flex items-center justify-center border border-slate-700">
+    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+  </button>
+
+  <div id="chat-window" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 bg-white/90 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[450px] transition-all">
+    <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-4 flex justify-between items-center border-b border-slate-700">
+      <div class="font-black text-sm flex items-center gap-2 tracking-wide">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+        </span>
+        LindiMaps Chat
+      </div>
+      <button onclick="toggleChat()" class="text-slate-400 hover:text-white transition-colors bg-white/10 p-1.5 rounded-full"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    </div>
+    
+    <div id="chat-messages" class="flex-1 p-4 overflow-y-auto bg-slate-50/50 space-y-4 custom-scrollbar text-sm flex flex-col">
+      </div>
+    
+    <div class="p-3 bg-white border-t border-slate-100 flex gap-2">
+      <input type="text" id="chat-input" placeholder="Shkruaj një mesazh..." class="flex-1 bg-slate-100 border border-slate-200/60 rounded-xl px-4 py-3 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" onkeypress="if(event.key === 'Enter') sendChatMessage()">
+      <button onclick="sendChatMessage()" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-95"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
