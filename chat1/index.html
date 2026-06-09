@@ -2857,3 +2857,105 @@ window.removeTempAttachment = (index) => {
 
 window.clearLogAttachments = () => {
     window
+    window.currentLogAttachments = [];
+    document.getElementById('log-file-input').value = '';
+    renderLogAttachmentsPreview();
+};
+
+window.viewAttachment = (logId, attIndex) => {
+    const log = logData.find(l => l.id === logId);
+    if (!log) return;
+
+    // Fallback logic for old structure
+    let attachments = [];
+    if(log.attachments && log.attachments.length > 0) {
+        attachments = log.attachments;
+    } else {
+        if (log.attachedPhoto) attachments.push({ type: 'photo', data: log.attachedPhoto, name: 'Foto' });
+        if (log.attachedPdf) attachments.push({ type: 'pdf', data: log.attachedPdf, name: 'PDF' });
+    }
+
+    const att = attachments[attIndex];
+    if(!att) return;
+
+    const contentDiv = document.getElementById('attachment-modal-content');
+    const title = document.getElementById('attachment-modal-title');
+    const downloadBtn = document.getElementById('attachment-download-btn');
+
+    contentDiv.innerHTML = '';
+
+    if (att.type === 'photo' || att.data.startsWith('data:image')) {
+        title.innerText = att.name || 'Foto e Bashkëngjitur';
+        contentDiv.innerHTML = `<img src="${att.data}" class="max-w-full max-h-full object-contain rounded-xl">`;
+    } else if (att.type === 'pdf') {
+        title.innerText = att.name || 'PDF e Bashkëngjitur';
+        contentDiv.innerHTML = `<iframe src="${att.data}" class="w-full h-full border-0 rounded-xl"></iframe>`;
+    }
+
+    downloadBtn.onclick = () => downloadAttachment(logId, attIndex);
+    document.getElementById('attachment-modal').classList.remove('hidden');
+};
+
+window.closeAttachmentModal = () => {
+    document.getElementById('attachment-modal').classList.add('hidden');
+    document.getElementById('attachment-modal-content').innerHTML = '';
+};
+
+window.downloadAttachment = (logId, attIndex) => {
+    const log = logData.find(l => l.id === logId);
+    if (!log) return;
+
+    let attachments = [];
+    if(log.attachments && log.attachments.length > 0) {
+        attachments = log.attachments;
+    } else {
+        if (log.attachedPhoto) attachments.push({ type: 'photo', data: log.attachedPhoto, name: 'Foto' });
+        if (log.attachedPdf) attachments.push({ type: 'pdf', data: log.attachedPdf, name: 'PDF' });
+    }
+
+    const att = attachments[attIndex];
+    if(!att) return;
+
+    const a = document.createElement("a");
+    a.href = att.data;
+    a.download = att.name || `Dokument_Aktiviteti_${log.date}.${att.type === 'photo' ? 'jpg' : 'pdf'}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+};
+
+window.removeLogAttachment = async (logId, attIndex) => {
+    askConfirm(`Jeni të sigurt që doni të hiqni këtë dokument nga ky aktivitet? Kjo nuk do të fshijë vetë aktivitetin.`, async () => {
+        const log = logData.find(l => l.id === logId);
+        if (!log) return;
+
+        let attachments = [];
+        if(log.attachments && log.attachments.length > 0) {
+            attachments = [...log.attachments];
+        } else {
+            if (log.attachedPhoto) attachments.push({ type: 'photo', data: log.attachedPhoto, name: 'Foto' });
+            if (log.attachedPdf) attachments.push({ type: 'pdf', data: log.attachedPdf, name: 'PDF' });
+        }
+
+        if(attachments[attIndex]) {
+            attachments.splice(attIndex, 1);
+        }
+
+        log.attachments = attachments;
+        // Clear old singular fields if they exist to migrate fully to array
+        log.attachedPhoto = null;
+        log.attachedPdf = null;
+
+        try {
+            await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(logId)), log, { merge: true });
+            showAlert(`Dokumenti u hoq me sukses.`);
+            renderReportList();
+        } catch(e) {
+            showAlert("Gabim në fshirjen e bashkëngjitjes: " + e.message);
+        }
+    });
+};
+
+</script>
+</body>
+</html>
