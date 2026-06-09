@@ -7,9 +7,8 @@
     <!-- Ngarkimi i Chart.js dhe i shtojcës për etiketa (datalabels) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <!-- SHTUAR E RE: Libraria për leximin e skedarëve Excel (SheetJS) -->
+    <!-- SheetJS për leximin e skedarëve Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
     <style>
         :root {
             --bg-color: #0b0f19;
@@ -75,7 +74,7 @@
 
         /* Stilet e Listës së Bashkive */
         .mun-list-container {
-            max-height: 55vh;
+            max-height: 50vh;
             overflow-y: auto;
             padding-right: 10px;
         }
@@ -351,6 +350,68 @@
             font-weight: bold;
         }
 
+        /* Seksioni i ri i ngarkimit të Excel në kolonën e majtë */
+        .excel-upload-panel {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .excel-input-label {
+            display: block;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px dashed var(--accent);
+            color: var(--accent);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .excel-input-label:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: var(--accent-glow);
+        }
+
+        .mapping-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .mapping-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mapping-row label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .mapping-row select {
+            flex: 1;
+            max-width: 180px;
+        }
+
+        .excel-status-msg {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            text-align: center;
+            color: #10b981;
+            font-weight: 500;
+        }
+
         /* Optimizimi i Plotë për Printim (PDF) */
         @media print {
             * {
@@ -424,26 +485,29 @@
 <body>
 
     <div class="dashboard-container">
-        <!-- Sidebar - Lista e Bashkive me mundësi modifikimi -->
+        <!-- Sidebar - Lista e Bashkive me mundësi modifikimi dhe ngarkim Excel -->
         <div class="glass-panel sidebar">
             <h1>Zgjedhjet & Editimi</h1>
             
-            <!-- E RE: Seksioni i ngarkimit të Excel-it pa prekur strukturën tjetër -->
-            <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);">
-                <span class="control-title" style="display:block; margin-bottom:10px;">Ngarko Të Dhëna nga Excel</span>
-                <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="width:100%; font-size: 0.85rem; margin-bottom: 10px;" onchange="handleExcelUpload(event)">
+            <!-- SEKSIONI EXCEL: Ngarkimi dhe përzgjedhja e fushave dinamike -->
+            <div class="excel-upload-panel">
+                <span class="control-title" style="display: block; margin-bottom: 8px;">Ngarko Excel (.xlsx, .xls)</span>
+                <label for="excelInput" class="excel-input-label">📁 Kliko për të ngarkuar</label>
+                <input type="file" id="excelInput" accept=".xlsx, .xls, .csv" style="display: none;" onchange="importExcel(event)">
                 
-                <!-- Këtu zgjidhen kolonat pasi ngarkoni exelin -->
-                <div id="excelMapping" style="display:none; flex-direction:column; gap:10px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <label style="font-size: 0.85rem; width: 60px;">Emërtimi:</label>
-                        <select id="colName" class="select-control" style="flex:1;"></select>
+                <div id="excelMappingSection" class="mapping-container" style="display: none;">
+                    <span class="control-title" style="text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">Përzgjedhja e Fushave</span>
+                    
+                    <div class="mapping-row">
+                        <label for="mappingLabel">Kolona e Emrave:</label>
+                        <select id="mappingLabel" class="select-control" onchange="applyExcelMapping()"></select>
                     </div>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <label style="font-size: 0.85rem; width: 60px;">Vlera:</label>
-                        <select id="colValue" class="select-control" style="flex:1;"></select>
+                    
+                    <div class="mapping-row">
+                        <label for="mappingValue">Kolona e Vlerave:</label>
+                        <select id="mappingValue" class="select-control" onchange="applyExcelMapping()"></select>
                     </div>
-                    <button class="btn-secondary" onclick="applyExcel()" style="padding: 8px; font-size: 0.85rem; margin-top: 5px;">Apliko Të Dhënat e Reja</button>
+                    <div id="statusMessage" class="excel-status-msg">Excel u lexua me sukses!</div>
                 </div>
             </div>
 
@@ -462,11 +526,11 @@
             
             <div class="chart-controls">
                 
-                <!-- E RE: Tipi i Grafikut -->
+                <!-- Tipi i Grafikut -->
                 <div class="control-group">
                     <span class="control-title">Tipi i Grafikut</span>
                     <div class="control-row">
-                        <select id="chartType" class="select-control" style="width: 100%; max-width: 200px;" onchange="updateChart()" title="Zgjidhni llojin e grafikut">
+                        <select id="chartType" class="select-control" style="width: 100%;" onchange="updateChart()">
                             <option value="pie" selected>Pie (Rrethor)</option>
                             <option value="doughnut">Doughnut (Unazë)</option>
                             <option value="bar">Column (Shtyllë Vertikale)</option>
@@ -540,7 +604,7 @@
                     <div class="control-row">
                         <label class="radio-label">
                             <input type="radio" name="displayMode" value="value" checked onchange="updateChart()"> 
-                            Vlerë
+                            Ha / Vlerë
                         </label>
                         <label class="radio-label">
                             <input type="radio" name="displayMode" value="percentage" onchange="updateChart()"> 
@@ -694,87 +758,11 @@
         ];
 
         let pieChart;
+        let excelParsedData = []; // Ruajmë të gjithë rreshtat e Excel-it të ngarkuar
+        let excelHeaders = [];    // Emrat e kolonave nga rreshti i parë
+
         // Regjistro shtojcën për shfaqjen e etiketave direkt mbi grafik
         Chart.register(ChartDataLabels);
-
-        // FUNKSIONET E REJA PER EXCEL
-        let uploadedExcelRows = [];
-
-        function handleExcelUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1}); // Lexo si matricë për të kapur headers lehtë
-
-                if (jsonData.length > 0) {
-                    const headers = jsonData[0];
-                    uploadedExcelRows = jsonData.slice(1); // Heqim rreshtin e parë (titujt)
-
-                    const colNameSelect = document.getElementById('colName');
-                    const colValueSelect = document.getElementById('colValue');
-                    
-                    colNameSelect.innerHTML = '';
-                    colValueSelect.innerHTML = '';
-
-                    headers.forEach((header, index) => {
-                        const optName = document.createElement('option');
-                        optName.value = index;
-                        optName.text = header || `Kolona ${index+1}`;
-                        colNameSelect.appendChild(optName);
-
-                        const optVal = document.createElement('option');
-                        optVal.value = index;
-                        optVal.text = header || `Kolona ${index+1}`;
-                        colValueSelect.appendChild(optVal);
-                    });
-
-                    // Nëse ka më shumë se 1 kolonë, automatikisht zgjedhim kolonën e dytë për Vlera
-                    if(headers.length > 1) {
-                        colValueSelect.selectedIndex = 1;
-                    }
-
-                    document.getElementById('excelMapping').style.display = 'flex';
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function applyExcel() {
-            const nameIdx = parseInt(document.getElementById('colName').value);
-            const valIdx = parseInt(document.getElementById('colValue').value);
-
-            // Zbrazim të dhënat e vjetra duke ruajtur lidhjen e array-t origjinal
-            rawData.length = 0; 
-            
-            uploadedExcelRows.forEach(row => {
-                const rawName = row[nameIdx];
-                const rawVal = parseFloat(row[valIdx]);
-                
-                if (rawName !== undefined && !isNaN(rawVal)) {
-                    rawData.push({
-                        name: String(rawName).trim(),
-                        value: rawVal
-                    });
-                }
-            });
-
-            // Rifreskojmë dritaren me të dhënat e reja
-            initData();
-            initList();
-            updateChart();
-            
-            // Fshehim panelin dhe pastrojmë inputin e skedarit
-            document.getElementById('excelMapping').style.display = 'none';
-            document.getElementById('excelFile').value = '';
-            alert("Të dhënat u ngarkuan me sukses!");
-        }
-        // FUNDI I FUNKSIONEVE TE EXCEL
 
         // Funksion për të konvertuar HSL në format HEX për Color Picker
         function hslToHex(h, s, l) {
@@ -791,8 +779,10 @@
         function initData() {
             // Shtojmë një ngjyrë të paracaktuar të bukur (HEX) për çdo element
             rawData.forEach((item, index) => {
-                const hue = (index * 137.508) % 360; // Shpërndarje e rregullt ngjyrash
-                item.color = hslToHex(hue, 70, 50);
+                if (!item.color) {
+                    const hue = (index * 137.508) % 360; 
+                    item.color = hslToHex(hue, 70, 50);
+                }
             });
         }
 
@@ -801,9 +791,9 @@
             container.innerHTML = ''; 
             
             rawData.forEach((item, index) => {
-                // Si parazgjedhje, zgjedhim 10 të fundit që janë vlerat më domethënëse për ta mbajtur grafikun të pastër në fillim
-                // Në rastin e ngarkimit të excel do jenë deri ne 10
-                const isChecked = (rawData.length <= 15 || index >= rawData.length - 10) ? 'checked' : ''; 
+                // Nëse kemi ngarkuar Excel, i zgjedhim të gjitha si parazgjedhje që të shfaqen menjëherë
+                // Ndryshe, zgjedhim vetëm 10 të fundit siç ishte fillimisht
+                const isChecked = (excelParsedData.length > 0 || index >= rawData.length - 10) ? 'checked' : ''; 
 
                 const div = document.createElement('div');
                 div.className = 'mun-item';
@@ -819,7 +809,118 @@
             });
         }
 
-        // Funksioni që ndryshon të dhënat kur përdoruesi ndryshon vlerat ose ngjyrën ose emrin
+        // FUNKSIONET DINAMIKE TË EXCEL-IT
+        function importExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                // Konvertojmë në matricë (rresht pas rreshti) ku rreshti i parë është Header
+                const matrix = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                
+                if (matrix.length < 2) {
+                    showCustomNotification("Skedari Excel nuk ka mjaftueshëm të dhëna ose rreshta.", "error");
+                    return;
+                }
+
+                excelHeaders = matrix[0]; // Ruajmë kokën e kolonave
+                excelParsedData = matrix.slice(1); // Heqim header rreshtin e parë
+
+                // Mbushim dropdowns me emrat e kolonave të zbuluara nga Excel
+                const selectLabel = document.getElementById('mappingLabel');
+                const selectValue = document.getElementById('mappingValue');
+
+                selectLabel.innerHTML = '';
+                selectValue.innerHTML = '';
+
+                let defaultLabelIndex = 0;
+                let defaultValueIndex = 1;
+
+                excelHeaders.forEach((header, index) => {
+                    const cleanHeaderName = header ? String(header).trim() : `Kolona ${index + 1}`;
+                    
+                    const optionL = document.createElement('option');
+                    optionL.value = index;
+                    optionL.text = cleanHeaderName;
+                    selectLabel.appendChild(optionL);
+
+                    const optionV = document.createElement('option');
+                    optionV.value = index;
+                    optionV.text = cleanHeaderName;
+                    selectValue.appendChild(optionV);
+
+                    // Përpiqemi të gjejmë automatikisht cilat janë kolonat më të përshtatshme bazuar në emra (psh. emri, bashkia, value, ha)
+                    const lowHeader = cleanHeaderName.toLowerCase();
+                    if (lowHeader.includes('emri') || lowHeader.includes('bashkia') || lowHeader.includes('name') || lowHeader.includes('municipality')) {
+                        defaultLabelIndex = index;
+                    }
+                    if (lowHeader.includes('vlera') || lowHeader.includes('ha') || lowHeader.includes('sipërfaqe') || lowHeader.includes('siperfaqe') || lowHeader.includes('value') || lowHeader.includes('area')) {
+                        defaultValueIndex = index;
+                    }
+                });
+
+                // Zgjedhim kolonat e parashikuara ose të parat në rradhë
+                selectLabel.selectedIndex = defaultLabelIndex;
+                selectValue.selectedIndex = (defaultValueIndex < excelHeaders.length) ? defaultValueIndex : (excelHeaders.length > 1 ? 1 : 0);
+
+                // Shfaqim panelin e përzgjedhjes së kolonave
+                document.getElementById('excelMappingSection').style.display = 'flex';
+                
+                // Aplikojmë menjëherë zgjedhjen
+                applyExcelMapping();
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function applyExcelMapping() {
+            const labelColIdx = parseInt(document.getElementById('mappingLabel').value);
+            const valueColIdx = parseInt(document.getElementById('mappingValue').value);
+
+            if (isNaN(labelColIdx) || isNaN(valueColIdx)) return;
+
+            // Pastrojmë të dhënat ekzistuese në memorje dhe i mbushim nga Excel-i
+            rawData.length = 0;
+
+            excelParsedData.forEach((row, index) => {
+                const labelVal = row[labelColIdx];
+                const numericalVal = parseFloat(row[valueColIdx]);
+
+                // Shmangim rreshtat tërësisht bosh ose pa emërtim
+                if (labelVal !== undefined && labelVal !== null && String(labelVal).trim() !== "") {
+                    rawData.push({
+                        name: String(labelVal).trim(),
+                        value: isNaN(numericalVal) ? 0 : numericalVal,
+                        // Gjenerojmë një ngjyrë të re të bukur për secilën
+                        color: hslToHex((index * 137.508) % 360, 70, 50)
+                    });
+                }
+            });
+
+            // Përditësojmë listën e sidebar-it dhe grafikun
+            initList();
+            updateChart();
+
+            // Përditësojmë tekstin e statusit
+            const statusMsg = document.getElementById('statusMessage');
+            statusMsg.textContent = `U ngarkuan ${rawData.length} rreshta me sukses!`;
+            statusMsg.style.color = "#00d4ff";
+        }
+
+        function showCustomNotification(text, type = "success") {
+            const statusMsg = document.getElementById('statusMessage');
+            statusMsg.textContent = text;
+            statusMsg.style.color = type === "error" ? "#f87171" : "#10b981";
+            document.getElementById('excelMappingSection').style.display = 'flex';
+        }
+        // FUNDI I FUNKSIONEVE EXCEL
+
+        // Funksioni që ndryshon të dhënat kur përdoruesi ndryshon vlerat ose ngjyrën ose emrin në sidebar
         function updateItemData(index, type) {
             if (type === 'color') {
                 rawData[index].color = document.getElementById(`color_${index}`).value;
@@ -845,14 +946,14 @@
             let othersValue = 0; // Vlera për "Të Tjerat" (bashkitë e pazgjedhura)
 
             checkboxes.forEach((cb, index) => {
-                if (cb.checked) {
+                if (cb.checked && rawData[index]) {
                     selectedData.push(rawData[index]);
-                } else {
-                    if(rawData[index]) othersValue += rawData[index].value;
+                } else if (rawData[index]) {
+                    othersValue += rawData[index].value;
                 }
             });
 
-            // Nëse përdoruesi kërkon që të grupsojë të pazgjedhurat për të formuar 100% totalin
+            // Nëse përdoruesi kërkon që të grupojë të pazgjedhurat për të formuar 100% totalin
             const groupingMode = document.querySelector('input[name="groupingMode"]:checked').value;
             if (groupingMode === 'grouped' && othersValue > 0) {
                 selectedData.push({
@@ -862,7 +963,7 @@
                 });
             }
             
-            // Llogarit Statistikat e reja
+            // Llogarit Statistikat e reja (përfshin edhe 'Të Tjerat' nëse grupimi është aktiv)
             const totalVal = selectedData.reduce((sum, item) => sum + item.value, 0);
             document.getElementById('totalArea').textContent = totalVal.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
             document.getElementById('totalCount').textContent = selectedData.length;
@@ -895,29 +996,29 @@
             const legendShape = document.getElementById('legendShape').value;
             const legendSize = parseInt(document.getElementById('legendSize').value);
 
-            // E RE: Merr tipin e grafikut dhe konfiguro aksat
+            // Merr tipin e grafikut dhe konfiguro asetin e ri Chart.js
             const selectedChartType = document.getElementById('chartType').value;
             const isHorizontal = selectedChartType === 'horizontalBar';
-            const actualType = isHorizontal ? 'bar' : selectedChartType; // Horizontal Bar në Chart.js > 3 bëhet me 'bar' dhe indexAxis: 'y'
-            
-            // Konfigurimi i aksave (Scales) në varësi të tipit të grafikut
+            const actualType = isHorizontal ? 'bar' : selectedChartType; // Horizontal Bar zëvendësohet me 'bar' në Chart.js 3+ me indexAxis: 'y'
+
+            // Përcakto strukturën e akseve për grafiqet shtyllore/lineare/radar
             let chartScales = {};
             if (['bar', 'line', 'horizontalBar'].includes(selectedChartType)) {
                 chartScales = {
                     x: {
                         ticks: { color: labelColor, font: {family: labelFont} },
-                        grid: { color: 'rgba(255,255,255,0.1)' }
+                        grid: { color: 'rgba(255,255,255,0.08)' }
                     },
                     y: {
                         ticks: { color: labelColor, font: {family: labelFont} },
-                        grid: { color: 'rgba(255,255,255,0.1)' }
+                        grid: { color: 'rgba(255,255,255,0.08)' }
                     }
                 };
             } else if (['radar', 'polarArea'].includes(selectedChartType)) {
                 chartScales = {
                     r: {
                         ticks: { color: labelColor, backdropColor: 'transparent', font: {family: labelFont} },
-                        grid: { color: 'rgba(255,255,255,0.2)' },
+                        grid: { color: 'rgba(255,255,255,0.15)' },
                         pointLabels: { color: labelColor, font: {family: labelFont, size: labelSize} }
                     }
                 };
@@ -931,7 +1032,6 @@
             // Formatuesi i etiketave mbi grafik
             const datalabelsFormatter = (value, context) => {
                 if (['bar', 'line', 'horizontalBar'].includes(selectedChartType)) {
-                    // Për kolonat ose vijat tregojmë thjesht vlerën
                     return displayMode === 'percentage' ? '' : value.toLocaleString();
                 }
 
@@ -939,7 +1039,7 @@
                 if (total === 0) return null;
                 const percNum = (value / total) * 100;
                 
-                // Nëse përqindja është nën 2.5%, e fshehim etiketën e asaj fete që të mos krijohet mbivendosje e shëmtuar teksti (për rrethorët)
+                // Nëse përqindja është nën 2.5%, e fshehim etiketën që të mos ketë mbingarkesë në rrethorët
                 if (percNum < 2.5 && ['pie', 'doughnut', 'polarArea'].includes(selectedChartType)) return null;
                 
                 return displayMode === 'percentage' 
@@ -949,31 +1049,34 @@
 
             const legendDisplay = legendPosition !== 'hide';
 
-            // NDRYSHIM I RENDESISHEM: E prishim grafikun e vjetër dhe e rikrijojmë që t'i përshtatet ndryshimit të tipit (nga Rrethor në Shtyllë, etj.) pa u prishur vizualisht
+            // Për të siguruar renderim pa gabime midis tipave të ndryshëm të grafikëve, e shkatërrojmë instancën e vjetër
             if (pieChart) {
                 pieChart.destroy();
             }
 
+            // Krijimi i instancës së re
             const ctx = document.getElementById('areaChart').getContext('2d');
             pieChart = new Chart(ctx, {
                 type: actualType,
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Vlera', // Përdoret për Bar dhe Line
+                        label: 'Vlera',
                         data: dataValues,
                         backgroundColor: bgColors,
                         borderWidth: finalBorderWidth,
                         borderColor: sliceBorderColor,
                         indexAxis: isHorizontal ? 'y' : 'x',
-                        tension: 0.3, // Për t'i bërë grafiqet "Line" me lakore të lëmuar
-                        fill: selectedChartType === 'radar' || selectedChartType === 'polarArea' // Radar & Polar mbushin sfondin natyrshëm
+                        tension: 0.3, // Për t'i dhënë grafikëve LINE lakore të lëmuar
+                        fill: selectedChartType === 'radar' || selectedChartType === 'polarArea'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    layout: { padding: 10 },
+                    layout: {
+                        padding: 10
+                    },
                     scales: chartScales,
                     plugins: {
                         title: {
@@ -981,13 +1084,21 @@
                             text: chartTitleText,
                             position: titlePosition,
                             color: labelColor,
-                            font: { family: labelFont, size: titleSize, weight: 'bold' },
+                            font: {
+                                family: labelFont,
+                                size: titleSize,
+                                weight: 'bold'
+                            },
                             padding: { top: 10, bottom: 20 }
                         },
                         datalabels: {
                             display: showLabels,
                             color: labelColor,
-                            font: { weight: 'bold', size: labelSize, family: labelFont },
+                            font: {
+                                weight: 'bold',
+                                size: labelSize,
+                                family: labelFont
+                            },
                             textStrokeColor: 'rgba(0,0,0,0.85)',
                             textStrokeWidth: 3,
                             formatter: datalabelsFormatter
@@ -1017,16 +1128,14 @@
                 if(pieChart) {
                     pieChart.options.plugins.legend.labels.color = mql.matches ? '#000000' : labelColor;
                     pieChart.options.plugins.title.color = mql.matches ? '#000000' : labelColor;
-                    
                     if(pieChart.options.scales.x) pieChart.options.scales.x.ticks.color = mql.matches ? '#000000' : labelColor;
                     if(pieChart.options.scales.y) pieChart.options.scales.y.ticks.color = mql.matches ? '#000000' : labelColor;
-                    
                     pieChart.update();
                 }
             });
         }
 
-        // Krijuesi i tekstit të mjetit informues (Tooltip) përshtatur me tipet e grafeve
+        // Krijuesi i tekstit të mjetit informues (Tooltip)
         function getTooltipCallback(mode, chartType) {
             return function(context) {
                 let label = context.dataset.label || context.label || '';
@@ -1066,7 +1175,7 @@
             
             // Gjenerojmë shkarkimin e fotos
             const link = document.createElement('a');
-            link.download = 'raport_grafik.png';
+            link.download = 'asig_raport_grafik.png';
             link.href = tempCanvas.toDataURL('image/png');
             link.click();
         }
