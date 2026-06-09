@@ -489,7 +489,7 @@
         <div class="glass-panel sidebar">
             <h1>Zgjedhjet & Editimi</h1>
             
-            <!-- SEKSIONI EXCEL: Ngarkimi dhe përzgjedhja e fushave dinamike -->
+            <!-- SEKSIONI EXCEL: Ngarkimi dhe përzgjedhja e fushave dinamike (Suporton pakufizuar kolona) -->
             <div class="excel-upload-panel">
                 <span class="control-title" style="display: block; margin-bottom: 8px;">Ngarko Excel (.xlsx, .xls)</span>
                 <label for="excelInput" class="excel-input-label">📁 Kliko për të ngarkuar</label>
@@ -542,16 +542,21 @@
                     </div>
                 </div>
 
-                <!-- Titulli i Grafikut -->
+                <!-- KONFIGURIMI FULL I TITULLIT (Ndarë plotësisht nga etiketat) -->
                 <div class="control-group">
-                    <span class="control-title">Titulli i Grafikut</span>
-                    <div class="control-row">
-                        <input type="text" id="chartTitle" class="select-control" style="width: 130px; cursor: text;" placeholder="Shkruaj titullin..." oninput="updateChart()">
-                        <select id="titlePosition" class="select-control" onchange="updateChart()" title="Pozicioni i titullit">
-                            <option value="top" selected>Lart</option>
-                            <option value="bottom">Poshtë</option>
-                            <option value="left">Majtas</option>
-                            <option value="right">Djathtas</option>
+                    <span class="control-title">Konfigurimi i Titullit</span>
+                    <div class="control-row" style="gap: 8px;">
+                        <input type="text" id="chartTitle" class="select-control" style="width: 120px; cursor: text;" placeholder="Titulli..." oninput="updateChart()">
+                        <select id="titleFont" class="select-control" onchange="updateChart()" title="Lloji i shkrimit të titullit">
+                            <option value="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" selected>Segoe UI</option>
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="'Courier New', Courier, monospace">Courier New</option>
+                            <option value="Georgia, serif">Georgia</option>
+                            <option value="Impact, fantasy">Impact</option>
+                            <option value="Tahoma, sans-serif">Tahoma</option>
+                            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                            <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                            <option value="Verdana, sans-serif">Verdana</option>
                         </select>
                         <select id="titleSize" class="select-control" onchange="updateChart()" title="Madhësia e titullit">
                             <option value="14">14px</option>
@@ -561,6 +566,16 @@
                             <option value="24">24px</option>
                             <option value="28">28px</option>
                         </select>
+                        <select id="titlePosition" class="select-control" onchange="updateChart()" title="Pozicioni i titullit">
+                            <option value="top" selected>Lart</option>
+                            <option value="bottom">Poshtë</option>
+                            <option value="left">Majtas</option>
+                            <option value="right">Djathtas</option>
+                        </select>
+                        <div class="color-picker-wrapper" title="Ngjyra e shkrimit të titullit">
+                            <input type="color" id="titleColor" value="#ffffff" onchange="updateChart()">
+                            <span>Ngjyra</span>
+                        </div>
                     </div>
                 </div>
 
@@ -583,7 +598,7 @@
                     </div>
                 </div>
 
-                <!-- Përfshirja / Grupimi (E RE: Mundëson formimin e 100% të totalit) -->
+                <!-- Përfshirja / Grupimi (Mundëson formimin e 100% të totalit) -->
                 <div class="control-group">
                     <span class="control-title">Përfshirja (Grupimi 100%)</span>
                     <div class="control-row">
@@ -613,15 +628,15 @@
                     </div>
                 </div>
 
-                <!-- Konfigurimi i Etiketave dhe Shkrimit -->
+                <!-- KONFIGURIMI FULL I ETIKETAVE (Ndarë plotësisht nga titulli) -->
                 <div class="control-group">
-                    <span class="control-title">Stili i Shkrimit & Etiketat</span>
-                    <div class="control-row">
+                    <span class="control-title">Stili i Etiketave mbi Grafik</span>
+                    <div class="control-row" style="gap: 8px;">
                         <label class="checkbox-label" style="margin-right: 5px;">
                             <input type="checkbox" id="showLabels" checked onchange="updateChart()">
                             Shfaq
                         </label>
-                        <select id="labelFont" class="select-control" onchange="updateChart()" title="Stili i shkrimit">
+                        <select id="labelFont" class="select-control" onchange="updateChart()" title="Stili i shkrimit të etiketave">
                             <option value="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" selected>Segoe UI</option>
                             <option value="Arial, sans-serif">Arial</option>
                             <option value="'Courier New', Courier, monospace">Courier New</option>
@@ -644,9 +659,9 @@
                             <option value="20">LBL: 20px</option>
                             <option value="24">LBL: 24px</option>
                         </select>
-                        <div class="color-picker-wrapper" title="Ngjyra e shkrimit (Aplikuar tek Etiketat, Legjenda dhe Titulli)">
+                        <div class="color-picker-wrapper" title="Ngjyra e etiketave dhe legjendës">
                             <input type="color" id="labelColor" value="#ffffff" onchange="updateChart()">
-                            <span>Ngjyra e Tekstit</span>
+                            <span>Ngjyra</span>
                         </div>
                     </div>
                 </div>
@@ -809,7 +824,7 @@
             });
         }
 
-        // FUNKSIONET DINAMIKE TË EXCEL-IT
+        // FUNKSIONET DINAMIKE TË EXCEL-IT (Mbështet mbi 1234+ kolona pa kufizim)
         function importExcel(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -821,7 +836,7 @@
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
                 
-                // Konvertojmë në matricë (rresht pas rreshti) ku rreshti i parë është Header
+                // Konvertojmë në matricë ku rreshti i parë është Header
                 const matrix = XLSX.utils.sheet_to_json(worksheet, {header: 1});
                 
                 if (matrix.length < 2) {
@@ -832,7 +847,7 @@
                 excelHeaders = matrix[0]; // Ruajmë kokën e kolonave
                 excelParsedData = matrix.slice(1); // Heqim header rreshtin e parë
 
-                // Mbushim dropdowns me emrat e kolonave të zbuluara nga Excel
+                // Mbushim dropdowns me të gjitha kolonat e zbuluara (pa asnjë kufi sasior)
                 const selectLabel = document.getElementById('mappingLabel');
                 const selectValue = document.getElementById('mappingValue');
 
@@ -855,7 +870,7 @@
                     optionV.text = cleanHeaderName;
                     selectValue.appendChild(optionV);
 
-                    // Përpiqemi të gjejmë automatikisht cilat janë kolonat më të përshtatshme bazuar në emra (psh. emri, bashkia, value, ha)
+                    // Parashikojmë automatikisht kolonat më të përshtatshme
                     const lowHeader = cleanHeaderName.toLowerCase();
                     if (lowHeader.includes('emri') || lowHeader.includes('bashkia') || lowHeader.includes('name') || lowHeader.includes('municipality')) {
                         defaultLabelIndex = index;
@@ -891,12 +906,11 @@
                 const labelVal = row[labelColIdx];
                 const numericalVal = parseFloat(row[valueColIdx]);
 
-                // Shmangim rreshtat tërësisht bosh ose pa emërtim
                 if (labelVal !== undefined && labelVal !== null && String(labelVal).trim() !== "") {
                     rawData.push({
                         name: String(labelVal).trim(),
                         value: isNaN(numericalVal) ? 0 : numericalVal,
-                        // Gjenerojmë një ngjyrë të re të bukur për secilën
+                        // Gjenerojmë një ngjyrë të re për secilën
                         color: hslToHex((index * 137.508) % 360, 70, 50)
                     });
                 }
@@ -943,7 +957,7 @@
             // Llogaritja e Zgjedhjeve dhe Grupimit
             const checkboxes = document.querySelectorAll('.mun-list-container input[type="checkbox"]');
             const selectedData = [];
-            let othersValue = 0; // Vlera për "Të Tjerat" (bashkitë e pazgjedhura)
+            let othersValue = 0; 
 
             checkboxes.forEach((cb, index) => {
                 if (cb.checked && rawData[index]) {
@@ -953,17 +967,17 @@
                 }
             });
 
-            // Nëse përdoruesi kërkon që të grupojë të pazgjedhurat për të formuar 100% totalin
+            // Grupimi 100%
             const groupingMode = document.querySelector('input[name="groupingMode"]:checked').value;
             if (groupingMode === 'grouped' && othersValue > 0) {
                 selectedData.push({
                     name: "Të Tjerat",
                     value: othersValue,
-                    color: "#475569" // Një ngjyrë gri neutrale dhe profesionale për grupimin
+                    color: "#475569" 
                 });
             }
             
-            // Llogarit Statistikat e reja (përfshin edhe 'Të Tjerat' nëse grupimi është aktiv)
+            // Llogarit Statistikat e reja
             const totalVal = selectedData.reduce((sum, item) => sum + item.value, 0);
             document.getElementById('totalArea').textContent = totalVal.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
             document.getElementById('totalCount').textContent = selectedData.length;
@@ -978,14 +992,17 @@
             document.getElementById('sliceBorderColor').disabled = !showOutlines;
             const finalBorderWidth = showOutlines ? 1.5 : 0;
             
+            // Lexo veçmas opsionet e Titullit ("Full")
             const chartTitleText = document.getElementById('chartTitle').value;
             const titlePosition = document.getElementById('titlePosition').value;
             const titleSize = parseInt(document.getElementById('titleSize').value);
+            const titleFont = document.getElementById('titleFont').value;
+            const titleColor = document.getElementById('titleColor').value;
 
             // Ndrysho ngjyrën e sfondit të enës së grafikut për efekt pamor direkt
             document.querySelector('.chart-wrapper').style.backgroundColor = chartBgColor;
 
-            // Lexo kontrollet e teksteve dhe legjendës
+            // Lexo veçmas opsionet e Etiketave ("Full")
             const displayMode = document.querySelector('input[name="displayMode"]:checked').value;
             const showLabels = document.getElementById('showLabels').checked;
             const labelFont = document.getElementById('labelFont').value;
@@ -999,7 +1016,7 @@
             // Merr tipin e grafikut dhe konfiguro asetin e ri Chart.js
             const selectedChartType = document.getElementById('chartType').value;
             const isHorizontal = selectedChartType === 'horizontalBar';
-            const actualType = isHorizontal ? 'bar' : selectedChartType; // Horizontal Bar zëvendësohet me 'bar' në Chart.js 3+ me indexAxis: 'y'
+            const actualType = isHorizontal ? 'bar' : selectedChartType; 
 
             // Përcakto strukturën e akseve për grafiqet shtyllore/lineare/radar
             let chartScales = {};
@@ -1039,7 +1056,7 @@
                 if (total === 0) return null;
                 const percNum = (value / total) * 100;
                 
-                // Nëse përqindja është nën 2.5%, e fshehim etiketën që të mos ketë mbingarkesë në rrethorët
+                // Fshehim etiketën nëse përqindja është nën 2.5% tek rrethorët
                 if (percNum < 2.5 && ['pie', 'doughnut', 'polarArea'].includes(selectedChartType)) return null;
                 
                 return displayMode === 'percentage' 
@@ -1049,7 +1066,7 @@
 
             const legendDisplay = legendPosition !== 'hide';
 
-            // Për të siguruar renderim pa gabime midis tipave të ndryshëm të grafikëve, e shkatërrojmë instancën e vjetër
+            // Për të siguruar renderim pa gabime, fshijmë instancën e mëparshme
             if (pieChart) {
                 pieChart.destroy();
             }
@@ -1067,7 +1084,7 @@
                         borderWidth: finalBorderWidth,
                         borderColor: sliceBorderColor,
                         indexAxis: isHorizontal ? 'y' : 'x',
-                        tension: 0.3, // Për t'i dhënë grafikëve LINE lakore të lëmuar
+                        tension: 0.3, 
                         fill: selectedChartType === 'radar' || selectedChartType === 'polarArea'
                     }]
                 },
@@ -1083,9 +1100,9 @@
                             display: chartTitleText.trim().length > 0,
                             text: chartTitleText,
                             position: titlePosition,
-                            color: labelColor,
+                            color: titleColor, // Ngjyra e dedikuar e titullit
                             font: {
-                                family: labelFont,
+                                family: titleFont, // Lloji i dedikuar i shkrimit të titullit
                                 size: titleSize,
                                 weight: 'bold'
                             },
@@ -1093,11 +1110,11 @@
                         },
                         datalabels: {
                             display: showLabels,
-                            color: labelColor,
+                            color: labelColor, // Ngjyra e dedikuar e etiketave
                             font: {
                                 weight: 'bold',
                                 size: labelSize,
-                                family: labelFont
+                                family: labelFont // Lloji i dedikuar i shkrimit të etiketave
                             },
                             textStrokeColor: 'rgba(0,0,0,0.85)',
                             textStrokeWidth: 3,
@@ -1107,7 +1124,7 @@
                             display: legendDisplay,
                             position: legendPosition,
                             labels: {
-                                color: labelColor,
+                                color: labelColor, 
                                 font: { family: labelFont, size: legendSize },
                                 padding: 15,
                                 usePointStyle: true,
@@ -1123,11 +1140,11 @@
                 }
             });
             
-            // Përshtatja automatike e ngjyrave kur shkojmë te printimi
+            // Përshtatja e ngjyrave për printim
             window.matchMedia('print').addEventListener('change', mql => {
                 if(pieChart) {
                     pieChart.options.plugins.legend.labels.color = mql.matches ? '#000000' : labelColor;
-                    pieChart.options.plugins.title.color = mql.matches ? '#000000' : labelColor;
+                    pieChart.options.plugins.title.color = mql.matches ? '#000000' : titleColor;
                     if(pieChart.options.scales.x) pieChart.options.scales.x.ticks.color = mql.matches ? '#000000' : labelColor;
                     if(pieChart.options.scales.y) pieChart.options.scales.y.ticks.color = mql.matches ? '#000000' : labelColor;
                     pieChart.update();
@@ -1155,25 +1172,21 @@
             };
         }
 
-        // Funksioni për shkarkimin e grafikut si Foto (PNG) me cilësi të plotë
+        // Funksioni për shkarkimin e grafikut si Foto (PNG)
         function downloadChart() {
             const canvas = document.getElementById('areaChart');
             
-            // Krijojmë një canvas të përkohshëm për të shtuar sfondin me ngjyrën e zgjedhur
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = canvas.width;
             tempCanvas.height = canvas.height;
             const ctx = tempCanvas.getContext('2d');
             
-            // Shtojmë sfondin bazuar në ngjyrën që ka zgjedhur përdoruesi
             const chartBgColor = document.getElementById('chartBgColor').value;
             ctx.fillStyle = chartBgColor;
             ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
             
-            // Vizatojmë grafikun mbi sfond
             ctx.drawImage(canvas, 0, 0);
             
-            // Gjenerojmë shkarkimin e fotos
             const link = document.createElement('a');
             link.download = 'asig_raport_grafik.png';
             link.href = tempCanvas.toDataURL('image/png');
