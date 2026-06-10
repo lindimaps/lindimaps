@@ -158,6 +158,7 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 </div>
 </div>
 
+<!-- Modal per Eksportimin e Chatit -->
 <div id="export-chat-modal" class="hidden fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
 <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center space-y-6 shadow-2xl border border-slate-100">
 <div class="space-y-2">
@@ -292,7 +293,6 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 </div>
 </div>
 </div>
-
 <div id="app-content" class="hidden">
 <header class="glass-card sticky top-0 z-50 px-6 py-3 flex justify-between items-center">
 <div class="flex items-center gap-3">
@@ -696,12 +696,12 @@ Koha e Punës Sot
 </div>
 
 </main>
+</div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, writeBatch, query, getDocs, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-// KONFIGURIMI I FIREBASE I SISTEMIT TË PARË
 const firebaseConfig = {
 apiKey: "AIzaSyAVTLaOuHZI0zyH-QLUixIFTak05E5uoDw",
 authDomain: "ruajaktivitetin.firebaseapp.com",
@@ -720,20 +720,18 @@ const appId = "sistemi-aktiviteteve-v1";
 window.db = db; window.doc = doc; window.deleteDoc = deleteDoc; window.appId = appId; window.arrayUnion = arrayUnion; window.writeBatch = writeBatch; window.getDocs = getDocs;
 let configData = []; let logData = []; let operatorData = []; let trashData = []; let sessionData = []; let deleteCallback = null; let unsubscribes = [];
 
-// VARIABLAT E CHAT-it
 let chatUsers = [];
 window.customGroups = [];
 let activeChatUserId = null;
 let chatUnsubscribe = null;
 let chatPendingAttachment = null;
-let chatReplyingTo = null; // Variabla per funksionin reply
+let chatReplyingTo = null; 
 window.typingUnsubscribe = null;
 let typingTimeout = null;
-window.totalUnread = 0; // Njoftimet e Chatit globale
-window.unreadCounts = {}; // Njoftimet specifike per perdorues
+window.totalUnread = 0; 
+window.unreadCounts = {}; 
 let onlinePresenceInterval = null;
 
-// VARIABLAT E INTEGRUARA PËR PUSHIMET
 let selectedYear = new Date().getFullYear();
 let currentVacationDate = new Date(selectedYear, new Date().getMonth(), 1);
 let selectionMode = 'vacation'; 
@@ -747,9 +745,6 @@ manualCarryover: null
 };
 let calculatedCarryover = 0;
 
-/* =========================================
-LLOGJIKA E DARK MODE
-========================================= */
 window.toggleDarkMode = () => {
 const isDark = document.documentElement.classList.toggle('dark-mode');
 localStorage.setItem('darkMode', isDark ? 'on' : 'off');
@@ -786,7 +781,6 @@ const getToday = () => new Date(new Date().getTime() - new Date().getTimezoneOff
 const getEndOfDay = (dateStr) => { const [y, m, d] = dateStr.split('-'); return new Date(y, m - 1, d, 23, 59, 59, 999).getTime(); };
 const setTodayDate = () => { document.getElementById('log-date').value = getToday(); };
 
-// Llogjika per foton
 let uploadedBase64 = null;
 window.previewSignupPhoto = (event) => {
 const file = event.target.files[0];
@@ -1133,11 +1127,9 @@ sessionInterval = setInterval(updateHoursUI, 60000);
 } catch(e) {}
 };
 
-// ================= FUNKSIONET E CHATIT DHE GLOBAL GROUP =================
-
 window.getChatRoomId = (uid1, uid2) => {
 if (uid1 === 'global_group_all' || uid2 === 'global_group_all') return 'global_group_all';
-if (uid1.startsWith('group_') || uid2.startsWith('group_')) return uid1.startsWith('group_') ? uid1 : uid2; // Per grupet custom
+if (uid1.startsWith('group_') || uid2.startsWith('group_')) return uid1.startsWith('group_') ? uid1 : uid2;
 return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
 };
 
@@ -1178,7 +1170,6 @@ window.renderChatUsers = () => {
 const container = document.getElementById('chat-users-container');
 if(!container) return;
 
-// Shto Grupin e Pergjithshem te parin
 const globalGroup = { uid: 'global_group_all', name: '👥 Grupi i Përgjithshëm', isGroup: true };
 const allUsersWithGroup = [globalGroup, ...window.customGroups, ...chatUsers];
 
@@ -1436,8 +1427,7 @@ ${ticks}
 container.scrollTop = container.scrollHeight;
 });
 };
-
-window.sendChatMessage = async () => {
+    window.sendChatMessage = async () => {
 const input = document.getElementById('chat-input');
 const text = input.value.trim();
 if(!text && !chatPendingAttachment) return;
