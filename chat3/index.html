@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LindiMaps Systems - Aktivitete dhe Leje</title>
+<title>LindiMaps Pagesat - Aktivitete dhe Leje</title>
 <script>
 if (localStorage.getItem('darkMode') === 'on') {
 document.documentElement.classList.add('dark-mode');
@@ -21,7 +21,6 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 nav#side-menu button.tab-btn { color: #444746 !important; }
 nav#side-menu button.tab-btn:hover { background: rgba(255, 255, 255, 0.6) !important; }
 .tab-active { color: #041e49 !important; background: rgba(211, 227, 253, 0.8) !important; font-weight: 600; box-shadow: none !important; border: none !important; }
-
 .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 @keyframes pulse-dot { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
 .animate-dot { animation: pulse-dot 2s infinite ease-in-out; transform-origin: center; }
@@ -37,9 +36,7 @@ nav#side-menu button.tab-btn:hover { background: rgba(255, 255, 255, 0.6) !impor
 .no-scrollbar::-webkit-scrollbar { display: none; }
 input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 
-/* =========================================
-DARK MODE OVERRIDES
-========================================= */
+/* DARK MODE OVERRIDES */
 .dark-mode body, .dark-mode.bg-\[\#f8fafc\] { background-color: #0f172a !important; color: #f1f5f9 !important; }
 .dark-mode .bg-white { background-color: #1e293b !important; border-color: #334155 !important; }
 .dark-mode .bg-slate-50 { background-color: #0f172a !important; border-color: #334155 !important; color: #f8fafc !important; }
@@ -47,15 +44,15 @@ DARK MODE OVERRIDES
 .dark-mode .bg-slate-900 { background-color: #3b82f6 !important; color: #ffffff !important; }
 .dark-mode .text-slate-900, .dark-mode .text-slate-800 { color: #f8fafc !important; }
 .dark-mode .text-slate-700, .dark-mode .text-slate-600 { color: #e2e8f0 !important; }
-.dark-mode label, .dark-mode .text-slate-500, .dark-mode .text-slate-400 { color: #cbd5e1 !important; } 
+.dark-mode label, .dark-mode .text-slate-500, .dark-mode .text-slate-400 { color: #cbd5e1 !important; }
 .dark-mode .border-slate-100, .dark-mode .border-slate-200\/60, .dark-mode .border-slate-200 { border-color: #334155 !important; }
 .dark-mode nav#side-menu { background-color: rgba(15, 23, 42, 0.95) !important; border-color: rgba(51, 65, 85, 0.8) !important; }
 .dark-mode nav#side-menu button.tab-btn { color: #cbd5e1 !important; }
 .dark-mode nav#side-menu button.tab-btn:hover { background: rgba(255,255,255,0.05) !important; }
 .dark-mode .tab-active { background: rgba(59, 130, 246, 0.2) !important; color: #93c5fd !important; }
 .dark-mode .glass-card { background: rgba(30, 41, 59, 0.9) !important; border-color: rgba(51, 65, 85, 0.8) !important; }
-.dark-mode input, .dark-mode select, .dark-mode textarea { background-color: #0f172a !important; border-color: #475569 !important; color: #f8fafc !important; } 
-.dark-mode input:focus, .dark-mode select:focus, .dark-mode textarea:focus { border-color: #60a5fa !important; background-color: #1e293b !important; } 
+.dark-mode input, .dark-mode select, .dark-mode textarea { background-color: #0f172a !important; border-color: #475569 !important; color: #f8fafc !important; }
+.dark-mode input:focus, .dark-mode select:focus, .dark-mode textarea:focus { border-color: #60a5fa !important; background-color: #1e293b !important; }
 .dark-mode .shadow-xl, .dark-mode .shadow-lg, .dark-mode .shadow-2xl { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important; }
 .dark-mode .bg-blue-50, .dark-mode .bg-blue-50\/50, .dark-mode .bg-blue-50\/70 { background-color: rgba(59, 130, 246, 0.1) !important; border-color: rgba(59, 130, 246, 0.2) !important; }
 .dark-mode .bg-emerald-50, .dark-mode .bg-emerald-50\/50 { background-color: rgba(16, 185, 129, 0.1) !important; border-color: rgba(16, 185, 129, 0.2) !important; }
@@ -84,7 +81,7 @@ DARK MODE OVERRIDES
 <h1 class="text-3xl font-black tracking-tighter leading-none">
 <span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span>
 </h1>
-<span class="text-[10px] uppercase tracking-[0.4em] font-bold text-slate-400 mt-1"> Systems </span>
+<span class="text-[10px] uppercase tracking-[0.4em] font-bold text-slate-400 mt-1"> Pagesat </span>
 </div>
 </div>
 
@@ -158,39 +155,17 @@ DARK MODE OVERRIDES
 </div>
 </div>
 
-<div id="delete-chat-modal" class="hidden fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-<div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center space-y-6 shadow-2xl border border-slate-100">
-<div class="space-y-2">
-<h3 class="text-xl font-extrabold text-slate-800">Fshi Bisedën</h3>
-<p class="text-slate-500 font-medium text-sm">Zgjidhni si dëshironi ta fshini këtë bisedë.</p>
-</div>
-<div class="flex flex-col gap-3">
-<button onclick="executeDeleteChat('me')" class="w-full bg-orange-100 hover:bg-orange-200 text-orange-600 py-4 rounded-xl font-bold transition-colors">Fshi vetëm për mua</button>
-<button onclick="executeDeleteChat('all')" class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-red-500/30 transition-colors">Fshi për të gjithë (Nga Databaza)</button>
-<button onclick="closeDeleteChatModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-4 rounded-xl font-bold transition-colors mt-2">Anulo</button>
-</div>
-</div>
-</div>
-
 <div id="attachment-modal" class="hidden fixed inset-0 z-[999] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
 <div class="bg-white rounded-[2rem] w-full max-w-2xl h-[80vh] flex flex-col overflow-hidden shadow-2xl relative">
 <div class="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50">
 <h3 id="attachment-modal-title" class="font-black text-slate-800 text-lg">Dokumenti</h3>
 <button onclick="closeAttachmentModal()" class="p-2 bg-white rounded-full text-slate-500 hover:bg-slate-200 transition-colors shadow-sm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
 </div>
-<div class="flex-1 bg-slate-100 overflow-hidden relative flex items-center justify-center p-2" id="attachment-modal-content">
-</div>
+<div class="flex-1 bg-slate-100 overflow-hidden relative flex items-center justify-center p-2" id="attachment-modal-content"></div>
 <div class="p-4 bg-white border-t border-slate-100 flex justify-end gap-3">
-<button id="attachment-download-btn" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-blue-700 shadow-md transition-colors flex items-center gap-2"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Shkarko Dokumentin</button>
+<button id="attachment-download-btn" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-blue-700 shadow-md transition-colors flex items-center gap-2"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Shkarko</button>
 </div>
 </div>
-</div>
-
-<div id="chat-photo-modal" class="hidden fixed inset-0 z-[1000] bg-black/95 flex flex-col items-center justify-center p-4 transition-all" onclick="this.classList.add('hidden')">
-<button class="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors backdrop-blur-md">
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-</button>
-<img id="chat-photo-full" class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl" onclick="event.stopPropagation()">
 </div>
 
 <div id="delete-account-modal" class="hidden fixed inset-0 z-[700] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
@@ -203,6 +178,49 @@ DARK MODE OVERRIDES
 <div class="flex gap-3">
 <button onclick="closeDeleteAccountModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-4 rounded-xl font-bold transition-colors">Anulo</button>
 <button onclick="confirmDeleteAccount()" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-red-500/30 transition-colors">Fshi</button>
+</div>
+</div>
+</div>
+
+<div id="delete-chat-modal" class="hidden fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+<div class="bg-white rounded-[2rem] p-6 max-w-sm w-full text-center space-y-6 shadow-2xl border border-slate-100">
+<div class="space-y-2">
+<h3 class="text-xl font-extrabold text-red-600">Fshi Bisedën</h3>
+<p class="text-slate-500 font-medium text-sm">Zgjidhni se si dëshironi ta fshini bisedën tuaj.</p>
+</div>
+<div class="flex flex-col gap-3">
+<button onclick="deleteChatRoom(false)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 py-4 rounded-xl font-bold transition-colors">Fshi vetëm për mua</button>
+<button onclick="deleteChatRoom(true)" class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-red-500/30 transition-colors">Fshi për të gjithë</button>
+<button onclick="closeDeleteChatModal()" class="w-full bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 py-4 rounded-xl font-bold transition-colors mt-2">Anulo</button>
+</div>
+</div>
+</div>
+
+<div id="create-group-modal" class="hidden fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+<div class="bg-white rounded-[2rem] p-6 max-w-md w-full space-y-4 shadow-2xl border border-slate-100">
+<h3 class="text-lg font-black text-slate-800">Krijo Grup të Ri</h3>
+<input type="text" id="group-name-input" placeholder="Emri i Grupit..." class="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/60 font-bold outline-none mb-2">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Zgjidh Anëtarët:</p>
+<div id="group-members-list" class="max-h-48 overflow-y-auto custom-scrollbar border border-slate-100 rounded-xl p-2 space-y-2 bg-slate-50"></div>
+<div class="flex gap-3 pt-2">
+<button onclick="closeCreateGroupModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">Anulo</button>
+<button onclick="createNewGroup()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold shadow-md transition-colors">Krijo Grupin</button>
+</div>
+</div>
+</div>
+
+<div id="chat-activity-modal" class="hidden fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+<div class="bg-white rounded-[2rem] p-6 max-w-md w-full space-y-4 shadow-2xl border border-slate-100">
+<h3 class="text-lg font-black text-slate-800">Dërgo një Aktivitet/Raport</h3>
+<select id="chat-activity-type" onchange="toggleChatActivityType()" class="w-full p-4 rounded-xl bg-slate-50 border border-slate-200/60 font-bold text-sm outline-none mb-2">
+<option value="activity">Aktivitete të ruajtura</option>
+<option value="report">Raport Përmbledhës (Leje/Orë)</option>
+</select>
+<select id="chat-activity-select" class="w-full p-4 rounded-xl bg-slate-50 border border-slate-200/60 font-bold text-sm outline-none">
+</select>
+<div class="flex gap-3 pt-2">
+<button onclick="document.getElementById('chat-activity-modal').classList.add('hidden')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">Anulo</button>
+<button onclick="sendSelectedActivityToChat()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold shadow-md transition-colors">Dërgo</button>
 </div>
 </div>
 </div>
@@ -254,20 +272,6 @@ DARK MODE OVERRIDES
 </div>
 </div>
 
-<div id="create-group-modal" class="hidden fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-<div class="bg-white rounded-[2rem] p-6 max-w-md w-full space-y-4 shadow-2xl border border-slate-100 relative">
-<h3 class="text-lg font-black text-slate-800">Krijo një Grup të Ri</h3>
-<input type="text" id="new-group-name" placeholder="Emri i Grupit" class="w-full p-4 rounded-xl bg-slate-50 border border-slate-200/60 font-bold focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm shadow-inner">
-<div class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-4 mb-2">Zgjidh Anëtarët:</div>
-<div id="create-group-users-list" class="max-h-[200px] overflow-y-auto custom-scrollbar space-y-2 border border-slate-100 p-2 rounded-xl bg-slate-50/50">
-</div>
-<div class="flex gap-3 pt-4 border-t border-slate-100 mt-2">
-<button onclick="document.getElementById('create-group-modal').classList.add('hidden')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">Anulo</button>
-<button onclick="saveNewGroup()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold shadow-md transition-colors">Krijo Grupin</button>
-</div>
-</div>
-</div>
-
 <div id="loading" class="fixed inset-0 bg-white/95 backdrop-blur-md z-[300] flex items-center justify-center">
 <div class="flex flex-col items-center gap-4">
 <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent shadow-lg shadow-blue-500/20"></div>
@@ -275,36 +279,6 @@ DARK MODE OVERRIDES
 <p id="loading-progress" class="text-blue-600 font-bold text-sm hidden">Duke u përpunuar: 0%</p>
 </div>
 </div>
-
-<div id="chat-activity-modal" class="hidden fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-<div class="bg-white rounded-[2rem] p-6 max-w-md w-full space-y-4 shadow-2xl border border-slate-100">
-<h3 class="text-lg font-black text-slate-800 text-center">Çfarë dëshironi të dërgoni?</h3>
-<div class="flex p-1 bg-slate-100 rounded-2xl mb-4">
-<button id="tab-modal-act" onclick="setChatModalTab('act')" class="flex-1 py-3 text-[10px] font-black uppercase rounded-xl bg-white text-blue-600 shadow-sm transition-all">Aktivitet</button>
-<button id="tab-modal-rep" onclick="setChatModalTab('rep')" class="flex-1 py-3 text-[10px] font-black uppercase rounded-xl text-slate-400 transition-all">Raport / Leje</button>
-</div>
-
-<div id="modal-act-content" class="space-y-3">
-<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Zgjidh Aktivitetin e Fundit:</p>
-<select id="chat-activity-select" class="w-full p-4 rounded-xl bg-slate-50 border border-slate-200/60 font-bold text-sm outline-none">
-</select>
-<button onclick="sendSelectedActivityToChat()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-bold shadow-md transition-colors mt-2">Dërgo Aktivitetin</button>
-</div>
-
-<div id="modal-rep-content" class="hidden space-y-3">
-<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Zgjidh Përmbledhjen:</p>
-<select id="chat-report-select" class="w-full p-4 rounded-xl bg-slate-50 border border-slate-200/60 font-bold text-sm outline-none">
-<option value="vacation">Statusi i Lejes dhe Raporteve (${selectedYear})</option>
-</select>
-<button onclick="sendSelectedReportToChat()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold shadow-md transition-colors mt-2">Dërgo Përmbledhjen</button>
-</div>
-
-<div class="pt-2 border-t border-slate-100">
-<button onclick="document.getElementById('chat-activity-modal').classList.add('hidden')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">Anulo</button>
-</div>
-</div>
-</div>
-
 <div id="app-content" class="hidden">
 <header class="glass-card sticky top-0 z-50 px-6 py-3 flex justify-between items-center">
 <div class="flex items-center gap-3">
@@ -322,7 +296,7 @@ DARK MODE OVERRIDES
 <span class="font-black text-sm tracking-tighter leading-none">
 <span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span>
 </span>
-<span class="text-[7px] uppercase font-bold text-slate-400 tracking-widest">Systems</span>
+<span class="text-[7px] uppercase font-bold text-slate-400 tracking-widest">Pagesat</span>
 </div>
 </div>
 </header>
@@ -392,7 +366,7 @@ Koshi
 Dil nga Sistemi
 </button>
 </div>
-</nav><main class="max-w-3xl mx-auto p-4 md:p-8 space-y-8">
+</nav><main class="max-w-4xl mx-auto p-4 md:p-8 space-y-8">
 
 <div id="greeting-banner" class="hidden relative overflow-hidden rounded-[2rem] p-6 md:p-8 shadow-2xl border border-blue-400/30 bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-500 text-white transition-all transform hover:scale-[1.01] duration-500">
 <div class="absolute top-0 right-0 -mr-20 -mt-20 w-72 h-72 rounded-full bg-white opacity-10 blur-3xl animate-pulse"></div>
@@ -422,11 +396,13 @@ Koha e Punës Sot
 </div>
 </div>
 
-<div id="view-chat" class="hidden h-[80vh] flex bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden relative">
+<div id="view-chat" class="hidden h-[85vh] flex bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden relative">
 <div id="chat-user-list" class="w-full md:w-1/3 border-r border-slate-100 flex flex-col h-full bg-slate-50/50">
-<div class="p-4 border-b border-slate-100 bg-white flex justify-between items-center">
-<h2 class="text-lg font-black text-slate-800">Përdoruesit</h2>
-<button onclick="document.getElementById('create-group-modal').classList.remove('hidden'); openCreateGroupModal();" class="text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-colors" title="Krijo Grup të Ri">➕ Grup</button>
+<div class="p-4 border-b border-slate-100 bg-white flex justify-between items-center z-10 shadow-sm">
+<h2 class="text-lg font-black text-slate-800">Bisedat</h2>
+<button onclick="openCreateGroupModal()" class="bg-blue-100 hover:bg-blue-200 text-blue-600 p-2 rounded-xl transition-colors" title="Krijo Grup me ftesë">
+<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+</button>
 </div>
 <div id="chat-users-container" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
 </div>
@@ -435,32 +411,34 @@ Koha e Punës Sot
 <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shadow-sm z-10">
 <div class="flex items-center gap-3">
 <button onclick="closeChatMobile()" class="md:hidden p-2 bg-white rounded-xl shadow-sm text-slate-500 hover:text-slate-800 border border-slate-200"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg></button>
-<div id="chat-active-user-avatar" class="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 bg-cover bg-center flex items-center justify-center overflow-hidden"></div>
+<div id="chat-active-user-avatar" class="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 bg-cover bg-center"></div>
 <div>
 <h3 id="chat-active-user-name" class="font-black text-slate-800 text-sm">Zgjidh një përdorues</h3>
 </div>
 </div>
-<button onclick="document.getElementById('delete-chat-modal').classList.remove('hidden')" class="p-2 text-slate-400 hover:bg-red-50 hover:text-red-500 rounded-xl transition-colors border border-transparent hover:border-red-200" title="Fshi ose pastro bisedën"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+<button onclick="openDeleteChatModal()" class="p-2 bg-white rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors shadow-sm border border-slate-200" title="Fshi bisedën">
+<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+</button>
 </div>
 <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/30 custom-scrollbar flex flex-col relative z-0">
 <div class="m-auto text-slate-400 font-bold text-sm text-center">Zgjidhni një person nga lista për të filluar bisedën.</div>
 </div>
 <div id="chat-typing-indicator" class="hidden px-4 py-1 text-[11px] font-bold text-slate-400 italic bg-slate-50/30"></div>
 
-<div id="chat-reply-preview" class="hidden absolute bottom-[80px] md:bottom-[72px] left-0 w-full bg-slate-100/95 backdrop-blur-sm p-2 md:p-3 border-t border-slate-200 flex items-center justify-between z-10 shadow-lg border-b border-slate-300">
-<div class="flex flex-col text-[10px] md:text-xs pl-3 border-l-4 border-blue-500 overflow-hidden w-full">
-<span class="font-black text-blue-600 tracking-wider uppercase text-[9px] md:text-[10px] mb-0.5">Duke iu përgjigjur:</span>
-<span id="chat-reply-text" class="text-slate-600 font-medium truncate w-[90%]"></span>
+<div id="chat-reply-preview" class="hidden absolute bottom-[76px] left-0 md:left-auto w-full md:w-[calc(100%)] bg-slate-100/95 backdrop-blur-md p-3 border-t border-slate-200 flex items-center justify-between z-10 shadow-lg">
+<div class="flex flex-col text-xs pl-3 border-l-4 border-blue-500 w-[85%]">
+<span class="font-black text-blue-600 tracking-wider uppercase text-[10px] mb-0.5">Duke iu përgjigjur:</span>
+<span id="chat-reply-text" class="text-slate-600 font-medium truncate w-full"></span>
 </div>
-<button onclick="clearChatReply()" class="text-slate-400 hover:text-red-500 p-1.5 md:p-2 bg-white rounded-full shadow-sm flex-shrink-0 ml-2 border border-slate-200"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+<button onclick="clearChatReply()" class="text-slate-400 hover:text-red-500 p-2 bg-white rounded-full shadow-md"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
 </div>
 
-<div class="p-3 md:p-4 border-t border-slate-100 bg-white space-y-3 relative z-20">
+<div class="p-4 border-t border-slate-100 bg-white space-y-3 relative z-20">
 <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
 <button onclick="sendQuickMessage('📄 Kërko Raport')" class="whitespace-nowrap px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-[10px] font-bold uppercase transition-colors shadow-sm">📄 Kërko Raport</button>
 <button onclick="sendQuickMessage('🤝 Kërko Takim')" class="whitespace-nowrap px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-[10px] font-bold uppercase transition-colors shadow-sm">🤝 Kërko Takim</button>
 <button onclick="sendQuickMessage('✔️ Konfirmo')" class="whitespace-nowrap px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg text-[10px] font-bold uppercase transition-colors shadow-sm">✔️ Konfirmo</button>
-<button onclick="openChatActivityModal()" class="whitespace-nowrap px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-600 rounded-lg text-[10px] font-bold uppercase transition-colors shadow-sm">📊 Dërgo Të Dhëna</button>
+<button onclick="openChatActivityModal()" class="whitespace-nowrap px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-600 rounded-lg text-[10px] font-bold uppercase transition-colors shadow-sm">📊 Dërgo Aktivitet/Raport</button>
 </div>
 <div class="flex gap-2 relative items-center">
 <input type="file" id="chat-attachment-input" class="hidden" onchange="handleChatAttachment(event)" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx">
@@ -471,13 +449,12 @@ Koha e Punës Sot
 <button onclick="clearChatAttachment()" class="text-red-500 hover:text-red-700 p-1"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
 </div>
 
-<input type="text" id="chat-input" placeholder="Shkruaj një mesazh..." oninput="handleChatTyping()" onkeydown="if(event.key === 'Enter') sendChatMessage()" class="flex-1 p-3 rounded-xl bg-slate-50 border border-slate-200/60 font-bold focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm shadow-inner">
-<button onclick="sendChatMessage()" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl shadow-md transition-all active:scale-95"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></button>
+<input type="text" id="chat-input" placeholder="Shkruaj një mesazh..." oninput="handleChatTyping()" onkeydown="if(event.key === 'Enter') sendChatMessage()" class="flex-1 p-3.5 rounded-xl bg-slate-50 border border-slate-200/60 font-bold focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm shadow-inner">
+<button onclick="sendChatMessage()" class="bg-blue-600 hover:bg-blue-700 text-white p-3.5 rounded-xl shadow-md transition-all active:scale-95"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></button>
 </div>
 </div>
 </div>
 </div>
-
 <div id="view-log" class="space-y-6">
 <div class="bg-white rounded-[2rem] p-6 md:p-8 shadow-xl shadow-slate-200/50 space-y-6 border border-slate-100 transition-all hover:shadow-2xl hover:shadow-slate-200/60">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -705,12 +682,12 @@ Koha e Punës Sot
 </div>
 
 </main>
-</div><script type="module">
+</div>
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, writeBatch, query, runTransaction, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, writeBatch, query, where, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-// KONFIGURIMI I FIREBASE I SISTEMIT TË PARË
 const firebaseConfig = {
 apiKey: "AIzaSyAVTLaOuHZI0zyH-QLUixIFTak05E5uoDw",
 authDomain: "ruajaktivitetin.firebaseapp.com",
@@ -729,36 +706,24 @@ const appId = "sistemi-aktiviteteve-v1";
 window.db = db; window.doc = doc; window.deleteDoc = deleteDoc; window.appId = appId;
 let configData = []; let logData = []; let operatorData = []; let trashData = []; let sessionData = []; let deleteCallback = null; let unsubscribes = [];
 
-// VARIABLAT E CHAT-it
 let chatUsers = [];
-let chatGroups = []; // Vektori për grupet me ftesë
+window.chatGroups = [];
 let activeChatUserId = null;
 let chatUnsubscribe = null;
 let chatPendingAttachment = null;
-let chatReplyingTo = null; // Variabla per funksionin reply
+let chatReplyingTo = null; 
 window.typingUnsubscribe = null;
 let typingTimeout = null;
-window.totalUnread = 0; // Njoftimet e Chatit Totale
-window.unreadCounts = {}; // Njoftimet për çdo user specifikisht
+window.totalUnread = 0; 
 let onlinePresenceInterval = null;
 
-// VARIABLAT E INTEGRUARA PËR PUSHIMET
 let selectedYear = new Date().getFullYear();
 let currentVacationDate = new Date(selectedYear, new Date().getMonth(), 1);
 let selectionMode = 'vacation'; 
 let activeVacationSideTab = 'selected'; 
-let vacationYearData = {
-allowance: 28,
-selected: [],
-medical: [],
-movableDates: {},
-manualCarryover: null
-};
+let vacationYearData = { allowance: 28, selected: [], medical: [], movableDates: {}, manualCarryover: null };
 let calculatedCarryover = 0;
 
-/* =========================================
-LLOGJIKA E DARK MODE
-========================================= */
 window.toggleDarkMode = () => {
 const isDark = document.documentElement.classList.toggle('dark-mode');
 localStorage.setItem('darkMode', isDark ? 'on' : 'off');
@@ -778,9 +743,7 @@ if(document.getElementById('text-dark-mode')) document.getElementById('text-dark
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-if(localStorage.getItem('darkMode') === 'on') {
-updateDarkModeUI(true);
-}
+if(localStorage.getItem('darkMode') === 'on') { updateDarkModeUI(true); }
 });
 
 const getBaseCollectionPath = (collectionName) => {
@@ -795,64 +758,44 @@ const getToday = () => new Date(new Date().getTime() - new Date().getTimezoneOff
 const getEndOfDay = (dateStr) => { const [y, m, d] = dateStr.split('-'); return new Date(y, m - 1, d, 23, 59, 59, 999).getTime(); };
 const setTodayDate = () => { document.getElementById('log-date').value = getToday(); };
 
-// Llogjika per foton
 let uploadedBase64 = null;
 window.previewSignupPhoto = (event) => {
-const file = event.target.files[0];
-if (!file) return;
+const file = event.target.files[0]; if (!file) return;
 const reader = new FileReader();
 reader.onload = (e) => {
 const img = new Image();
 img.onload = () => {
-const canvas = document.createElement('canvas');
-const MAX_WIDTH = 250;
-let scaleSize = 1;
+const canvas = document.createElement('canvas'); const MAX_WIDTH = 250; let scaleSize = 1;
 if (img.width > MAX_WIDTH) { scaleSize = MAX_WIDTH / img.width; }
-canvas.width = img.width * scaleSize;
-canvas.height = img.height * scaleSize;
-const ctx = canvas.getContext('2d');
-ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+canvas.width = img.width * scaleSize; canvas.height = img.height * scaleSize;
+const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 uploadedBase64 = canvas.toDataURL('image/jpeg', 0.8);
 document.getElementById('signup-photo-preview').innerHTML = `<img src="${uploadedBase64}" class="w-full h-full object-cover">`;
 };
 img.src = e.target.result;
-};
-reader.readAsDataURL(file);
+}; reader.readAsDataURL(file);
 };
 
 window.updateProfilePhoto = async (event) => {
-const user = auth.currentUser;
-if (!user) return;
-const file = event.target.files[0];
-if (!file) return;
+const user = auth.currentUser; if (!user) return;
+const file = event.target.files[0]; if (!file) return;
 document.getElementById('loading').classList.remove('hidden');
 const reader = new FileReader();
 reader.onload = (e) => {
 const img = new Image();
 img.onload = async () => {
-const canvas = document.createElement('canvas');
-const MAX_WIDTH = 250;
-let scaleSize = 1;
+const canvas = document.createElement('canvas'); const MAX_WIDTH = 250; let scaleSize = 1;
 if (img.width > MAX_WIDTH) { scaleSize = MAX_WIDTH / img.width; }
-canvas.width = img.width * scaleSize;
-canvas.height = img.height * scaleSize;
-const ctx = canvas.getContext('2d');
-ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+canvas.width = img.width * scaleSize; canvas.height = img.height * scaleSize;
+const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 const newBase64 = canvas.toDataURL('image/jpeg', 0.8);
 try {
 const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info');
 await setDoc(docRef, { photoBase64: newBase64 }, { merge: true });
-await refreshProfile(user);
-showAlert("Fotoja e profilit u përditësua me sukses!");
-} catch(err) {
-showAlert("Gabim në ruajtjen e fotos: " + err.message);
-} finally {
-document.getElementById('loading').classList.add('hidden');
-}
-};
-img.src = e.target.result;
-};
-reader.readAsDataURL(file);
+await refreshProfile(user); showAlert("Fotoja e profilit u përditësua me sukses!");
+} catch(err) { showAlert("Gabim në ruajtjen e fotos: " + err.message); } finally { document.getElementById('loading').classList.add('hidden'); }
+}; img.src = e.target.result;
+}; reader.readAsDataURL(file);
 };
 
 window.openProfileModal = () => document.getElementById('profile-modal').classList.remove('hidden');
@@ -864,182 +807,67 @@ window.showAuthSection = (section) => { document.getElementById('login-section')
 document.getElementById('login-btn').onclick = async () => { const email = document.getElementById('login-email').value.trim(); const pass = document.getElementById('login-password').value; if(!email || !pass) return showAlert("Plotësoni email dhe fjalëkalimin."); try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { showAlert("Kredenciale të pasakta."); } };
 
 document.getElementById('signup-btn').onclick = async () => {
-const email = document.getElementById('signup-email').value.trim();
-const pass = document.getElementById('signup-password').value;
-const name = document.getElementById('signup-name').value.trim();
-const surname = document.getElementById('signup-surname').value.trim();
-const institution = document.getElementById('signup-institution').value.trim();
-const phone = document.getElementById('signup-phone').value.trim();
-
+const email = document.getElementById('signup-email').value.trim(); const pass = document.getElementById('signup-password').value; const name = document.getElementById('signup-name').value.trim(); const surname = document.getElementById('signup-surname').value.trim(); const institution = document.getElementById('signup-institution').value.trim(); const phone = document.getElementById('signup-phone').value.trim();
 if(!email || pass.length < 6 || !name || !surname) return showAlert("Plotësoni fushat e detyrueshme (Emër, Mbiemër, Email) dhe fjalëkalimi min. 6 karaktere.");
-
 document.getElementById('loading').classList.remove('hidden');
 try {
-const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-const user = userCredential.user;
-await setDoc(doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info'), {
-name, surname, institution, phone, photoBase64: uploadedBase64, email: user.email, createdAt: Date.now()
-});
-document.getElementById('loading').classList.add('hidden');
-showAlert("Llogaria u krijua!");
-} catch (e) {
-document.getElementById('loading').classList.add('hidden');
-showAlert("Gabim në regjistrim: Email mund te jete i perdorur.");
-}
+const userCredential = await createUserWithEmailAndPassword(auth, email, pass); const user = userCredential.user;
+await setDoc(doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info'), { name, surname, institution, phone, photoBase64: uploadedBase64, email: user.email, createdAt: Date.now() });
+document.getElementById('loading').classList.add('hidden'); showAlert("Llogaria u krijua!");
+} catch (e) { document.getElementById('loading').classList.add('hidden'); showAlert("Gabim në regjistrim: Email mund te jete i perdorur."); }
 };
 
 document.getElementById('reset-btn').onclick = async () => { const email = document.getElementById('reset-email').value.trim(); if(!email) return showAlert("Shkruani email-in."); try { await sendPasswordResetEmail(auth, email); showAlert("Linku u dërgua."); showAuthSection('login'); } catch (e) { showAlert("Email-i nuk u gjet."); } };
 
 window.sendLoggedResetLink = async () => {
-const user = auth.currentUser;
-if (!user || !user.email) return showAlert("Gabim: Përdoruesi nuk ka email të vlefshëm.");
-try {
-document.getElementById('loading').classList.remove('hidden');
-await sendPasswordResetEmail(auth, user.email);
-showAlert("Linku për rivendosjen e fjalëkalimit u dërgua në email-in tuaj: " + user.email);
-} catch(e) { showAlert("Gabim: " + e.message); } finally { document.getElementById('loading').classList.add('hidden'); }
+const user = auth.currentUser; if (!user || !user.email) return showAlert("Gabim: Përdoruesi nuk ka email të vlefshëm.");
+try { document.getElementById('loading').classList.remove('hidden'); await sendPasswordResetEmail(auth, user.email); showAlert("Linku për rivendosjen e fjalëkalimit u dërgua në email-in tuaj: " + user.email); } catch(e) { showAlert("Gabim: " + e.message); } finally { document.getElementById('loading').classList.add('hidden'); }
 };
 
 window.openDeleteAccountModal = () => { document.getElementById('delete-account-password').value = ''; document.getElementById('delete-account-modal').classList.remove('hidden'); };
 window.closeDeleteAccountModal = () => { document.getElementById('delete-account-modal').classList.add('hidden'); };
 window.confirmDeleteAccount = async () => {
-const user = auth.currentUser;
-if(!user) return;
-const password = document.getElementById('delete-account-password').value;
-if(!password) return showAlert("Ju lutem shkruani fjalëkalimin për të konfirmuar.");
-
+const user = auth.currentUser; if(!user) return;
+const password = document.getElementById('delete-account-password').value; if(!password) return showAlert("Ju lutem shkruani fjalëkalimin për të konfirmuar.");
 document.getElementById('loading').classList.remove('hidden');
 try {
-const credential = EmailAuthProvider.credential(user.email, password);
-await reauthenticateWithCredential(user, credential);
-try { await deleteDoc(doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info')); } catch(e) {}
-await deleteUser(user);
-closeDeleteAccountModal();
-closeProfileModal();
-showAlert("Llogaria u fshi me sukses përgjithmonë.");
-} catch(error) {
-showAlert("Gabim: Fjalëkalimi i pasaktë ose ndodhi një problem.");
-} finally { document.getElementById('loading').classList.add('hidden'); }
+const credential = EmailAuthProvider.credential(user.email, password); await reauthenticateWithCredential(user, credential);
+try { await deleteDoc(doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info')); } catch(e) {} await deleteUser(user);
+closeDeleteAccountModal(); closeProfileModal(); showAlert("Llogaria u fshi me sukses përgjithmonë.");
+} catch(error) { showAlert("Gabim: Fjalëkalimi i pasaktë ose ndodhi një problem."); } finally { document.getElementById('loading').classList.add('hidden'); }
 };
 
 window.makeEditable = (field, val1, val2) => {
 if (field === 'fullname') {
-document.getElementById('modal-fullname').innerHTML = `
-<div class="flex gap-2 mt-2 justify-center">
-<input type="text" id="edit-name" value="${val1}" class="w-20 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
-<input type="text" id="edit-surname" value="${val2}" class="w-20 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
-<button onclick="saveProfileData('fullname')" class="bg-blue-600 text-white px-2 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 shadow-sm">Ruaj</button>
-</div>`;
+document.getElementById('modal-fullname').innerHTML = `<div class="flex gap-2 mt-2 justify-center"><input type="text" id="edit-name" value="${val1}" class="w-20 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium"><input type="text" id="edit-surname" value="${val2}" class="w-20 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium"><button onclick="saveProfileData('fullname')" class="bg-blue-600 text-white px-2 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 shadow-sm">Ruaj</button></div>`;
 } else if (field === 'institution') {
-document.getElementById('modal-institution-container').innerHTML = `
-<span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Institucioni</span>
-<div class="flex gap-2 mt-1">
-<input type="text" id="edit-institution" value="${val1}" class="flex-1 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
-<button onclick="saveProfileData('institution')" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 transition-colors shadow-sm">Ruaj</button>
-</div>`;
+document.getElementById('modal-institution-container').innerHTML = `<span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Institucioni</span><div class="flex gap-2 mt-1"><input type="text" id="edit-institution" value="${val1}" class="flex-1 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium"><button onclick="saveProfileData('institution')" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 transition-colors shadow-sm">Ruaj</button></div>`;
 } else if (field === 'phone') {
-document.getElementById('modal-phone-container').innerHTML = `
-<span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Numër Telefoni</span>
-<div class="flex gap-2 mt-1">
-<input type="text" id="edit-phone" value="${val1}" class="flex-1 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium">
-<button onclick="saveProfileData('phone')" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-emerald-700 transition-colors shadow-sm">Ruaj</button>
-</div>`;
+document.getElementById('modal-phone-container').innerHTML = `<span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Numër Telefoni</span><div class="flex gap-2 mt-1"><input type="text" id="edit-phone" value="${val1}" class="flex-1 p-1.5 px-2 text-xs rounded-lg border border-slate-200 outline-none focus:border-blue-400 font-medium"><button onclick="saveProfileData('phone')" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-emerald-700 transition-colors shadow-sm">Ruaj</button></div>`;
 }
 };
 
 window.saveProfileData = async (field) => {
-const user = auth.currentUser;
-if (!user) return;
-let updateData = {};
-if (field === 'institution') {
-const val = document.getElementById('edit-institution').value.trim();
-if(!val) return showAlert("Plotësoni fushën.");
-updateData.institution = val;
-} else if (field === 'phone') {
-const val = document.getElementById('edit-phone').value.trim();
-if(!val) return showAlert("Plotësoni fushën.");
-updateData.phone = val;
-} else if (field === 'fullname') {
-const name = document.getElementById('edit-name').value.trim();
-const surname = document.getElementById('edit-surname').value.trim();
-if(!name || !surname) return showAlert("Plotësoni fushat.");
-updateData.name = name;
-updateData.surname = surname;
-}
-try {
-document.getElementById('loading').classList.remove('hidden');
-const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info');
-await setDoc(docRef, updateData, { merge: true });
-await refreshProfile(user);
-} catch(e) { showAlert("Gabim në ruajtje: " + e.message); } finally { document.getElementById('loading').classList.add('hidden'); }
+const user = auth.currentUser; if (!user) return; let updateData = {};
+if (field === 'institution') { const val = document.getElementById('edit-institution').value.trim(); if(!val) return showAlert("Plotësoni fushën."); updateData.institution = val; } else if (field === 'phone') { const val = document.getElementById('edit-phone').value.trim(); if(!val) return showAlert("Plotësoni fushën."); updateData.phone = val; } else if (field === 'fullname') { const name = document.getElementById('edit-name').value.trim(); const surname = document.getElementById('edit-surname').value.trim(); if(!name || !surname) return showAlert("Plotësoni fushat."); updateData.name = name; updateData.surname = surname; }
+try { document.getElementById('loading').classList.remove('hidden'); const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info'); await setDoc(docRef, updateData, { merge: true }); await refreshProfile(user); } catch(e) { showAlert("Gabim në ruajtje: " + e.message); } finally { document.getElementById('loading').classList.add('hidden'); }
 };
 
-window.updatePublicProfile = async (user, fullName, photoBase64) => {
-try {
-await setDoc(doc(db, `artifacts/${appId}/public_users`, user.uid), {
-uid: user.uid, email: user.email, name: fullName || user.email.split('@')[0], photoBase64: photoBase64 || null, lastActive: Date.now()
-}, { merge: true });
-} catch(e) { console.error("Public profile sync error", e); }
-};
+window.updatePublicProfile = async (user, fullName, photoBase64) => { try { await setDoc(doc(db, `artifacts/${appId}/public_users`, user.uid), { uid: user.uid, email: user.email, name: fullName || user.email.split('@')[0], photoBase64: photoBase64 || null, lastActive: Date.now() }, { merge: true }); } catch(e) { console.error("Public profile sync error", e); } };
 
 window.refreshProfile = async (user) => {
 try {
-const profileSnap = await getDoc(doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info'));
-let pData = {}; let fullName = "";
+const profileSnap = await getDoc(doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info')); let pData = {}; let fullName = "";
 if (profileSnap.exists()) {
-pData = profileSnap.data();
-fullName = (pData.name && pData.surname) ? `${pData.name} ${pData.surname}` : "";
-
-if (fullName) {
-document.getElementById('sidebar-name').innerText = fullName;
-document.getElementById('modal-fullname').innerHTML = `
-<div class="flex items-center gap-2 justify-center">
-<span class="text-xl font-black text-slate-800">${fullName}</span>
-<button onclick="makeEditable('fullname', '${pData.name || ''}', '${pData.surname || ''}')" class="text-blue-500 hover:text-blue-700 bg-slate-50 p-1.5 rounded-lg shadow-sm border border-slate-100 transition-colors" title="Edito Emrin">
-<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5z"></path></svg>
-</button></div>`;
-} else {
-document.getElementById('sidebar-name').innerText = user.email.split('@')[0];
-makeEditable('fullname', '', '');
-}
-
+pData = profileSnap.data(); fullName = (pData.name && pData.surname) ? `${pData.name} ${pData.surname}` : "";
+if (fullName) { document.getElementById('sidebar-name').innerText = fullName; document.getElementById('modal-fullname').innerHTML = `<div class="flex items-center gap-2 justify-center"><span class="text-xl font-black text-slate-800">${fullName}</span><button onclick="makeEditable('fullname', '${pData.name || ''}', '${pData.surname || ''}')" class="text-blue-500 hover:text-blue-700 bg-slate-50 p-1.5 rounded-lg shadow-sm border border-slate-100 transition-colors" title="Edito Emrin"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5z"></path></svg></button></div>`; } else { document.getElementById('sidebar-name').innerText = user.email.split('@')[0]; makeEditable('fullname', '', ''); }
 document.getElementById('modal-email').innerText = pData.email || user.email;
-
-if (pData.institution) {
-document.getElementById('modal-institution-container').innerHTML = `
-<div class="flex justify-between items-center w-full"><div class="flex flex-col">
-<span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Institucioni</span>
-<span id="modal-institution" class="text-sm font-bold text-slate-700">${pData.institution}</span>
-</div><button onclick="makeEditable('institution', '${pData.institution.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700 bg-white p-1.5 rounded-lg shadow-sm border border-slate-100 transition-colors" title="Edito Institucionin">
-<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5z"></path></svg></button></div>`;
-} else { makeEditable('institution', ''); }
-
-if (pData.phone) {
-document.getElementById('modal-phone-container').innerHTML = `
-<div class="flex justify-between items-center w-full"><div class="flex flex-col">
-<span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Numër Telefoni</span>
-<span id="modal-phone" class="text-sm font-bold text-slate-700">${pData.phone}</span>
-</div><button onclick="makeEditable('phone', '${pData.phone.replace(/'/g, "\\'")}')" class="text-emerald-500 hover:text-emerald-700 bg-white p-1.5 rounded-lg shadow-sm border border-slate-100 transition-colors" title="Edito Numrin">
-<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5z"></path></svg></button></div>`;
-} else { makeEditable('phone', ''); }
-
-if (pData.photoBase64) {
-document.getElementById('sidebar-photo').style.backgroundImage = `url(${pData.photoBase64})`;
-document.getElementById('sidebar-photo-fallback').classList.add('hidden');
-document.getElementById('modal-photo').style.backgroundImage = `url(${pData.photoBase64})`;
-document.getElementById('modal-photo').innerHTML = '';
-}
-} else {
-document.getElementById('sidebar-name').innerText = user.email.split('@')[0];
-makeEditable('fullname', '', '');
-document.getElementById('modal-email').innerText = user.email;
-makeEditable('institution', ''); makeEditable('phone', '');
-}
+if (pData.institution) { document.getElementById('modal-institution-container').innerHTML = `<div class="flex justify-between items-center w-full"><div class="flex flex-col"><span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Institucioni</span><span id="modal-institution" class="text-sm font-bold text-slate-700">${pData.institution}</span></div><button onclick="makeEditable('institution', '${pData.institution.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700 bg-white p-1.5 rounded-lg shadow-sm border border-slate-100 transition-colors" title="Edito Institucionin"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5z"></path></svg></button></div>`; } else { makeEditable('institution', ''); }
+if (pData.phone) { document.getElementById('modal-phone-container').innerHTML = `<div class="flex justify-between items-center w-full"><div class="flex flex-col"><span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Numër Telefoni</span><span id="modal-phone" class="text-sm font-bold text-slate-700">${pData.phone}</span></div><button onclick="makeEditable('phone', '${pData.phone.replace(/'/g, "\\'")}')" class="text-emerald-500 hover:text-emerald-700 bg-white p-1.5 rounded-lg shadow-sm border border-slate-100 transition-colors" title="Edito Numrin"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5z"></path></svg></button></div>`; } else { makeEditable('phone', ''); }
+if (pData.photoBase64) { document.getElementById('sidebar-photo').style.backgroundImage = `url(${pData.photoBase64})`; document.getElementById('sidebar-photo-fallback').classList.add('hidden'); document.getElementById('modal-photo').style.backgroundImage = `url(${pData.photoBase64})`; document.getElementById('modal-photo').innerHTML = ''; }
+} else { document.getElementById('sidebar-name').innerText = user.email.split('@')[0]; makeEditable('fullname', '', ''); document.getElementById('modal-email').innerText = user.email; makeEditable('institution', ''); makeEditable('phone', ''); }
 window.updatePublicProfile(user, fullName, pData.photoBase64);
-} catch(e) {
-console.error("Profile fetch error", e);
-document.getElementById('sidebar-name').innerText = user.email.split('@')[0];
-}
+} catch(e) { console.error("Profile fetch error", e); document.getElementById('sidebar-name').innerText = user.email.split('@')[0]; }
 };
 
 window.calculateHours = () => { const start = document.getElementById('log-start-time').value; const end = document.getElementById('log-end-time').value; if (start && end) { const startTime = new Date(`1970-01-01T${start}:00`); const endTime = new Date(`1970-01-01T${end}:00`); let diff = (endTime - startTime) / (1000 * 60 * 60); if (diff < 0) diff += 24; document.getElementById('log-hours').value = diff.toFixed(1); } };
@@ -1057,11 +885,11 @@ localStorage.setItem('savedTab', tab);
 document.getElementById(`view-${tab}`).classList.remove('hidden');
 document.getElementById(`tab-${tab}`).classList.replace('text-slate-400', 'tab-active');
 
-// Fshih bannerin kur je te Chati
-if(tab === 'chat') { 
+// Logjika për fshehjen e Welcome tek Chat
+if (tab === 'chat') {
 document.getElementById('greeting-banner').classList.add('hidden');
-document.getElementById('chat-badge').classList.add('hidden'); 
-window.totalUnread = 0; 
+document.getElementById('chat-badge').classList.add('hidden');
+window.totalUnread = 0;
 } else {
 document.getElementById('greeting-banner').classList.remove('hidden');
 }
@@ -1077,77 +905,29 @@ const ALBANIAN_QUOTES = [
 ];
 let sessionInterval;
 
-window.validateReportDates = () => {
-const start = document.getElementById('rep-start').value;
-const end = document.getElementById('rep-end').value;
-if (start && end && new Date(end) < new Date(start)) {
-showAlert("Data pasardhëse nuk mund të jetë më e vogël se data paraardhëse.");
-document.getElementById('rep-end').value = start;
-updateProcessFilterUI();
-}
-};
-
 window.handleCheckIn = async (user) => {
-const hour = new Date().getHours();
-let greeting = "Mirëmbrëma";
-if (hour >= 5 && hour < 12) greeting = "Mirëmëngjes";
-else if (hour >= 12 && hour < 18) greeting = "Mirëdita";
+const hour = new Date().getHours(); let greeting = "Mirëmbrëma";
+if (hour >= 5 && hour < 12) greeting = "Mirëmëngjes"; else if (hour >= 12 && hour < 18) greeting = "Mirëdita";
 document.getElementById('greeting-title').innerText = `${greeting}!`;
-
 const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
-const quoteIndex = dayOfYear % ALBANIAN_QUOTES.length;
-document.getElementById('greeting-quote').innerText = `"${ALBANIAN_QUOTES[quoteIndex]}"`;
+const quoteIndex = dayOfYear % ALBANIAN_QUOTES.length; document.getElementById('greeting-quote').innerText = `"${ALBANIAN_QUOTES[quoteIndex]}"`;
 
 try {
-const today = getToday();
-const secureId = getSecureId(today + "_session");
-const sessionRef = doc(db, getBaseCollectionPath('work_sessions'), secureId);
-const sessionSnap = await getDoc(sessionRef);
-
-let checkInTime = Date.now();
-let totalBaseMin = 0;
-let history = [];
-
-if (!sessionSnap.exists()) {
-history = [{ in: checkInTime, out: null }];
-await setDoc(sessionRef, { date: today, userEmail: user.email, currentCheckIn: checkInTime, totalMinutes: 0, history });
-} else {
-const data = sessionSnap.data();
-history = data.history || [];
-if (!data.currentCheckIn) {
-history.push({ in: checkInTime, out: null });
-await setDoc(sessionRef, { ...data, currentCheckIn: checkInTime, history });
-} else {
-checkInTime = data.currentCheckIn;
-}
-totalBaseMin = data.totalMinutes || 0;
-}
-
-const checkInDate = new Date(checkInTime);
-const timeString = checkInDate.toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
+const today = getToday(); const secureId = getSecureId(today + "_session"); const sessionRef = doc(db, getBaseCollectionPath('work_sessions'), secureId); const sessionSnap = await getDoc(sessionRef);
+let checkInTime = Date.now(); let totalBaseMin = 0; let history = [];
+if (!sessionSnap.exists()) { history = [{ in: checkInTime, out: null }]; await setDoc(sessionRef, { date: today, userEmail: user.email, currentCheckIn: checkInTime, totalMinutes: 0, history }); } else { const data = sessionSnap.data(); history = data.history || []; if (!data.currentCheckIn) { history.push({ in: checkInTime, out: null }); await setDoc(sessionRef, { ...data, currentCheckIn: checkInTime, history }); } else { checkInTime = data.currentCheckIn; } totalBaseMin = data.totalMinutes || 0; }
+const checkInDate = new Date(checkInTime); const timeString = checkInDate.toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
 document.getElementById('session-login-time').innerText = `Logimi i fundit: ${timeString}`;
-
 if(sessionInterval) clearInterval(sessionInterval);
-const updateHoursUI = () => {
-const endOfDay = getEndOfDay(today);
-const endTime = Math.min(Date.now(), endOfDay);
-const currentSessionMins = Math.max(0, Math.floor((endTime - checkInTime) / 60000));
-const totalMinNow = totalBaseMin + currentSessionMins;
-const h = Math.floor(totalMinNow / 60);
-const m = totalMinNow % 60;
-document.getElementById('session-hours').innerText = `${h}h ${m}m`;
-if (!document.getElementById('view-sessions').classList.contains('hidden')) { renderSessionList(); }
-};
-updateHoursUI();
-sessionInterval = setInterval(updateHoursUI, 60000);
+const updateHoursUI = () => { const endOfDay = getEndOfDay(today); const endTime = Math.min(Date.now(), endOfDay); const currentSessionMins = Math.max(0, Math.floor((endTime - checkInTime) / 60000)); const totalMinNow = totalBaseMin + currentSessionMins; const h = Math.floor(totalMinNow / 60); const m = totalMinNow % 60; document.getElementById('session-hours').innerText = `${h}h ${m}m`; if (!document.getElementById('view-sessions').classList.contains('hidden')) { renderSessionList(); } };
+updateHoursUI(); sessionInterval = setInterval(updateHoursUI, 60000);
 } catch(e) {}
 };
-
-// ================= FUNKSIONET E CHATIT DHE GRUPEVE =================
+  // ================= FUNKSIONET E CHATIT DHE GLOBAL GROUP =================
 
 window.getChatRoomId = (uid1, uid2) => {
-if(uid2 && uid2.startsWith('group_')) return uid2;
-if(uid1 && uid1.startsWith('group_')) return uid1;
+if (uid1.startsWith('group_')) return uid1;
+if (uid2.startsWith('group_')) return uid2;
 if (uid1 === 'global_group_all' || uid2 === 'global_group_all') return 'global_group_all';
 return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
 };
@@ -1156,64 +936,116 @@ window.renderChatUsers = () => {
 const container = document.getElementById('chat-users-container');
 if(!container) return;
 
-const globalGroup = { uid: 'global_group_all', name: '👥 Grupi i Përgjithshëm', isGroup: true };
-const allUsersWithGroup = [globalGroup, ...chatGroups, ...chatUsers];
+const allUsersWithGroup = [
+...window.chatGroups,
+...chatUsers
+];
 
 container.innerHTML = allUsersWithGroup.map(u => {
 const isOnline = u.isGroup ? true : (Date.now() - (u.lastActive || 0) < 120000);
 const dotClass = isOnline ? 'bg-green-500' : 'bg-slate-300';
 const isActiveSelection = activeChatUserId === u.uid;
-const unreadCount = window.unreadCounts[u.uid] || 0;
-
-let avatarContent = '';
-if(u.isGroup && u.uid === 'global_group_all') {
-avatarContent = '<svg class="w-full h-full text-blue-500 p-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>';
-} else if (u.isGroup && u.uid.startsWith('group_')) {
-avatarContent = '<svg class="w-full h-full text-indigo-500 p-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>';
-} else if (!u.photoBase64) {
-avatarContent = '<svg class="w-full h-full text-blue-300 p-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
-}
+const badgeHtml = u.unreadCount > 0 ? `<div class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${u.unreadCount}</div>` : '';
 
 return `
-<div onclick="openChatWith('${u.uid}', '${u.name.replace(/'/g, "\\'")}', '${u.photoBase64 || ''}')" class="flex items-center justify-between p-3 rounded-xl hover:bg-white cursor-pointer border border-transparent hover:border-slate-100 transition-all ${isActiveSelection ? 'bg-white shadow-sm border-slate-100' : ''}">
-<div class="flex items-center gap-3 overflow-hidden">
+<div onclick="openChatWith('${u.uid}', '${u.name.replace(/'/g, "\\'")}', '${u.photoBase64 || ''}')" class="flex items-center gap-3 p-3 rounded-xl hover:bg-white cursor-pointer border border-transparent hover:border-slate-100 transition-all ${isActiveSelection ? 'bg-white shadow-sm border-slate-100' : ''}">
 <div class="relative w-10 h-10 rounded-full bg-blue-100 border border-blue-200 bg-cover bg-center flex-shrink-0" style="background-image: url('${u.photoBase64 || ''}')">
-${avatarContent}
+${(!u.photoBase64 && !u.isGroup) ? '<svg class="w-full h-full text-blue-300 p-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>' : ''}
+${u.isGroup ? '<svg class="w-full h-full text-blue-500 p-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>' : ''}
 <div class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${dotClass}"></div>
 </div>
-<div class="flex flex-col overflow-hidden w-full">
+<div class="flex flex-col overflow-hidden w-full flex-1">
 <span class="font-bold text-slate-800 text-sm truncate">${u.name}</span>
 </div>
-</div>
-${unreadCount > 0 ? `<span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">${unreadCount}</span>` : ''}
+${badgeHtml}
 </div>
 `;
 }).join('');
+};
+
+window.openCreateGroupModal = () => {
+const container = document.getElementById('group-members-list');
+container.innerHTML = chatUsers.map(u => `
+<label class="flex items-center gap-2 p-2 bg-white rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors">
+<input type="checkbox" value="${u.uid}" class="group-member-cbx w-4 h-4 text-blue-600 rounded">
+<span class="text-sm font-bold text-slate-700">${u.name}</span>
+</label>
+`).join('');
+document.getElementById('group-name-input').value = '';
+document.getElementById('create-group-modal').classList.remove('hidden');
+};
+
+window.closeCreateGroupModal = () => document.getElementById('create-group-modal').classList.add('hidden');
+
+window.createNewGroup = async () => {
+const name = document.getElementById('group-name-input').value.trim();
+if (!name) return showAlert("Ju lutem shkruani emrin e grupit.");
+const selected = Array.from(document.querySelectorAll('.group-member-cbx:checked')).map(cb => cb.value);
+if (selected.length === 0) return showAlert("Zgjidhni të paktën një anëtar.");
+
+selected.push(auth.currentUser.uid); // Shto veten
+const groupId = `group_${Date.now()}`;
+try {
+await setDoc(doc(db, `artifacts/${appId}/global_groups`, groupId), {
+name: name,
+members: selected,
+createdBy: auth.currentUser.uid,
+createdAt: Date.now()
+});
+closeCreateGroupModal();
+showAlert("Grupi u krijua me sukses!");
+} catch (e) { showAlert("Gabim gjatë krijimit të grupit."); }
+};
+
+window.openDeleteChatModal = () => {
+if(!activeChatUserId) return;
+document.getElementById('delete-chat-modal').classList.remove('hidden');
+};
+window.closeDeleteChatModal = () => document.getElementById('delete-chat-modal').classList.add('hidden');
+
+window.deleteChatRoom = async (forEveryone) => {
+if(!activeChatUserId) return;
+const roomId = getChatRoomId(auth.currentUser.uid, activeChatUserId);
+closeDeleteChatModal();
+document.getElementById('loading').classList.remove('hidden');
+
+try {
+// Ndryshime tek message collection
+const { getDocs, writeBatch } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+const q = query(collection(db, `artifacts/${appId}/global_chats/${roomId}/messages`));
+const snap = await getDocs(q);
+const batch = writeBatch(db);
+
+snap.docs.forEach(d => {
+if(forEveryone) {
+batch.delete(d.ref);
+} else {
+batch.update(d.ref, { deletedFor: arrayUnion(auth.currentUser.uid) });
+}
+});
+await batch.commit();
+showAlert("Biseda u pastrua me sukses.");
+} catch(e) { showAlert("Gabim gjatë pastrimit të bisedës: " + e.message); }
+finally { document.getElementById('loading').classList.add('hidden'); }
 };
 
 window.openChatWith = (uid, name, photoUrl) => {
 activeChatUserId = uid;
 document.getElementById('chat-active-user-name').innerText = name;
 document.getElementById('chat-active-user-avatar').style.backgroundImage = `url('${photoUrl}')`;
-
-if (!photoUrl && uid === 'global_group_all') {
+if (!photoUrl && uid.startsWith('group_')) {
 document.getElementById('chat-active-user-avatar').innerHTML = '<svg class="w-full h-full text-blue-500 p-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>';
-} else if (!photoUrl && uid.startsWith('group_')) {
-document.getElementById('chat-active-user-avatar').innerHTML = '<svg class="w-full h-full text-indigo-500 p-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>';
-} else {
-document.getElementById('chat-active-user-avatar').innerHTML = '';
-}
+} else { document.getElementById('chat-active-user-avatar').innerHTML = ''; }
 
 if (window.innerWidth < 768) {
 document.getElementById('chat-user-list').classList.add('hidden');
 document.getElementById('chat-window').classList.remove('hidden');
 document.getElementById('chat-window').classList.add('flex');
-} else {
-document.getElementById('chat-window').classList.remove('hidden');
-}
+} else { document.getElementById('chat-window').classList.remove('hidden'); }
 
-// Reseto numëruesin kur e hap
-window.unreadCounts[uid] = 0;
+// Hiqim counter kur hyjm ne bisede
+const userObj = window.chatGroups.find(g => g.uid === uid) || chatUsers.find(u => u.uid === uid);
+if(userObj) { window.totalUnread -= (userObj.unreadCount || 0); userObj.unreadCount = 0; }
 renderChatUsers();
 
 const roomId = getChatRoomId(auth.currentUser.uid, uid);
@@ -1222,9 +1054,7 @@ window.typingUnsubscribe = onSnapshot(doc(db, `artifacts/${appId}/global_chats/$
 const ind = document.getElementById('chat-typing-indicator');
 if(docSnap.exists() && docSnap.data().isTyping) {
 ind.classList.remove('hidden'); ind.innerText = name.split(' ')[0] + ' po shkruan...';
-} else {
-ind.classList.add('hidden');
-}
+} else { ind.classList.add('hidden'); }
 });
 loadChatMessages(uid);
 };
@@ -1243,82 +1073,45 @@ if(!activeChatUserId) return;
 const roomId = getChatRoomId(auth.currentUser.uid, activeChatUserId);
 setDoc(doc(db, `artifacts/${appId}/global_chats/${roomId}/typing`, auth.currentUser.uid), { isTyping: true, timestamp: Date.now() }, {merge: true});
 clearTimeout(typingTimeout);
-typingTimeout = setTimeout(() => {
-setDoc(doc(db, `artifacts/${appId}/global_chats/${roomId}/typing`, auth.currentUser.uid), { isTyping: false }, {merge: true});
-}, 1500);
+typingTimeout = setTimeout(() => { setDoc(doc(db, `artifacts/${appId}/global_chats/${roomId}/typing`, auth.currentUser.uid), { isTyping: false }, {merge: true}); }, 1500);
 };
 
 window.handleChatAttachment = (event) => {
-const file = event.target.files[0];
-if(!file) return;
-const reader = new FileReader();
+const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
 reader.onload = (e) => {
 chatPendingAttachment = { type: file.type.startsWith('image/') ? 'photo' : 'file', data: e.target.result, name: file.name };
 document.getElementById('chat-attachment-preview').classList.remove('hidden');
 document.getElementById('chat-attachment-name').innerText = file.name;
-};
-reader.readAsDataURL(file);
-};
-
-window.clearChatAttachment = () => {
-chatPendingAttachment = null;
-document.getElementById('chat-attachment-preview').classList.add('hidden');
-document.getElementById('chat-attachment-input').value = '';
+}; reader.readAsDataURL(file);
 };
 
-// Funksioni për modalin e fotove në chat
-window.openChatPhotoModal = (url) => {
-document.getElementById('chat-photo-full').src = url;
-document.getElementById('chat-photo-modal').classList.remove('hidden');
+window.clearChatAttachment = () => { chatPendingAttachment = null; document.getElementById('chat-attachment-preview').classList.add('hidden'); document.getElementById('chat-attachment-input').value = ''; };
+
+window.replyToMsg = (msgId, text) => { chatReplyingTo = { id: msgId, text: text }; document.getElementById('chat-reply-preview').classList.remove('hidden'); document.getElementById('chat-reply-text').innerText = text; document.getElementById('chat-input').focus(); };
+window.clearChatReply = () => { chatReplyingTo = null; document.getElementById('chat-reply-preview').classList.add('hidden'); };
+
+window.viewChatImage = (src) => {
+document.getElementById('attachment-modal-title').innerText = 'Foto e Dërguar';
+document.getElementById('attachment-modal-content').innerHTML = `<img src="${src}" class="max-w-full max-h-full object-contain rounded-xl">`;
+document.getElementById('attachment-download-btn').onclick = () => { const a = document.createElement("a"); a.href = src; a.download = 'Foto_Chat.jpg'; a.click(); };
+document.getElementById('attachment-modal').classList.remove('hidden');
 };
 
-// Funksioni për fshirjen e bisedës (Për mua / Për të gjithë)
-window.closeDeleteChatModal = () => document.getElementById('delete-chat-modal').classList.add('hidden');
-
-window.executeDeleteChat = async (type) => {
-if(!activeChatUserId) return;
-const roomId = getChatRoomId(auth.currentUser.uid, activeChatUserId);
+window.addActivityToMyLogs = async (actStr) => {
+const act = JSON.parse(decodeURIComponent(actStr));
+const logId = Date.now().toString();
 try {
-if(type === 'me') {
-// Fshirja vetëm për mua => Ruajmë një timestamp në localStorage për mos shfaqje
-localStorage.setItem(`chat_cleared_${roomId}`, Date.now().toString());
-} else if (type === 'all') {
-// Fshijmë gjithçka nga databaza
-const q = query(collection(db, `artifacts/${appId}/global_chats/${roomId}/messages`));
-const querySnapshot = await getDocs(q);
-const batch = writeBatch(db);
-querySnapshot.forEach((d) => {
-batch.delete(d.ref);
+await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(logId)), {
+actId: act.actId || "shared",
+actName: act.actName,
+date: act.date || getToday(),
+operator: auth.currentUser.email.split('@')[0], 
+hours: act.hours,
+processes: act.processes || [],
+timestamp: Date.now()
 });
-await batch.commit();
-localStorage.removeItem(`chat_cleared_${roomId}`);
-}
-closeDeleteChatModal();
-loadChatMessages(activeChatUserId); // Riload per te pare efektin
-showAlert("Biseda u pastrua me sukses!");
-} catch(e) {
-showAlert("Gabim gjatë fshirjes: " + e.message);
-}
-};
-
-window.replyToMsg = (msgId, text) => {
-chatReplyingTo = { id: msgId, text: text };
-document.getElementById('chat-reply-preview').classList.remove('hidden');
-document.getElementById('chat-reply-text').innerText = text;
-document.getElementById('chat-input').focus();
-};
-window.clearChatReply = () => {
-chatReplyingTo = null;
-document.getElementById('chat-reply-preview').classList.add('hidden');
-};
-
-window.deleteChatMsg = async (msgId) => {
-askConfirm("Jeni të sigurt që doni të fshini këtë mesazh?", async () => {
-const roomId = getChatRoomId(auth.currentUser.uid, activeChatUserId);
-try {
-await deleteDoc(doc(db, `artifacts/${appId}/global_chats/${roomId}/messages`, msgId));
-} catch(e) { showAlert("Gabim gjatë fshirjes."); }
-});
+showAlert("Aktiviteti u shtua me sukses tek të dhënat e tua!");
+} catch(e) { showAlert("Gabim: " + e.message); }
 };
 
 window.loadChatMessages = (otherUid) => {
@@ -1327,12 +1120,8 @@ const roomId = getChatRoomId(auth.currentUser.uid, otherUid);
 const q = query(collection(db, `artifacts/${appId}/global_chats/${roomId}/messages`));
 
 chatUnsubscribe = onSnapshot(q, snap => {
-// Filtrim për "Fshi vetëm për mua"
-const clearedAtStr = localStorage.getItem(`chat_cleared_${roomId}`);
-const clearedAt = clearedAtStr ? parseInt(clearedAtStr) : 0;
-
 const msgs = snap.docs.map(d => ({id: d.id, ...d.data()}))
-.filter(m => m.timestamp > clearedAt)
+.filter(m => !(m.deletedFor && m.deletedFor.includes(auth.currentUser.uid))) // Filtro mesazhet e fshira "për mua"
 .sort((a, b) => a.timestamp - b.timestamp);
 
 const container = document.getElementById('chat-messages');
@@ -1346,24 +1135,17 @@ setDoc(doc(db, `artifacts/${appId}/global_chats/${roomId}/messages`, m.id), { st
 container.innerHTML = msgs.map(m => {
 const isMe = m.senderId === auth.currentUser.uid;
 const time = new Date(m.timestamp).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
-const senderProfile = chatUsers.find(u => u.uid === m.senderId);
-const senderNameStr = senderProfile ? senderProfile.name.split(' ')[0] : 'Dikush';
 
 let ticks = '';
 if (isMe) {
-if (m.status === 'read') {
-// DY Tike jeshile të theksuara për lexuar
-ticks = `<span class="text-green-500 ml-1 text-[13px] font-black drop-shadow-[0_0_1px_rgba(0,0,0,0.5)] tracking-tighter">✓✓</span>`;
-} else {
-// NJË Tik jeshil i theksuar kur u dërgua por nuk u lexua ende
-ticks = `<span class="text-green-500 ml-1 text-[13px] font-black drop-shadow-[0_0_1px_rgba(0,0,0,0.5)]">✓</span>`;
-}
+if (m.status === 'read') { ticks = `<span class="text-green-500 ml-1 text-[13px] font-black drop-shadow-[0_0_1px_rgba(0,0,0,0.5)] tracking-tighter">✓✓</span>`; } 
+else { ticks = `<span class="text-green-500 ml-1 text-[13px] font-black drop-shadow-[0_0_1px_rgba(0,0,0,0.5)]">✓</span>`; }
 }
 
 let attachmentHtml = '';
 if(m.attachment) {
 if(m.attachment.type === 'photo' || m.attachment.data.startsWith('data:image')) {
-attachmentHtml = `<img src="${m.attachment.data}" class="max-w-[200px] rounded-xl mb-2 border border-black/10 cursor-pointer" onclick="openChatPhotoModal('${m.attachment.data}')">`;
+attachmentHtml = `<img src="${m.attachment.data}" class="max-w-[200px] rounded-xl mb-2 border border-black/10 cursor-pointer" onclick="viewChatImage('${m.attachment.data}')">`;
 } else {
 attachmentHtml = `<a href="${m.attachment.data}" download="${m.attachment.name}" class="flex items-center gap-2 bg-black/10 p-2 rounded-xl mb-2 hover:bg-black/20 transition-colors text-xs font-bold"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> ${m.attachment.name}</a>`;
 }
@@ -1371,60 +1153,42 @@ attachmentHtml = `<a href="${m.attachment.data}" download="${m.attachment.name}"
 
 let activityHtml = '';
 if(m.activity) {
-if(m.activity.type === 'vacation') {
-// Të dhënat e pushimeve të ndara
-activityHtml = `
-<div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl mb-2 min-w-[220px]">
-<div class="flex items-center gap-2 mb-2 pb-2 border-b border-indigo-200">
-<span class="text-xl">🏖️</span>
-<span class="font-black text-indigo-800 text-sm">${m.activity.actName}</span>
-</div>
-<div class="grid grid-cols-2 gap-2 text-[10px]">
-<div class="flex flex-col"><span class="font-extrabold uppercase text-slate-400">Buxheti:</span> <span class="font-bold text-slate-700">${m.activity.allowance} ditë</span></div>
-<div class="flex flex-col"><span class="font-extrabold uppercase text-slate-400">Mbartur:</span> <span class="font-bold text-slate-700">${m.activity.carryover} ditë</span></div>
-<div class="flex flex-col"><span class="font-extrabold uppercase text-slate-400">Shfrytëzuar:</span> <span class="font-bold text-blue-600">${m.activity.used} ditë</span></div>
-<div class="flex flex-col"><span class="font-extrabold uppercase text-slate-400">Raporte:</span> <span class="font-bold text-orange-500">${m.activity.medical} ditë</span></div>
-</div>
-</div>`;
-} else {
-// Aktivitet normal i ndarë (përfshin të gjitha proceset)
 let procsHtml = '';
 if (m.activity.processes && m.activity.processes.length > 0) {
 procsHtml = `<div class="mt-2 pt-2 border-t border-black/10 grid grid-cols-1 gap-1">` + 
 m.activity.processes.map(p => `<div class="flex flex-col text-[10px]"><span class="font-extrabold uppercase opacity-60">${p.label}:</span> <span class="font-bold">${p.value}</span></div>`).join('') +
 `</div>`;
 }
-
-// Butoni Shto tek loget (vetëm nëse nuk jemi vetë dërguesi, ose dhe nëse jemi, i japim mundësinë)
-const base64Act = btoa(unescape(encodeURIComponent(JSON.stringify(m.activity))));
+// SHTUAR BOTONI PER TE RUAJTUR AKTIVITETIN TEK LOGET E MIA NQS NUK JAM UNE DERGUESI
+let addBtnHtml = '';
+if(!isMe) {
+const actString = encodeURIComponent(JSON.stringify(m.activity));
+addBtnHtml = `<button onclick="addActivityToMyLogs('${actString}')" class="w-full mt-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-900 border border-blue-500/20 text-[10px] font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg> Shto tek aktivitetet e mia</button>`;
+}
 
 activityHtml = `
 <div class="bg-black/5 border border-black/10 p-3 rounded-xl mb-2 min-w-[220px]">
-<div class="text-[9px] uppercase tracking-wider font-black mb-1 opacity-60">Aktivitet i Ndarë</div>
+<div class="text-[9px] uppercase tracking-wider font-black mb-1 opacity-60">Aktivitet / Raport i Ndarë</div>
 <div class="font-black text-sm">${m.activity.actName}</div>
 <div class="text-xs font-bold opacity-80 mt-1">${m.activity.operator}</div>
-<div class="text-[10px] font-bold opacity-70 mt-1">🕒 ${m.activity.hours} orë | 📅 ${m.activity.date}</div>
+<div class="text-[10px] font-bold opacity-70 mt-1">🕒 ${m.activity.hours || 0} orë | 📅 ${m.activity.date || 'Raport'}</div>
 ${procsHtml}
-<button onclick="importActivityToLogs('${base64Act}')" class="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold text-[9px] uppercase tracking-widest py-2 rounded-lg shadow-sm transition-colors">➕ Shto tek e mia</button>
+${addBtnHtml}
 </div>`;
-}
 }
 
 let repliedHtml = '';
 if(m.replyTo) {
-repliedHtml = `<div class="bg-black/10 border-l-4 border-black/20 p-2 rounded-r-lg mb-2 text-[10px] text-white/80 opacity-90"><span class="font-bold opacity-70 uppercase tracking-wider text-[8px] block mb-0.5">Përgjigje ndaj:</span><span class="italic font-medium">${m.replyTo.text}</span></div>`;
+repliedHtml = `<div class="bg-black/10 border-l-4 border-black/20 p-2 rounded-r-lg mb-2 text-[10px] text-white/80 opacity-90"><span class="font-bold opacity-70 uppercase tracking-wider text-[8px] block mb-0.5">Përgjigje ndaj:</span><span class="italic font-medium truncate block max-w-[200px]">${m.replyTo.text}</span></div>`;
 }
 
 const theText = (m.text || '').replace(/'/g, "\\'");
-const senderLabel = (activeChatUserId.startsWith('group_') || activeChatUserId === 'global_group_all') && !isMe ? `<div class="text-[9px] font-bold text-slate-500 mb-0.5 ml-1">${senderNameStr}</div>` : '';
 
 return `
 <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} w-full mb-3 group">
-${senderLabel}
 <div class="relative max-w-[85%] md:max-w-[75%] px-4 py-2.5 rounded-2xl text-sm font-medium ${isMe ? 'bg-blue-600 text-white rounded-br-sm shadow-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-bl-sm shadow-sm'}">
 <div class="absolute -top-3 ${isMe ? 'left-2 flex-row-reverse' : 'right-2'} hidden group-hover:flex gap-1 bg-white border border-slate-200 shadow-sm rounded-lg p-1 z-20">
 <button onclick="replyToMsg('${m.id}', '${theText.length > 0 ? theText : 'Skedar/Aktivitet'}')" class="text-slate-400 hover:text-blue-500 p-1" title="Përgjigju"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
-${isMe ? `<button onclick="deleteChatMsg('${m.id}')" class="text-slate-400 hover:text-red-500 p-1" title="Fshi"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>` : ''}
 </div>
 
 ${repliedHtml}
@@ -1458,14 +1222,8 @@ timestamp: Date.now(),
 status: 'sent'
 };
 
-if(chatPendingAttachment) {
-msgData.attachment = chatPendingAttachment;
-clearChatAttachment();
-}
-if(chatReplyingTo) {
-msgData.replyTo = chatReplyingTo;
-clearChatReply();
-}
+if(chatPendingAttachment) { msgData.attachment = chatPendingAttachment; clearChatAttachment(); }
+if(chatReplyingTo) { msgData.replyTo = chatReplyingTo; clearChatReply(); }
 
 try {
 await setDoc(doc(collection(db, `artifacts/${appId}/global_chats/${roomId}/messages`)), msgData);
@@ -1473,225 +1231,59 @@ setDoc(doc(db, `artifacts/${appId}/global_chats/${roomId}/typing`, auth.currentU
 } catch(e) { showAlert("Gabim në dërgimin e mesazhit."); }
 };
 
-window.sendQuickMessage = (text) => {
-document.getElementById('chat-input').value = text;
-sendChatMessage();
-};
+window.sendQuickMessage = (text) => { document.getElementById('chat-input').value = text; sendChatMessage(); };
 
 window.openChatActivityModal = () => {
 if(!activeChatUserId) return showAlert("Zgjidhni një përdorues për të dërguar aktivitetin.");
-const select = document.getElementById('chat-activity-select');
-select.innerHTML = '<option value="">-- Zgjidh Aktivitetin e Fundit --</option>' + logData.slice(0, 20).map(l => `<option value="${l.id}">${l.date} - ${l.actName} (${l.hours}h)</option>`).join('');
+toggleChatActivityType();
 document.getElementById('chat-activity-modal').classList.remove('hidden');
 };
 
-window.setChatModalTab = (tab) => {
-if(tab === 'act') {
-document.getElementById('tab-modal-act').className = "flex-1 py-3 text-[10px] font-black uppercase rounded-xl bg-white text-blue-600 shadow-sm transition-all";
-document.getElementById('tab-modal-rep').className = "flex-1 py-3 text-[10px] font-black uppercase rounded-xl text-slate-400 transition-all";
-document.getElementById('modal-act-content').classList.remove('hidden');
-document.getElementById('modal-rep-content').classList.add('hidden');
+window.toggleChatActivityType = () => {
+const type = document.getElementById('chat-activity-type').value;
+const select = document.getElementById('chat-activity-select');
+if (type === 'activity') {
+select.innerHTML = '<option value="">-- Zgjidh Aktivitetin e Fundit --</option>' + logData.slice(0, 20).map(l => `<option value="${l.id}">${l.date} - ${l.actName} (${l.hours}h)</option>`).join('');
 } else {
-document.getElementById('tab-modal-rep').className = "flex-1 py-3 text-[10px] font-black uppercase rounded-xl bg-white text-blue-600 shadow-sm transition-all";
-document.getElementById('tab-modal-act').className = "flex-1 py-3 text-[10px] font-black uppercase rounded-xl text-slate-400 transition-all";
-document.getElementById('modal-rep-content').classList.remove('hidden');
-document.getElementById('modal-act-content').classList.add('hidden');
+select.innerHTML = '<option value="vacation_report">Raporti Mujor i Lejeve</option>';
 }
 };
 
 window.sendSelectedActivityToChat = async () => {
-const logId = document.getElementById('chat-activity-select').value;
-if(!logId) return;
-const log = logData.find(l => l.id === logId);
+const type = document.getElementById('chat-activity-type').value;
+const selectedVal = document.getElementById('chat-activity-select').value;
+if(!selectedVal) return;
+
+const roomId = getChatRoomId(auth.currentUser.uid, activeChatUserId);
+let activityPayload = {};
+
+if (type === 'activity') {
+const log = logData.find(l => l.id === selectedVal);
 if(!log) return;
-
-const roomId = getChatRoomId(auth.currentUser.uid, activeChatUserId);
-const msgData = {
-senderId: auth.currentUser.uid,
-text: "Kam ndarë këtë aktivitet me ty.",
-activity: {
-type: 'log',
-actName: log.actName,
-hours: log.hours,
-date: log.date,
-operator: log.operator,
-processes: log.processes || [] 
-},
-timestamp: Date.now(),
-status: 'sent'
-};
-
-try {
-await setDoc(doc(collection(db, `artifacts/${appId}/global_chats/${roomId}/messages`)), msgData);
-document.getElementById('chat-activity-modal').classList.add('hidden');
-} catch(e) { showAlert("Gabim: " + e.message); }
-};
-
-window.sendSelectedReportToChat = async () => {
-const sel = document.getElementById('chat-report-select').value;
-if(sel !== 'vacation') return;
-
-const roomId = getChatRoomId(auth.currentUser.uid, activeChatUserId);
-const activeCarryover = (vacationYearData.manualCarryover !== null) ? Number(vacationYearData.manualCarryover) : calculatedCarryover;
-
-const msgData = {
-senderId: auth.currentUser.uid,
-text: "Kam ndarë përmbledhjen time të pushimeve.",
-activity: {
-type: 'vacation',
-actName: `Statusi i Lejes (${selectedYear})`,
-allowance: vacationYearData.allowance || 28,
-carryover: activeCarryover,
-used: vacationYearData.selected.length,
-medical: vacationYearData.medical?.length || 0
-},
-timestamp: Date.now(),
-status: 'sent'
-};
-
-try {
-await setDoc(doc(collection(db, `artifacts/${appId}/global_chats/${roomId}/messages`)), msgData);
-document.getElementById('chat-activity-modal').classList.add('hidden');
-} catch(e) { showAlert("Gabim: " + e.message); }
-};
-
-window.importActivityToLogs = async (base64Act) => {
-try {
-const act = JSON.parse(decodeURIComponent(escape(atob(base64Act))));
-if(act.type === 'vacation') return;
-
-const safeId = getSecureId(Date.now().toString());
-const payload = {
-actId: act.actId || "imported",
-actName: act.actName,
-date: act.date || getToday(),
-operator: auth.currentUser.email.split('@')[0], // Vendosim vetveten si operator default per import
-hours: act.hours,
-processes: act.processes || [],
-attachments: [],
-timestamp: Date.now()
-};
-
-await setDoc(doc(db, getBaseCollectionPath('logs'), safeId), payload);
-showAlert("Aktiviteti u shtua me sukses tek Regjistrimet e tua!");
-} catch(e) {
-showAlert("Gabim gjatë shtimit: " + e.message);
-}
-};
-
-window.openCreateGroupModal = () => {
-document.getElementById('new-group-name').value = '';
-const container = document.getElementById('create-group-users-list');
-container.innerHTML = chatUsers.map(u => `
-<label class="flex items-center gap-3 p-2 bg-white rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 transition-colors">
-<input type="checkbox" value="${u.uid}" class="group-member-cbx accent-blue-600 w-4 h-4">
-<span class="text-xs font-bold text-slate-700">${u.name}</span>
-</label>
-`).join('');
-};
-
-window.saveNewGroup = async () => {
-const name = document.getElementById('new-group-name').value.trim();
-if(!name) return showAlert("Ju lutem vendosni një emër për grupin.");
-
-const cbxs = document.querySelectorAll('.group-member-cbx:checked');
-const memberUids = Array.from(cbxs).map(cb => cb.value);
-if(memberUids.length === 0) return showAlert("Ju lutem zgjidhni të paktën një anëtar tjetër.");
-
-const allMembers = [auth.currentUser.uid, ...memberUids];
-const groupId = "group_" + Date.now().toString();
-
-try {
-await setDoc(doc(db, `artifacts/${appId}/chat_groups`, groupId), {
-uid: groupId,
-name: name,
-isGroup: true,
-members: allMembers,
-createdAt: Date.now(),
-createdBy: auth.currentUser.uid
-});
-document.getElementById('create-group-modal').classList.add('hidden');
-showAlert("Grupi u krijua me sukses!");
-} catch(e) {
-showAlert("Gabim gjatë krijimit të grupit: " + e.message);
-}
-};
-
-onAuthStateChanged(auth, async (user) => {
-if (user) {
-document.getElementById('app-content').classList.remove('hidden');
-document.getElementById('auth-overlay').classList.add('hidden');
-document.getElementById('sync-status').innerText = user.email;
-document.getElementById('sidebar-name').innerText = "Duke u ngarkuar...";
-
-const savedTab = localStorage.getItem('savedTab') || 'log';
-switchTab(savedTab);
-
-await refreshProfile(user);
-document.getElementById('loading').classList.add('hidden');
-startListening(user.uid);
-handleCheckIn(user);
-
-if(savedTab !== 'chat') {
-document.getElementById('greeting-banner').classList.remove('hidden');
-}
-
-// Update last active every 1 min
-if(onlinePresenceInterval) clearInterval(onlinePresenceInterval);
-onlinePresenceInterval = setInterval(() => {
-setDoc(doc(db, `artifacts/${appId}/public_users`, user.uid), { lastActive: Date.now() }, { merge: true });
-}, 60000);
-
+activityPayload = { actName: log.actName, hours: log.hours, date: log.date, operator: log.operator, processes: log.processes || [] };
 } else {
-document.getElementById('app-content').classList.add('hidden');
-document.getElementById('auth-overlay').classList.remove('hidden');
-showAuthSection('login');
-unsubscribes.forEach(unsub => unsub());
-unsubscribes = [];
-document.getElementById('greeting-banner').classList.add('hidden');
-document.getElementById('loading').classList.add('hidden');
-if(sessionInterval) clearInterval(sessionInterval);
-if(onlinePresenceInterval) clearInterval(onlinePresenceInterval);
-if(chatUnsubscribe) chatUnsubscribe();
-if(window.typingUnsubscribe) window.typingUnsubscribe();
+const allow = Number(vacationYearData.allowance) || 28;
+const manCarr = vacationYearData.manualCarryover !== null ? Number(vacationYearData.manualCarryover) : calculatedCarryover;
+activityPayload = {
+actName: "Përmbledhja e Lejeve", hours: 0, date: `Viti ${selectedYear}`, operator: auth.currentUser.email.split('@')[0],
+processes: [
+{label: "Të përdorura", value: vacationYearData.selected.length + " ditë"},
+{label: "Mbetja nga Viti Kaluar", value: manCarr + " ditë"},
+{label: "Buxheti Vjetor", value: allow + " ditë"},
+{label: "Mbetja Totale", value: ((allow + manCarr) - vacationYearData.selected.length) + " ditë"}
+]
+};
 }
-});
 
-window.logout = async () => {
-document.getElementById('loading').classList.remove('hidden');
-if(sessionInterval) clearInterval(sessionInterval);
-if(onlinePresenceInterval) clearInterval(onlinePresenceInterval);
-const user = auth.currentUser;
-if (user) {
-try {
-const today = getToday();
-const sessionRef = doc(db, getBaseCollectionPath('work_sessions'), getSecureId(today + "_session"));
-const sessionSnap = await getDoc(sessionRef);
-if (sessionSnap.exists()) {
-const data = sessionSnap.data();
-if (data.currentCheckIn) {
-const endOfDay = getEndOfDay(today);
-const endTime = Math.min(Date.now(), endOfDay);
-const sessionMins = Math.max(0, Math.floor((endTime - data.currentCheckIn) / 60000));
-const newTotal = (data.totalMinutes || 0) + sessionMins;
-let history = data.history || [];
-if (history.length > 0 && history[history.length - 1].out === null) { history[history.length - 1].out = endTime; }
-await setDoc(sessionRef, { ...data, totalMinutes: newTotal, currentCheckIn: null, history });
-}
-}
-} catch(e) {}
-}
-signOut(auth);
+const msgData = { senderId: auth.currentUser.uid, text: "Kam ndarë këtë informacion me ty.", activity: activityPayload, timestamp: Date.now(), status: 'sent' };
+try { await setDoc(doc(collection(db, `artifacts/${appId}/global_chats/${roomId}/messages`)), msgData); document.getElementById('chat-activity-modal').classList.add('hidden'); } catch(e) { showAlert("Gabim: " + e.message); }
 };
 
-// Listeners Global
 let unreadListenerUnsubscribes = [];
 
 function startListening(userId) {
-unsubscribes.forEach(unsub => unsub());
-unsubscribes = [];
-unreadListenerUnsubscribes.forEach(u => u());
-unreadListenerUnsubscribes = [];
+unsubscribes.forEach(unsub => unsub()); unsubscribes = [];
+unreadListenerUnsubscribes.forEach(u => u()); unreadListenerUnsubscribes = [];
 
 const filterAndClean = (snap) => snap.docs.filter(d => d.id.startsWith(userId + "_")).map(d => ({ id: getCleanId(d.id), ...d.data() }));
 
@@ -1700,73 +1292,23 @@ const unsubLogs = onSnapshot(collection(db, getBaseCollectionPath('logs')), snap
 const unsubOps = onSnapshot(collection(db, getBaseCollectionPath('operators')), snap => { operatorData = filterAndClean(snap); updateDropdowns(); renderOperatorList(); });
 const unsubTrash = onSnapshot(collection(db, getBaseCollectionPath('trash')), snap => { trashData = filterAndClean(snap); renderTrashList(); });
 
-const listenToUnread = (rooms) => {
-unreadListenerUnsubscribes.forEach(u => u());
-unreadListenerUnsubscribes = [];
-window.totalUnread = 0;
-
-rooms.forEach(room => {
-const roomId = room.roomId;
-const uid = room.uid; // per te lidhur unread count me userin ose grupin
-
-const unsubUnread = onSnapshot(query(collection(db, `artifacts/${appId}/global_chats/${roomId}/messages`)), msgSnap => {
-const clearedAtStr = localStorage.getItem(`chat_cleared_${roomId}`);
-const clearedAt = clearedAtStr ? parseInt(clearedAtStr) : 0;
-
-let unread = 0;
-msgSnap.docs.forEach(d => { 
-const mData = d.data();
-if(mData.senderId !== userId && mData.status !== 'read' && mData.timestamp > clearedAt) unread++; 
+const unsubGroups = onSnapshot(collection(db, `artifacts/${appId}/global_groups`), snap => {
+window.chatGroups = snap.docs.map(d => ({uid: d.id, ...d.data(), isGroup: true})).filter(g => g.members.includes(userId) || g.uid === 'global_group_all');
+renderChatUsers();
+attachUnreadListeners(userId);
 });
-
-window.unreadCounts[uid] = unread;
-renderChatUsers(); // Përditëso UI te përdoruesi individual
-
-window.totalUnread = Object.values(window.unreadCounts).reduce((a, b) => a + b, 0);
-
-const badge = document.getElementById('chat-badge');
-badge.innerText = window.totalUnread;
-badge.classList.toggle('hidden', window.totalUnread === 0 || !document.getElementById('view-chat').classList.contains('hidden'));
-});
-unreadListenerUnsubscribes.push(unsubUnread);
-});
-};
 
 const unsubPublicUsers = onSnapshot(collection(db, `artifacts/${appId}/public_users`), snap => {
 chatUsers = snap.docs.map(d => d.data()).filter(u => u.uid !== auth.currentUser.uid);
-
-// Sinkronizo grupet e ftuara
-getDocs(collection(db, `artifacts/${appId}/chat_groups`)).then(grpSnap => {
-chatGroups = grpSnap.docs.map(d => d.data()).filter(g => g.members && g.members.includes(auth.currentUser.uid));
 renderChatUsers();
-
-// Përgatit dhomat për unread listening
-let roomsToListen = chatUsers.map(u => ({uid: u.uid, roomId: getChatRoomId(userId, u.uid)}));
-roomsToListen.push({uid: 'global_group_all', roomId: 'global_group_all'});
-chatGroups.forEach(g => {
-roomsToListen.push({uid: g.uid, roomId: g.uid});
-});
-
-listenToUnread(roomsToListen);
-});
-});
-
-const unsubGroups = onSnapshot(collection(db, `artifacts/${appId}/chat_groups`), snap => {
-chatGroups = snap.docs.map(d => d.data()).filter(g => g.members && g.members.includes(auth.currentUser.uid));
-renderChatUsers();
+attachUnreadListeners(userId);
 });
 
 const unsubYears = onSnapshot(collection(db, `artifacts/${appId}/users/${userId}/years`), snap => {
 window.allYearsVacationData = {};
 snap.docs.forEach(doc => { window.allYearsVacationData[doc.id] = doc.data(); });
 if (window.allYearsVacationData[selectedYear]) {
-vacationYearData = {
-allowance: window.allYearsVacationData[selectedYear].allowance ?? 28,
-selected: window.allYearsVacationData[selectedYear].selected || [],
-medical: window.allYearsVacationData[selectedYear].medical || [],
-movableDates: window.allYearsVacationData[selectedYear].movableDates || {},
-manualCarryover: window.allYearsVacationData[selectedYear].manualCarryover !== undefined ? window.allYearsVacationData[selectedYear].manualCarryover : null
-};
+vacationYearData = { allowance: window.allYearsVacationData[selectedYear].allowance ?? 28, selected: window.allYearsVacationData[selectedYear].selected || [], medical: window.allYearsVacationData[selectedYear].medical || [], movableDates: window.allYearsVacationData[selectedYear].movableDates || {}, manualCarryover: window.allYearsVacationData[selectedYear].manualCarryover !== undefined ? window.allYearsVacationData[selectedYear].manualCarryover : null };
 updateVacationUI();
 }
 renderReportList();
@@ -1777,10 +1319,8 @@ sessionData = filterAndClean(snap).sort((a,b) => new Date(b.date) - new Date(a.d
 const todayStr = getToday();
 sessionData.forEach(s => {
 if (s.currentCheckIn && s.date !== todayStr) {
-const endOfDay = getEndOfDay(s.date);
-const sessionMins = Math.max(0, Math.floor((endOfDay - s.currentCheckIn) / 60000));
-const newTotal = (s.totalMinutes || 0) + sessionMins;
-let history = s.history || [];
+const endOfDay = getEndOfDay(s.date); const sessionMins = Math.max(0, Math.floor((endOfDay - s.currentCheckIn) / 60000));
+const newTotal = (s.totalMinutes || 0) + sessionMins; let history = s.history || [];
 if (history.length > 0 && history[history.length - 1].out === null) { history[history.length - 1].out = endOfDay; }
 const sId = getSecureId(s.date + "_session");
 setDoc(doc(db, getBaseCollectionPath('work_sessions'), sId), { ...s, totalMinutes: newTotal, currentCheckIn: null, history }).catch(e => console.error(e));
@@ -1790,21 +1330,74 @@ if(!document.getElementById('view-sessions').classList.contains('hidden')) { ren
 const todaySession = sessionData.find(s => s.date === todayStr);
 if (todaySession && todaySession.history) {
 const historyHtml = todaySession.history.map(h => {
-const inTime = new Date(h.in).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
-const outTime = h.out ? new Date(h.out).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}) : '<span class="animate-pulse text-emerald-400">Aktiv</span>';
+const inTime = new Date(h.in).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}); const outTime = h.out ? new Date(h.out).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}) : '<span class="animate-pulse text-emerald-400">Aktiv</span>';
 return `<div class="flex justify-between border-b border-white/10 py-1.5 last:border-0"><span class="text-blue-100">In: ${inTime}</span><span class="text-cyan-200 font-bold">Out: ${outTime}</span></div>`;
 }).join('');
-const container = document.getElementById('session-history-container');
-if(container) container.innerHTML = historyHtml;
+const container = document.getElementById('session-history-container'); if(container) container.innerHTML = historyHtml;
 }
 });
-unsubscribes.push(unsubConfig, unsubLogs, unsubOps, unsubTrash, unsubPublicUsers, unsubGroups, unsubYears, unsubSessions);
+unsubscribes.push(unsubConfig, unsubLogs, unsubOps, unsubTrash, unsubGroups, unsubPublicUsers, unsubYears, unsubSessions);
 }
 
+function attachUnreadListeners(userId) {
+unreadListenerUnsubscribes.forEach(u => u()); unreadListenerUnsubscribes = []; window.totalUnread = 0;
+
+const allChatEntities = [...(window.chatGroups || []), ...chatUsers, {uid: 'global_group_all', isGroup: true}];
+allChatEntities.forEach(u => {
+const roomId = getChatRoomId(userId, u.uid);
+const unsubUnread = onSnapshot(query(collection(db, `artifacts/${appId}/global_chats/${roomId}/messages`)), msgSnap => {
+let unread = 0;
+msgSnap.docs.forEach(d => { 
+const mData = d.data();
+if(mData.senderId !== userId && mData.status !== 'read' && !(mData.deletedFor && mData.deletedFor.includes(userId))) unread++; 
+});
+
+const userObjInGroup = window.chatGroups?.find(g => g.uid === u.uid);
+const userObjInUsers = chatUsers.find(cu => cu.uid === u.uid);
+if(userObjInGroup) userObjInGroup.unreadCount = unread;
+if(userObjInUsers) userObjInUsers.unreadCount = unread;
+if(u.uid === 'global_group_all') { const globalGroup = window.chatGroups?.find(g => g.uid === 'global_group_all'); if(globalGroup) globalGroup.unreadCount = unread; }
+
+if (unread > 0 && document.getElementById('view-chat').classList.contains('hidden')) { window.totalUnread += unread; }
+const badge = document.getElementById('chat-badge');
+badge.innerText = window.totalUnread;
+badge.classList.toggle('hidden', window.totalUnread === 0);
+renderChatUsers();
+});
+unreadListenerUnsubscribes.push(unsubUnread);
+});
+}
+
+onAuthStateChanged(auth, async (user) => {
+if (user) {
+document.getElementById('app-content').classList.remove('hidden'); document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('sync-status').innerText = user.email; document.getElementById('sidebar-name').innerText = "Duke u ngarkuar...";
+const savedTab = localStorage.getItem('savedTab') || 'log'; switchTab(savedTab);
+await refreshProfile(user); document.getElementById('loading').classList.add('hidden'); startListening(user.uid); handleCheckIn(user);
+if(onlinePresenceInterval) clearInterval(onlinePresenceInterval);
+onlinePresenceInterval = setInterval(() => { setDoc(doc(db, `artifacts/${appId}/public_users`, user.uid), { lastActive: Date.now() }, { merge: true }); }, 60000);
+} else {
+document.getElementById('app-content').classList.add('hidden'); document.getElementById('auth-overlay').classList.remove('hidden'); showAuthSection('login'); unsubscribes.forEach(unsub => unsub()); unsubscribes = []; document.getElementById('greeting-banner').classList.add('hidden'); document.getElementById('loading').classList.add('hidden');
+if(sessionInterval) clearInterval(sessionInterval); if(onlinePresenceInterval) clearInterval(onlinePresenceInterval); if(chatUnsubscribe) chatUnsubscribe(); if(window.typingUnsubscribe) window.typingUnsubscribe();
+}
+});
+
+window.logout = async () => {
+document.getElementById('loading').classList.remove('hidden'); if(sessionInterval) clearInterval(sessionInterval); if(onlinePresenceInterval) clearInterval(onlinePresenceInterval);
+const user = auth.currentUser;
+if (user) {
+try {
+const today = getToday(); const sessionRef = doc(db, getBaseCollectionPath('work_sessions'), getSecureId(today + "_session")); const sessionSnap = await getDoc(sessionRef);
+if (sessionSnap.exists()) {
+const data = sessionSnap.data();
+if (data.currentCheckIn) { const endOfDay = getEndOfDay(today); const endTime = Math.min(Date.now(), endOfDay); const sessionMins = Math.max(0, Math.floor((endTime - data.currentCheckIn) / 60000)); const newTotal = (data.totalMinutes || 0) + sessionMins; let history = data.history || []; if (history.length > 0 && history[history.length - 1].out === null) { history[history.length - 1].out = endTime; } await setDoc(sessionRef, { ...data, totalMinutes: newTotal, currentCheckIn: null, history }); }
+}
+} catch(e) {}
+}
+signOut(auth);
+};
+
 window.generateProcessFields = (valuesMap = null) => { const actId = document.getElementById('log-act-select').value; const container = document.getElementById('dynamic-fields-container'); container.innerHTML = ""; if(!actId) return; const act = configData.find(c => c.id === actId); if(!act) return; act.processes.forEach(p => { const val = valuesMap ? (valuesMap[p.label] || "") : ""; let inputHtml = p.type === 'text' ? `<textarea data-label="${p.label}" class="process-input process-textarea w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all">${val}</textarea>` : `<input type="${p.type === 'ora' ? 'time' : p.type === 'data' ? 'date' : 'text'}" data-label="${p.label}" value="${val}" ${p.type === 'numër' ? 'onkeydown="handleMathEnter(event)"' : ''} class="process-input w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all">`; container.innerHTML += `<div class="space-y-1"><label class="text-[10px] font-extrabold text-slate-500 uppercase ml-1">${p.label}</label>${inputHtml}</div>`; }); setTimeout(() => document.querySelectorAll('.process-textarea').forEach(ta => autoExpand(ta)), 50); };
-
 document.getElementById('save-log-btn').onclick = async () => { const actId = document.getElementById('log-act-select').value; if(!actId) return showAlert("Zgjidhni aktivitetin."); const rawId = document.getElementById('log-edit-id').value || Date.now().toString(); try { await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(rawId)), { actId, actName: configData.find(c => c.id === actId).name, date: document.getElementById('log-date').value, operator: document.getElementById('log-operator-select').value, hours: parseFloat(document.getElementById('log-hours').value), startTime: document.getElementById('log-start-time').value, endTime: document.getElementById('log-end-time').value, processes: Array.from(document.querySelectorAll('.process-input')).map(i => ({ label: i.dataset.label, value: i.value })), attachments: window.currentLogAttachments || [], timestamp: Date.now() }); cancelLogEdit(); } catch (e) { showAlert("Gabim: " + e.message); } };
-
 window.cancelLogEdit = () => { document.getElementById('log-edit-id').value = ""; document.getElementById('log-hours').value = ""; document.getElementById('log-start-time').value = ""; document.getElementById('log-end-time').value = ""; document.getElementById('log-act-select').value = ""; document.getElementById('dynamic-fields-container').innerHTML = ""; document.getElementById('cancel-log-edit').classList.add('hidden'); document.getElementById('save-log-btn').innerText = "Ruaj në Cloud"; clearLogAttachments(); setTodayDate(); };
 window.editLogEntry = (id) => { const log = logData.find(l => l.id === id); if(!log) return; switchTab('log'); document.getElementById('log-edit-id').value = id; document.getElementById('log-date').value = log.date; document.getElementById('log-operator-select').value = log.operator; document.getElementById('log-act-select').value = log.actId; document.getElementById('log-hours').value = log.hours; document.getElementById('log-start-time').value = log.startTime || ""; document.getElementById('log-end-time').value = log.endTime || ""; const vals = {}; log.processes.forEach(p => vals[p.label] = p.value); generateProcessFields(vals); window.currentLogAttachments = log.attachments ? [...log.attachments] : []; if(log.attachedPhoto && !window.currentLogAttachments.find(a => a.type === 'photo')) window.currentLogAttachments.push({ type: 'photo', data: log.attachedPhoto, name: 'Foto e vjetër.jpg' }); if(log.attachedPdf && !window.currentLogAttachments.find(a => a.type === 'pdf')) window.currentLogAttachments.push({ type: 'pdf', data: log.attachedPdf, name: 'Dokument i vjetër.pdf' }); renderLogAttachmentsPreview(); document.getElementById('cancel-log-edit').classList.remove('hidden'); document.getElementById('save-log-btn').innerText = "Zëvendëso"; };
 window.duplicateLogEntry = (id) => { const log = logData.find(l => l.id === id); if(!log) return; switchTab('log'); document.getElementById('log-edit-id').value = ""; document.getElementById('log-date').value = log.date; document.getElementById('log-operator-select').value = log.operator; document.getElementById('log-act-select').value = log.actId; document.getElementById('log-hours').value = log.hours; document.getElementById('log-start-time').value = log.startTime || ""; document.getElementById('log-end-time').value = log.endTime || ""; const vals = {}; log.processes.forEach(p => vals[p.label] = p.value); generateProcessFields(vals); window.currentLogAttachments = log.attachments ? [...log.attachments] : []; if(log.attachedPhoto && !window.currentLogAttachments.find(a => a.type === 'photo')) window.currentLogAttachments.push({ type: 'photo', data: log.attachedPhoto, name: 'Foto e vjetër.jpg' }); if(log.attachedPdf && !window.currentLogAttachments.find(a => a.type === 'pdf')) window.currentLogAttachments.push({ type: 'pdf', data: log.attachedPdf, name: 'Dokument i vjetër.pdf' }); renderLogAttachmentsPreview(); document.getElementById('cancel-log-edit').classList.remove('hidden'); document.getElementById('save-log-btn').innerText = "Ruaj në Cloud"; };
@@ -1818,104 +1411,39 @@ window.syncCheckboxes = (el) => { document.querySelectorAll('.print-col-cbx').fo
 
 window.updateProcessFilterUI = () => {
 const actId = document.getElementById('rep-act-select').value;
-const filterContainer = document.getElementById('rep-dynamic-filters');
-filterContainer.innerHTML = "";
-const printPanel = document.getElementById('print-columns-container');
-const printList = document.getElementById('print-columns-list');
-let act = null;
-if(actId) {
-act = configData.find(c => c.id === actId);
-if(act) { act.processes.forEach(p => { const vals = [...new Set(logData.filter(l => l.actId === actId).flatMap(l => l.processes).filter(proc => proc.label === p.label).map(proc => proc.value).filter(v => v))].sort(); filterContainer.innerHTML += `<div class="flex flex-col"><label class="text-[8px] font-bold text-slate-400 uppercase ml-1">${p.label}</label><select data-filter-label="${p.label}" class="rep-proc-filter p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-[10px] font-bold appearance-none cursor-pointer"><option value="">Të gjitha</option>${vals.map(v => `<option value="${v}">${v}</option>`).join("")}</select></div>`; }); }
-}
-if(printPanel) {
-printPanel.classList.remove('hidden');
-let colsHtml = `
-<div class="w-full mb-3">
-<h4 class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-2 pb-1 border-b border-blue-100/50">Të Përgjithshme</h4>
-<div class="flex flex-wrap gap-2">
-<label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"><input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="Data" checked> Data</label>
-<label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"><input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="Eksperti" checked> Eksperti</label>
-<label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"><input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="Orë" checked> Orë</label>
-</div></div>`;
-
-if (act) {
-if(act.processes && act.processes.length > 0) {
-colsHtml += `<div class="w-full mb-3"><h4 class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest mb-2 pb-1 border-b border-blue-100/50">${act.name}</h4><div class="flex flex-wrap gap-2">`;
-let printedThisAct = new Set();
-act.processes.forEach(p => {
-if(!printedThisAct.has(p.label)) { printedThisAct.add(p.label); colsHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"><input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="${p.label}" checked> ${p.label}</label>`; }
-});
-colsHtml += `</div></div>`;
-}
-} else {
-configData.forEach(c => {
-if(c.processes && c.processes.length > 0) {
-colsHtml += `<div class="w-full mb-3"><h4 class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest mb-2 pb-1 border-b border-blue-100/50">${c.name}</h4><div class="flex flex-wrap gap-2">`;
-let printedThisAct = new Set();
-c.processes.forEach(p => {
-if(!printedThisAct.has(p.label)) { printedThisAct.add(p.label); colsHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"><input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="${p.label}" checked> ${p.label}</label>`; }
-});
-colsHtml += `</div></div>`;
-}
-});
-}
-printList.innerHTML = colsHtml;
-}
+const filterContainer = document.getElementById('rep-dynamic-filters'); filterContainer.innerHTML = ""; const printPanel = document.getElementById('print-columns-container'); const printList = document.getElementById('print-columns-list'); let act = null;
+if(actId) { act = configData.find(c => c.id === actId); if(act) { act.processes.forEach(p => { const vals = [...new Set(logData.filter(l => l.actId === actId).flatMap(l => l.processes).filter(proc => proc.label === p.label).map(proc => proc.value).filter(v => v))].sort(); filterContainer.innerHTML += `<div class="flex flex-col"><label class="text-[8px] font-bold text-slate-400 uppercase ml-1">${p.label}</label><select data-filter-label="${p.label}" class="rep-proc-filter p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-[10px] font-bold appearance-none cursor-pointer"><option value="">Të gjitha</option>${vals.map(v => `<option value="${v}">${v}</option>`).join("")}</select></div>`; }); } }
+if(printPanel) { printPanel.classList.remove('hidden'); let colsHtml = `<div class="w-full mb-3"><h4 class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-2 pb-1 border-b border-blue-100/50">Të Përgjithshme</h4><div class="flex flex-wrap gap-2"><label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"><input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="Data" checked> Data</label><label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"><input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="Eksperti" checked> Eksperti</label><label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"><input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="Orë" checked> Orë</label></div></div>`;
+if (act) { if(act.processes && act.processes.length > 0) { colsHtml += `<div class="w-full mb-3"><h4 class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest mb-2 pb-1 border-b border-blue-100/50">${act.name}</h4><div class="flex flex-wrap gap-2">`; let printedThisAct = new Set(); act.processes.forEach(p => { if(!printedThisAct.has(p.label)) { printedThisAct.add(p.label); colsHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"><input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="${p.label}" checked> ${p.label}</label>`; } }); colsHtml += `</div></div>`; } } else { configData.forEach(c => { if(c.processes && c.processes.length > 0) { colsHtml += `<div class="w-full mb-3"><h4 class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest mb-2 pb-1 border-b border-blue-100/50">${c.name}</h4><div class="flex flex-wrap gap-2">`; let printedThisAct = new Set(); c.processes.forEach(p => { if(!printedThisAct.has(p.label)) { printedThisAct.add(p.label); colsHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"><input type="checkbox" onchange="syncCheckboxes(this)" class="print-col-cbx accent-blue-600" value="${p.label}" checked> ${p.label}</label>`; } }); colsHtml += `</div></div>`; } }); } printList.innerHTML = colsHtml; }
 };
 
 window.getFilteredLogs = () => {
-const start = document.getElementById('rep-start').value;
-const end = document.getElementById('rep-end').value;
-const op = document.getElementById('rep-op-select').value;
-const act = document.getElementById('rep-act-select').value;
-let f = [...logData];
+const start = document.getElementById('rep-start').value; const end = document.getElementById('rep-end').value; const op = document.getElementById('rep-op-select').value; const act = document.getElementById('rep-act-select').value; let f = [...logData];
 if (start && end) { f = f.filter(l => l.date >= start && l.date <= end); } else if (start) { f = f.filter(l => l.date === start); } else if (end) { f = f.filter(l => l.date === end); }
-if (op && op !== "") f = f.filter(l => l.operator === op);
-if (act && act !== "") f = f.filter(l => l.actId === act);
-document.querySelectorAll('.rep-proc-filter').forEach(flt => {
-if(flt.value && flt.value !== "") f = f.filter(l => l.processes.find(p => p.label === flt.dataset.filterLabel && p.value === flt.value));
-});
+if (op && op !== "") f = f.filter(l => l.operator === op); if (act && act !== "") f = f.filter(l => l.actId === act);
+document.querySelectorAll('.rep-proc-filter').forEach(flt => { if(flt.value && flt.value !== "") f = f.filter(l => l.processes.find(p => p.label === flt.dataset.filterLabel && p.value === flt.value)); });
 return f.sort((a, b) => new Date(b.date) - new Date(a.date) || (b.timestamp || 0) - (a.timestamp || 0));
 };
 
+window.validateReportDates = () => { const start = document.getElementById('rep-start').value; const end = document.getElementById('rep-end').value; if (start && end && new Date(end) < new Date(start)) { showAlert("Data pasardhëse nuk mund të jetë më e vogël se data paraardhëse."); document.getElementById('rep-end').value = start; updateProcessFilterUI(); } };
 window.editLogDateInline = async (logId) => { const log = logData.find(l => l.id === logId); if(!log) return; const newVal = prompt('Ndrysho datën (YYYY-MM-DD):', log.date || ''); if(newVal !== null && newVal !== log.date) { log.date = newVal; try { await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(logId)), log); } catch(e) {} } };
 window.editLogTimeInline = async (logId) => { const log = logData.find(l => l.id === logId); if(!log) return; const newStart = prompt('Ndrysho orën e fillimit (HH:MM):', log.startTime || ''); if(newStart === null) return; const newEnd = prompt('Ndrysho orën e mbarimit (HH:MM):', log.endTime || ''); if(newEnd === null) return; let newHours = log.hours; if (newStart && newEnd) { const startTime = new Date(`1970-01-01T${newStart}:00`); const endTime = new Date(`1970-01-01T${newEnd}:00`); let diff = (endTime - startTime) / (1000 * 60 * 60); if (diff < 0) diff += 24; newHours = parseFloat(diff.toFixed(1)); } log.startTime = newStart; log.endTime = newEnd; log.hours = newHours; try { await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(logId)), log); } catch(e) {} };
 window.editProcessInline = async (logId, label) => { const log = logData.find(l => l.id === logId); if(!log) return; const procIndex = log.processes.findIndex(p => p.label === label); if(procIndex === -1) return; const oldVal = log.processes[procIndex].value; const newVal = prompt(`Ndrysho "${label}":`, oldVal); if(newVal !== null && newVal !== oldVal) { log.processes[procIndex].value = newVal; try { await setDoc(doc(db, getBaseCollectionPath('logs'), getSecureId(logId)), log); } catch(e) {} } };
 
 window.generateLogItemHtml = (log) => {
-let attachmentsHtml = ""; let allAttachments = [];
-if(log.attachments && log.attachments.length > 0) { allAttachments = [...log.attachments]; } else { if (log.attachedPhoto) allAttachments.push({ type: 'photo', data: log.attachedPhoto, name: 'Foto' }); if (log.attachedPdf) allAttachments.push({ type: 'pdf', data: log.attachedPdf, name: 'PDF' }); }
-
-if (allAttachments.length > 0) {
-attachmentsHtml = `<div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-100">`;
-allAttachments.forEach((att, index) => {
-const isPhoto = att.type === 'photo' || att.data.startsWith('data:image');
-const iconStr = isPhoto ? '📷' : '📄'; const bgClass = isPhoto ? 'bg-blue-50 border-blue-100' : 'bg-indigo-50 border-indigo-100'; const textClass = isPhoto ? 'text-blue-600 hover:text-blue-800' : 'text-indigo-600 hover:text-indigo-800'; const dividerClass = isPhoto ? 'bg-blue-200' : 'bg-indigo-200'; const dlBtnClass = isPhoto ? 'text-blue-500 hover:text-blue-700' : 'text-indigo-500 hover:text-indigo-700';
-attachmentsHtml += `<div class="flex items-center gap-1 ${bgClass} border rounded-lg p-1.5 shadow-sm max-w-full"><button onclick="viewAttachment('${log.id}', ${index})" class="flex items-center gap-1 text-[9px] font-bold ${textClass} uppercase px-2 transition-colors truncate max-w-[150px]">${iconStr} Shiko: ${att.name || 'Dokument'}</button><div class="w-px h-3 ${dividerClass}"></div><button onclick="downloadAttachment('${log.id}', ${index})" class="${dlBtnClass} px-1" title="Shkarko"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg></button><div class="w-px h-3 ${dividerClass}"></div><button onclick="removeLogAttachment('${log.id}', ${index})" class="text-red-400 hover:text-red-600 px-1" title="Hiq"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 6L6 18M6 6l12 12"></path></svg></button></div>`;
-});
-attachmentsHtml += `</div>`;
-}
-
+let attachmentsHtml = ""; let allAttachments = []; if(log.attachments && log.attachments.length > 0) { allAttachments = [...log.attachments]; } else { if (log.attachedPhoto) allAttachments.push({ type: 'photo', data: log.attachedPhoto, name: 'Foto' }); if (log.attachedPdf) allAttachments.push({ type: 'pdf', data: log.attachedPdf, name: 'PDF' }); }
+if (allAttachments.length > 0) { attachmentsHtml = `<div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-100">`; allAttachments.forEach((att, index) => { const isPhoto = att.type === 'photo' || att.data.startsWith('data:image'); const iconStr = isPhoto ? '📷' : '📄'; const bgClass = isPhoto ? 'bg-blue-50 border-blue-100' : 'bg-indigo-50 border-indigo-100'; const textClass = isPhoto ? 'text-blue-600 hover:text-blue-800' : 'text-indigo-600 hover:text-indigo-800'; const dividerClass = isPhoto ? 'bg-blue-200' : 'bg-indigo-200'; const dlBtnClass = isPhoto ? 'text-blue-500 hover:text-blue-700' : 'text-indigo-500 hover:text-indigo-700'; attachmentsHtml += `<div class="flex items-center gap-1 ${bgClass} border rounded-lg p-1.5 shadow-sm max-w-full"><button onclick="viewAttachment('${log.id}', ${index})" class="flex items-center gap-1 text-[9px] font-bold ${textClass} uppercase px-2 transition-colors truncate max-w-[150px]">${iconStr} Shiko: ${att.name || 'Dokument'}</button><div class="w-px h-3 ${dividerClass}"></div><button onclick="downloadAttachment('${log.id}', ${index})" class="${dlBtnClass} px-1" title="Shkarko"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg></button><div class="w-px h-3 ${dividerClass}"></div><button onclick="removeLogAttachment('${log.id}', ${index})" class="text-red-400 hover:text-red-600 px-1" title="Hiq"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 6L6 18M6 6l12 12"></path></svg></button></div>`; }); attachmentsHtml += `</div>`; }
 return ` <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"><div class="flex justify-between items-start"><div><span class="text-[9px] font-black bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg uppercase tracking-wider">${log.actName}</span><h4 class="font-bold text-slate-800 text-sm mt-2">${log.operator}</h4><div class="mt-2 text-[10px] font-bold text-slate-500 flex flex-wrap gap-2"><span class="bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-md cursor-pointer hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all shadow-sm" onclick="editLogDateInline('${log.id}')">📅 ${log.date}</span><span class="bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-md cursor-pointer hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all shadow-sm" onclick="editLogTimeInline('${log.id}')">⏰ ${log.startTime || '--:--'} - ${log.endTime || '--:--'} (${log.hours} orë)</span></div></div><div class="flex gap-2 opacity-80 group-hover:opacity-100 transition-opacity"><button onclick="duplicateLogEntry('${log.id}')" class="text-emerald-600 text-[10px] font-bold uppercase bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors">Kopjo</button><button onclick="editLogEntry('${log.id}')" class="text-blue-600 text-[10px] font-bold uppercase bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">Edito</button><button onclick="deleteItem('logs', '${log.id}')" class="text-red-500 text-[10px] font-bold uppercase bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors">Fshi</button></div></div><div class="grid grid-cols-1 gap-2 border-t border-slate-100 pt-4 mt-4">${log.processes.map(p => `<div class="text-[11px] p-2.5 -m-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-200 transition-all" onclick="editProcessInline('${log.id}', '${p.label.replace(/'/g, "\\'")}')"><b class="text-slate-400 uppercase text-[9px] tracking-wider">${p.label}:</b><br><span class="text-slate-700 font-semibold">${p.value}</span></div>`).join("")}</div>${attachmentsHtml}</div>`;
 };
 
 window.renderReportList = () => {
-const logs = getFilteredLogs();
-let html = "";
-const start = document.getElementById('rep-start').value;
-const end = document.getElementById('rep-end').value;
-
+const logs = getFilteredLogs(); let html = ""; const start = document.getElementById('rep-start').value; const end = document.getElementById('rep-end').value;
 if (start && end) {
-let currDate = new Date(start); const endDate = new Date(end); let dateRange = [];
-while (currDate <= endDate) { dateRange.push(currDate.toISOString().split('T')[0]); currDate.setDate(currDate.getDate() + 1); }
-dateRange.sort((a, b) => new Date(b) - new Date(a));
+let currDate = new Date(start); const endDate = new Date(end); let dateRange = []; while (currDate <= endDate) { dateRange.push(currDate.toISOString().split('T')[0]); currDate.setDate(currDate.getDate() + 1); } dateRange.sort((a, b) => new Date(b) - new Date(a));
 dateRange.forEach(dateStr => {
-const logsForDate = logs.filter(l => l.date === dateStr);
-html += `<div class="text-center my-6 font-black text-slate-400 uppercase tracking-widest text-sm py-2 flex items-center gap-4"><div class="flex-1 h-px bg-slate-200"></div><span>${dateStr}</span><div class="flex-1 h-px bg-slate-200"></div></div>`;
+const logsForDate = logs.filter(l => l.date === dateStr); html += `<div class="text-center my-6 font-black text-slate-400 uppercase tracking-widest text-sm py-2 flex items-center gap-4"><div class="flex-1 h-px bg-slate-200"></div><span>${dateStr}</span><div class="flex-1 h-px bg-slate-200"></div></div>`;
 if (logsForDate.length === 0) {
-const dateYear = new Date(dateStr).getFullYear(); const yearVacation = window.allYearsVacationData?.[dateYear];
-const isVacation = yearVacation?.selected?.includes(dateStr); const isMedical = yearVacation?.medical?.includes(dateStr);
-const hols = getHolidaysForYear(dateYear); const isHoliday = hols[dateStr];
+const dateYear = new Date(dateStr).getFullYear(); const yearVacation = window.allYearsVacationData?.[dateYear]; const isVacation = yearVacation?.selected?.includes(dateStr); const isMedical = yearVacation?.medical?.includes(dateStr); const hols = getHolidaysForYear(dateYear); const isHoliday = hols[dateStr];
 if (isVacation) { html += `<div class="bg-blue-50/70 p-6 rounded-[2rem] border border-blue-100/50 shadow-sm text-center"><p class="text-blue-600 font-bold text-sm">🌴 Në këtë datë ju keni patur ditë pushimi (Leje vjetore)</p></div>`; } 
 else if (isMedical) { html += `<div class="bg-orange-50/70 p-6 rounded-[2rem] border border-orange-100/50 shadow-sm text-center"><p class="text-orange-600 font-bold text-sm">🏥 Në këtë datë ju keni qenë me raport mjekësor</p></div>`; } 
 else if (isHoliday) { html += `<div class="bg-red-50/70 p-6 rounded-[2rem] border border-red-100/50 shadow-sm text-center"><p class="text-red-500 font-bold text-sm">🎉 Ditë feste zyrtare: ${isHoliday}</p></div>`; } 
@@ -1923,15 +1451,10 @@ else { html += `<div class="bg-white p-6 rounded-[2rem] border border-slate-100 
 } else { logsForDate.forEach(log => { html += generateLogItemHtml(log); }); }
 });
 } else {
-let lastDate = "";
-logs.forEach(log => {
-if (log.date !== lastDate) { html += `<div class="text-center my-6 font-black text-slate-400 uppercase tracking-widest text-sm py-2 flex items-center gap-4"><div class="flex-1 h-px bg-slate-200"></div><span>${log.date}</span><div class="flex-1 h-px bg-slate-200"></div></div>`; lastDate = log.date; }
-html += generateLogItemHtml(log);
-});
+let lastDate = ""; logs.forEach(log => { if (log.date !== lastDate) { html += `<div class="text-center my-6 font-black text-slate-400 uppercase tracking-widest text-sm py-2 flex items-center gap-4"><div class="flex-1 h-px bg-slate-200"></div><span>${log.date}</span><div class="flex-1 h-px bg-slate-200"></div></div>`; lastDate = log.date; } html += generateLogItemHtml(log); });
 if(logs.length === 0 && (start || end)) {
 const d = start || end; html += `<div class="text-center my-6 font-black text-slate-400 uppercase tracking-widest text-sm py-2 flex items-center gap-4"><div class="flex-1 h-px bg-slate-200"></div><span>${d}</span><div class="flex-1 h-px bg-slate-200"></div></div>`;
-const dateYear = new Date(d).getFullYear(); const yearVacation = window.allYearsVacationData?.[dateYear];
-const isVacation = yearVacation?.selected?.includes(d); const isMedical = yearVacation?.medical?.includes(d); const hols = getHolidaysForYear(dateYear); const isHoliday = hols[d];
+const dateYear = new Date(d).getFullYear(); const yearVacation = window.allYearsVacationData?.[dateYear]; const isVacation = yearVacation?.selected?.includes(d); const isMedical = yearVacation?.medical?.includes(d); const hols = getHolidaysForYear(dateYear); const isHoliday = hols[d];
 if (isVacation) { html += `<div class="bg-blue-50/70 p-6 rounded-[2rem] border border-blue-100/50 shadow-sm text-center"><p class="text-blue-600 font-bold text-sm">🌴 Në këtë datë ju keni patur ditë pushimi (Leje vjetore)</p></div>`; } 
 else if (isMedical) { html += `<div class="bg-orange-50/70 p-6 rounded-[2rem] border border-orange-100/50 shadow-sm text-center"><p class="text-orange-600 font-bold text-sm">🏥 Në këtë datë ju keni qenë me raport mjekësor</p></div>`; } 
 else if (isHoliday) { html += `<div class="bg-red-50/70 p-6 rounded-[2rem] border border-red-100/50 shadow-sm text-center"><p class="text-red-500 font-bold text-sm">🎉 Ditë feste zyrtare: ${isHoliday}</p></div>`; } 
@@ -1946,28 +1469,42 @@ if(sessionData.length === 0) { document.getElementById('sessions-results').inner
 let html = "";
 sessionData.forEach(s => {
 let currentMins = s.totalMinutes || 0; let isActive = false; let activeText = `<span class="bg-slate-100 text-slate-500 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider">Mbyllur</span>`;
-if(s.currentCheckIn) {
-const endOfDay = getEndOfDay(s.date); const endTime = Math.min(Date.now(), endOfDay); currentMins += Math.max(0, Math.floor((endTime - s.currentCheckIn) / 60000));
-if (Date.now() <= endOfDay) { isActive = true; activeText = `<span class="bg-emerald-100 text-emerald-600 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider animate-pulse">Aktiv Tani</span>`; }
-}
-const h = Math.floor(currentMins / 60); const m = currentMins % 60;
-let historyHtml = "";
-if (s.history && s.history.length > 0) {
-historyHtml = '<div class="mt-4 border-t border-slate-100 pt-3 space-y-2"><p class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mb-1">Hyrje - Daljet</p>';
-s.history.forEach(hist => {
-const inTime = new Date(hist.in).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}); const outTime = hist.out ? new Date(hist.out).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}) : (isActive ? '<span class="text-emerald-500 animate-pulse">Aktiv</span>' : '23:59');
-historyHtml += `<div class="flex justify-between items-center text-[11px] font-bold bg-slate-50 px-3 py-2 rounded-lg border border-slate-100"><span class="text-blue-600">Hyrje: ${inTime}</span><span class="text-slate-600">Dalje: ${outTime}</span></div>`;
-});
-historyHtml += '</div>';
-}
+if(s.currentCheckIn) { const endOfDay = getEndOfDay(s.date); const endTime = Math.min(Date.now(), endOfDay); currentMins += Math.max(0, Math.floor((endTime - s.currentCheckIn) / 60000)); if (Date.now() <= endOfDay) { isActive = true; activeText = `<span class="bg-emerald-100 text-emerald-600 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider animate-pulse">Aktiv Tani</span>`; } }
+const h = Math.floor(currentMins / 60); const m = currentMins % 60; let historyHtml = "";
+if (s.history && s.history.length > 0) { historyHtml = '<div class="mt-4 border-t border-slate-100 pt-3 space-y-2"><p class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mb-1">Hyrje - Daljet</p>'; s.history.forEach(hist => { const inTime = new Date(hist.in).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}); const outTime = hist.out ? new Date(hist.out).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}) : (isActive ? '<span class="text-emerald-500 animate-pulse">Aktiv</span>' : '23:59'); historyHtml += `<div class="flex justify-between items-center text-[11px] font-bold bg-slate-50 px-3 py-2 rounded-lg border border-slate-100"><span class="text-blue-600">Hyrje: ${inTime}</span><span class="text-slate-600">Dalje: ${outTime}</span></div>`; }); historyHtml += '</div>'; }
 html += `<div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-md shadow-slate-200/30 hover:shadow-lg transition-all flex flex-col"><div class="flex justify-between items-center"><div><p class="text-[11px] font-black uppercase text-blue-500 tracking-wider">${s.date}</p><h4 class="font-bold text-slate-800 text-xl mt-1">${h}h ${m}m</h4><p class="text-[10px] text-slate-400 mt-1 font-medium">${s.userEmail}</p></div><div>${activeText}</div></div>${historyHtml}</div>`;
-});
-document.getElementById('sessions-results').innerHTML = html;
+}); document.getElementById('sessions-results').innerHTML = html;
 };
 
-window.exportSessionsExcel = () => {
-let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns
-</script>
-</body>
-</html>
+window.exportSessionsExcel = () => { let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body><h3 style="font-family: sans-serif; color: #1e293b; margin-top: 20px;">Evidenca e Orarit të Punës</h3><table border="1" style="border-collapse:collapse; font-family: sans-serif; font-size: 12px; margin-bottom: 20px;"><tr style="background-color: #3b82f6; color: white; font-weight: bold; height: 35px;"><th style="padding: 8px;">Data</th><th style="padding: 8px;">Përdoruesi</th><th style="padding: 8px;">Totali Orëve</th><th style="padding: 8px;">Statusi</th><th style="padding: 8px;">Itinerari (In - Out)</th></tr>`; sessionData.forEach(s => { let currentMins = s.totalMinutes || 0; let status = "Mbyllur"; if(s.currentCheckIn) { const endOfDay = getEndOfDay(s.date); const endTime = Math.min(Date.now(), endOfDay); currentMins += Math.max(0, Math.floor((endTime - s.currentCheckIn) / 60000)); if (Date.now() <= endOfDay) { status = "Aktiv"; } } const h = Math.floor(currentMins / 60); const m = currentMins % 60; let historyStr = ""; if (s.history && s.history.length > 0) { historyStr = s.history.map(hist => { const inTime = new Date(hist.in).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}); const outTime = hist.out ? new Date(hist.out).toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'}) : (status === 'Aktiv' ? 'Aktiv' : '23:59'); return `[${inTime} - ${outTime}]`; }).join(' | '); } else { historyStr = "-"; } html += `<tr style="height: 30px;"><td style="padding: 8px; text-align: center; font-weight: bold;">${s.date}</td><td style="padding: 8px;">${s.userEmail}</td><td style="padding: 8px; text-align: center; font-weight: bold;">${h}h ${m}m</td><td style="padding: 8px; text-align: center; color: ${status === 'Aktiv' ? 'green' : 'gray'};">${status}</td><td style="padding: 8px; font-size: 11px; color: #475569;">${historyStr}</td></tr>`; }); html += `</table></body></html>`; const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `Orari_LindiMaps_${new Date().getTime()}.xls`; a.click(); URL.revokeObjectURL(url); };
+window.exportToPDF = () => { const { jsPDF } = window.jspdf; const docPDF = new jsPDF('l', 'mm', 'a4'); const filtered = getFilteredLogs(); const actId = document.getElementById('rep-act-select').value; const activities = actId ? [configData.find(c => c.id === actId)] : configData; let activeCols = null; const printContainer = document.getElementById('print-columns-container'); if (printContainer && !printContainer.classList.contains('hidden')) { const cbx = document.querySelectorAll('.print-col-cbx:checked'); activeCols = Array.from(cbx).map(c => c.value); if(activeCols.length === 0) { showAlert("Ju lutem zgjidhni të paktën një fushë për printim."); return; } } let startY = 15; let hasAddedTable = false; activities.forEach(act => { if(!act) return; const actLogs = filtered.filter(l => l.actId === act.id); if(actLogs.length === 0) return; if (hasAddedTable) { docPDF.addPage(); startY = 15; } docPDF.setFontSize(14); docPDF.text(`Aktiviteti: ${act.name}`, 14, startY); let allHeaders = ['Data', 'Eksperti', 'Orë', ...act.processes.map(p => p.label)]; let finalHeaders = activeCols ? allHeaders.filter(h => activeCols.includes(h)) : allHeaders; const headers = [finalHeaders]; const body = actLogs.map(l => { const rowData = { 'Data': l.date, 'Eksperti': l.operator, 'Orë': l.hours }; act.processes.forEach(p => { rowData[p.label] = l.processes.find(pr => pr.label === p.label)?.value || '-'; }); return finalHeaders.map(h => rowData[h]); }); docPDF.autoTable({ startY: startY + 5, head: headers, body: body, theme: 'striped', styles: { fontSize: 8 }, headStyles: { fillColor: [59, 130, 246] } }); startY = docPDF.lastAutoTable.finalY + 15; hasAddedTable = true; }); if(!hasAddedTable) { showAlert("Nuk ka të dhëna për tu printuar."); return; } docPDF.save(`Raport_LindiMaps_${new Date().getTime()}.pdf`); };
+window.exportToExcel = () => { const filtered = getFilteredLogs(); const actId = document.getElementById('rep-act-select').value; const activities = actId ? [configData.find(c => c.id === actId)] : configData; let activeCols = null; const printContainer = document.getElementById('print-columns-container'); if (printContainer && !printContainer.classList.contains('hidden')) { const cbx = document.querySelectorAll('.print-col-cbx:checked'); activeCols = Array.from(cbx).map(c => c.value); if(activeCols.length === 0) { showAlert("Ju lutem zgjidhni të paktën një fushë për printim."); return; } } let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body>`; let hasData = false; activities.forEach(act => { if(!act) return; const actLogs = filtered.filter(l => l.actId === act.id); if(actLogs.length === 0) return; hasData = true; let allHeaders = ['Data', 'Eksperti', 'Orë', ...act.processes.map(p => p.label)]; let finalHeaders = activeCols ? allHeaders.filter(h => activeCols.includes(h)) : allHeaders; html += `<h3 style="font-family: sans-serif; color: #1e293b; margin-top: 20px;">Aktiviteti: ${act.name}</h3><table border="1" style="border-collapse:collapse; font-family: sans-serif; font-size: 11px; margin-bottom: 20px;"><tr style="background-color: #3b82f6; color: white; font-weight: bold; height: 30px;">`; finalHeaders.forEach(h => { html += `<th style="padding: 5px;">${h}</th>`; }); html += `</tr>`; actLogs.forEach(l => { const rowData = { 'Data': l.date || '', 'Eksperti': l.operator || '', 'Orë': l.hours || '0' }; act.processes.forEach(p => { rowData[p.label] = l.processes.find(pr => pr.label === p.label)?.value || '-'; }); html += `<tr style="height: 25px;">`; finalHeaders.forEach(h => { html += `<td style="padding: 5px;${h==='Data'||h==='Orë' ? ' text-align: center;' : ''}">${rowData[h]}</td>`; }); html += `</tr>`; }); html += `</table><br/>`; }); if(!hasData) { showAlert("Nuk ka të dhëna për tu printuar."); return; } html += `</body></html>`; const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `Raport_LindiMaps_${new Date().getTime()}.xls`; a.click(); URL.revokeObjectURL(url); };
+window.updateDropdowns = () => { const acts = configData.map(c => `<option value="${c.id}">${c.name}</option>`).join(""); const ops = operatorData.map(o => `<option value="${o.name}">${o.name}</option>`).join(""); document.getElementById('log-act-select').innerHTML = `<option value="">-- Zgjidh --</option>` + acts; document.getElementById('log-operator-select').innerHTML = `<option value="">-- Zgjidh --</option>` + ops; document.getElementById('rep-op-select').innerHTML = `<option value="">Eksperti: Të gjithë</option>` + ops; document.getElementById('rep-act-select').innerHTML = `<option value="">Aktiviteti: Të gjithë</option>` + acts; };
+document.getElementById('add-act-btn').onclick = async () => { const name = document.getElementById('new-act-name').value.trim(); const procStr = document.getElementById('new-act-processes').value.trim(); if(!name) return showAlert("Emri i aktivitetit është i detyrueshëm."); let processes = []; if(procStr) { processes = procStr.split('\n').map(line => { const parts = line.split(':'); return { label: parts[0]?.trim() || '', type: parts[1]?.trim() || 'text' }; }).filter(p => p.label); } const id = document.getElementById('edit-id').value || Date.now().toString(); try { await setDoc(doc(db, getBaseCollectionPath('config'), getSecureId(id)), { name, processes, timestamp: Date.now() }); resetConfigForm(); } catch(e) { showAlert("Gabim: " + e.message); } };
+window.resetConfigForm = () => { document.getElementById('edit-id').value = ''; document.getElementById('new-act-name').value = ''; document.getElementById('new-act-processes').value = ''; document.getElementById('add-act-btn').innerText = 'Ruaj Aktivitetin'; document.getElementById('cancel-edit-btn').classList.add('hidden'); document.getElementById('config-title').innerText = 'Shto Aktivitet'; };
+window.editConfig = (id) => { const item = configData.find(c => c.id === id); if(!item) return; document.getElementById('edit-id').value = item.id; document.getElementById('new-act-name').value = item.name; document.getElementById('new-act-processes').value = (item.processes || []).map(p => `${p.label}:${p.type}`).join('\n'); document.getElementById('add-act-btn').innerText = 'Përditëso'; document.getElementById('cancel-edit-btn').classList.remove('hidden'); document.getElementById('config-title').innerText = 'Edito Aktivitet'; };
+window.renderConfigList = () => { document.getElementById('config-list').innerHTML = configData.map(c => ` <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 flex justify-between items-center shadow-md shadow-slate-200/30 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"> <div> <h4 class="font-bold text-slate-800">${c.name}</h4> <span class="text-[10px] text-slate-400 font-medium">${c.processes ? c.processes.length : 0} fusha të lidhura</span> </div> <div class="flex gap-2"> <button onclick="editConfig('${c.id}')" class="text-blue-600 font-bold bg-blue-50 px-3 py-2 rounded-lg text-xs uppercase hover:bg-blue-100 transition-colors">Edito</button> <button onclick="deleteItem('config', '${c.id}')" class="text-red-500 font-bold bg-red-50 px-3 py-2 rounded-lg text-xs uppercase hover:bg-red-100 transition-colors">Fshi</button> </div> </div> `).join(""); };
+window.renderTrashList = () => document.getElementById('trash-results').innerHTML = trashData.map(t => `<div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-md shadow-slate-200/30 hover:shadow-lg transition-all flex justify-between items-center"><div><p class="text-[10px] font-black uppercase text-red-400 tracking-wider">${t.originalCollection}</p><h4 class="font-bold text-slate-800">${t.name || t.actName || t.operator}</h4></div><div class="flex gap-2"><button onclick="restoreItem('${t.id}', '${t.originalCollection}')" class="text-emerald-600 font-bold bg-emerald-50 hover:bg-emerald-100 px-3 py-2 rounded-lg text-xs uppercase transition-colors">Rikthe</button><button onclick="deleteSingleTrashItem('${t.id}')" class="text-red-500 font-bold bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg text-xs uppercase transition-colors">Fshi</button></div></div>`).join("");
+window.emptyTrash = async () => { askConfirm("Jeni të sigurt që doni ta pastroni koshin përgjithmonë?", async () => { for(const item of trashData) await deleteDoc(doc(db, getBaseCollectionPath('trash'), getSecureId(item.id))); }); };
+window.deleteSingleTrashItem = async (id) => { askConfirm("Jeni të sigurt që doni ta fshini këtë element përgjithmonë?", async () => { try { await deleteDoc(doc(db, getBaseCollectionPath('trash'), getSecureId(id))); } catch(e) {} }); };
+window.editOperator = (id) => { const op = operatorData.find(o => o.id === id); if(!op) return; document.getElementById('edit-op-id').value = op.id; document.getElementById('new-op-name').value = op.name; document.getElementById('add-op-btn').innerText = 'Ruaj'; document.getElementById('cancel-op-btn').classList.remove('hidden'); };
+window.resetOpForm = () => { document.getElementById('edit-op-id').value = ''; document.getElementById('new-op-name').value = ''; document.getElementById('add-op-btn').innerText = 'Shto'; document.getElementById('cancel-op-btn').classList.add('hidden'); };
+document.getElementById('add-op-btn').onclick = async () => { const name = document.getElementById('new-op-name').value.trim(); const editId = document.getElementById('edit-op-id').value; if(name) { const idToSave = editId || Date.now().toString(); await setDoc(doc(db, getBaseCollectionPath('operators'), getSecureId(idToSave)), { name, timestamp: Date.now() }); resetOpForm(); } };
+window.renderOperatorList = () => document.getElementById('operator-list').innerHTML = operatorData.map(o => ` <div class="bg-white border border-slate-200/60 shadow-sm px-4 py-3 rounded-2xl flex items-center gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all"> <span class="text-xs font-bold text-slate-700">${o.name}</span> <div class="flex gap-2 ml-2 border-l border-slate-100 pl-3"> <button onclick="editOperator('${o.id}')" class="text-blue-500 font-bold hover:text-blue-700 text-[10px] uppercase transition-colors">Edito</button> <button onclick="deleteItem('operators', '${o.id}')" class="text-red-400 font-bold hover:text-red-600 text-[10px] uppercase transition-colors">Fshi</button> </div> </div>`).join("");
 
+window.exportSystemData = async () => { document.getElementById('loading').classList.remove('hidden'); try { const user = auth.currentUser; if (!user) throw new Error("Përdoruesi nuk është i identifikuar."); const yearsData = {}; for (let y = 2024; y <= 2035; y++) { const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(y)); const snap = await getDoc(docRef); if (snap.exists()) { yearsData[y] = snap.data(); } } const backupObj = { configData, logData, operatorData, vacationYears: yearsData, exportedAt: Date.now(), version: "2.0" }; const dataStr = JSON.stringify(backupObj, null, 2); const blob = new Blob([dataStr], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `LindiMaps_Full_Backup_${new Date().toISOString().split('T')[0]}.json`; a.click(); URL.revokeObjectURL(url); } catch (err) { showAlert("Gabim gjatë shkarkimit të backup: " + err.message); } finally { document.getElementById('loading').classList.add('hidden'); } };
+window.importSystemData = (event) => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = async (e) => { try { const data = JSON.parse(e.target.result); document.getElementById('loading').classList.remove('hidden'); document.getElementById('loading-progress').classList.remove('hidden'); document.getElementById('loading-progress').innerText = "Duke importuar..."; const user = auth.currentUser; if (!user) throw new Error("Përdoruesi nuk është i identifikuar."); const processCollection = async (arr, colName) => { if (arr && Array.isArray(arr)) { for (const item of arr) { const secureId = getSecureId(item.id); await setDoc(doc(db, getBaseCollectionPath(colName), secureId), item); } } }; const configsToImport = data.configData || data.config || []; const logsToImport = data.logData || data.logs || []; const operatorsToImport = data.operatorData || data.operators || []; await processCollection(configsToImport, 'config'); await processCollection(logsToImport, 'logs'); await processCollection(operatorsToImport, 'operators'); if (data.vacationYears && typeof data.vacationYears === 'object') { for (const [year, backupYearData] of Object.entries(data.vacationYears)) { const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(year)); const snap = await getDoc(docRef); let mergedYearData = { ...backupYearData }; if (snap.exists()) { const existingData = snap.data(); const mergedSelected = Array.from(new Set([...(existingData.selected || []), ...(backupYearData.selected || [])])).sort(); const mergedMedical = Array.from(new Set([...(existingData.medical || []), ...(backupYearData.medical || [])])).sort(); const mergedMovable = { ...(existingData.movableDates || {}), ...(backupYearData.movableDates || {}) }; mergedYearData = { allowance: existingData.allowance ?? backupYearData.allowance ?? 28, selected: mergedSelected, medical: mergedMedical, movableDates: mergedMovable, manualCarryover: existingData.manualCarryover !== undefined ? existingData.manualCarryover : backupYearData.manualCarryover }; } await setDoc(docRef, mergedYearData); } } if (!document.getElementById('view-vacations').classList.contains('hidden')) { fetchVacationYearData(); } document.getElementById('loading').classList.add('hidden'); document.getElementById('loading-progress').classList.add('hidden'); showAlert("Të dhënat dhe pushimet u importuan me sukses!"); event.target.value = ''; } catch (err) { document.getElementById('loading').classList.add('hidden'); document.getElementById('loading-progress').classList.add('hidden'); showAlert("Gabim në importim: Skedari nuk është i vlefshëm."); } }; reader.readAsText(file); };
+window.toggleMenu = () => { const menu = document.getElementById('side-menu'); const overlay = document.getElementById('menu-overlay'); menu.classList.toggle('-translate-x-full'); overlay.classList.toggle('hidden'); };
+
+const getHolidaysForYear = (yr = selectedYear) => { const year = yr; const defaults = { 'Bajrami i Madh': year === 2026 ? `${year}-03-20` : `${year}-03-31`, 'Pashkët Katolike': year === 2026 ? `${year}-04-05` : `${year}-04-20`, 'Pashkët Ortodokse': year === 2026 ? `${year}-04-12` : `${year}-04-12`, 'Kurban Bajrami': year === 2026 ? `${year}-05-27` : `${year}-06-07` }; const currentMovable = yr === selectedYear ? { ...defaults, ...(vacationYearData.movableDates || {}) } : defaults; let baseHolidays = { [`${year}-01-01`]: 'Viti i Ri', [`${year}-01-02`]: 'Viti i Ri', [`${year}-03-14`]: 'Dita e Verës', [`${year}-03-22`]: 'Dita e Nevruzit', [`${year}-05-01`]: 'Dita e Punës', [`${year}-09-05`]: 'Nënë Tereza', [`${year}-11-22`]: 'Dita e Alfabetit', [`${year}-11-28`]: 'Pavarësia', [`${year}-11-29`]: 'Çlirimi', [`${year}-12-08`]: 'Dita e Rinisë', [`${year}-12-25`]: 'Krishtlindjet' }; Object.entries(currentMovable).forEach(([name, date]) => { if(date) baseHolidays[date] = name; }); let finalHolidays = { ...baseHolidays }; Object.entries(baseHolidays).sort().forEach(([dateStr, name]) => { const date = new Date(dateStr); const dayOfWeek = date.getDay(); if (dayOfWeek === 0 || dayOfWeek === 6) { let nextWorkDay = new Date(date); let offset = (dayOfWeek === 0) ? 1 : 2; nextWorkDay.setDate(date.getDate() + offset); let nextStr = nextWorkDay.toISOString().split('T')[0]; while (finalHolidays[nextStr]) { nextWorkDay.setDate(nextWorkDay.getDate() + 1); nextStr = nextWorkDay.toISOString().split('T')[0]; } finalHolidays[nextStr] = `${name} (Shtyrë)`; } }); return finalHolidays; };
+
+window.renderVacationSelectors = () => { let html = `<button onclick="setVacationYear(${selectedYear - 1})" class="p-2 text-slate-400 hover:text-blue-600 transition-colors flex items-center justify-center" title="Viti i kaluar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m15 18-6-6 6-6"/></svg></button>`; [-2, -1, 0, 1, 2].forEach(offset => { const y = selectedYear + offset; if (y >= 2024) { html += `<button onclick="setVacationYear(${y})" class="px-3.5 py-1.5 rounded-xl text-[10px] font-black transition-all ${selectedYear === y ? 'bg-white text-blue-600 shadow-sm font-bold' : 'text-slate-400 uppercase'}" style="min-width: 45px;">${y}</button>`; } }); html += `<button onclick="setVacationYear(${selectedYear + 1})" class="p-2 text-slate-400 hover:text-blue-600 transition-colors flex items-center justify-center" title="Viti i ardhshëm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m9 18 6-6-6-6"/></svg></button>`; document.getElementById('vacation-year-selector').innerHTML = html; };
+window.setVacationYear = (year) => { if (year < 2024) year = 2024; selectedYear = year; currentVacationDate = new Date(year, currentVacationDate.getMonth(), 1); renderVacationSelectors(); fetchVacationYearData(); };
+window.fetchVacationYearData = async () => { const user = auth.currentUser; if (!user) return; const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(selectedYear)); const snap = await getDoc(docRef); if (snap.exists()) { const data = snap.data(); vacationYearData = { allowance: data.allowance ?? 28, selected: data.selected || [], medical: data.medical || [], movableDates: data.movableDates || {}, manualCarryover: (data.manualCarryover !== undefined && data.manualCarryover !== "") ? data.manualCarryover : null }; } else { vacationYearData = { allowance: 28, selected: [], medical: [], movableDates: {}, manualCarryover: null }; } let chainValue = 0; for (let y = 2024; y < selectedYear; y++) { const preRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(y)); const preSnap = await getDoc(preRef); if (preSnap.exists()) { const data = preSnap.data(); const currentYearStart = (data.manualCarryover !== undefined && data.manualCarryover !== null && data.manualCarryover !== "") ? Number(data.manualCarryover) : chainValue; chainValue = Math.max(0, (currentYearStart + (Number(data.allowance) || 28)) - (data.selected || []).length); } else { chainValue += 28; } } calculatedCarryover = chainValue; window.allYearsVacationData = window.allYearsVacationData || {}; window.allYearsVacationData[selectedYear] = vacationYearData; updateVacationUI(); };
+
+const updateVacationUI = () => { document.getElementById('carryover-label').innerText = `Mbartur nga ${selectedYear-1}`; document.getElementById('allowance-label').innerText = `Leja ${selectedYear}`; document.getElementById('v-manual-carryover').value = vacationYearData.manualCarryover ?? ""; document.getElementById('v-manual-carryover').placeholder = calculatedCarryover; document.getElementById('v-allowance').value = vacationYearData.allowance; const activeCarryover = (vacationYearData.manualCarryover !== null) ? Number(vacationYearData.manualCarryover) : calculatedCarryover; const allowanceVal = Number(vacationYearData.allowance) || 28; const totalRemaining = (allowanceVal + activeCarryover) - vacationYearData.selected.length; const carryoverRemaining = Math.max(0, activeCarryover - vacationYearData.selected.length); const usedInYear = vacationYearData.selected.length; document.getElementById('v-used').innerText = usedInYear; document.getElementById('v-medical').innerText = vacationYearData.medical?.length || 0; const remEl = document.getElementById('v-remaining'); remEl.innerText = totalRemaining; if(totalRemaining < 0) { remEl.className = "text-2xl font-black text-red-500"; } else { remEl.className = "text-2xl font-black text-emerald-600"; } const subtextEl = document.getElementById('v-subtext'); if(usedInYear < activeCarryover) { subtextEl.innerText = `mbetur ${selectedYear - 1} (${carryoverRemaining} ditë)`; } else { subtextEl.innerText = `mbetur ${selectedYear} (${totalRemaining} ditë)`; } renderVacationCalendar(); renderVacationSideTab(); };
+window.saveVacationYearConfig = async () => { const user = auth.currentUser; if (!user) return; const manCarry = document.getElementById('v-manual-carryover').value; const allow = document.getElementById('v-allowance').value; const updateData = { manualCarryover: manCarry === "" ? null : Number(manCarry), allowance: allow === "" ? 28 : Number(allow) }; const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(selectedYear)); await setDoc(docRef, updateData, { merge: true }); fetchVacationYearData(); };
+window.setVacationMode = (mode) => { selectionMode = mode; document.getElementById('mode-vacation-btn').className = `px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all ${mode === 'vacation' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400'}`; document.getElementById('mode-medical-btn').className = `px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all ${mode === 'medical' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-400'}`; };
+window.changeVacationMonth = (offset) => { currentVacationDate = new Date(currentVacationDate.getFullYear(), currentVacationDate.getMonth() + offset, 1); renderVacationCalendar(); };
+
+window.toggleVacationDay = async (dStr) => { const user = auth.currentUser; if(!user) return; const isWkd = [0, 6].includes(new Date(dStr).getDay()); const hols = getHolidaysForYear(); if (hols[dStr] || isWkd) return; const isVacation = vacationYearData.selected.includes(dStr); const isMedical = vacationYearData.medical?.includes(dStr); if (isVacation || isMedical) { const type = isVacation ? 'selected' : 'medical'; const label = isVacation ? 'lejen' : 'raportin mjekësor'; askConfirm(`Dëshironi të hiqni datën ${dStr}? Ky veprim do ta kalojë këtë element në koshin e fshirjes.`, async () => { const next = vacationYearData[type].filter(i => i !== dStr); const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(selectedYear)); await setDoc(docRef, { ...vacationYearData, [type]: next }, { merge: true }); const trashId = `${selectedYear}_${type}_${dStr}`; const secureTrashId = getSecureId(trashId); await setDoc(doc(db, getBaseCollectionPath('trash'), secureTrashId), { id: trashId, originalCollection: 'Pushime & Leje', name: `${type === 'selected' ? 'Leje' : 'Raport'}: ${dStr} (${selectedYear})`, deletedAt: Date.now(), year: selectedYear, type: type, date: dStr }); fetchVacationYearData(); }); } else { const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/years`, String(selectedYear)); if (selectionMode === 'vacation') { const next = [...vacationYearData.selected, dStr].sort(); await setDoc(docRef, { ...vacationYearData, selected: next }, { merge: true }); } else { const next = [...(vacationYearData.medical
