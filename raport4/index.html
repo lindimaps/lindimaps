@@ -417,32 +417,46 @@
         const renderDailyActivities = () => {
             const container = document.getElementById('daily-activities-list');
             const selectedDate = document.getElementById('act-date').value;
+            const filterType = document.getElementById('act-filter-type') ? document.getElementById('act-filter-type').value : 'date';
             
-            if (!selectedDate) {
-                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Zgjidhni datën.</p>';
+            let filteredActs = window.appState.activities;
+            
+            if (filterType === 'date') {
+                if(!selectedDate) {
+                    container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Zgjidhni datën për të parë listën.</p>';
+                    return;
+                }
+                filteredActs = filteredActs.filter(a => a.date === selectedDate);
+            } else if (filterType === 'week') {
+                if(!selectedDate) {
+                    container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Zgjidhni një datë që i përket javës.</p>';
+                    return;
+                }
+                const weekStr = getISOWeekString(selectedDate);
+                filteredActs = filteredActs.filter(a => a.week === weekStr);
+            }
+            
+            filteredActs.sort((a, b) => a.timestamp - b.timestamp);
+
+            if (filteredActs.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">Asnjë aktivitet i gjetur.</p>';
                 return;
             }
 
-            const daysActivities = window.appState.activities
-                .filter(a => a.date === selectedDate)
-                .sort((a, b) => a.timestamp - b.timestamp);
-
-            if (daysActivities.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">Asnjë aktivitet për këtë datë.</p>';
-                return;
-            }
-
-            container.innerHTML = daysActivities.map((act, idx) => `
+            container.innerHTML = filteredActs.map((act, idx) => `
                 <div class="bg-white border border-gray-100 p-4 rounded-xl shadow-sm relative group">
                     <button onclick="window.deleteActivity('${act.id}')" class="absolute top-2 right-2 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     </button>
                     <div class="flex gap-3">
                         <div class="bg-blue-100 text-blue-700 font-bold h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs">${idx + 1}</div>
-                        <div>
-                            <h4 class="font-bold text-gray-800 text-sm mb-1">${escapeHtml(act.detyra)}</h4>
-                            <p class="text-xs text-gray-500"><span class="font-semibold text-gray-700">Objektivi:</span> ${escapeHtml(act.objektivi)}</p>
-                            ${act.statusi ? `<span class="inline-block mt-2 px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded uppercase">${escapeHtml(act.statusi)}</span>` : ''}
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-gray-800 text-sm mb-1 truncate">${escapeHtml(act.detyra)}</h4>
+                            <p class="text-xs text-gray-500 truncate"><span class="font-semibold text-gray-700">Objektivi:</span> ${escapeHtml(act.objektivi)}</p>
+                            <div class="flex items-center justify-between mt-2 gap-2">
+                                ${act.statusi ? `<span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded uppercase truncate max-w-[50%]">${escapeHtml(act.statusi)}</span>` : '<span></span>'}
+                                <span class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded whitespace-nowrap">📅 ${escapeHtml(act.date)} | ${escapeHtml(act.week.split('-')[1])}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -486,8 +500,19 @@
             const tbody = document.getElementById('report-tbody');
             tbody.innerHTML = '';
 
+            // Shto rreshtin e Sektorit automatikisht si nëntitull në fillim të tabelës
+            const sektoriName = prof.sektori || "SEKTORI I PËRPUNIMIT TË IMAZHERIVE SATELITORE";
+            tbody.innerHTML = `
+                <tr class="bg-gray-100 group">
+                    <td colspan="10" class="border border-gray-300 p-2 text-center align-middle font-bold text-gray-900 text-[12pt] uppercase"><input class="w-full text-center bg-transparent border-none outline-none text-[12pt] uppercase font-bold" value="${escapeHtml(sektoriName)}"></td>
+                    <td class="border border-gray-300 p-2 text-center no-print">
+                        <button onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700 font-semibold text-xs opacity-0 group-hover:opacity-100 transition-opacity">Hiq</button>
+                    </td>
+                </tr>
+            `;
+
             if (weeklyActs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-10 text-gray-500 font-medium">Nuk ka asnjë aktivitet të regjistruar për këtë javë.</td></tr>`;
+                tbody.innerHTML += `<tr><td colspan="11" class="text-center py-10 text-gray-500 font-medium text-[12pt]">Nuk ka asnjë aktivitet të regjistruar për këtë javë.</td></tr>`;
                 return;
             }
 
@@ -495,16 +520,21 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-50 bg-white transition-colors group text-[12pt]";
                 
-                let statusColor = "text-gray-800";
-                if(act.statusi && act.statusi.toLowerCase().includes("proces")) statusColor = "text-orange-600";
-                if(act.statusi && act.statusi.toLowerCase().includes("përfunduar")) statusColor = "text-green-600";
+                let statusColor = "text-gray-900";
+                let sLower = (act.statusi || "").toLowerCase();
+                
+                // Përshtatja e ngjyrave bazuar në status
+                if(sLower.includes("proces") || sLower.includes("vazhdon")) statusColor = "text-orange-600 font-bold";
+                else if(sLower.includes("përfunduar") || sLower.includes("perfunduar")) statusColor = "text-green-600 font-bold";
+                else if(sLower.includes("rishikohet")) statusColor = "text-blue-600 font-bold";
+                else if(sLower.includes("zi") || sLower.includes("pezull")) statusColor = "text-black font-bold";
 
                 tr.innerHTML = `
-                    <td class="border border-gray-300 p-2 text-center align-middle font-bold text-gray-800">${index + 1}</td>
+                    <td class="border border-gray-300 p-2 text-center align-middle font-bold text-gray-900">${index + 1}</td>
                     <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.objektivi)}</textarea></td>
                     <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.detyra)}</textarea></td>
                     <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.produkti)}</textarea></td>
-                    <td class="border border-gray-300 p-1 text-center align-middle font-bold ${statusColor}"><input class="w-full text-center bg-transparent border-none outline-none text-[12pt]" value="${escapeHtml(act.statusi)}"></td>
+                    <td class="border border-gray-300 p-1 text-center align-middle ${statusColor}"><input class="w-full text-center bg-transparent border-none outline-none text-[12pt] ${statusColor}" value="${escapeHtml(act.statusi)}"></td>
                     <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.pergjegjesi)}</textarea></td>
                     <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.info || "")}</textarea></td>
                     <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.problematika)}</textarea></td>
@@ -533,6 +563,19 @@
 
         window.addEventListener('beforeprint', () => { autoResizeTextareas(); });
 
+        window.addSubheader = () => {
+            const tbody = document.getElementById('report-tbody');
+            const tr = document.createElement('tr');
+            tr.className = "bg-gray-100 group";
+            tr.innerHTML = `
+                <td colspan="10" class="border border-gray-300 p-2 text-center align-middle font-bold text-gray-900 text-[12pt] uppercase"><input class="w-full text-center bg-transparent border-none outline-none text-[12pt] uppercase font-bold" value="TITULLI I RI"></td>
+                <td class="border border-gray-300 p-2 text-center no-print">
+                    <button onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700 font-semibold text-xs opacity-0 group-hover:opacity-100 transition-opacity">Hiq</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        };
+
         window.exportToExcel = () => {
             const dateRange = document.getElementById('rep-periudha').value;
             const specialisti = document.getElementById('rep-specialisti').value || 'Raporti';
@@ -551,20 +594,37 @@
             const rows = document.getElementById('report-tbody').querySelectorAll('tr');
             rows.forEach(tr => {
                 tableHtml += `<tr>`;
-                const cells = tr.querySelectorAll('td:not(.no-print)');
-                cells.forEach((td, index) => {
-                    let val = "";
-                    if(td.querySelector('textarea')) val = td.querySelector('textarea').value;
-                    else if(td.querySelector('input')) val = td.querySelector('input').value;
-                    else val = td.innerText;
-                    
+                
+                // Kontrollo nëse rreshti është Titull Sektori (colspan)
+                const tdColspan = tr.querySelector('td[colspan]');
+                if (tdColspan && tdColspan.colSpan >= 10) {
+                    let val = tdColspan.querySelector('input') ? tdColspan.querySelector('input').value : tdColspan.innerText;
                     val = escapeHtml(val).replace(/\n/g, '<br>');
+                    tableHtml += `<td colspan="10" style="text-align: center; font-weight: bold; background-color: #f3f4f6; font-size: 12pt;">${val}</td>`;
+                } else {
+                    const cells = tr.querySelectorAll('td:not(.no-print)');
+                    cells.forEach((td, index) => {
+                        let val = "";
+                        if(td.querySelector('textarea')) val = td.querySelector('textarea').value;
+                        else if(td.querySelector('input')) val = td.querySelector('input').value;
+                        else val = td.innerText;
+                        
+                        val = escapeHtml(val).replace(/\n/g, '<br>');
 
-                    let align = "vertical-align: top;";
-                    if (index === 0 || index === 4 || index === 8) align += " text-align: center;"; 
+                        let align = "vertical-align: top;";
+                        if (index === 0 || index === 4 || index === 8) align += " text-align: center;"; 
+                        
+                        // Ruajtja e ngjyrave në Excel
+                        if (index === 4) {
+                             let sLower = val.toLowerCase();
+                             if(sLower.includes("proces") || sLower.includes("vazhdon")) align += " color: #ea580c; font-weight: bold;";
+                             else if(sLower.includes("përfunduar") || sLower.includes("perfunduar")) align += " color: #16a34a; font-weight: bold;";
+                             else if(sLower.includes("rishikohet")) align += " color: #2563eb; font-weight: bold;";
+                        }
 
-                    tableHtml += `<td style="${align}">${val}</td>`;
-                });
+                        tableHtml += `<td style="${align}">${val}</td>`;
+                    });
+                }
                 tableHtml += `</tr>`;
             });
 
@@ -923,9 +983,16 @@
                     </div>
 
                     <!-- Sidebar List -->
-                    <div class="bg-gray-50 rounded-2xl border border-gray-200 p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Të ruajtura (Kjo datë)</h3>
-                        <div id="daily-activities-list" class="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+                    <div class="bg-gray-50 rounded-2xl border border-gray-200 p-6 flex flex-col max-h-[750px]">
+                        <div class="flex justify-between items-center mb-4 border-b pb-2 gap-2">
+                            <h3 class="text-lg font-bold text-gray-800">Të ruajtura</h3>
+                            <select id="act-filter-type" onchange="window.renderDailyActivities()" class="text-[10px] uppercase font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded px-2 py-1.5 outline-none cursor-pointer">
+                                <option value="date">Kjo Datë</option>
+                                <option value="week">Kjo Javë</option>
+                                <option value="all">Të Gjitha</option>
+                            </select>
+                        </div>
+                        <div id="daily-activities-list" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-2">
                             <!-- Populated via JS -->
                         </div>
                     </div>
@@ -969,6 +1036,10 @@
                     </div>
 
                     <div class="flex justify-end gap-3 border-t pt-4">
+                        <button onclick="window.addSubheader()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-5 py-2.5 rounded-lg text-sm font-bold shadow transition-all flex items-center gap-2 mr-auto">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Shto Titull Sektori
+                        </button>
                         <button onclick="window.exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow transition-all flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             Eksporto Excel
