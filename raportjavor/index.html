@@ -135,6 +135,21 @@
             document.getElementById('form-' + forma).classList.remove('hidden');
         };
 
+        // Ruaj listat e personalizuara në Firebase
+        window.saveCustomListsToFirebase = async function() {
+            if (!window.userId) return;
+            try {
+                const listsRef = window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'listat_e_mia');
+                await window.setDoc(listsRef, {
+                    specialistet: window.specialistet,
+                    objektivat: window.objektivat,
+                    afatet: window.afatet
+                });
+            } catch (e) {
+                console.error("Gabim gjatë ruajtjes së listave:", e);
+            }
+        };
+
         window.saveDataToFirebase = async function() {
             if (!window.userId) return;
             
@@ -184,9 +199,6 @@
                 const dataToSave = {
                     header: headerData,
                     rows: tableRows,
-                    specialistet: window.specialistet,
-                    objektivat: window.objektivat,
-                    afatet: window.afatet,
                     kolonaTeFshehura: window.kolonaTeFshehura,
                     lastUpdated: new Date().toISOString()
                 };
@@ -214,21 +226,29 @@
         window.loadDataFromFirebase = async function() {
             if (!window.userId) return;
             try {
+                // Ngarko listat e ruajtura
+                const listsRef = window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'listat_e_mia');
+                const listsSnap = await window.getDoc(listsRef);
+                
+                if (listsSnap.exists()) {
+                    const listsData = listsSnap.data();
+                    if (listsData.specialistet) { window.specialistet.length = 0; window.specialistet.push(...listsData.specialistet); }
+                    if (listsData.objektivat) { window.objektivat.length = 0; window.objektivat.push(...listsData.objektivat); }
+                    if (listsData.afatet) { window.afatet.length = 0; window.afatet.push(...listsData.afatet); }
+                }
+
+                window.perditesoDropdownSpecialistet();
+                window.perditesoDropdownObjektivat();
+                window.perditesoDropdownAfatet();
+
                 const docRef = window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'raporti_aktual');
                 const docSnap = await window.getDoc(docRef);
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
-                    if (data.specialistet) { window.specialistet.length = 0; window.specialistet.push(...data.specialistet); }
-                    if (data.objektivat) { window.objektivat.length = 0; window.objektivat.push(...data.objektivat); }
-                    if (data.afatet) { window.afatet.length = 0; window.afatet.push(...data.afatet); }
                     if (data.kolonaTeFshehura) { window.kolonaTeFshehura.length = 0; window.kolonaTeFshehura.push(...data.kolonaTeFshehura); }
                     
-                    window.perditesoDropdownSpecialistet();
-                    window.perditesoDropdownObjektivat();
-                    window.perditesoDropdownAfatet();
-
                     if (data.header) {
                         document.getElementById('inp-drejtoria').value = data.header.drejtoria || '';
                         document.getElementById('inp-sektori').value = data.header.sektori || '';
@@ -741,13 +761,14 @@
                 document.getElementById('modal-specialist').classList.remove('flex');
             }
 
-            function ruajSpecialistModal() {
+            async function ruajSpecialistModal() {
                 const emerIRi = document.getElementById('inp-new-specialist').value;
                 if (emerIRi && emerIRi.trim() !== "") {
                     const emriPaster = emerIRi.trim();
                     if (!specialistet.includes(emriPaster)) {
                         specialistet.push(emriPaster);
                         perditesoDropdownSpecialistet();
+                        await window.saveCustomListsToFirebase();
                         
                         // Zgjidh automatikisht atë të saposhtuarin në krye
                         document.getElementById('main-specialist').value = emriPaster;
@@ -777,12 +798,13 @@
                 document.getElementById('modal-objektiv').classList.remove('flex');
             }
 
-            function ruajObjektivModal() {
+            async function ruajObjektivModal() {
                 const tekstiIRi = document.getElementById('inp-new-objektiv').value.trim();
                 if (tekstiIRi !== "") {
                     const nextId = `Objektivi ${objektivat.length + 1}`;
                     objektivat.push({ id: nextId, text: tekstiIRi });
                     perditesoDropdownObjektivat();
+                    await window.saveCustomListsToFirebase();
                     mbyllModalObjektiv();
                 } else {
                     document.getElementById('modal-error-obj').classList.remove('hidden');
@@ -824,12 +846,13 @@
                 document.getElementById('modal-afat').classList.remove('flex');
             }
 
-            function ruajAfatModal() {
+            async function ruajAfatModal() {
                 const afatiRi = document.getElementById('inp-new-afat').value.trim();
                 if (afatiRi !== "") {
                     if (!afatet.includes(afatiRi)) {
                         afatet.push(afatiRi);
                         perditesoDropdownAfatet();
+                        await window.saveCustomListsToFirebase();
                         mbyllModalAfat();
                     } else {
                         document.getElementById('modal-error-afat').classList.remove('hidden');
