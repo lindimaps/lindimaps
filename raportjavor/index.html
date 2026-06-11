@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raporti Javor i Aktiviteteve</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- === Lidhja me Firebase === -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        // Shtuam modulet e reja për Email Auth
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAG56-nHpfwzEw2noQZh3hrCbvcMWXShsg",
@@ -25,33 +26,25 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Expose Firebase tools to global scope so existing functions can use them
         window.db = db;
         window.auth = auth;
         window.doc = doc;
         window.setDoc = setDoc;
         window.getDoc = getDoc;
-        
-        // Define common app ID for the artifact path requirement
         window.__app_id = 'raportimi-javor-asig'; 
 
-        // === LOGJIKA E RE E AUTENTIFIKIMIT ===
-        
-        // Dëgjuesi i gjendjes së hyrjes
         onAuthStateChanged(auth, async (user) => {
             const authContainer = document.getElementById('auth-container');
             const mainApp = document.getElementById('main-app');
             const userEmailDisplay = document.getElementById('user-email-display');
             
             if (user) {
-                // Përdoruesi është i loguar
                 window.userId = user.uid;
                 userEmailDisplay.textContent = user.email;
                 
                 authContainer.classList.add('hidden');
                 mainApp.classList.remove('hidden');
                 
-                // Show a small save status indicator (if it doesn't exist)
                 if (!document.getElementById('save-status')) {
                     const statusDiv = document.createElement('div');
                     statusDiv.id = 'save-status';
@@ -60,18 +53,15 @@
                     document.body.appendChild(statusDiv);
                 }
 
-                // Load existing data for this user
                 await loadDataFromFirebase();
                 setupAutoSave();
             } else {
-                // Përdoruesi nuk është i loguar
                 window.userId = null;
                 authContainer.classList.remove('hidden');
                 mainApp.classList.add('hidden');
             }
         });
 
-        // Funksionet e Hyrjes / Daljes
         window.hyrNeLlogari = function(e) {
             e.preventDefault();
             const email = document.getElementById('auth-email').value;
@@ -128,25 +118,20 @@
 
         window.dilNgaLlogaria = function() {
             signOut(auth).then(() => {
-                // Rihap faqen për të pastruar memorien e formularit automatikisht
                 window.location.reload();
             });
         };
 
-        // Funksionet për ndryshimin e pamjes së Autentifikimit
         window.shfaqFormen = function(forma) {
             document.getElementById('form-login').classList.add('hidden');
             document.getElementById('form-register').classList.add('hidden');
             document.getElementById('form-reset').classList.add('hidden');
-            
             document.getElementById('form-' + forma).classList.remove('hidden');
         };
 
-        // Save Data Function
         window.saveDataToFirebase = async function() {
             if (!window.userId) return;
             
-            // Show saving status
             const statusIndicator = document.getElementById('save-status');
             if(statusIndicator) {
                  statusIndicator.textContent = 'Duke ruajtur...';
@@ -155,7 +140,6 @@
             }
 
             try {
-                // Collect Header Data
                 const headerData = {
                     drejtoria: document.getElementById('inp-drejtoria').value,
                     sektori: document.getElementById('inp-sektori').value,
@@ -163,23 +147,20 @@
                     periudha: document.getElementById('inp-periudha').value
                 };
 
-                // Collect Table Data
                 const tableRows = [];
                 const rows = document.getElementById('table-body').querySelectorAll('tr');
                 
                 rows.forEach(tr => {
                     const firstCell = tr.firstElementChild;
                     if (firstCell && firstCell.hasAttribute('colspan')) {
-                        // Is a Section Title Row
                         const input = tr.querySelector('input');
                         tableRows.push({
                             type: 'title',
                             text: input ? input.value : tr.innerText
                         });
                     } else {
-                        // Is a normal data row
                         const rowData = { type: 'data', cells: [] };
-                        const cells = tr.querySelectorAll('td:not(.no-print)'); // Skip action column
+                        const cells = tr.querySelectorAll('td:not(.no-print)');
                         
                         cells.forEach((td, index) => {
                             let value = "";
@@ -194,7 +175,6 @@
                     }
                 });
 
-                // Prepare final payload
                 const dataToSave = {
                     header: headerData,
                     rows: tableRows,
@@ -205,11 +185,9 @@
                     lastUpdated: new Date().toISOString()
                 };
 
-                // Use the strict required path for artifacts
                 const docRef = window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'raporti_aktual');
                 await window.setDoc(docRef, dataToSave);
                 
-                // Update status indicator
                 if(statusIndicator) {
                      statusIndicator.textContent = 'Ruajtur automatikisht ✓';
                      setTimeout(() => {
@@ -217,7 +195,6 @@
                          statusIndicator.classList.add('opacity-0');
                      }, 2000);
                 }
-
             } catch (e) {
                 console.error("Error saving document: ", e);
                 if(statusIndicator) {
@@ -228,10 +205,8 @@
             }
         }
 
-        // Load Data Function
         window.loadDataFromFirebase = async function() {
             if (!window.userId) return;
-            
             try {
                 const docRef = window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'raporti_aktual');
                 const docSnap = await window.getDoc(docRef);
@@ -239,37 +214,30 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
-                    // 1. Restore configuration arrays first
-                    if (data.specialistet) window.specialistet = data.specialistet;
-                    if (data.objektivat) window.objektivat = data.objektivat;
-                    if (data.afatet) window.afatet = data.afatet;
-                    if (data.kolonaTeFshehura) window.kolonaTeFshehura = data.kolonaTeFshehura;
+                    if (data.specialistet) { window.specialistet.length = 0; window.specialistet.push(...data.specialistet); }
+                    if (data.objektivat) { window.objektivat.length = 0; window.objektivat.push(...data.objektivat); }
+                    if (data.afatet) { window.afatet.length = 0; window.afatet.push(...data.afatet); }
+                    if (data.kolonaTeFshehura) { window.kolonaTeFshehura.length = 0; window.kolonaTeFshehura.push(...data.kolonaTeFshehura); }
                     
-                    // Update Dropdowns globally
                     window.perditesoDropdownSpecialistet();
                     window.perditesoDropdownObjektivat();
                     window.perditesoDropdownAfatet();
 
-                    // 2. Restore Header Data
                     if (data.header) {
                         document.getElementById('inp-drejtoria').value = data.header.drejtoria || '';
                         document.getElementById('inp-sektori').value = data.header.sektori || '';
                         document.getElementById('inp-periudha').value = data.header.periudha || '';
-                        
-                        // Set main specialist after dropdowns are populated
                         setTimeout(() => {
                            document.getElementById('main-specialist').value = data.header.specialisti || '';
                         }, 50);
                     }
 
-                    // 3. Restore Table Rows
                     if (data.rows && data.rows.length > 0) {
                         const tbody = document.getElementById('table-body');
-                        tbody.innerHTML = ''; // Clear existing default rows
-                        window.numeruesiRreshtave = 0; // Reset counter
-                        window.historiaFshirjeve = []; // Reset history
+                        tbody.innerHTML = '';
+                        window.numeruesiRreshtave = 0;
+                        window.historiaFshirjeve.length = 0;
                         
-                        // Hide columns based on saved state
                         window.kolonaTeFshehura.forEach(colIdx => {
                             const thead = document.querySelector('thead tr');
                             if(thead.children[colIdx]) thead.children[colIdx].style.display = 'none';
@@ -279,12 +247,10 @@
                             if (rowData.type === 'title') {
                                 window.shtoTitullSektori(null, rowData.text); 
                             } else if (rowData.type === 'data') {
-                                window.shtoRreshtBosh(); // Helper to add empty row structure
+                                window.shtoRresht();
                                 const newRow = tbody.lastElementChild;
                                 
-                                // Fill row with saved values
                                 rowData.cells.forEach(cell => {
-                                    // Skip filling the ID column (index 0) and action col
                                     if (cell.index > 0) {
                                         const td = newRow.children[cell.index];
                                         if (td) {
@@ -294,19 +260,13 @@
                                             const afatSelect = td.querySelector('.row-afat');
                                             const input = td.querySelector('input');
                                             
-                                            // Determine how to set the value based on what element exists
                                             if (objSelect && textarea) {
-                                                 // Try to match value to an objective first
                                                  const matchedObj = window.objektivat.find(o => o.text === cell.value);
-                                                 if (matchedObj) {
-                                                     objSelect.value = matchedObj.id;
-                                                 }
+                                                 if (matchedObj) objSelect.value = matchedObj.id;
                                                  textarea.value = cell.value;
                                             }
                                             else if (afatSelect && input) {
-                                                 if (window.afatet.includes(cell.value)) {
-                                                     afatSelect.value = cell.value;
-                                                 }
+                                                 if (window.afatet.includes(cell.value)) afatSelect.value = cell.value;
                                                  input.value = cell.value;
                                             }
                                             else if (textarea) textarea.value = cell.value;
@@ -328,32 +288,21 @@
             }
         }
 
-        // Setup Event Listeners for Auto-Save
         window.setupAutoSave = function() {
-            // Use debounce to prevent saving on every single keystroke instantly
             let timeoutId;
             const debouncedSave = () => {
                 clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => {
-                    window.saveDataToFirebase();
-                }, 1500); // Wait 1.5s after typing stops before saving
+                timeoutId = setTimeout(() => { window.saveDataToFirebase(); }, 1500);
             };
 
-            // Listen to all inputs and textareas
             document.body.addEventListener('input', (e) => {
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                    debouncedSave();
-                }
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') debouncedSave();
             });
 
-            // Listen to all dropdown changes
             document.body.addEventListener('change', (e) => {
-                if (e.target.tagName === 'SELECT') {
-                    debouncedSave();
-                }
+                if (e.target.tagName === 'SELECT') debouncedSave();
             });
             
-            // Override existing action functions to trigger save
             const originalShtoRresht = window.shtoRresht;
             window.shtoRresht = function() { originalShtoRresht(); debouncedSave(); };
             
@@ -369,8 +318,9 @@
             const originalRiktheFshirjen = window.riktheFshirjen;
             window.riktheFshirjen = function() { originalRiktheFshirjen(); debouncedSave(); };
         }
-        
     </script>
+    
+    <!-- === Stilet origjinale === -->
     <style>
         * {
             font-family: 'Times New Roman', Times, serif !important;
@@ -453,12 +403,11 @@
 </head>
 <body class="bg-gray-100 p-4 md:p-8 min-h-screen text-gray-800 font-sans">
 
-    <!-- === KONTENIERI I AUTENTIFIKIMIT (LOGIN/REGISTER/RESET) === -->
+    <!-- === KONTENIERI I AUTENTIFIKIMIT === -->
     <div id="auth-container" class="flex items-center justify-center min-h-[80vh] hidden">
         <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border-t-4 border-blue-600">
             <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Raportimi Javor ASIG</h2>
             
-            <!-- Forma e Login -->
             <form id="form-login" onsubmit="window.hyrNeLlogari(event)">
                 <h3 class="text-lg font-semibold mb-4 text-gray-600">Hyrje në Sistemin e Raportimit</h3>
                 <div id="auth-error" class="bg-red-100 text-red-600 text-sm p-2 rounded mb-4 hidden font-bold text-center"></div>
@@ -479,7 +428,6 @@
                 </div>
             </form>
 
-            <!-- Forma e Regjistrimit -->
             <form id="form-register" class="hidden" onsubmit="window.krijoLlogari(event)">
                 <h3 class="text-lg font-semibold mb-4 text-gray-600">Krijo Llogari të Re</h3>
                 <div id="reg-error" class="bg-red-100 text-red-600 text-sm p-2 rounded mb-4 hidden font-bold text-center"></div>
@@ -499,7 +447,6 @@
                 </div>
             </form>
 
-            <!-- Forma e Rikthimit të Fjalëkalimit -->
             <form id="form-reset" class="hidden" onsubmit="window.rifitimiFjalekalimit(event)">
                 <h3 class="text-lg font-semibold mb-4 text-gray-600">Rikthimi i Fjalëkalimit</h3>
                 <div id="reset-msg" class="text-sm p-2 rounded mb-4 hidden font-bold text-center"></div>
@@ -517,12 +464,9 @@
             </form>
         </div>
     </div>
-    <!-- === FUNDI I KONTENIERIT TË AUTENTIFIKIMIT === -->
 
-    <!-- === APLIKACIONI KRYESOR (SHFAQET VETËM PAS LOGIN) === -->
+    <!-- === APLIKACIONI KRYESOR ORIGJINAL === -->
     <div id="main-app" class="hidden">
-        
-        <!-- Headeri i sipërm me informacionin e përdoruesit -->
         <div class="max-w-[1400px] mx-auto mb-2 flex justify-between items-end no-print">
             <div class="text-sm font-bold text-gray-600">Statusi: <span class="text-green-600">I lidhur</span></div>
             <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border">
@@ -539,609 +483,692 @@
             
             <!-- Pjesa e Kokës së Dokumentit -->
             <div id="print-header" class="print-only-header"></div>
-                            <div class="flex justify-between items-center gap-1"><span>Produkti Final</span> <button onclick="fshiKolone(3)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
-                        </th>
-                        <th class="border border-gray-300 p-2 min-w-[120px]">
-                            <div class="flex justify-between items-center gap-1"><span>Statusi</span> <button onclick="fshiKolone(4)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
-                        </th>
-                        <th class="border border-gray-300 p-2 min-w-[150px]">
-                            <div class="flex justify-between items-center gap-1"><span>Personi Përgjegjës</span> <button onclick="fshiKolone(5)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
-                        </th>
-                        <th class="border border-gray-300 p-2 min-w-[250px]">
-                            <div class="flex justify-between items-center gap-1"><span>Informacion</span> <button onclick="fshiKolone(6)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
-                        </th>
-                        <th class="border border-gray-300 p-2 min-w-[150px]">
-                            <div class="flex justify-between items-center gap-1"><span>Problematikat</span> <button onclick="fshiKolone(7)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
-                        </th>
-                        <th class="border border-gray-300 p-2 min-w-[100px]">
-                            <div class="flex justify-between items-center gap-1"><span>Afati</span> <button onclick="fshiKolone(8)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
-                        </th>
-                        <th class="border border-gray-300 p-2 min-w-[150px]">
-                            <div class="flex justify-between items-center gap-1"><span>Kujt i Raportohet</span> <button onclick="fshiKolone(9)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
-                        </th>
-                        <th class="border border-gray-300 p-2 w-10 no-print">Veprime</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body">
-                    <!-- Rreshtat do të shtohen këtu dinamikisht -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Modal per Shto Specialist -->
-    <div id="modal-specialist" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-96 transform transition-all">
-            <h2 class="text-xl font-bold mb-4">Shto Specialist të ri</h2>
-            <input type="text" id="inp-new-specialist" class="w-full border p-2 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Shkruaj emrin dhe mbiemrin...">
-            <div id="modal-error" class="text-red-500 text-sm mb-4 hidden font-bold">Ky specialist ekziston tashmë! Ju lutem provoni një tjetër.</div>
-            <div class="flex justify-end gap-2 mt-4">
-                <button onclick="mbyllModalSpecialist()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">Anulo</button>
-                <button onclick="ruajSpecialistModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Ruaj</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal per Shto Objektiv -->
-    <div id="modal-objektiv" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-[600px] max-w-[90vw] transform transition-all">
-            <h2 class="text-xl font-bold mb-4">Shto Objektiv të ri</h2>
-            <textarea id="inp-new-objektiv" class="w-full border p-2 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400" rows="4" placeholder="Shkruaj përshkrimin e plotë të objektivit..."></textarea>
-            <div id="modal-error-obj" class="text-red-500 text-sm mb-4 hidden font-bold">Ju lutem shkruani një tekst për objektivin!</div>
-            <div class="flex justify-end gap-2 mt-4">
-                <button onclick="mbyllModalObjektiv()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">Anulo</button>
-                <button onclick="ruajObjektivModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Ruaj</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal per Shto Afat -->
-    <div id="modal-afat" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-96 transform transition-all">
-            <h2 class="text-xl font-bold mb-4">Shto Afat të ri</h2>
-            <input type="text" id="inp-new-afat" class="w-full border p-2 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="P.sh. Janar-Dhjetor">
-            <div id="modal-error-afat" class="text-red-500 text-sm mb-4 hidden font-bold">Ky afat ekziston tashmë!</div>
-            <div class="flex justify-end gap-2 mt-4">
-                <button onclick="mbyllModalAfat()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">Anulo</button>
-                <button onclick="ruajAfatModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Ruaj</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Ruajmë specialistët në memorie (Array)
-        let specialistet = ['Erland Alla', 'Specialist Test'];
-        
-        // Ruajmë objektivat në memorie
-        let objektivat = [
-            { id: "Objektivi 1", text: "Bashkërendimi ndërinstitucional" },
-            { id: "Objektivi 2", text: 'Mbarëvajtja e projektit "Shërbime Satelitore" në kuadër të monitorimit të territorit me teknologji të avancuar.' },
-            { id: "Objektivi 3", text: "Ndjekja e implementimit të projekteve që lidhen me mbledhjen e informacionit gjeohapësinor të kapur (mbledhur) nëpërmjet teknologjisë UAV" },
-            { id: "Objektivi 4", text: 'Ndjekja e implementimit të projekteve që lidhen me mbledhjen e informacionit gjeohapësinor të kapur (mbledhur) nëpërmjet fotografimit me kamera "Street View 360°".' },
-            { id: "Objektivi 5", text: '"Dija institucionale dhe kapacitetet njerëzore" (Ngritja e kapaciteteve të stafit të ASIG nëpërmjet projekteve).' }
-        ];
-
-        // Ruajmë afatet në memorie
-        let afatet = ['Janar-Dhjetor'];
-        let kolonaTeFshehura = []; // Ruajmë indeksat e kolonave të fshehura
-
-        let numeruesiRreshtave = 0;
-        let historiaFshirjeve = []; // Për të ruajtur rreshtat e fshirë për rikthim
-        
-        // Ekspozimi i variablave në window për qasje nga moduli Firebase
-        window.specialistet = specialistet;
-        window.objektivat = objektivat;
-        window.afatet = afatet;
-        window.kolonaTeFshehura = kolonaTeFshehura;
-        window.numeruesiRreshtave = numeruesiRreshtave;
-        window.historiaFshirjeve = historiaFshirjeve;
-
-        // Funksioni për të fshehur një kolonë
-        function fshiKolone(colIndex) {
-            kolonaTeFshehura.push(colIndex);
-            
-            // Ruajmë veprimin në histori për Undo
-            historiaFshirjeve.push({ type: 'kolone', colIndex: colIndex });
-            document.getElementById('btn-rikthe').classList.remove('hidden');
-            
-            // Fshih headerin e asaj kolone
-            const thead = document.querySelector('thead tr');
-            thead.children[colIndex].style.display = 'none';
-            
-            // Fshih qelizat ekzistuese në atë kolonë
-            const tbody = document.getElementById('table-body');
-            Array.from(tbody.children).forEach(tr => {
-                const firstCell = tr.firstElementChild;
-                if (firstCell.hasAttribute('colspan')) {
-                    // Zvogëlo hapësirën e titujve të sektorit
-                    let currentColspan = parseInt(firstCell.getAttribute('colspan'));
-                    firstCell.setAttribute('colspan', currentColspan - 1);
-                } else {
-                    tr.children[colIndex].style.display = 'none';
-                    tr.children[colIndex].classList.add('hidden-col');
-                }
-            });
-        }
-        window.fshiKolone = fshiKolone;
-
-        // Funksioni për të përditësuar të gjitha menutë dropdown (select) të specialistëve
-        function perditesoDropdownSpecialistet() {
-            const optionsHTML = specialistet.map(s => `<option value="${s}">${s}</option>`).join('');
-            
-            // Përditëso specialistin kryesor në header
-            const mainSelect = document.getElementById('main-specialist');
-            const mainVal = mainSelect.value;
-            mainSelect.innerHTML = optionsHTML;
-            if (specialistet.includes(mainVal)) mainSelect.value = mainVal;
-
-            // Përditëso të gjithë rreshtat e tabelës
-            document.querySelectorAll('.row-specialist').forEach(select => {
-                const rreshtVal = select.value;
-                select.innerHTML = `<option value=""></option>` + optionsHTML; // Shto një opsion bosh në fillim për rreshtat
-                if (specialistet.includes(rreshtVal)) select.value = rreshtVal;
-            });
-        }
-        window.perditesoDropdownSpecialistet = perditesoDropdownSpecialistet;
-
-        // Menaxhimi i Modalit të Specialistëve
-        function hapModalSpecialist() {
-            document.getElementById('modal-specialist').classList.remove('hidden');
-            document.getElementById('modal-specialist').classList.add('flex');
-            document.getElementById('inp-new-specialist').value = '';
-            document.getElementById('modal-error').classList.add('hidden');
-            document.getElementById('inp-new-specialist').focus();
-        }
-
-        function mbyllModalSpecialist() {
-            document.getElementById('modal-specialist').classList.add('hidden');
-            document.getElementById('modal-specialist').classList.remove('flex');
-        }
-
-        function ruajSpecialistModal() {
-            const emerIRi = document.getElementById('inp-new-specialist').value;
-            if (emerIRi && emerIRi.trim() !== "") {
-                const emriPaster = emerIRi.trim();
-                if (!specialistet.includes(emriPaster)) {
-                    specialistet.push(emriPaster);
-                    perditesoDropdownSpecialistet();
+            <div class="interactive-header mb-8">
+                <h1 class="text-2xl font-bold text-center mb-6 uppercase">Raporti Javor i Aktiviteteve</h1>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Fusha: Drejtoria -->
+                    <div class="flex flex-col">
+                        <label class="font-bold text-sm mb-1">Drejtoria:</label>
+                        <input id="inp-drejtoria" type="text" class="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="P.sh. Drejtoria e Përpunimit të të Dhënave..." value="DREJTORIA E PËRPUNIMIT TË TË DHËNAVE REMOTE SENSING">
+                    </div>
                     
-                    // Zgjidh automatikisht atë të saposhtuarin në krye
-                    document.getElementById('main-specialist').value = emriPaster;
-                    mbyllModalSpecialist();
-                } else {
-                    document.getElementById('modal-error').classList.remove('hidden');
-                }
-            }
-        }
-
-        // Lejo shtypjen e 'Enter' për të ruajtur specialistin
-        document.getElementById('inp-new-specialist').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') ruajSpecialistModal();
-        });
-
-        // Menaxhimi i Modalit të Objektivave
-        function hapModalObjektiv() {
-            document.getElementById('modal-objektiv').classList.remove('hidden');
-            document.getElementById('modal-objektiv').classList.add('flex');
-            document.getElementById('inp-new-objektiv').value = '';
-            document.getElementById('modal-error-obj').classList.add('hidden');
-            document.getElementById('inp-new-objektiv').focus();
-        }
-
-        function mbyllModalObjektiv() {
-            document.getElementById('modal-objektiv').classList.add('hidden');
-            document.getElementById('modal-objektiv').classList.remove('flex');
-        }
-
-        function ruajObjektivModal() {
-            const tekstiIRi = document.getElementById('inp-new-objektiv').value.trim();
-            if (tekstiIRi !== "") {
-                const nextId = `Objektivi ${objektivat.length + 1}`;
-                objektivat.push({ id: nextId, text: tekstiIRi });
-                perditesoDropdownObjektivat();
-                mbyllModalObjektiv();
-            } else {
-                document.getElementById('modal-error-obj').classList.remove('hidden');
-            }
-        }
-
-        function perditesoDropdownObjektivat() {
-            const optionsHTML = `<option value="">-- Zgjidh Objektivin --</option>` + 
-                objektivat.map(o => `<option value="${o.id}" data-text="${escapeHtml(o.text)}">${o.id}: ${o.text}</option>`).join('');
-
-            document.querySelectorAll('.row-objektiv').forEach(select => {
-                const val = select.value;
-                select.innerHTML = optionsHTML;
-                if (val) select.value = val;
-            });
-        }
-        window.perditesoDropdownObjektivat = perditesoDropdownObjektivat;
-
-        function ndryshoTekstinObjektivit(selectElement) {
-            if(selectElement.value) {
-                const textarea = selectElement.nextElementSibling;
-                const selectedOption = selectElement.options[selectElement.selectedIndex];
-                textarea.value = selectedOption.getAttribute('data-text');
-                textarea.style.height = 'auto';
-                textarea.style.height = textarea.scrollHeight + 'px';
-            }
-        }
-
-        // Menaxhimi i Modalit dhe Dropdown-it për Afatet
-        function hapModalAfat() {
-            document.getElementById('modal-afat').classList.remove('hidden');
-            document.getElementById('modal-afat').classList.add('flex');
-            document.getElementById('inp-new-afat').value = '';
-            document.getElementById('modal-error-afat').classList.add('hidden');
-            document.getElementById('inp-new-afat').focus();
-        }
-
-        function mbyllModalAfat() {
-            document.getElementById('modal-afat').classList.add('hidden');
-            document.getElementById('modal-afat').classList.remove('flex');
-        }
-
-        function ruajAfatModal() {
-            const afatiRi = document.getElementById('inp-new-afat').value.trim();
-            if (afatiRi !== "") {
-                if (!afatet.includes(afatiRi)) {
-                    afatet.push(afatiRi);
-                    window.afatet = afatet; // Update global
-                    perditesoDropdownAfatet();
-                    mbyllModalAfat();
-                    if(window.saveDataToFirebase) window.saveDataToFirebase();
-                } else {
-                    document.getElementById('modal-error-afat').classList.remove('hidden');
-                }
-            }
-        }
-
-        function perditesoDropdownAfatet() {
-            const optionsHTML = `<option value="">-- Zgjidh --</option>` + 
-                afatet.map(a => `<option value="${a}">${a}</option>`).join('');
-
-            document.querySelectorAll('.row-afat').forEach(select => {
-                const val = select.value;
-                select.innerHTML = optionsHTML;
-                if (val) select.value = val;
-            });
-        }
-        window.perditesoDropdownAfatet = perditesoDropdownAfatet;
-
-        function ndryshoTekstinAfatit(selectElement) {
-            if(selectElement.value) {
-                const input = selectElement.nextElementSibling;
-                input.value = selectElement.value;
-            }
-        }
-
-        // Funksioni për ngjyrosjen e statusit
-        function ndryshoNgjyrenStatusit(selectElement) {
-            if (selectElement.value === 'Në proces') {
-                selectElement.classList.remove('text-black');
-                selectElement.classList.add('text-orange-500');
-            } else if (selectElement.value === 'Përfunduar') {
-                selectElement.classList.remove('text-orange-500');
-                selectElement.classList.add('text-black');
-            } else {
-                selectElement.classList.remove('text-orange-500', 'text-black');
-            }
-        }
-        window.ndryshoNgjyrenStatusit = ndryshoNgjyrenStatusit;
-
-        // Funksioni për të shtuar një rresht të ri aktiviteti me objektivat fikse
-        function shtoRresht() {
-            numeruesiRreshtave++;
-            const tbody = document.getElementById('table-body');
-            const tr = document.createElement('tr');
-            tr.className = "hover:bg-gray-50 transition-colors";
-            
-            // Merr specialistin kryesor aktual për t'ia vendosur by default rreshtit
-            const specialistiAktual = document.getElementById('main-specialist').value;
-
-            // Krijo opsionet për dropdownin e atij rreshti
-            const opsionetS = `<option value=""></option>` + specialistet.map(s => 
-                `<option value="${s}" ${s === specialistiAktual ? 'selected' : ''}>${s}</option>`
-            ).join('');
-
-            tr.innerHTML = `
-                <td class="border border-gray-300 p-2 text-center align-top font-bold text-gray-600">${numeruesiRreshtave}</td>
-                <td class="border border-gray-300 p-1 align-top relative">
-                    <select class="w-full mb-1 p-1 border rounded bg-gray-100 text-gray-700 cursor-pointer focus:outline-none no-print row-objektiv" onchange="ndryshoTekstinObjektivit(this)">
-                    </select>
-                    <textarea class="w-full p-1 focus:outline-none focus:bg-blue-50 resize-none" rows="2" placeholder="Zgjidh sipër ose shkruaj..."></textarea>
-                </td>
-                <td class="border border-gray-300 p-1 align-top"><textarea class="w-full p-1 focus:outline-none focus:bg-blue-50 resize-none" rows="3" placeholder="Përshkruaj detyrat..."></textarea></td>
-                <td class="border border-gray-300 p-1 align-top"><textarea class="w-full p-1 focus:outline-none focus:bg-blue-50 resize-none" rows="2" placeholder="Produkti final..."></textarea></td>
-                <td class="border border-gray-300 p-1 align-top">
-                    <select class="w-full p-2 font-bold focus:outline-none bg-transparent cursor-pointer transition-colors status-select text-orange-500" onchange="ndryshoNgjyrenStatusit(this)">
-                        <option value="Në proces" class="text-orange-500 font-bold">Në proces</option>
-                        <option value="Përfunduar" class="text-black font-bold">Përfunduar</option>
-                    </select>
-                </td>
-                <td class="border border-gray-300 p-1 align-top">
-                    <select class="w-full p-2 focus:outline-none bg-transparent row-specialist">
-                        ${opsionetS}
-                    </select>
-                </td>
-                <td class="border border-gray-300 p-1 align-top"><textarea class="w-full p-1 focus:outline-none focus:bg-blue-50 resize-none" rows="3" placeholder="Informacion shtesë / nr. ndërtesash etj..."></textarea></td>
-                <td class="border border-gray-300 p-1 align-top"><textarea class="w-full p-1 focus:outline-none focus:bg-blue-50 resize-none" rows="2" placeholder="-"></textarea></td>
-                <td class="border border-gray-300 p-1 align-top">
-                    <select class="w-full mb-1 p-1 border rounded bg-gray-100 text-gray-700 cursor-pointer focus:outline-none no-print row-afat" onchange="ndryshoTekstinAfatit(this)">
-                    </select>
-                    <input type="text" class="w-full p-2 focus:outline-none focus:bg-blue-50" placeholder="Zgjidh ose shkruaj...">
-                </td>
-                <td class="border border-gray-300 p-1 align-top">
-                    <select class="w-full p-2 focus:outline-none bg-transparent">
-                        <option>Përgjegjësi i Sektorit</option>
-                        <option>Drejtor i Drejtorisë</option>
-                    </select>
-                </td>
-                <td class="border border-gray-300 p-1 align-middle text-center no-print">
-                    <div class="flex flex-col gap-1 items-center">
-                        <button onclick="shtoTitullSektori(this)" class="bg-gray-100 text-gray-700 hover:bg-gray-500 hover:text-white p-1 rounded transition-colors text-xs w-full" title="Shto Titull Poshtë këtij rreshti">
-                            + Titull
-                        </button>
-                        <button onclick="fshiRreshtin(this)" class="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white p-1 rounded transition-colors text-xs w-full" title="Fshi Rreshtin">
-                            Fshi
-                        </button>
+                    <!-- Fusha: Sektori -->
+                    <div class="flex flex-col">
+                        <label class="font-bold text-sm mb-1">Sektori:</label>
+                        <input id="inp-sektori" type="text" class="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="P.sh. Sektori i Përpunimit..." value="SEKTORI I PËRPUNIMIT TË IMAZHERIVE SATELITORE">
                     </div>
-                </td>
-            `;
-            tbody.appendChild(tr);
-            
-            // Mbush dropdown-in e sapokrijuar me objektivat dhe afatet
-            perditesoDropdownObjektivat();
-            perditesoDropdownAfatet(); 
-            
-            // Kontrollo nëse duhet të fshehim ndonjë kolonë në rreshtin e ri
-            Array.from(tr.children).forEach((td, index) => {
-                if(kolonaTeFshehura.includes(index)) {
-                    td.style.display = 'none';
-                    td.classList.add('hidden-col');
-                }
-            });
-        }
-        window.shtoRresht = shtoRresht;
-        
-        // Helper function for Firebase loader to just add empty structure
-        window.shtoRreshtBosh = function() { shtoRresht(); };
 
-        // Funksion për të shtuar rresht titulli të ndërmjetëm (psh "Sektori i Imazherive...")
-        function shtoTitullSektori(btnRef = null, forcedTitle = null) {
-            const activeColspan = 10 - kolonaTeFshehura.length; // Përshtat hapësirën bazuar tek kolonat e fshehura
-            const tbody = document.getElementById('table-body');
-            const tr = document.createElement('tr');
-            
-            let valStr = forcedTitle !== null ? `value="${escapeHtml(forcedTitle)}"` : 'value="SEKTORI I PËRPUNIMIT TË IMAZHERIVE SATELITORE"';
-            if(forcedTitle === null && btnRef) valStr = ''; // Empty placeholder if user clicks button manually
-            
-            tr.innerHTML = `
-                <td colspan="${activeColspan}" class="border border-gray-300 p-2 bg-gray-100">
-                    <input type="text" class="w-full text-center font-bold uppercase bg-transparent focus:outline-none" placeholder="SHKRUAJ TITULLIN E SEKTORIT KËTU..." ${valStr}>
-                </td>
-                <td class="border border-gray-300 p-1 text-center no-print">
-                    <div class="flex flex-col gap-1 items-center">
-                        <button onclick="shtoTitullSektori(this)" class="bg-gray-100 text-gray-700 hover:bg-gray-500 hover:text-white p-1 rounded transition-colors text-xs w-full" title="Shto Titull Poshtë">
-                            + Titull
-                        </button>
-                        <button onclick="fshiRreshtin(this, true)" class="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white p-1 rounded transition-colors text-xs w-full" title="Fshi Titullin">
-                            Fshi
-                        </button>
+                    <!-- Fusha: Specialisti me opsion shtimi -->
+                    <div class="flex flex-col">
+                        <label class="font-bold text-sm mb-1">Specialisti:</label>
+                        <div class="flex items-center gap-2">
+                            <select id="main-specialist" class="border rounded p-2 flex-grow focus:outline-none focus:ring-2 focus:ring-blue-400">
+                                <!-- Opsionet mbushen nga JavaScript -->
+                            </select>
+                            <button onclick="hapModalSpecialist()" class="no-print bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" title="Shto Specialist të ri">
+                                + Shto
+                            </button>
+                        </div>
                     </div>
-                </td>
-            `;
-            
-            // Nëse shtypet butoni nga një rresht specifik, futet direkt poshtë atij rreshti
-            if (btnRef && btnRef instanceof HTMLElement) {
-                const parentTr = btnRef.closest('tr');
-                parentTr.insertAdjacentElement('afterend', tr);
-            } else {
-                tbody.appendChild(tr);
-            }
-            riNumerim();
-        }
-        window.shtoTitullSektori = shtoTitullSektori;
 
-        // Fshirja e rreshtit dhe ruajtja e tij në histori për ta rikthyer (Undo)
-        function fshiRreshtin(btn, eshteTitull = false) {
-            const tr = btn.closest('tr');
-            
-            // Ruajmë elementin dhe pozicionin e tij ekzakt në memorie me tipin 'rresht'
-            historiaFshirjeve.push({
-                type: 'rresht',
-                element: tr,
-                nextSibling: tr.nextElementSibling
-            });
-            
-            // Shfaq butonin "Rikthe" në krye të faqes
-            document.getElementById('btn-rikthe').classList.remove('hidden');
-            
-            tr.remove();
-            if(!eshteTitull) riNumerim();
-        }
-        window.fshiRreshtin = fshiRreshtin;
+                    <!-- Fusha: Periudha/Data -->
+                    <div class="flex flex-col">
+                        <label class="font-bold text-sm mb-1">Periudha (Java):</label>
+                        <input id="inp-periudha" type="text" class="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="P.sh. 08-12.05.2026" value="08-12.05.2026">
+                    </div>
+                </div>
+            </div>
 
-        // Funksioni jetik për të rikthyer rreshtin/titullin ose kolonën e fshirë (Undo)
-        function riktheFshirjen() {
-            if (historiaFshirjeve.length === 0) return;
+            <!-- Butonat e Veprimeve -->
+            <div class="mb-4 flex flex-wrap gap-2 no-print">
+                <button onclick="shtoRresht()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow">
+                    + Shto Rresht Aktiviteti
+                </button>
+                <button onclick="shtoTitullSektori()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded shadow">
+                    + Shto Nëntitull (Sektor)
+                </button>
+                <button onclick="hapModalObjektiv()" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded shadow">
+                    + Shto Objektiv
+                </button>
+                <button onclick="hapModalAfat()" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded shadow">
+                    + Shto Afat
+                </button>
+                <button id="btn-rikthe" onclick="riktheFshirjen()" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded shadow">
+                    ↶ Rikthe Fshirjen
+                </button>
+                <div class="flex-grow"></div>
+                <button onclick="eksportoExcel()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Eksporto Excel
+                </button>
+                <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Printo / Ruaj PDF
+                </button>
+            </div>
+
+            <!-- Tabela -->
+            <div class="overflow-x-auto border rounded-lg">
+                <table class="w-full text-sm text-left border-collapse">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                        <tr>
+                            <th class="border border-gray-300 p-2 text-center w-10">Nr.</th>
+                            <th class="border border-gray-300 p-2 min-w-[200px]">
+                                <div class="flex justify-between items-center gap-1"><span>Objektivi</span> <button onclick="fshiKolone(1)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
+                            </th>
+                            <th class="border border-gray-300 p-2 min-w-[200px]">
+                                <div class="flex justify-between items-center gap-1"><span>Detyrat Individuale</span> <button onclick="fshiKolone(2)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
+                            </th>
+                            <th class="border border-gray-300 p-2 min-w-[150px]">
+                                <div class="flex justify-between items-center gap-1"><span>Produkti Final</span> <button onclick="fshiKolone(3)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
+                            </th>
+                            <th class="border border-gray-300 p-2 min-w-[120px]">
+                                <div class="flex justify-between items-center gap-1"><span>Statusi</span> <button onclick="fshiKolone(4)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
+                            </th>
+                            <th class="border border-gray-300 p-2 min-w-[150px]">
+                                <div class="flex justify-between items-center gap-1"><span>Personi Përgjegjës</span> <button onclick="fshiKolone(5)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
+                            </th>
+                            <th class="border border-gray-300 p-2 min-w-[250px]">
+                                <div class="flex justify-between items-center gap-1"><span>Informacion</span> <button onclick="fshiKolone(6)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
+                            </th>
+                            <th class="border border-gray-300 p-2 min-w-[150px]">
+                                <div class="flex justify-between items-center gap-1"><span>Problematikat</span> <button onclick="fshiKolone(7)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
+                            </th>
+                            <th class="border border-gray-300 p-2 min-w-[100px]">
+                                <div class="flex justify-between items-center gap-1"><span>Afati</span> <button onclick="fshiKolone(8)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
+                            </th>
+                            <th class="border border-gray-300 p-2 min-w-[150px]">
+                                <div class="flex justify-between items-center gap-1"><span>Kujt i Raportohet</span> <button onclick="fshiKolone(9)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
+                            </th>
+                            <th class="border border-gray-300 p-2 w-10 no-print">Veprime</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Rreshtat do të shtohen këtu dinamikisht -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal per Shto Specialist -->
+        <div id="modal-specialist" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl w-96 transform transition-all">
+                <h2 class="text-xl font-bold mb-4">Shto Specialist të ri</h2>
+                <input type="text" id="inp-new-specialist" class="w-full border p-2 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Shkruaj emrin dhe mbiemrin...">
+                <div id="modal-error" class="text-red-500 text-sm mb-4 hidden font-bold">Ky specialist ekziston tashmë! Ju lutem provoni një tjetër.</div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button onclick="mbyllModalSpecialist()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">Anulo</button>
+                    <button onclick="ruajSpecialistModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Ruaj</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal per Shto Objektiv -->
+        <div id="modal-objektiv" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl w-[600px] max-w-[90vw] transform transition-all">
+                <h2 class="text-xl font-bold mb-4">Shto Objektiv të ri</h2>
+                <textarea id="inp-new-objektiv" class="w-full border p-2 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400" rows="4" placeholder="Shkruaj përshkrimin e plotë të objektivit..."></textarea>
+                <div id="modal-error-obj" class="text-red-500 text-sm mb-4 hidden font-bold">Ju lutem shkruani një tekst për objektivin!</div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button onclick="mbyllModalObjektiv()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">Anulo</button>
+                    <button onclick="ruajObjektivModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Ruaj</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal per Shto Afat -->
+        <div id="modal-afat" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl w-96 transform transition-all">
+                <h2 class="text-xl font-bold mb-4">Shto Afat të ri</h2>
+                <input type="text" id="inp-new-afat" class="w-full border p-2 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="P.sh. Janar-Dhjetor">
+                <div id="modal-error-afat" class="text-red-500 text-sm mb-4 hidden font-bold">Ky afat ekziston tashmë!</div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button onclick="mbyllModalAfat()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">Anulo</button>
+                    <button onclick="ruajAfatModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Ruaj</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- === SKRIPTI JOT ORIGJINAL === -->
+        <script>
+            // Ruajmë specialistët në memorie (Array)
+            let specialistet = ['Erland Alla', 'Specialist Test'];
             
-            const eFundit = historiaFshirjeve.pop();
-            const tbody = document.getElementById('table-body');
-            
-            if (eFundit.type === 'kolone') {
-                // RIKTHE KOLONËN E FSHIRË
-                const colIndex = eFundit.colIndex;
+            // Ruajmë objektivat në memorie
+            let objektivat = [
+                { id: "Objektivi 1", text: "Bashkërendimi ndërinstitucional" },
+                { id: "Objektivi 2", text: 'Mbarëvajtja e projektit "Shërbime Satelitore" në kuadër të monitorimit të territorit me teknologji të avancuar.' },
+                { id: "Objektivi 3", text: "Ndjekja e implementimit të projekteve që lidhen me mbledhjen e informacionit gjeohapësinor të kapur (mbledhur) nëpërmjet teknologjisë UAV" },
+                { id: "Objektivi 4", text: 'Ndjekja e implementimit të projekteve që lidhen me mbledhjen e informacionit gjeohapësinor të kapur (mbledhur) nëpërmjet fotografimit me kamera "Street View 360°".' },
+                { id: "Objektivi 5", text: '"Dija institucionale dhe kapacitetet njerëzore" (Ngritja e kapaciteteve të stafit të ASIG nëpërmjet projekteve).' }
+            ];
+
+            // Ruajmë afatet në memorie
+            let afatet = ['Janar-Dhjetor'];
+            let kolonaTeFshehura = []; // Ruajmë indeksat e kolonave të fshehura
+
+            let numeruesiRreshtave = 0;
+            let historiaFshirjeve = []; // Për të ruajtur rreshtat e fshirë për rikthim
+
+            // Funksioni për të fshehur një kolonë
+            function fshiKolone(colIndex) {
+                kolonaTeFshehura.push(colIndex);
                 
-                // Hiq indeksin e kolonës nga vargu i fshehjeve
-                kolonaTeFshehura = kolonaTeFshehura.filter(idx => idx !== colIndex);
+                // Ruajmë veprimin në histori për Undo
+                historiaFshirjeve.push({ type: 'kolone', colIndex: colIndex });
+                document.getElementById('btn-rikthe').classList.remove('hidden');
                 
-                // Shfaq headerin
+                // Fshih headerin e asaj kolone
                 const thead = document.querySelector('thead tr');
-                thead.children[colIndex].style.display = '';
+                thead.children[colIndex].style.display = 'none';
                 
-                // Shfaq qelizat në çdo rresht
+                // Fshih qelizat ekzistuese në atë kolonë
+                const tbody = document.getElementById('table-body');
                 Array.from(tbody.children).forEach(tr => {
                     const firstCell = tr.firstElementChild;
                     if (firstCell.hasAttribute('colspan')) {
+                        // Zvogëlo hapësirën e titujve të sektorit
                         let currentColspan = parseInt(firstCell.getAttribute('colspan'));
-                        firstCell.setAttribute('colspan', currentColspan + 1);
+                        firstCell.setAttribute('colspan', currentColspan - 1);
                     } else {
-                        tr.children[colIndex].style.display = '';
-                        tr.children[colIndex].classList.remove('hidden-col');
+                        tr.children[colIndex].style.display = 'none';
+                        tr.children[colIndex].classList.add('hidden-col');
                     }
                 });
+            }
+
+            // Funksioni për të përditësuar të gjitha menutë dropdown (select) të specialistëve
+            function perditesoDropdownSpecialistet() {
+                const optionsHTML = specialistet.map(s => `<option value="${s}">${s}</option>`).join('');
                 
-                // Rregullo edhe rreshtat që janë fshirë ndërkohë dhe presin në histori
-                historiaFshirjeve.forEach(item => {
-                    if((item.type === 'rresht' || !item.type) && item.element) {
-                         const firstCell = item.element.firstElementChild;
-                         if (firstCell && firstCell.hasAttribute('colspan')) {
-                              let currentColspan = parseInt(firstCell.getAttribute('colspan'));
-                              firstCell.setAttribute('colspan', currentColspan + 1);
-                         } else if (item.element.children[colIndex]) {
-                              item.element.children[colIndex].style.display = '';
-                              item.element.children[colIndex].classList.remove('hidden-col');
-                         }
+                // Përditëso specialistin kryesor në header
+                const mainSelect = document.getElementById('main-specialist');
+                const mainVal = mainSelect.value;
+                mainSelect.innerHTML = optionsHTML;
+                if (specialistet.includes(mainVal)) mainSelect.value = mainVal;
+
+                // Përditëso të gjithë rreshtat e tabelës
+                document.querySelectorAll('.row-specialist').forEach(select => {
+                    const rreshtVal = select.value;
+                    select.innerHTML = `<option value=""></option>` + optionsHTML; // Shto një opsion bosh në fillim për rreshtat
+                    if (specialistet.includes(rreshtVal)) select.value = rreshtVal;
+                });
+            }
+
+            // Menaxhimi i Modalit të Specialistëve
+            function hapModalSpecialist() {
+                document.getElementById('modal-specialist').classList.remove('hidden');
+                document.getElementById('modal-specialist').classList.add('flex');
+                document.getElementById('inp-new-specialist').value = '';
+                document.getElementById('modal-error').classList.add('hidden');
+                document.getElementById('inp-new-specialist').focus();
+            }
+
+            function mbyllModalSpecialist() {
+                document.getElementById('modal-specialist').classList.add('hidden');
+                document.getElementById('modal-specialist').classList.remove('flex');
+            }
+
+            function ruajSpecialistModal() {
+                const emerIRi = document.getElementById('inp-new-specialist').value;
+                if (emerIRi && emerIRi.trim() !== "") {
+                    const emriPaster = emerIRi.trim();
+                    if (!specialistet.includes(emriPaster)) {
+                        specialistet.push(emriPaster);
+                        perditesoDropdownSpecialistet();
+                        
+                        // Zgjidh automatikisht atë të saposhtuarin në krye
+                        document.getElementById('main-specialist').value = emriPaster;
+                        mbyllModalSpecialist();
+                    } else {
+                        document.getElementById('modal-error').classList.remove('hidden');
+                    }
+                }
+            }
+
+            // Lejo shtypjen e 'Enter' për të ruajtur specialistin
+            document.getElementById('inp-new-specialist').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') ruajSpecialistModal();
+            });
+
+            // Menaxhimi i Modalit të Objektivave
+            function hapModalObjektiv() {
+                document.getElementById('modal-objektiv').classList.remove('hidden');
+                document.getElementById('modal-objektiv').classList.add('flex');
+                document.getElementById('inp-new-objektiv').value = '';
+                document.getElementById('modal-error-obj').classList.add('hidden');
+                document.getElementById('inp-new-objektiv').focus();
+            }
+
+            function mbyllModalObjektiv() {
+                document.getElementById('modal-objektiv').classList.add('hidden');
+                document.getElementById('modal-objektiv').classList.remove('flex');
+            }
+
+            function ruajObjektivModal() {
+                const tekstiIRi = document.getElementById('inp-new-objektiv').value.trim();
+                if (tekstiIRi !== "") {
+                    const nextId = `Objektivi ${objektivat.length + 1}`;
+                    objektivat.push({ id: nextId, text: tekstiIRi });
+                    perditesoDropdownObjektivat();
+                    mbyllModalObjektiv();
+                } else {
+                    document.getElementById('modal-error-obj').classList.remove('hidden');
+                }
+            }
+
+            function perditesoDropdownObjektivat() {
+                const optionsHTML = `<option value="">-- Zgjidh Objektivin --</option>` + 
+                    objektivat.map(o => `<option value="${o.id}" data-text="${escapeHtml(o.text)}">${o.id}: ${o.text}</option>`).join('');
+
+                document.querySelectorAll('.row-objektiv').forEach(select => {
+                    const val = select.value;
+                    select.innerHTML = optionsHTML;
+                    if (val) select.value = val;
+                });
+            }
+
+            function ndryshoTekstinObjektivit(selectElement) {
+                if(selectElement.value) {
+                    const textarea = selectElement.nextElementSibling;
+                    const selectedOption = selectElement.options[selectElement.selectedIndex];
+                    textarea.value = selectedOption.getAttribute('data-text');
+                    textarea.style.height = 'auto';
+                    textarea.style.height = textarea.scrollHeight + 'px';
+                }
+            }
+
+            // Menaxhimi i Modalit dhe Dropdown-it për Afatet
+            function hapModalAfat() {
+                document.getElementById('modal-afat').classList.remove('hidden');
+                document.getElementById('modal-afat').classList.add('flex');
+                document.getElementById('inp-new-afat').value = '';
+                document.getElementById('modal-error-afat').classList.add('hidden');
+                document.getElementById('inp-new-afat').focus();
+            }
+
+            function mbyllModalAfat() {
+                document.getElementById('modal-afat').classList.add('hidden');
+                document.getElementById('modal-afat').classList.remove('flex');
+            }
+
+            function ruajAfatModal() {
+                const afatiRi = document.getElementById('inp-new-afat').value.trim();
+                if (afatiRi !== "") {
+                    if (!afatet.includes(afatiRi)) {
+                        afatet.push(afatiRi);
+                        perditesoDropdownAfatet();
+                        mbyllModalAfat();
+                    } else {
+                        document.getElementById('modal-error-afat').classList.remove('hidden');
+                    }
+                }
+            }
+
+            function perditesoDropdownAfatet() {
+                const optionsHTML = `<option value="">-- Zgjidh --</option>` + 
+                    afatet.map(a => `<option value="${a}">${a}</option>`).join('');
+
+                document.querySelectorAll('.row-afat').forEach(select => {
+                    const val = select.value;
+                    select.innerHTML = optionsHTML;
+                    if (val) select.value = val;
+                });
+            }
+
+            function ndryshoTekstinAfatit(selectElement) {
+                if(selectElement.value) {
+                    const input = selectElement.nextElementSibling;
+                    input.value = selectElement.value;
+                }
+            }
+
+            // Funksioni për ngjyrosjen e statusit
+            function ndryshoNgjyrenStatusit(selectElement) {
+                if (selectElement.value === 'Në proces') {
+                    selectElement.classList.remove('text-black');
+                    selectElement.classList.add('text-orange-500');
+                } else if (selectElement.value === 'Përfunduar') {
+                    selectElement.classList.remove('text-orange-500');
+                    selectElement.classList.add('text-black');
+                } else {
+                    selectElement.classList.remove('text-orange-500', 'text-black');
+                }
+            }
+
+            // Funksioni për të shtuar një rresht të ri aktiviteti me objektivat fikse
+            function shtoRresht() {
+                numeruesiRreshtave++;
+                const tbody = document.getElementById('table-body');
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors";
+                
+                // Merr specialistin kryesor aktual për t'ia vendosur by default rreshtit
+                const specialistiAktual = document.getElementById('main-specialist').value;
+
+                // Krijo opsionet për dropdownin e atij rreshti
+                const opsionetS = `<option value=""></option>` + specialistet.map(s => 
+                    `<option value="${s}" ${s === specialistiAktual ? 'selected' : ''}>${s}</option>`
+                ).join('');
+
+                tr.innerHTML = `
+                    <td class="border border-gray-300 p-2 text-center align-top font-bold text-gray-600">${numeruesiRreshtave}</td>
+                    <td class="border border-gray-300 p-1 align-top relative">
+                        <select class="w-full mb-1 p-1 border rounded bg-gray-100 text-gray-700 cursor-pointer focus:outline-none no-print row-objektiv" onchange="ndryshoTekstinObjektivit(this)">
+                        </select>
+                        <textarea class="w-full p-1 focus:outline-none focus:bg-blue-50 resize-none" rows="2" placeholder="Zgjidh sipër ose shkruaj..."></textarea>
+                    </td>
+                    <td class="border border-gray-300 p-1 align-top"><textarea class="w-full p-1 focus:outline-none focus:bg-blue-50 resize-none" rows="3" placeholder="Përshkruaj detyrat..."></textarea></td>
+                    <td class="border border-gray-300 p-1 align-top"><textarea class="w-full p-1 focus:outline-none focus:bg-blue-50 resize-none" rows="2" placeholder="Produkti final..."></textarea></td>
+                    <td class="border border-gray-300 p-1 align-top">
+                        <select class="w-full p-2 font-bold focus:outline-none bg-transparent cursor-pointer transition-colors status-select text-orange-500" onchange="ndryshoNgjyrenStatusit(this)">
+                            <option value="Në proces" class="text-orange-500 font-bold">Në proces</option>
+                            <option value="Përfunduar" class="text-black font-bold">Përfunduar</option>
+                        </select>
+                    </td>
+                    <td class="border border-gray-300 p-1 align-top">
+                        <select class="w-full p-2 focus:outline-none bg-transparent row-specialist">
+                            ${opsionetS}
+                        </select>
+                    </td>
+                    <td class="border border-gray-300 p-1 align-top"><textarea class="w-full p-1 focus:outline-none focus:bg-blue-50 resize-none" rows="3" placeholder="Informacion shtesë / nr. ndërtesash etj..."></textarea></td>
+                    <td class="border border-gray-300 p-1 align-top"><textarea class="w-full p-1 focus:outline-none focus:bg-blue-50 resize-none" rows="2" placeholder="-"></textarea></td>
+                    <td class="border border-gray-300 p-1 align-top">
+                        <select class="w-full mb-1 p-1 border rounded bg-gray-100 text-gray-700 cursor-pointer focus:outline-none no-print row-afat" onchange="ndryshoTekstinAfatit(this)">
+                        </select>
+                        <input type="text" class="w-full p-2 focus:outline-none focus:bg-blue-50" placeholder="Zgjidh ose shkruaj...">
+                    </td>
+                    <td class="border border-gray-300 p-1 align-top">
+                        <select class="w-full p-2 focus:outline-none bg-transparent">
+                            <option>Përgjegjësi i Sektorit</option>
+                            <option>Drejtor i Drejtorisë</option>
+                        </select>
+                    </td>
+                    <td class="border border-gray-300 p-1 align-middle text-center no-print">
+                        <div class="flex flex-col gap-1 items-center">
+                            <button onclick="shtoTitullSektori(this)" class="bg-gray-100 text-gray-700 hover:bg-gray-500 hover:text-white p-1 rounded transition-colors text-xs w-full" title="Shto Titull Poshtë këtij rreshti">
+                                + Titull
+                            </button>
+                            <button onclick="fshiRreshtin(this)" class="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white p-1 rounded transition-colors text-xs w-full" title="Fshi Rreshtin">
+                                Fshi
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+                
+                // Mbush dropdown-in e sapokrijuar me objektivat dhe afatet
+                perditesoDropdownObjektivat();
+                perditesoDropdownAfatet(); 
+                
+                // Kontrollo nëse duhet të fshehim ndonjë kolonë në rreshtin e ri
+                Array.from(tr.children).forEach((td, index) => {
+                    if(kolonaTeFshehura.includes(index)) {
+                        td.style.display = 'none';
+                        td.classList.add('hidden-col');
                     }
                 });
-            } else {
-                // RIKTHE RRESHTIN OSE TITULLIN E FSHIRË
-                // Riktheje në pozicionin origjinal nqs vëllai i tij ekziston, përndryshe në fund
-                if (eFundit.nextSibling && tbody.contains(eFundit.nextSibling)) {
-                    tbody.insertBefore(eFundit.element, eFundit.nextSibling);
+            }
+
+            // Funksion për të shtuar rresht titulli të ndërmjetëm (psh "Sektori i Imazherive...")
+            function shtoTitullSektori(btnRef = null, forceVal = null) {
+                const activeColspan = 10 - kolonaTeFshehura.length; // Përshtat hapësirën bazuar tek kolonat e fshehura
+                const tbody = document.getElementById('table-body');
+                const tr = document.createElement('tr');
+                let valueAttr = '';
+                if(forceVal !== null) valueAttr = `value="${escapeHtml(forceVal)}"`;
+                else if (btnRef === null) valueAttr = `value="SEKTORI I PËRPUNIMIT TË IMAZHERIVE SATELITORE"`;
+
+                tr.innerHTML = `
+                    <td colspan="${activeColspan}" class="border border-gray-300 p-2 bg-gray-100">
+                        <input type="text" class="w-full text-center font-bold uppercase bg-transparent focus:outline-none" placeholder="SHKRUAJ TITULLIN E SEKTORIT KËTU..." ${valueAttr}>
+                    </td>
+                    <td class="border border-gray-300 p-1 text-center no-print">
+                        <div class="flex flex-col gap-1 items-center">
+                            <button onclick="shtoTitullSektori(this)" class="bg-gray-100 text-gray-700 hover:bg-gray-500 hover:text-white p-1 rounded transition-colors text-xs w-full" title="Shto Titull Poshtë">
+                                + Titull
+                            </button>
+                            <button onclick="fshiRreshtin(this, true)" class="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white p-1 rounded transition-colors text-xs w-full" title="Fshi Titullin">
+                                Fshi
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                // Nëse shtypet butoni nga një rresht specifik, futet direkt poshtë atij rreshti
+                if (btnRef && btnRef instanceof HTMLElement) {
+                    const parentTr = btnRef.closest('tr');
+                    parentTr.insertAdjacentElement('afterend', tr);
                 } else {
-                    tbody.appendChild(eFundit.element);
+                    tbody.appendChild(tr);
                 }
                 riNumerim();
             }
-            
-            // Hiq butonin Rikthe nqs s'ka fshirje të tjera pezull
-            if (historiaFshirjeve.length === 0) {
-                document.getElementById('btn-rikthe').classList.add('hidden');
-            }
-        }
-        window.riktheFshirjen = riktheFshirjen;
 
-        // Funksioni për të ribërë numrat rendorë pas fshirjes së një rreshti
-        function riNumerim() {
-            const tbody = document.getElementById('table-body');
-            let counter = 1;
-            Array.from(tbody.children).forEach(tr => {
-                // Nëse rreshti nuk ka `colspan` do të thotë që është rresht normal
-                const firstCell = tr.firstElementChild;
-                if (!firstCell.hasAttribute('colspan')) {
-                    firstCell.textContent = counter++;
-                }
-            });
-            numeruesiRreshtave = counter - 1;
-        }
-        window.riNumerim = riNumerim;
-
-        // Auto-resize për textareas gjatë shtypjes për t'u dukur si celulat e Excel-it
-        document.addEventListener('input', function (event) {
-            if (event.target.tagName.toLowerCase() === 'textarea') {
-                event.target.style.height = 'auto';
-                event.target.style.height = (event.target.scrollHeight) + 'px';
-            }
-        }, false);
-
-        // Funksion për të përgatitur pamjen ekzakte të printimit si Excel
-        window.addEventListener('beforeprint', () => {
-            const drejtoria = document.getElementById('inp-drejtoria').value || "";
-            const sektori = document.getElementById('inp-sektori').value || "";
-            const specialisti = document.getElementById('main-specialist').value || "";
-            const data = document.getElementById('inp-periudha').value || "";
-            
-            document.getElementById('print-header').textContent = 
-                `RAPORTI JAVOR I SPECIALISTIT ${specialisti.toUpperCase()} ${drejtoria.toUpperCase()} / ${sektori.toUpperCase()} ${data}`;
-            
-            // Zgjerimi i fushave në maksimum për printim
-            document.querySelectorAll('textarea').forEach(ta => {
-                ta.style.height = 'auto';
-                ta.style.height = ta.scrollHeight + 'px';
-            });
-        });
-
-        // Funksioni për eksportimin në Excel (XLS)
-        function eksportoExcel() {
-            const drejtoria = document.getElementById('inp-drejtoria').value || "";
-            const sektori = document.getElementById('inp-sektori').value || "";
-            const specialisti = document.getElementById('main-specialist').value || "";
-            const data = document.getElementById('inp-periudha').value || "";
-            
-            const titulli = `RAPORTI JAVOR I SPECIALISTIT ${specialisti.toUpperCase()} ${drejtoria.toUpperCase()} / ${sektori.toUpperCase()} ${data}`;
-            
-            // Stilizimet e kërkuara për qendërzim dhe format Times New Roman 12
-            let tableHtml = `<table border="1" style="font-family: 'Times New Roman', Times, serif; font-size: 12pt; text-align: center; vertical-align: middle;">
-                <tr><td colspan="${10 - kolonaTeFshehura.length}" style="text-align:center; font-weight:bold; font-size: 14px; border:none;"><span style="background-color:white;">${escapeHtml(titulli)}</span></td></tr>
-                <tr style="font-weight:bold;">`;
-            
-            const headers = ['Nr.', 'OBJEKTIVI', 'DETYRAT INDIVIDUALE', 'PRODUKTI FINAL', 'STATUSI', 'PERSONI PËRGJEGJËS', 'INFORMACION', 'PROBLEMATIKAT', 'AFATI', 'KUJT I RAPORTOHET'];
-            
-            headers.forEach((h, i) => {
-                if(!kolonaTeFshehura.includes(i)) {
-                    tableHtml += `<th style="text-align:center; vertical-align:middle; background-color:#f3f4f6;">${h}</th>`;
-                }
-            });
-            tableHtml += `</tr>`;
+            // Fshirja e rreshtit dhe ruajtja e tij në histori për ta rikthyer (Undo)
+            function fshiRreshtin(btn, eshteTitull = false) {
+                const tr = btn.closest('tr');
                 
-            const rows = document.getElementById('table-body').querySelectorAll('tr');
-            rows.forEach(tr => {
-                tableHtml += '<tr>';
-                const cells = tr.querySelectorAll('td:not(.no-print)');
-                if (cells.length === 1) { 
-                   // Rresht titulli sektori (colspan)
-                   const val = tr.querySelector('input') ? tr.querySelector('input').value : tr.innerText;
-                   // Ngjyra u kufizua tek teksti me <span> që të mos shtrihet përtej
-                   tableHtml += `<td colspan="${10 - kolonaTeFshehura.length}" style="text-align:center; font-weight:bold; vertical-align:middle;"><span style="background-color:#f9fafb; padding:2px 10px;">${escapeHtml(val)}</span></td>`;
+                // Ruajmë elementin dhe pozicionin e tij ekzakt në memorie me tipin 'rresht'
+                historiaFshirjeve.push({
+                    type: 'rresht',
+                    element: tr,
+                    nextSibling: tr.nextElementSibling
+                });
+                
+                // Shfaq butonin "Rikthe" në krye të faqes
+                document.getElementById('btn-rikthe').classList.remove('hidden');
+                
+                tr.remove();
+                if(!eshteTitull) riNumerim();
+            }
+
+            // Funksioni jetik për të rikthyer rreshtin/titullin ose kolonën e fshirë (Undo)
+            function riktheFshirjen() {
+                if (historiaFshirjeve.length === 0) return;
+                
+                const eFundit = historiaFshirjeve.pop();
+                const tbody = document.getElementById('table-body');
+                
+                if (eFundit.type === 'kolone') {
+                    // RIKTHE KOLONËN E FSHIRË
+                    const colIndex = eFundit.colIndex;
+                    
+                    // Hiq indeksin e kolonës nga vargu i fshehjeve
+                    kolonaTeFshehura = kolonaTeFshehura.filter(idx => idx !== colIndex);
+                    
+                    // Shfaq headerin
+                    const thead = document.querySelector('thead tr');
+                    thead.children[colIndex].style.display = '';
+                    
+                    // Shfaq qelizat në çdo rresht
+                    Array.from(tbody.children).forEach(tr => {
+                        const firstCell = tr.firstElementChild;
+                        if (firstCell.hasAttribute('colspan')) {
+                            let currentColspan = parseInt(firstCell.getAttribute('colspan'));
+                            firstCell.setAttribute('colspan', currentColspan + 1);
+                        } else {
+                            tr.children[colIndex].style.display = '';
+                            tr.children[colIndex].classList.remove('hidden-col');
+                        }
+                    });
+                    
+                    // Rregullo edhe rreshtat që janë fshirë ndërkohë dhe presin në histori
+                    historiaFshirjeve.forEach(item => {
+                        if((item.type === 'rresht' || !item.type) && item.element) {
+                             const firstCell = item.element.firstElementChild;
+                             if (firstCell && firstCell.hasAttribute('colspan')) {
+                                  let currentColspan = parseInt(firstCell.getAttribute('colspan'));
+                                  firstCell.setAttribute('colspan', currentColspan + 1);
+                             } else if (item.element.children[colIndex]) {
+                                  item.element.children[colIndex].style.display = '';
+                                  item.element.children[colIndex].classList.remove('hidden-col');
+                             }
+                        }
+                    });
                 } else {
-                   cells.forEach((td, index) => {
-                       // Shmang kolonat e fshehura gjatë eksportit në Excel
-                       if(td.classList.contains('hidden-col') || td.style.display === 'none') return;
-                       
-                       let text = "";
-                       if (td.querySelector('textarea')) text = td.querySelector('textarea').value;
-                       else if (td.querySelector('select')) text = td.querySelector('select').value;
-                       else if (td.querySelector('input')) text = td.querySelector('input').value;
-                       else text = td.innerText;
-                       
-                       // Ruajmë ngjyrën portokalli në Excel dhe qendërzimin e detyrueshëm
-                       let inlineStyle = 'text-align: center; vertical-align: middle;';
-                       if (index === 4 && text === "Në proces") inlineStyle += ' color:#f97316; font-weight:bold;';
-                       if (index === 4 && text === "Përfunduar") inlineStyle += ' font-weight:bold;';
-                       
-                       tableHtml += `<td style="${inlineStyle}">${escapeHtml(text).replace(/\n/g, '<br>')}</td>`;
-                   });
+                    // RIKTHE RRESHTIN OSE TITULLIN E FSHIRË
+                    // Riktheje në pozicionin origjinal nqs vëllai i tij ekziston, përndryshe në fund
+                    if (eFundit.nextSibling && tbody.contains(eFundit.nextSibling)) {
+                        tbody.insertBefore(eFundit.element, eFundit.nextSibling);
+                    } else {
+                        tbody.appendChild(eFundit.element);
+                    }
+                    riNumerim();
                 }
-                tableHtml += '</tr>';
+                
+                // Hiq butonin Rikthe nqs s'ka fshirje të tjera pezull
+                if (historiaFshirjeve.length === 0) {
+                    document.getElementById('btn-rikthe').classList.add('hidden');
+                }
+            }
+
+            // Funksioni për të ribërë numrat rendorë pas fshirjes së një rreshti
+            function riNumerim() {
+                const tbody = document.getElementById('table-body');
+                let counter = 1;
+                Array.from(tbody.children).forEach(tr => {
+                    // Nëse rreshti nuk ka `colspan` do të thotë që është rresht normal
+                    const firstCell = tr.firstElementChild;
+                    if (!firstCell.hasAttribute('colspan')) {
+                        firstCell.textContent = counter++;
+                    }
+                });
+                numeruesiRreshtave = counter - 1;
+            }
+
+            // Auto-resize për textareas gjatë shtypjes për t'u dukur si celulat e Excel-it
+            document.addEventListener('input', function (event) {
+                if (event.target.tagName.toLowerCase() === 'textarea') {
+                    event.target.style.height = 'auto';
+                    event.target.style.height = (event.target.scrollHeight) + 'px';
+                }
+            }, false);
+
+            // Funksion për të përgatitur pamjen ekzakte të printimit si Excel
+            window.addEventListener('beforeprint', () => {
+                const drejtoria = document.getElementById('inp-drejtoria').value || "";
+                const sektori = document.getElementById('inp-sektori').value || "";
+                const specialisti = document.getElementById('main-specialist').value || "";
+                const data = document.getElementById('inp-periudha').value || "";
+                
+                document.getElementById('print-header').textContent = 
+                    `RAPORTI JAVOR I SPECIALISTIT ${specialisti.toUpperCase()} ${drejtoria.toUpperCase()} / ${sektori.toUpperCase()} ${data}`;
+                
+                // Zgjerimi i fushave në maksimum për printim
+                document.querySelectorAll('textarea').forEach(ta => {
+                    ta.style.height = 'auto';
+                    ta.style.height = ta.scrollHeight + 'px';
+                });
             });
-            tableHtml += '</table>';
+
+            // Funksioni për eksportimin në Excel (XLS)
+            function eksportoExcel() {
+                const drejtoria = document.getElementById('inp-drejtoria').value || "";
+                const sektori = document.getElementById('inp-sektori').value || "";
+                const specialisti = document.getElementById('main-specialist').value || "";
+                const data = document.getElementById('inp-periudha').value || "";
+                
+                const titulli = `RAPORTI JAVOR I SPECIALISTIT ${specialisti.toUpperCase()} ${drejtoria.toUpperCase()} / ${sektori.toUpperCase()} ${data}`;
+                
+                // Stilizimet e kërkuara për qendërzim dhe format Times New Roman 12
+                let tableHtml = `<table border="1" style="font-family: 'Times New Roman', Times, serif; font-size: 12pt; text-align: center; vertical-align: middle;">
+                    <tr><td colspan="${10 - kolonaTeFshehura.length}" style="text-align:center; font-weight:bold; font-size: 14px; border:none;"><span style="background-color:white;">${escapeHtml(titulli)}</span></td></tr>
+                    <tr style="font-weight:bold;">`;
+                
+                const headers = ['Nr.', 'OBJEKTIVI', 'DETYRAT INDIVIDUALE', 'PRODUKTI FINAL', 'STATUSI', 'PERSONI PËRGJEGJËS', 'INFORMACION', 'PROBLEMATIKAT', 'AFATI', 'KUJT I RAPORTOHET'];
+                
+                headers.forEach((h, i) => {
+                    if(!kolonaTeFshehura.includes(i)) {
+                        tableHtml += `<th style="text-align:center; vertical-align:middle; background-color:#f3f4f6;">${h}</th>`;
+                    }
+                });
+                tableHtml += `</tr>`;
+                    
+                const rows = document.getElementById('table-body').querySelectorAll('tr');
+                rows.forEach(tr => {
+                    tableHtml += '<tr>';
+                    const cells = tr.querySelectorAll('td:not(.no-print)');
+                    if (cells.length === 1) { 
+                       // Rresht titulli sektori (colspan)
+                       const val = tr.querySelector('input') ? tr.querySelector('input').value : tr.innerText;
+                       // Ngjyra u kufizua tek teksti me <span> që të mos shtrihet përtej
+                       tableHtml += `<td colspan="${10 - kolonaTeFshehura.length}" style="text-align:center; font-weight:bold; vertical-align:middle;"><span style="background-color:#f9fafb; padding:2px 10px;">${escapeHtml(val)}</span></td>`;
+                    } else {
+                       cells.forEach((td, index) => {
+                           // Shmang kolonat e fshehura gjatë eksportit në Excel
+                           if(td.classList.contains('hidden-col') || td.style.display === 'none') return;
+                           
+                           let text = "";
+                           if (td.querySelector('textarea')) text = td.querySelector('textarea').value;
+                           else if (td.querySelector('select')) text = td.querySelector('select').value;
+                           else if (td.querySelector('input')) text = td.querySelector('input').value;
+                           else text = td.innerText;
+                           
+                           // Ruajmë ngjyrën portokalli në Excel dhe qendërzimin e detyrueshëm
+                           let inlineStyle = 'text-align: center; vertical-align: middle;';
+                           if (index === 4 && text === "Në proces") inlineStyle += ' color:#f97316; font-weight:bold;';
+                           if (index === 4 && text === "Përfunduar") inlineStyle += ' font-weight:bold;';
+                           
+                           tableHtml += `<td style="${inlineStyle}">${escapeHtml(text).replace(/\n/g, '<br>')}</td>`;
+                       });
+                    }
+                    tableHtml += '</tr>';
+                });
+                tableHtml += '</table>';
+                
+                // Krijojmë dhe shkarkojmë skedarin Excel
+                const blob = new Blob(['\ufeff' + tableHtml], { type: 'application/vnd.ms-excel' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Raporti_${specialisti.replace(/\s+/g, '_')}_${data}.xls`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
             
-            // Krijojmë dhe shkarkojmë skedarin Excel
-            const blob = new Blob(['\ufeff' + tableHtml], { type: 'application/vnd.ms-excel' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Raporti_${specialisti.replace(/\s+/g, '_')}_${data}.xls`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-        
-        function escapeHtml(unsafe) {
-            return (unsafe || "").toString()
-                 .replace(/&/g, "&amp;")
-                 .replace(/</g, "&lt;")
-                 .replace(/>/g, "&gt;")
-                 .replace(/"/g, "&quot;")
-                 .replace(/'/g, "&#039;");
-        }
+            function escapeHtml(unsafe) {
+                return (unsafe || "").toString()
+                     .replace(/&/g, "&amp;")
+                     .replace(/</g, "&lt;")
+                     .replace(/>/g, "&gt;")
+                     .replace(/"/g, "&quot;")
+                     .replace(/'/g, "&#039;");
+            }
 
-        // Kemi hequr funksionet e inicializimit të rreshtit automatik këtu poshtë 
-        // sepse ato tani menaxhohen nga procesi i Load Data nga Firebase (ose shtohen aty nëse është dokument i ri)
+            // Inicializimi i parë nëse përdoruesi hyn për herë të parë
+            perditesoDropdownSpecialistet();
+            perditesoDropdownObjektivat();
+            perditesoDropdownAfatet();
+            
+            shtoTitullSektori();
+            shtoRresht();
 
-    </script>
-    </div> <!-- Fundi i div main-app -->
+            // LIDHJA E FUNKSIONEVE ME FIREBASE PA PREKUR KODIN E MËSIPËRM
+            window.specialistet = specialistet;
+            window.objektivat = objektivat;
+            window.afatet = afatet;
+            window.kolonaTeFshehura = kolonaTeFshehura;
+            window.historiaFshirjeve = historiaFshirjeve;
+            window.numeruesiRreshtave = numeruesiRreshtave;
+            
+            window.fshiKolone = fshiKolone;
+            window.perditesoDropdownSpecialistet = perditesoDropdownSpecialistet;
+            window.perditesoDropdownObjektivat = perditesoDropdownObjektivat;
+            window.perditesoDropdownAfatet = perditesoDropdownAfatet;
+            window.ndryshoNgjyrenStatusit = ndryshoNgjyrenStatusit;
+            window.shtoRresht = shtoRresht;
+            window.shtoTitullSektori = shtoTitullSektori;
+            window.fshiRreshtin = fshiRreshtin;
+            window.riktheFshirjen = riktheFshirjen;
+            window.riNumerim = riNumerim;
+        </script>
+    </div>
 </body>
 </html>
