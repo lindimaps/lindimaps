@@ -7,7 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        // Shtuam modulet e reja për Email Auth
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -34,40 +35,112 @@
         // Define common app ID for the artifact path requirement
         window.__app_id = 'raportimi-javor-asig'; 
 
-        async function initFirebase() {
-            try {
-                // Determine user ID (using custom token logic if available, else anonymous)
-                let user;
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    const { signInWithCustomToken } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
-                    const userCredential = await signInWithCustomToken(auth, __initial_auth_token);
-                    user = userCredential.user;
-                } else {
-                    const userCredential = await signInAnonymously(auth);
-                    user = userCredential.user;
-                }
-                
+        // === LOGJIKA E RE E AUTENTIFIKIMIT ===
+        
+        // Dëgjuesi i gjendjes së hyrjes
+        onAuthStateChanged(auth, async (user) => {
+            const authContainer = document.getElementById('auth-container');
+            const mainApp = document.getElementById('main-app');
+            const userEmailDisplay = document.getElementById('user-email-display');
+            
+            if (user) {
+                // Përdoruesi është i loguar
                 window.userId = user.uid;
+                userEmailDisplay.textContent = user.email;
                 
-                // Show a small save status indicator
-                const statusDiv = document.createElement('div');
-                statusDiv.id = 'save-status';
-                statusDiv.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded shadow text-sm opacity-0 transition-opacity z-50 no-print';
-                statusDiv.textContent = 'Ruajtur automatikisht ✓';
-                document.body.appendChild(statusDiv);
+                authContainer.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                
+                // Show a small save status indicator (if it doesn't exist)
+                if (!document.getElementById('save-status')) {
+                    const statusDiv = document.createElement('div');
+                    statusDiv.id = 'save-status';
+                    statusDiv.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded shadow text-sm opacity-0 transition-opacity z-50 no-print';
+                    statusDiv.textContent = 'Ruajtur automatikisht ✓';
+                    document.body.appendChild(statusDiv);
+                }
 
-                // Load existing data
+                // Load existing data for this user
                 await loadDataFromFirebase();
-                
-                // Set up auto-saving (listen for changes on inputs/textareas)
                 setupAutoSave();
-
-            } catch (error) {
-                console.error("Error initializing Firebase:", error);
+            } else {
+                // Përdoruesi nuk është i loguar
+                window.userId = null;
+                authContainer.classList.remove('hidden');
+                mainApp.classList.add('hidden');
             }
-        }
+        });
 
-        initFirebase();
+        // Funksionet e Hyrjes / Daljes
+        window.hyrNeLlogari = function(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
+            const errorDiv = document.getElementById('auth-error');
+            errorDiv.classList.add('hidden');
+            
+            signInWithEmailAndPassword(auth, email, pass)
+                .catch((error) => {
+                    errorDiv.textContent = "Gabim: Email ose fjalëkalim i pasaktë!";
+                    errorDiv.classList.remove('hidden');
+                });
+        };
+
+        window.krijoLlogari = function(e) {
+            e.preventDefault();
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            const errorDiv = document.getElementById('reg-error');
+            errorDiv.classList.add('hidden');
+            
+            if(pass.length < 6) {
+                errorDiv.textContent = "Fjalëkalimi duhet të ketë të paktën 6 karaktere!";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            createUserWithEmailAndPassword(auth, email, pass)
+                .catch((error) => {
+                    errorDiv.textContent = "Gabim: " + error.message;
+                    errorDiv.classList.remove('hidden');
+                });
+        };
+
+        window.rifitimiFjalekalimit = function(e) {
+            e.preventDefault();
+            const email = document.getElementById('reset-email').value;
+            const msgDiv = document.getElementById('reset-msg');
+            msgDiv.classList.add('hidden');
+            msgDiv.classList.remove('text-green-600', 'text-red-600');
+            
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    msgDiv.textContent = "Një email për rivendosjen e fjalëkalimit u dërgua me sukses!";
+                    msgDiv.classList.add('text-green-600');
+                    msgDiv.classList.remove('hidden');
+                })
+                .catch((error) => {
+                    msgDiv.textContent = "Gabim: Adresa e email nuk u gjet.";
+                    msgDiv.classList.add('text-red-600');
+                    msgDiv.classList.remove('hidden');
+                });
+        };
+
+        window.dilNgaLlogaria = function() {
+            signOut(auth).then(() => {
+                // Rihap faqen për të pastruar memorien e formularit automatikisht
+                window.location.reload();
+            });
+        };
+
+        // Funksionet për ndryshimin e pamjes së Autentifikimit
+        window.shfaqFormen = function(forma) {
+            document.getElementById('form-login').classList.add('hidden');
+            document.getElementById('form-register').classList.add('hidden');
+            document.getElementById('form-reset').classList.add('hidden');
+            
+            document.getElementById('form-' + forma).classList.remove('hidden');
+        };
 
         // Save Data Function
         window.saveDataToFirebase = async function() {
@@ -380,92 +453,92 @@
 </head>
 <body class="bg-gray-100 p-4 md:p-8 min-h-screen text-gray-800 font-sans">
 
-    <div class="print-container w-full mx-auto bg-white p-6 shadow-lg rounded-lg">
-        
-        <!-- Pjesa e Kokës së Dokumentit -->
-        <div id="print-header" class="print-only-header"></div>
-        <div class="interactive-header mb-8">
-            <h1 class="text-2xl font-bold text-center mb-6 uppercase">Raporti Javor i Aktiviteteve</h1>
+    <!-- === KONTENIERI I AUTENTIFIKIMIT (LOGIN/REGISTER/RESET) === -->
+    <div id="auth-container" class="flex items-center justify-center min-h-[80vh] hidden">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border-t-4 border-blue-600">
+            <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Raportimi Javor ASIG</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Fusha: Drejtoria -->
-                <div class="flex flex-col">
-                    <label class="font-bold text-sm mb-1">Drejtoria:</label>
-                    <input id="inp-drejtoria" type="text" class="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="P.sh. Drejtoria e Përpunimit të të Dhënave..." value="DREJTORIA E PËRPUNIMIT TË TË DHËNAVE REMOTE SENSING">
+            <!-- Forma e Login -->
+            <form id="form-login" onsubmit="window.hyrNeLlogari(event)">
+                <h3 class="text-lg font-semibold mb-4 text-gray-600">Hyrje në Sistemin e Raportimit</h3>
+                <div id="auth-error" class="bg-red-100 text-red-600 text-sm p-2 rounded mb-4 hidden font-bold text-center"></div>
+                <div class="mb-4">
+                    <label class="block text-sm font-bold mb-1">Email</label>
+                    <input id="auth-email" type="email" required class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="adresa@shembull.com">
                 </div>
-                
-                <!-- Fusha: Sektori -->
-                <div class="flex flex-col">
-                    <label class="font-bold text-sm mb-1">Sektori:</label>
-                    <input id="inp-sektori" type="text" class="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="P.sh. Sektori i Përpunimit..." value="SEKTORI I PËRPUNIMIT TË IMAZHERIVE SATELITORE">
+                <div class="mb-4">
+                    <label class="block text-sm font-bold mb-1">Fjalëkalimi</label>
+                    <input id="auth-pass" type="password" required class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="••••••••">
                 </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 transition-colors">
+                    Hyr
+                </button>
+                <div class="text-sm text-center flex flex-col gap-2">
+                    <a href="#" onclick="window.shfaqFormen('reset')" class="text-blue-500 hover:underline">Keni harruar fjalëkalimin?</a>
+                    <a href="#" onclick="window.shfaqFormen('register')" class="text-gray-500 hover:underline">Nuk keni llogari? Krijo një të re.</a>
+                </div>
+            </form>
 
-                <!-- Fusha: Specialisti me opsion shtimi -->
-                <div class="flex flex-col">
-                    <label class="font-bold text-sm mb-1">Specialisti:</label>
-                    <div class="flex items-center gap-2">
-                        <select id="main-specialist" class="border rounded p-2 flex-grow focus:outline-none focus:ring-2 focus:ring-blue-400">
-                            <!-- Opsionet mbushen nga JavaScript -->
-                        </select>
-                        <button onclick="hapModalSpecialist()" class="no-print bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" title="Shto Specialist të ri">
-                            + Shto
-                        </button>
-                    </div>
+            <!-- Forma e Regjistrimit -->
+            <form id="form-register" class="hidden" onsubmit="window.krijoLlogari(event)">
+                <h3 class="text-lg font-semibold mb-4 text-gray-600">Krijo Llogari të Re</h3>
+                <div id="reg-error" class="bg-red-100 text-red-600 text-sm p-2 rounded mb-4 hidden font-bold text-center"></div>
+                <div class="mb-4">
+                    <label class="block text-sm font-bold mb-1">Email</label>
+                    <input id="reg-email" type="email" required class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="adresa@shembull.com">
                 </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-bold mb-1">Fjalëkalimi i ri</label>
+                    <input id="reg-pass" type="password" required class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="Të paktën 6 karaktere">
+                </div>
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4 transition-colors">
+                    Krijo Llogari
+                </button>
+                <div class="text-sm text-center">
+                    <a href="#" onclick="window.shfaqFormen('login')" class="text-blue-500 hover:underline">Kthehu te Hyrja</a>
+                </div>
+            </form>
 
-                <!-- Fusha: Periudha/Data -->
-                <div class="flex flex-col">
-                    <label class="font-bold text-sm mb-1">Periudha (Java):</label>
-                    <input id="inp-periudha" type="text" class="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="P.sh. 08-12.05.2026" value="08-12.05.2026">
+            <!-- Forma e Rikthimit të Fjalëkalimit -->
+            <form id="form-reset" class="hidden" onsubmit="window.rifitimiFjalekalimit(event)">
+                <h3 class="text-lg font-semibold mb-4 text-gray-600">Rikthimi i Fjalëkalimit</h3>
+                <div id="reset-msg" class="text-sm p-2 rounded mb-4 hidden font-bold text-center"></div>
+                <div class="mb-4">
+                    <p class="text-xs text-gray-500 mb-2">Shkruani adresën e emailit me të cilën jeni regjistruar dhe ne do t'ju dërgojmë një lidhje për të krijuar një fjalëkalim të ri.</p>
+                    <label class="block text-sm font-bold mb-1">Email</label>
+                    <input id="reset-email" type="email" required class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="adresa@shembull.com">
                 </div>
+                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded mb-4 transition-colors">
+                    Dërgo Linkun
+                </button>
+                <div class="text-sm text-center">
+                    <a href="#" onclick="window.shfaqFormen('login')" class="text-blue-500 hover:underline">Kthehu te Hyrja</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- === FUNDI I KONTENIERIT TË AUTENTIFIKIMIT === -->
+
+    <!-- === APLIKACIONI KRYESOR (SHFAQET VETËM PAS LOGIN) === -->
+    <div id="main-app" class="hidden">
+        
+        <!-- Headeri i sipërm me informacionin e përdoruesit -->
+        <div class="max-w-[1400px] mx-auto mb-2 flex justify-between items-end no-print">
+            <div class="text-sm font-bold text-gray-600">Statusi: <span class="text-green-600">I lidhur</span></div>
+            <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border">
+                <div class="text-sm font-bold text-gray-700">Llogaria: <span id="user-email-display" class="text-blue-600 font-normal">...</span></div>
+                <div class="w-px h-4 bg-gray-300"></div>
+                <button onclick="window.dilNgaLlogaria()" class="text-sm font-bold text-red-500 hover:text-red-700 transition-colors flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    Dil
+                </button>
             </div>
         </div>
 
-        <!-- Butonat e Veprimeve -->
-        <div class="mb-4 flex flex-wrap gap-2 no-print">
-            <button onclick="shtoRresht()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow">
-                + Shto Rresht Aktiviteti
-            </button>
-            <button onclick="shtoTitullSektori()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded shadow">
-                + Shto Nëntitull (Sektor)
-            </button>
-            <button onclick="hapModalObjektiv()" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded shadow">
-                + Shto Objektiv
-            </button>
-            <button onclick="hapModalAfat()" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded shadow">
-                + Shto Afat
-            </button>
-            <button id="btn-rikthe" onclick="riktheFshirjen()" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded shadow">
-                ↶ Rikthe Fshirjen
-            </button>
-            <div class="flex-grow"></div>
-            <button onclick="eksportoExcel()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Eksporto Excel
-            </button>
-            <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                Printo / Ruaj PDF
-            </button>
-        </div>
-
-        <!-- Tabela -->
-        <div class="overflow-x-auto border rounded-lg">
-            <table class="w-full text-sm text-left border-collapse">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-200">
-                    <tr>
-                        <th class="border border-gray-300 p-2 text-center w-10">Nr.</th>
-                        <th class="border border-gray-300 p-2 min-w-[200px]">
-                            <div class="flex justify-between items-center gap-1"><span>Objektivi</span> <button onclick="fshiKolone(1)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
-                        </th>
-                        <th class="border border-gray-300 p-2 min-w-[200px]">
-                            <div class="flex justify-between items-center gap-1"><span>Detyrat Individuale</span> <button onclick="fshiKolone(2)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
-                        </th>
-                        <th class="border border-gray-300 p-2 min-w-[150px]">
+        <div class="print-container w-full mx-auto bg-white p-6 shadow-lg rounded-lg">
+            
+            <!-- Pjesa e Kokës së Dokumentit -->
+            <div id="print-header" class="print-only-header"></div>
                             <div class="flex justify-between items-center gap-1"><span>Produkti Final</span> <button onclick="fshiKolone(3)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none" title="Hiq Kolonën">✕</button></div>
                         </th>
                         <th class="border border-gray-300 p-2 min-w-[120px]">
@@ -1065,21 +1138,10 @@
                  .replace(/'/g, "&#039;");
         }
 
-        // Inicializimi
-        perditesoDropdownSpecialistet();
-        perditesoDropdownObjektivat();
-        perditesoDropdownAfatet();
-        
-        // Shto një titull sektori dhe një rresht bosh automatikisht ONLY IF Firebase doesn't load
-        // This is now handled slightly differently to avoid overriding firebase loads,
-        // but keeping it here as fallback visually before load finishes
-        setTimeout(() => {
-           if(document.getElementById('table-body').children.length === 0) {
-               shtoTitullSektori();
-               shtoRresht();
-           }
-        }, 800); // Wait briefly to see if Firebase loaded data
+        // Kemi hequr funksionet e inicializimit të rreshtit automatik këtu poshtë 
+        // sepse ato tani menaxhohen nga procesi i Load Data nga Firebase (ose shtohen aty nëse është dokument i ri)
 
     </script>
+    </div> <!-- Fundi i div main-app -->
 </body>
 </html>
