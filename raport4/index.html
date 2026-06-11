@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Raporti Javor ASIG - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- === Lidhja me Firebase === -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Logjika për ta bërë databazën të funksionojë pavarësisht mjedisit
+        let firebaseConfig;
+        let isCanvasEnvironment = false;
+
+        if (typeof __firebase_config !== 'undefined') {
+            // Përdorim databazën e integruar të platformës për të garantuar ruajtjen
+            firebaseConfig = JSON.parse(__firebase_config);
+            isCanvasEnvironment = true;
+        } else {
+            // Kthim tek konfigurimi juaj lokal
+            firebaseConfig = {
+                apiKey: "AIzaSyAG56-nHpfwzEw2noQZh3hrCbvcMWXShsg",
+                authDomain: "raportimi-javor-asig.firebaseapp.com",
+                projectId: "raportimi-javor-asig",
+                storageBucket: "raportimi-javor-asig.firebasestorage.app",
+                messagingSenderId: "45204029848",
+                appId: "1:45204029848:web:19a6977e6ccc01928bebed"
+            };
+        }
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.auth = auth;
+        window.doc = doc;
+        window.setDoc = setDoc;
+        window.getDoc = getDoc;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.deleteDoc = deleteDoc;
+        window.query = query;
+        window.orderBy = orderBy;
+        window.where = where;
+        
+        // Përshtatje e ID-së së aplikacionit
+        window.__app_id = typeof __app_id !== 'undefined' ? __app_id : 'raportimi-javor-asig'; 
+
+        // Nëse jemi në mjedisin e platformës, bëjmë lidhje të sigurt automatike për t'i dhënë leje DB-së të shkruajë
+        if (isCanvasEnvironment) {
+            const initAuth = async () => {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (e) {
+                    console.error("Gabim në autentifikim:", e);
+                }
+            };
+            initAuth();
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            const authContainer = document.getElementById('auth-container');
+            const mainApp = document.getElementById('main-app');
+            const userEmailDisplay = document.getElementById('user-email-display');
+            
+            if (user) {
+                window.userId = user.uid;
+                userEmailDisplay.textContent = user.email || "Përdorues i Sistemit";
+                
+                authContainer.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                mainApp.classList.add('flex'); // Për sidebar-in
+                
+                // Ngarko të dhënat dhe vizato faqen
+                await window.ngarkoKonfigurimet();
+                window.ndryshoPamjen('shto-aktivitet'); 
+                document.getElementById('kalendari-data').valueAsDate = new Date();
+                window.ngarkoAktivitetetEDites();
+                
+            } else {
+                window.userId = null;
+                authContainer.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+                mainApp.classList.remove('flex');
+            }
+        });
+
+        window.hyrNeLlogari = function(e) { 
+            e.preventDefault(); 
+            // Bypass vizual për mjedisin e platformës
+            if(isCanvasEnvironment) { signInAnonymously(auth); return; }
+            
+            const email = document.getElementById('auth-email').value; 
+            const pass = document.getElementById('auth-pass').value; 
+            signInWithEmailAndPassword(auth, email, pass).catch((error) => { 
+                document.getElementById('auth-error').textContent = "Gabim: Email ose fjalëkalim i pasaktë!"; 
+                document.getElementById('auth-error').classList.remove('hidden'); 
+            }); 
+        };
+        
+        window.krijoLlogari = function(e) { 
+            e.preventDefault(); 
+            if(isCanvasEnvironment) { signInAnonymously(auth); return; }
+
+            const email = document.getElementById('reg-email').value; 
+            const pass = document.getElementById('reg-pass').value; 
+            if(pass.length < 6) { 
+                document.getElementById('reg-error').textContent = "Minimum 6 karaktere!"; 
+                document.getElementById('reg-error').classList.remove('hidden'); 
+                return; 
+            } 
+            createUserWithEmailAndPassword(auth, email, pass).catch((error) => { 
+                document.getElementById('reg-error').textContent = "Gabim: " + error.message; 
+                document.getElementById('reg-error').classList.remove('hidden'); 
+            }); 
+        };
+        
+        window.dilNgaLlogaria = function() { signOut(auth).then(() => { window.location.reload(); }); };
+        window.shfaqFormen = function(forma) { document.getElementById('form-login').classList.add('hidden'); document.getElementById('form-register').classList.add('hidden'); document.getElementById('form-' + forma).classList.remove('hidden'); };
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Inter:wght=400;700;900&display=swap');
+        * { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+        
+        .sidebar-item { transition: all 0.3s ease; }
+        .sidebar-item.active { background-color: #e0e7ff; color: #4f46e5; border-right: 4px solid #4f46e5; }
+        .sidebar-item:hover:not(.active) { background-color: #f1f5f9; }
+
+        .btn-primary-custom { background-color: #3b82f6 !important; color: white !important; }
+
+        @media print {
+            * { font-family: 'Times New Roman', Times, serif !important; }
+            .no-print { display: none !important; }
+            body { background-color: white; padding: 0; }
+            #sidebar { display: none !important; }
+            #main-content { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            .print-container { box-shadow: none !important; margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; border: none !important; }
+            .interactive-header { display: none !important; }
+            .print-only-header { display: block !important; text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 20px; text-transform: uppercase; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #000 !important; padding: 4px !important; font-size: 11px !important; color: #000 !important; background: transparent !important; }
+            select.text-orange-500 { color: #f97316 !important; }
+            input, textarea, select { border: none !important; background: transparent !important; resize: none; width: 100%; box-shadow: none !important; appearance: none; -webkit-appearance: none; overflow: visible !important; padding: 0 !important; border-radius: 0 !important; }
+            textarea { height: auto !important; white-space: pre-wrap; }
+        }
+        .print-only-header { display: none; }
+        textarea { field-sizing: content; min-height: 40px; }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-900 h-screen overflow-hidden flex flex-col">
+
+    <!-- === KONTENIERI I AUTENTIFIKIMIT === -->
+    <div id="auth-container" class="fixed inset-0 z-[400] bg-white flex items-center justify-center p-6">
+        <div class="max-w-md w-full space-y-6 overflow-y-auto max-h-[90vh] custom-scrollbar p-2">
+            <div class="flex items-center gap-3 justify-center mb-6">
+                <div class="h-14 w-14 flex items-center justify-center bg-slate-900 rounded-2xl shadow-xl">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
+                </div>
+                <div class="flex flex-col text-left">
+                    <h1 class="text-3xl font-black tracking-tighter leading-none">LINDI<span class="text-blue-500">MAPS</span></h1>
+                    <span class="text-[10px] uppercase tracking-[0.4em] font-bold text-slate-400 mt-1"> Raportet </span>
+                </div>
+            </div>
+            <form id="form-login" class="space-y-4" onsubmit="window.hyrNeLlogari(event)">
+                <h2 class="text-center font-extrabold text-slate-800 text-xl">Identifikohu</h2>
+                <div id="auth-error" class="bg-red-50 text-red-600 text-[11px] font-bold p-3 rounded-2xl mb-2 hidden text-center"></div>
+                <input id="auth-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold outline-none focus:border-blue-500">
+                <input id="auth-pass" type="password" placeholder="Fjalëkalimi" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold outline-none focus:border-blue-500">
+                <button type="submit" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold hover:bg-blue-600 transition-all">Hyr në Sistem</button>
+                <div class="flex justify-between px-2 text-[11px] font-bold text-slate-400">
+                    <button type="button" onclick="window.shfaqFormen('register')" class="text-blue-600 uppercase tracking-widest">Krijo llogari</button>
+                </div>
+            </form>
+            <form id="form-register" class="hidden space-y-4" onsubmit="window.krijoLlogari(event)">
+                <h2 class="text-center font-extrabold text-slate-800 text-xl">Regjistrohu</h2>
+                <div id="reg-error" class="bg-red-50 text-red-600 text-[11px] font-bold p-3 rounded-2xl mb-2 hidden text-center"></div>
+                <input id="reg-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold outline-none focus:border-blue-500">
+                <input id="reg-pass" type="password" placeholder="Fjalëkalimi (Të paktën 6 karaktere)" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold outline-none focus:border-blue-500">
+                <button type="submit" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-bold transition-all">Krijo Llogarinë</button>
+                <div class="text-center">
+                    <button type="button" onclick="window.shfaqFormen('login')" class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Kthehu te Logimi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- === APLIKACIONI KRYESOR (DASHBOARD) === -->
+    <div id="main-app" class="hidden h-full w-full">
+        
+        <!-- SIDEBAR -->
+        <div id="sidebar" class="w-72 bg-white border-r border-slate-200 h-full flex flex-col no-print z-40">
+            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+                <div class="h-10 w-10 flex items-center justify-center bg-slate-900 rounded-xl">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-black text-lg tracking-tighter leading-none">LINDI<span class="text-blue-500">MAPS</span></span>
+                    <span class="text-[8px] uppercase font-bold text-slate-400 tracking-widest">Dashboard</span>
+                </div>
+            </div>
+            
+            <nav class="flex-grow p-4 space-y-2 overflow-y-auto custom-scrollbar">
+                <button onclick="window.ndryshoPamjen('shto-aktivitet')" id="nav-shto-aktivitet" class="sidebar-item w-full flex items-center gap-3 p-4 rounded-xl font-bold text-slate-600 text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Regjistro Aktivitet
+                </button>
+                <button onclick="window.ndryshoPamjen('raporti-javor')" id="nav-raporti-javor" class="sidebar-item w-full flex items-center gap-3 p-4 rounded-xl font-bold text-slate-600 text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Raporti Javor
+                </button>
+                <button onclick="window.ndryshoPamjen('konfigurimet')" id="nav-konfigurimet" class="sidebar-item w-full flex items-center gap-3 p-4 rounded-xl font-bold text-slate-600 text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Konfigurimet (Listat)
+                </button>
+            </nav>
+
+            <div class="p-6 border-t border-slate-100 space-y-4">
+                <div class="text-xs font-bold text-slate-500 truncate" id="user-email-display">...</div>
+                <button onclick="window.dilNgaLlogaria()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl text-[12px] font-extrabold transition-colors uppercase tracking-widest">
+                    Dil nga llogaria
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div id="main-content" class="flex-grow overflow-y-auto bg-[#f8fafc] relative">
+            
+            <!-- VIEW 1: REGJISTRO AKTIVITET (E RE) -->
+            <div id="view-shto-aktivitet" class="p-6 md:p-10 space-y-6 hidden">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h1 class="text-3xl font-black text-slate-800 uppercase tracking-widest mb-2">Ditari i Aktiviteteve</h1>
+                        <p class="text-slate-500 font-medium">Regjistro detyrat ditore. Ato do të kalojnë automatikisht tek Raporti Javor.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Forma e Regjistrimit -->
+                    <div class="lg:col-span-2 bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/40 border border-slate-100">
+                        <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
+                            <h2 class="text-xl font-black text-slate-800 flex items-center gap-2">
+                                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Shto Aktivitet të Ri
+                            </h2>
+                            <input type="date" id="kalendari-data" class="p-3 rounded-xl bg-slate-50 border-2 border-slate-200 font-bold text-slate-700 focus:border-blue-500 outline-none cursor-pointer" onchange="window.ngarkoAktivitetetEDites()">
+                        </div>
+
+                        <div class="space-y-5">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div class="space-y-1">
+                                    <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">1. Objektivi (Zgjidh nga lista)</label>
+                                    <select id="form-objektivi" class="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 font-bold text-slate-700 focus:border-blue-500 outline-none cursor-pointer"></select>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">2. Statusi</label>
+                                    <select id="form-statusi" class="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 font-bold text-slate-700 focus:border-blue-500 outline-none cursor-pointer"></select>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">3. Detyrat Individuale</label>
+                                <textarea id="form-detyra" rows="2" class="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 font-bold text-slate-700 focus:border-blue-500 outline-none resize-none" placeholder="Përshkruaj çfarë u bë..."></textarea>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">4. Produkti Final</label>
+                                <textarea id="form-produkti" rows="2" class="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 font-bold text-slate-700 focus:border-blue-500 outline-none resize-none" placeholder="Rezultati i punës..."></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                <div class="space-y-1">
+                                    <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">5. Personi Përgjegjës</label>
+                                    <select id="form-pergjegjesi" class="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 font-bold text-slate-700 focus:border-blue-500 outline-none cursor-pointer"></select>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">6. Kujt i Raportohet</label>
+                                    <select id="form-raportohet" class="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 font-bold text-slate-700 focus:border-blue-500 outline-none cursor-pointer"></select>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">7. Afati</label>
+                                    <select id="form-afati" class="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 font-bold text-slate-700 focus:border-blue-500 outline-none cursor-pointer"></select>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">8. Informacion (Shtesë/Problematika)</label>
+                                <textarea id="form-info" rows="2" class="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 font-bold text-slate-700 focus:border-blue-500 outline-none resize-none" placeholder="Shënime të tjera..."></textarea>
+                            </div>
+
+                            <button onclick="window.ruajAktivitetinDitor()" class="w-full bg-blue-600 text-white p-5 rounded-xl font-black text-sm uppercase tracking-widest shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition-all mt-4">
+                                Ruaj Aktivitetin e Ditës
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lista e Aktiviteteve të Ditës -->
+                    <div class="bg-slate-900 rounded-[2rem] p-6 shadow-xl text-white">
+                        <h3 class="font-black text-lg mb-6 text-blue-400 border-b border-slate-700 pb-4">Aktivitetet e kësaj date</h3>
+                        <div id="lista-ditore" class="space-y-4 overflow-y-auto max-h-[600px] custom-scrollbar pr-2">
+                            <div class="text-slate-500 text-sm font-bold text-center py-10">Zgjidhni datën për të parë aktivitetet.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: KONFIGURIMET (LISTAT DHE PROFILI) -->
+            <div id="view-konfigurimet" class="p-6 md:p-10 space-y-8 hidden max-w-7xl mx-auto pb-20">
+                <div>
+                    <h1 class="text-3xl font-black text-slate-800 uppercase tracking-widest mb-2">Konfigurimet e Sistemit</h1>
+                    <p class="text-slate-500 font-medium">Menaxho listat rënëse dhe të dhënat e tua personale për raportet.</p>
+                </div>
+
+                <!-- Të dhënat Personale -->
+                <div class="bg-white rounded-3xl p-8 shadow-lg border border-slate-100">
+                    <h2 class="text-xl font-black text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
+                        <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Profili Im (Të dhënat bazë të Raportit)
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Specialisti (Emri yt)</label>
+                            <input id="conf-specialisti" type="text" class="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 font-bold text-slate-700 outline-none focus:border-indigo-500">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Sektori Default</label>
+                            <input id="conf-sektori" type="text" class="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 font-bold text-slate-700 outline-none focus:border-indigo-500">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Drejtoria Default</label>
+                            <input id="conf-drejtoria" type="text" class="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 font-bold text-slate-700 outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+                    <button onclick="window.ruajProfilin()" class="mt-6 bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 transition-all text-sm uppercase tracking-widest">
+                        Ruaj Profilin
+                    </button>
+                </div>
+
+                <!-- 5 LISTAT E KONFIGURUESHME -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                    
+                    <!-- Lista 1: Objektivat -->
+                    <div class="bg-white rounded-3xl p-6 shadow-lg border border-slate-100 flex flex-col h-96">
+                        <h3 class="font-black text-blue-600 mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+                            1. Objektivat
+                            <span id="count-objektivat" class="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded-lg">0</span>
+                        </h3>
+                        <div id="container-objektivat" class="flex-grow overflow-y-auto custom-scrollbar pr-2 space-y-2 mb-4"></div>
+                        <div class="flex gap-2 mt-auto pt-4 border-t border-slate-100">
+                            <input type="text" id="input-objektivat" placeholder="Shto të re..." class="flex-grow p-3 rounded-xl bg-slate-50 border border-slate-200 font-bold text-sm outline-none focus:border-blue-400">
+                            <button onclick="window.shtoNeListe('objektivat')" class="bg-slate-900 text-white px-4 rounded-xl font-bold hover:bg-black transition-colors">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Lista 2: Statusi -->
+                    <div class="bg-white rounded-3xl p-6 shadow-lg border border-slate-100 flex flex-col h-96">
+                        <h3 class="font-black text-orange-600 mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+                            2. Statusi
+                            <span id="count-statuset" class="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded-lg">0</span>
+                        </h3>
+                        <div id="container-statuset" class="flex-grow overflow-y-auto custom-scrollbar pr-2 space-y-2 mb-4"></div>
+                        <div class="flex gap-2 mt-auto pt-4 border-t border-slate-100">
+                            <input type="text" id="input-statuset" placeholder="Shto të re..." class="flex-grow p-3 rounded-xl bg-slate-50 border border-slate-200 font-bold text-sm outline-none focus:border-orange-400">
+                            <button onclick="window.shtoNeListe('statuset')" class="bg-slate-900 text-white px-4 rounded-xl font-bold hover:bg-black transition-colors">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Lista 3: Personi Përgjegjës -->
+                    <div class="bg-white rounded-3xl p-6 shadow-lg border border-slate-100 flex flex-col h-96">
+                        <h3 class="font-black text-emerald-600 mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+                            3. Personi Përgjegjës
+                            <span id="count-pergjegjesit" class="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded-lg">0</span>
+                        </h3>
+                        <div id="container-pergjegjesit" class="flex-grow overflow-y-auto custom-scrollbar pr-2 space-y-2 mb-4"></div>
+                        <div class="flex gap-2 mt-auto pt-4 border-t border-slate-100">
+                            <input type="text" id="input-pergjegjesit" placeholder="Shto të re..." class="flex-grow p-3 rounded-xl bg-slate-50 border border-slate-200 font-bold text-sm outline-none focus:border-emerald-400">
+                            <button onclick="window.shtoNeListe('pergjegjesit')" class="bg-slate-900 text-white px-4 rounded-xl font-bold hover:bg-black transition-colors">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Lista 4: Kujt i Raportohet -->
+                    <div class="bg-white rounded-3xl p-6 shadow-lg border border-slate-100 flex flex-col h-96">
+                        <h3 class="font-black text-purple-600 mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+                            4. Kujt i Raportohet
+                            <span id="count-raportimet" class="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded-lg">0</span>
+                        </h3>
+                        <div id="container-raportimet" class="flex-grow overflow-y-auto custom-scrollbar pr-2 space-y-2 mb-4"></div>
+                        <div class="flex gap-2 mt-auto pt-4 border-t border-slate-100">
+                            <input type="text" id="input-raportimet" placeholder="Shto të re..." class="flex-grow p-3 rounded-xl bg-slate-50 border border-slate-200 font-bold text-sm outline-none focus:border-purple-400">
+                            <button onclick="window.shtoNeListe('raportimet')" class="bg-slate-900 text-white px-4 rounded-xl font-bold hover:bg-black transition-colors">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Lista 5: Afatet -->
+                    <div class="bg-white rounded-3xl p-6 shadow-lg border border-slate-100 flex flex-col h-96">
+                        <h3 class="font-black text-rose-600 mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+                            5. Afatet Standarde
+                            <span id="count-afatet" class="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded-lg">0</span>
+                        </h3>
+                        <div id="container-afatet" class="flex-grow overflow-y-auto custom-scrollbar pr-2 space-y-2 mb-4"></div>
+                        <div class="flex gap-2 mt-auto pt-4 border-t border-slate-100">
+                            <input type="text" id="input-afatet" placeholder="Shto të re..." class="flex-grow p-3 rounded-xl bg-slate-50 border border-slate-200 font-bold text-sm outline-none focus:border-rose-400">
+                            <button onclick="window.shtoNeListe('afatet')" class="bg-slate-900 text-white px-4 rounded-xl font-bold hover:bg-black transition-colors">+</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- VIEW 3: RAPORTI JAVOR (EXCELI DHE TABELA EKZISTUESE E PËRSHTATUR) -->
+            <div id="view-raporti-javor" class="w-full px-4 sm:px-6 lg:px-8 space-y-6 print-container mt-6 hidden pb-20">
+                <div id="print-header" class="print-only-header"></div>
+                
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2rem] p-8 shadow-xl text-white mb-6 flex flex-col md:flex-row items-center justify-between no-print">
+                    <div>
+                        <h2 class="text-2xl font-black mb-1">Gjenerimi i Raportit Javor</h2>
+                        <p class="text-blue-100 font-medium text-sm">Sistemi grumbullon automatikisht të gjitha aktivitetet nga e Hëna në të Premte për javën e zgjedhur.</p>
+                    </div>
+                    <div class="mt-6 md:mt-0 flex gap-3 items-center bg-white/10 p-3 rounded-2xl backdrop-blur-sm">
+                        <label class="font-bold text-sm">Java e Datës:</label>
+                        <input type="date" id="raporti-data-zgjedhur" class="p-2.5 rounded-xl bg-white text-slate-900 font-bold outline-none cursor-pointer" onchange="window.gjeneroRaportinNgaData()">
+                        <button onclick="window.gjeneroRaportinNgaData()" class="bg-white text-blue-600 px-6 py-2.5 rounded-xl font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-transform text-xs">
+                            Gjenero
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[2rem] p-6 md:p-10 shadow-xl shadow-slate-200/40 border border-slate-100 interactive-header w-full">
+                    <h1 class="text-2xl md:text-3xl font-black text-center mb-8 uppercase tracking-widest text-slate-800">
+                        Raporti Javor i Aktiviteteve
+                    </h1>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-[12px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Drejtoria</label>
+                            <input id="inp-drejtoria" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold text-base text-slate-700 outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[12px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Sektori</label>
+                            <input id="inp-sektori" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold text-base text-slate-700 outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[12px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Specialisti</label>
+                            <input id="inp-specialisti" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold text-base text-slate-700 outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[12px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Periudha (Java)</label>
+                            <input id="inp-periudha" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold text-base text-slate-700 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[2rem] p-4 md:p-8 shadow-xl shadow-slate-200/40 border border-slate-100 w-full">
+                    <div class="mb-6 flex flex-wrap gap-4 no-print items-center">
+                        <button onclick="window.shtoRreshtManual()" class="bg-blue-100 text-blue-700 px-6 py-4 rounded-xl font-bold hover:bg-blue-200 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
+                            + Rresht Bosh
+                        </button>
+                        <button onclick="window.shtoTitullSektori()" class="bg-slate-100 text-slate-600 px-6 py-4 rounded-xl font-bold hover:bg-slate-200 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
+                            + Nëntitull
+                        </button>
+                        
+                        <div class="flex-grow w-full md:w-auto"></div>
+                        
+                        <div class="flex gap-3 w-full md:w-auto justify-end">
+                            <button onclick="window.eksportoExcel()" class="bg-emerald-600 text-white px-8 py-4 rounded-xl font-black shadow-lg shadow-emerald-600/30 hover:bg-emerald-700 transition-all active:scale-95 text-[12px] uppercase tracking-wider flex items-center gap-2">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Shkarko Excel
+                            </button>
+                            <button onclick="window.print()" class="bg-slate-900 text-white px-8 py-4 rounded-xl font-black shadow-lg shadow-slate-900/30 hover:bg-black transition-all active:scale-95 text-[12px] uppercase tracking-wider flex items-center gap-2">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg> Printo / PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto custom-scrollbar border-2 border-slate-200/80 rounded-2xl w-full">
+                        <table class="w-full text-base text-left border-collapse" id="main-report-table">
+                            <thead class="bg-slate-100 text-[11px] font-extrabold text-slate-600 uppercase tracking-widest border-b-2 border-slate-200/80">
+                                <tr>
+                                    <th class="border-r border-slate-200 p-4 text-center w-16">Nr.</th>
+                                    <th class="border-r border-slate-200 p-4 min-w-[280px]">Objektivi</th>
+                                    <th class="border-r border-slate-200 p-4 min-w-[280px]">Detyrat Individuale</th>
+                                    <th class="border-r border-slate-200 p-4 min-w-[220px]">Produkti Final</th>
+                                    <th class="border-r border-slate-200 p-4 min-w-[160px]">Statusi</th>
+                                    <th class="border-r border-slate-200 p-4 min-w-[200px]">Personi Përgjegjës</th>
+                                    <th class="border-r border-slate-200 p-4 min-w-[320px]">Informacion</th>
+                                    <th class="border-r border-slate-200 p-4 min-w-[220px]">Problematikat</th>
+                                    <th class="border-r border-slate-200 p-4 min-w-[160px]">Afati</th>
+                                    <th class="border-r border-slate-200 p-4 min-w-[200px]">Kujt i Raportohet</th>
+                                    <th class="p-4 w-20 no-print text-center">Veprime</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                <!-- Rreshtat mbushen automatikisht nga DB -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT KRYESOR -->
+    <script>
+        // --- 1. TË DHËNAT E STRUKTURUARA (LISTAT STANDARDE FILLLESTARE) ---
+        window.konfigurimet = {
+            objektivat: [
+                "Bashkërendimi ndërinstitucional", 
+                'Mbarëvajtja e projektit "Shërbime Satelitore"',
+                "Ndjekja e implementimit të projekteve UAV",
+                'Ndjekja e implementimit Street View 360°',
+                '"Dija institucionale dhe kapacitetet njerëzore"'
+            ],
+            statuset: ["Në proces", "Përfunduar", "Në pritje", "Anuluar"],
+            pergjegjesit: ["Specialisti", "Përgjegjësi i Sektorit", "Drejtor i Drejtorisë"],
+            raportimet: ["Përgjegjësi i Sektorit", "Drejtor i Drejtorisë", "Drejtori i Përgjithshëm"],
+            afatet: ["Janar-Dhjetor", "Qershor", "Përgjatë vitit"],
+            profil: {
+                specialisti: "Emri Mbiemri",
+                sektori: "SEKTORI I PËRPUNIMIT TË IMAZHERIVE SATELITORE",
+                drejtoria: "DREJTORIA E PËRPUNIMIT TË TË DHËNAVE REMOTE SENSING"
+            }
+        };
+
+        // --- 2. LOGJIKA E NDËRRIMIT TË PAMJES ---
+        window.ndryshoPamjen = function(pamjaID) {
+            document.querySelectorAll('#main-content > div').forEach(div => div.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('view-' + pamjaID).classList.remove('hidden');
+            document.getElementById('nav-' + pamjaID).classList.add('active');
+
+            if(pamjaID === 'raporti-javor') {
+                document.getElementById('raporti-data-zgjedhur').valueAsDate = new Date();
+                window.gjeneroRaportinNgaData();
+            } else if (pamjaID === 'shto-aktivitet') {
+                // Sigurohemi që sa herë hapim aktivitetin, listat të jenë të freskëta
+                window.mbushDropdownetNeForme();
+            }
+        }
+
+        // --- 3. MENAXHIMI I KONFIGURIMEVE (Listat & Firebase) ---
+        window.ngarkoKonfigurimet = async function() {
+            if (!window.userId) return;
+            try {
+                const docSnap = await window.getDoc(window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'konfigurimet'));
+                if (docSnap.exists()) {
+                    window.konfigurimet = { ...window.konfigurimet, ...docSnap.data() };
+                } else {
+                    await window.ruajKonfigurimetNeDB(); 
+                }
+                
+                // Set profile inputs visual
+                document.getElementById('conf-specialisti').value = window.konfigurimet.profil.specialisti || "";
+                document.getElementById('conf-sektori').value = window.konfigurimet.profil.sektori || "";
+                document.getElementById('conf-drejtoria').value = window.konfigurimet.profil.drejtoria || "";
+
+                window.vizatoPaneletEKonfigurimeve();
+                window.mbushDropdownetNeForme();
+                
+            } catch (e) { console.error("Gabim ne ngarkim konfig:", e); }
+        }
+
+        window.ruajKonfigurimetNeDB = async function() {
+            if (!window.userId) return;
+            try {
+                await window.setDoc(window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'konfigurimet'), window.konfigurimet);
+            } catch (e) { console.error("Gabim ne ruajtje konfig:", e); }
+        }
+
+        window.ruajProfilin = async function() {
+            window.konfigurimet.profil.specialisti = document.getElementById('conf-specialisti').value;
+            window.konfigurimet.profil.sektori = document.getElementById('conf-sektori').value;
+            window.konfigurimet.profil.drejtoria = document.getElementById('conf-drejtoria').value;
+            await window.ruajKonfigurimetNeDB();
+            alert("Profili u ruajt me sukses!");
+        }
+
+        // Kjo funksion mbush direkt kodin HTML per 5 panelet e listave
+        window.vizatoPaneletEKonfigurimeve = function() {
+            const listatArray = ['objektivat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet'];
+            
+            listatArray.forEach(listaId => {
+                const container = document.getElementById(`container-${listaId}`);
+                const countBadge = document.getElementById(`count-${listaId}`);
+                if(!container) return;
+                
+                const elementet = window.konfigurimet[listaId] || [];
+                countBadge.textContent = elementet.length;
+
+                container.innerHTML = elementet.map((item, index) => `
+                    <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100 shadow-sm text-sm font-bold text-slate-700">
+                        <span class="truncate pr-4" title="${window.escapeHtml(item)}">${window.escapeHtml(item)}</span>
+                        <button onclick="window.fshiNgaLista('${listaId}', ${index})" class="text-red-400 hover:text-red-600 bg-red-50 p-1.5 rounded-lg transition-colors flex-shrink-0">✕</button>
+                    </div>
+                `).join('');
+            });
+        }
+
+        window.shtoNeListe = async function(listaId) {
+            const input = document.getElementById(`input-${listaId}`);
+            const vlera = input.value.trim();
+            if(vlera && !window.konfigurimet[listaId].includes(vlera)) {
+                window.konfigurimet[listaId].push(vlera);
+                input.value = ''; // Pastro fushen
+                await window.ruajKonfigurimetNeDB();
+                window.vizatoPaneletEKonfigurimeve();
+                window.mbushDropdownetNeForme();
+            }
+        }
+
+        // Lejo shtypjen e Enter per te shtuar ne lista
+        ['objektivat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet'].forEach(id => {
+            const inp = document.getElementById(`input-${id}`);
+            if(inp) inp.addEventListener('keypress', function(e) { if (e.key === 'Enter') window.shtoNeListe(id); });
+        });
+
+        window.fshiNgaLista = async function(listaId, index) {
+            if(confirm('Jeni të sigurt që doni ta fshini këtë opsion?')) {
+                window.konfigurimet[listaId].splice(index, 1);
+                await window.ruajKonfigurimetNeDB();
+                window.vizatoPaneletEKonfigurimeve();
+                window.mbushDropdownetNeForme();
+            }
+        }
+
+        // Ky funksion i merr listat dhe i shfaq direkt tek Dropdown-et kur shton Aktivitetin
+        window.mbushDropdownetNeForme = function() {
+            const mbushes = (idElementi, lista) => {
+                const el = document.getElementById(idElementi);
+                if(!el) return;
+                const vleraAktuale = el.value; // Ruaj vleren nese kishte nje te zgjedhur
+                
+                el.innerHTML = '<option value="">-- Zgjidh Opsionin --</option>' + (lista || []).map(item => {
+                    // Shkurto emrin nese eshte i gjate per tu treguar bukur, por ruaj te plote ne value
+                    const shortText = item.length > 60 ? item.substring(0, 60) + '...' : item;
+                    return `<option value="${window.escapeHtml(item)}">${window.escapeHtml(shortText)}</option>`;
+                }).join('');
+                
+                // Riven vleren nese ende ekziston
+                if(lista.includes(vleraAktuale)) el.value = vleraAktuale;
+            };
+
+            mbushes('form-objektivi', window.konfigurimet.objektivat);
+            mbushes('form-statusi', window.konfigurimet.statuset);
+            mbushes('form-pergjegjesi', window.konfigurimet.pergjegjesit);
+            mbushes('form-raportohet', window.konfigurimet.raportimet);
+            mbushes('form-afati', window.konfigurimet.afatet);
+        }
+
+        // --- 4. LOGJIKA E AKTIVITETEVE DITORE ---
+        window.getIsoWeekData = function(dateObj) {
+            const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+            return `${d.getUTCFullYear()}-W${weekNo}`;
+        }
+
+        window.ngarkoAktivitetetEDites = async function() {
+            if (!window.userId) return;
+            const dataZgjedhur = document.getElementById('kalendari-data').value;
+            const listaDiv = document.getElementById('lista-ditore');
+            listaDiv.innerHTML = '<div class="text-center py-4"><div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div></div>';
+
+            try {
+                const q = window.query(
+                    window.collection(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'aktivitetet_ditore'),
+                    window.where('data', '==', dataZgjedhur)
+                );
+                const querySnapshot = await window.getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    listaDiv.innerHTML = '<div class="text-slate-500 text-sm font-bold text-center py-10">Nuk ka aktivitete për këtë datë.</div>';
+                    return;
+                }
+
+                listaDiv.innerHTML = '';
+                const docs = [];
+                querySnapshot.forEach(d => docs.push({id: d.id, ...d.data()}));
+                docs.sort((a,b) => a.nrJavor - b.nrJavor); // Rendit nga 1, 2, 3... per kete jave
+
+                docs.forEach(data => {
+                    listaDiv.innerHTML += `
+                        <div class="bg-slate-800 rounded-2xl p-4 border border-slate-700 relative group">
+                            <button onclick="window.fshiAktivitetDitor('${data.id}')" class="absolute top-2 right-2 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
+                            <div class="flex gap-3">
+                                <div class="bg-blue-600/20 text-blue-400 font-black h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 text-sm">${data.nrJavor}</div>
+                                <div>
+                                    <h4 class="font-bold text-[13px] text-white line-clamp-2 leading-snug mb-1">${window.escapeHtml(data.detyra)}</h4>
+                                    <div class="text-[11px] text-slate-400 font-medium line-clamp-1 border-l-2 border-slate-600 pl-2">Obj: ${window.escapeHtml(data.objektivi)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (e) {
+                console.error(e);
+                listaDiv.innerHTML = '<div class="text-red-400 text-sm font-bold text-center py-4">Gabim në ngarkim.</div>';
+            }
+        }
+
+        window.ruajAktivitetinDitor = async function() {
+            if (!window.userId) return;
+            
+            const dStr = document.getElementById('kalendari-data').value;
+            if(!dStr) { alert("Zgjidhni datën!"); return; }
+            const dateObj = new Date(dStr);
+            const weekStr = window.getIsoWeekData(dateObj);
+
+            // Marrim te dhenat nga fushat poshte (nga dropdowns dhe textarea)
+            const obj = document.getElementById('form-objektivi').value;
+            const stat = document.getElementById('form-statusi').value;
+            const pergj = document.getElementById('form-pergjegjesi').value;
+            const rap = document.getElementById('form-raportohet').value;
+            const afati = document.getElementById('form-afati').value;
+
+            const det = document.getElementById('form-detyra').value.trim();
+            const prod = document.getElementById('form-produkti').value.trim();
+            const info = document.getElementById('form-info').value.trim();
+
+            if(!obj || !det) { alert("Objektivi dhe Detyra Individuale janë fusha të detyrueshme!"); return; }
+
+            try {
+                // Gjej numrin e fundit te rregjistruar per KETE jave per ti dhene NR rendor unik
+                const qWeek = window.query(
+                    window.collection(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'aktivitetet_ditore'),
+                    window.where('java', '==', weekStr)
+                );
+                const snapWeek = await window.getDocs(qWeek);
+                let maxNr = 0;
+                snapWeek.forEach(d => { if(d.data().nrJavor > maxNr) maxNr = d.data().nrJavor; });
+                const nrIRi = maxNr + 1;
+
+                const dataToSave = {
+                    data: dStr,
+                    java: weekStr,
+                    nrJavor: nrIRi,
+                    objektivi: obj,
+                    detyra: det,
+                    produkti: prod,
+                    statusi: stat,
+                    pergjegjesi: pergj,
+                    raportohet: rap,
+                    afati: afati,
+                    info: info,
+                    // Marrim dhe profilit qe ky rekord te kete 'pronarin' e vet
+                    profil_specialisti: window.konfigurimet.profil.specialisti,
+                    profil_sektori: window.konfigurimet.profil.sektori,
+                    profil_drejtoria: window.konfigurimet.profil.drejtoria,
+                    timestamp: new Date().getTime()
+                };
+
+                await window.addDoc(window.collection(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'aktivitetet_ditore'), dataToSave);
+                
+                // Pastro fushat e shkrimit, por ruaj opsionet e Dropdown ne menyre qe nese user shton disa pune resht mos ti zgjedhe prap nga e para
+                document.getElementById('form-detyra').value = '';
+                document.getElementById('form-produkti').value = '';
+                document.getElementById('form-info').value = '';
+                
+                window.ngarkoAktivitetetEDites();
+
+            } catch(e) {
+                console.error(e);
+                alert("Gabim gjatë ruajtjes!");
+            }
+        }
+
+        window.fshiAktivitetDitor = async function(id) {
+            if(confirm("Dëshironi ta fshini këtë aktivitet?")) {
+                await window.deleteDoc(window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'aktivitetet_ditore', id));
+                window.ngarkoAktivitetetEDites();
+            }
+        }
+
+        // --- 5. LOGJIKA E GJENERIMIT TË RAPORTIT JAVOR ---
+        window.getWeekBounds = function(dateObj) {
+            const day = dateObj.getDay() || 7; 
+            if (day !== 1) dateObj.setHours(-24 * (day - 1)); 
+            const mon = new Date(dateObj);
+            const fri = new Date(mon);
+            fri.setDate(mon.getDate() + 4); 
+            return { mon, fri };
+        }
+
+        window.formatDateRange = function(mon, fri) {
+            const f = (d) => ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth()+1)).slice(-2) + '.' + d.getFullYear();
+            return `${f(mon)} - ${f(fri)}`;
+        }
+
+        window.gjeneroRaportinNgaData = async function() {
+            if (!window.userId) return;
+            const inputData = document.getElementById('raporti-data-zgjedhur').value;
+            if(!inputData) return;
+            
+            const dateObj = new Date(inputData);
+            const weekStr = window.getIsoWeekData(dateObj);
+            const bounds = window.getWeekBounds(dateObj);
+            
+            // Ploteso koken automatikisht nga Profili
+            document.getElementById('inp-drejtoria').value = window.konfigurimet.profil.drejtoria || "";
+            document.getElementById('inp-sektori').value = window.konfigurimet.profil.sektori || "";
+            document.getElementById('inp-specialisti').value = window.konfigurimet.profil.specialisti || "";
+            document.getElementById('inp-periudha').value = window.formatDateRange(bounds.mon, bounds.fri);
+
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '<tr><td colspan="11" class="text-center py-10 font-bold text-slate-500">Duke mbledhur të dhënat e javës nga databaza...</td></tr>';
+
+            try {
+                const q = window.query(
+                    window.collection(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'aktivitetet_ditore'),
+                    window.where('java', '==', weekStr)
+                );
+                const querySnapshot = await window.getDocs(q);
+                
+                const aktivitete = [];
+                querySnapshot.forEach(d => aktivitete.push(d.data()));
+                aktivitete.sort((a,b) => a.nrJavor - b.nrJavor);
+
+                tbody.innerHTML = '';
+
+                // Shto titullin e Sektorit by default tek Tabela e Madhe
+                window.shtoTitullSektoriHTML(window.konfigurimet.profil.sektori || "SEKTORI");
+
+                if (aktivitete.length === 0) {
+                    tbody.innerHTML += '<tr><td colspan="11" class="text-center py-6 font-bold text-slate-400 bg-slate-50 border-b border-slate-200">Nuk ka asnjë aktivitet të regjistruar për këtë javë. Shkoni tek "Regjistro Aktivitet".</td></tr>';
+                } else {
+                    aktivitete.forEach(akt => {
+                        window.shtoRreshtNgaDB(akt);
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="11" class="text-center py-10 font-bold text-red-500">Gabim në gjenerim!</td></tr>';
+            }
+        }
+
+        // Fusha te perbashketa per tu dukur tamam si excel vizual
+        const commonInputClass = "w-full p-3.5 bg-transparent font-bold text-[13px] text-slate-800 outline-none resize-none overflow-hidden text-center";
+
+        window.shtoTitullSektoriHTML = function(titulli) {
+            const tbody = document.getElementById('table-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td colspan="10" class="border-b border-slate-300 p-4 bg-[#f1f5f9]">
+                    <input type="text" class="w-full text-center font-black uppercase bg-transparent border-0 tracking-widest text-slate-800 outline-none text-[14px]" value="${window.escapeHtml(titulli)}">
+                </td>
+                <td class="border-b border-slate-300 p-3 text-center no-print bg-[#f1f5f9]">
+                    <button onclick="this.closest('tr').remove()" class="bg-red-100 text-red-700 p-2.5 rounded-xl font-bold text-[11px] uppercase w-full">Fshi</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        window.shtoTitullSektori = function() { window.shtoTitullSektoriHTML("TITULL I RI SHTESË"); }
+        window.shtoRreshtManual = function() { window.shtoRreshtNgaDB({nrJavor: "-", objektivi:"", detyra:"", produkti:"", statusi:"", pergjegjesi:window.konfigurimet.profil.specialisti, info:"", afati:"", raportohet:""}); }
+
+        // Mbushe tabelen ekzakte me logjiken e rreshtit te vjeter
+        window.shtoRreshtNgaDB = function(data) {
+            const tbody = document.getElementById('table-body');
+            const tr = document.createElement('tr');
+            tr.className = "bg-white hover:bg-slate-50 transition-colors";
+            
+            let statusColor = "text-slate-800";
+            if (data.statusi === "Në proces") statusColor = "text-orange-600";
+            
+            tr.innerHTML = `
+                <td class="border border-slate-300 p-3 text-center align-middle font-black text-slate-500 text-sm">${data.nrJavor}</td>
+                <td class="border border-slate-300 p-2 align-middle"><textarea class="${commonInputClass}" rows="3">${window.escapeHtml(data.objektivi || "")}</textarea></td>
+                <td class="border border-slate-300 p-2 align-middle"><textarea class="${commonInputClass}" rows="3">${window.escapeHtml(data.detyra || "")}</textarea></td>
+                <td class="border border-slate-300 p-2 align-middle"><textarea class="${commonInputClass}" rows="2">${window.escapeHtml(data.produkti || "")}</textarea></td>
+                <td class="border border-slate-300 p-2 align-middle text-center font-bold ${statusColor}"><input type="text" class="w-full text-center bg-transparent outline-none font-bold ${statusColor}" value="${window.escapeHtml(data.statusi || "")}"></td>
+                <td class="border border-slate-300 p-2 align-middle"><textarea class="${commonInputClass}" rows="2">${window.escapeHtml(data.pergjegjesi || "")}</textarea></td>
+                <td class="border border-slate-300 p-2 align-middle"><textarea class="${commonInputClass}" rows="3">${window.escapeHtml(data.info || "")}</textarea></td>
+                <td class="border border-slate-300 p-2 align-middle"><textarea class="${commonInputClass}" rows="2">-</textarea></td>
+                <td class="border border-slate-300 p-2 align-middle"><input type="text" class="w-full text-center bg-transparent outline-none font-bold text-[13px] text-slate-800" value="${window.escapeHtml(data.afati || "")}"></td>
+                <td class="border border-slate-300 p-2 align-middle"><textarea class="${commonInputClass}" rows="2">${window.escapeHtml(data.raportohet || "")}</textarea></td>
+                <td class="border border-slate-300 p-2 align-middle text-center no-print">
+                    <button onclick="this.closest('tr').remove()" class="bg-red-50 text-red-600 border border-red-100 p-2 rounded-xl font-bold text-[11px] uppercase w-full">Fshi</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+
+            tr.querySelectorAll('textarea').forEach(ta => {
+                ta.style.height = 'auto';
+                setTimeout(() => { ta.style.height = ta.scrollHeight + 'px'; }, 10);
+                ta.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = this.scrollHeight + 'px';
+                });
+            });
+        }
+
+        // --- 6. LOGJIKA E EXCELIT ---
+        window.eksportoExcel = function() {
+            const drejtoria = document.getElementById('inp-drejtoria').value || "";
+            const sektori = document.getElementById('inp-sektori').value || "";
+            const specialisti = document.getElementById('inp-specialisti').value || "";
+            const data = document.getElementById('inp-periudha').value || "";
+            
+            const titulli = `RAPORTI JAVOR I SPECIALISTIT ${specialisti.toUpperCase()} ${drejtoria.toUpperCase()} / ${sektori.toUpperCase()} ${data}`;
+            
+            let tableHtml = `<table border="1" style="font-family: 'Times New Roman', Times, serif; font-size: 12pt; text-align: center; vertical-align: middle;">
+                <tr><td colspan="10" style="text-align:center; font-weight:bold; font-size: 14px; border:none;"><span style="background-color:white;">${window.escapeHtml(titulli)}</span></td></tr>
+                <tr style="font-weight:bold;">`;
+            
+            const headers = ['Nr.', 'OBJEKTIVI', 'DETYRAT INDIVIDUALE', 'PRODUKTI FINAL', 'STATUSI', 'PERSONI PËRGJEGJËS', 'INFORMACION', 'PROBLEMATIKAT', 'AFATI', 'KUJT I RAPORTOHET'];
+            headers.forEach((h) => {
+                tableHtml += `<th style="text-align:center; vertical-align:middle; background-color:#f3f4f6;">${h}</th>`;
+            });
+            tableHtml += `</tr>`;
+                
+            const rows = document.getElementById('table-body').querySelectorAll('tr');
+            rows.forEach(tr => {
+                tableHtml += '<tr>';
+                const cells = tr.querySelectorAll('td:not(.no-print)');
+                if (cells.length === 1) { 
+                   const val = tr.querySelector('input') ? tr.querySelector('input').value : tr.innerText;
+                   tableHtml += `<td colspan="10" style="text-align:center; font-weight:bold; vertical-align:middle;"><span style="background-color:#f9fafb; padding:2px 10px;">${window.escapeHtml(val)}</span></td>`;
+                } else {
+                   cells.forEach((td, index) => {
+                       let text = "";
+                       if (td.querySelector('textarea')) text = td.querySelector('textarea').value;
+                       else if (td.querySelector('input')) text = td.querySelector('input').value;
+                       else text = td.innerText;
+                       
+                       let inlineStyle = 'text-align: center; vertical-align: middle;';
+                       if (index === 4 && text === "Në proces") inlineStyle += ' color:#f97316; font-weight:bold;';
+                       if (index === 4 && text === "Përfunduar") inlineStyle += ' font-weight:bold;';
+                       
+                       tableHtml += `<td style="${inlineStyle}">${window.escapeHtml(text).replace(/\n/g, '<br>')}</td>`;
+                   });
+                }
+                tableHtml += '</tr>';
+            });
+            tableHtml += '</table>';
+            
+            const blob = new Blob(['\ufeff' + tableHtml], { type: 'application/vnd.ms-excel' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Raporti_${specialisti.replace(/\s+/g, '_')}_${data}.xls`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        
+        window.escapeHtml = function(unsafe) {
+            return (unsafe || "").toString()
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        window.addEventListener('beforeprint', () => {
+            const drejtoria = document.getElementById('inp-drejtoria').value || "";
+            const sektori = document.getElementById('inp-sektori').value || "";
+            const specialisti = document.getElementById('inp-specialisti').value || "";
+            const data = document.getElementById('inp-periudha').value || "";
+            
+            document.getElementById('print-header').textContent = 
+                `RAPORTI JAVOR I SPECIALISTIT ${specialisti.toUpperCase()} ${drejtoria.toUpperCase()} / ${sektori.toUpperCase()} ${data}`;
+            
+            document.querySelectorAll('#view-raporti-javor textarea').forEach(ta => {
+                ta.style.height = 'auto';
+                ta.style.height = ta.scrollHeight + 'px';
+            });
+        });
+
+    </script>
+</body>
+</html>
