@@ -26,11 +26,11 @@
             #sidebar, .no-print, #toast-container { display: none !important; }
             #main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
             .print-container { padding: 0 !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
-            table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
+            table { width: 100%; border-collapse: collapse; page-break-inside: auto; font-family: 'Times New Roman', Times, serif !important; }
             tr { page-break-inside: avoid; page-break-after: auto; }
-            th, td { border: 1px solid #000 !important; padding: 6px !important; font-size: 11px !important; color: #000 !important; }
-            textarea, input { border: none !important; background: transparent !important; resize: none; width: 100%; box-shadow: none !important; padding: 0 !important; }
-            .report-header-print { display: block !important; text-align: center; margin-bottom: 20px; }
+            th, td { border: 1px solid #000 !important; padding: 6px !important; font-size: 12pt !important; color: #000 !important; font-family: 'Times New Roman', Times, serif !important; }
+            textarea, input { border: none !important; background: transparent !important; resize: none; width: 100%; box-shadow: none !important; padding: 0 !important; font-family: 'Times New Roman', Times, serif !important; font-size: 12pt !important; }
+            .report-header-print { display: block !important; text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif !important; font-size: 14pt !important; font-weight: bold; }
         }
 
         .report-header-print { display: none; }
@@ -369,6 +369,7 @@
             const pergjegjesi = document.getElementById('act-pergjegjesi').value;
             const raportohet = document.getElementById('act-raportohet').value;
             const afati = document.getElementById('act-afati').value;
+            const info = document.getElementById('act-info') ? document.getElementById('act-info').value.trim() : "";
             const problematika = document.getElementById('act-problematika').value.trim();
 
             if (!dateVal || !objektivi || !detyra) {
@@ -380,7 +381,7 @@
             const timestamp = Date.now();
 
             const activityData = {
-                date: dateVal, week: weekString, objektivi, statusi, detyra, produkti, pergjegjesi, raportohet, afati, problematika, timestamp
+                date: dateVal, week: weekString, objektivi, statusi, detyra, produkti, pergjegjesi, raportohet, afati, info, problematika, timestamp
             };
 
             try {
@@ -391,6 +392,7 @@
                 
                 document.getElementById('act-detyra').value = '';
                 document.getElementById('act-produkti').value = '';
+                if(document.getElementById('act-info')) document.getElementById('act-info').value = '';
                 document.getElementById('act-problematika').value = '';
                 
             } catch (error) {
@@ -485,28 +487,29 @@
             tbody.innerHTML = '';
 
             if (weeklyActs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-10 text-gray-500 font-medium">Nuk ka asnjë aktivitet të regjistruar për këtë javë.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-10 text-gray-500 font-medium">Nuk ka asnjë aktivitet të regjistruar për këtë javë.</td></tr>`;
                 return;
             }
 
             weeklyActs.forEach((act, index) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 bg-white transition-colors group";
+                tr.className = "hover:bg-gray-50 bg-white transition-colors group text-[12pt]";
                 
                 let statusColor = "text-gray-800";
                 if(act.statusi && act.statusi.toLowerCase().includes("proces")) statusColor = "text-orange-600";
                 if(act.statusi && act.statusi.toLowerCase().includes("përfunduar")) statusColor = "text-green-600";
 
                 tr.innerHTML = `
-                    <td class="border border-gray-300 p-2 text-center align-middle font-bold text-gray-500">${index + 1}</td>
-                    <td class="border border-gray-300 p-1"><textarea class="w-full text-sm bg-transparent border-none outline-none resize-none p-2" rows="2">${escapeHtml(act.objektivi)}</textarea></td>
-                    <td class="border border-gray-300 p-1"><textarea class="w-full text-sm bg-transparent border-none outline-none resize-none p-2" rows="2">${escapeHtml(act.detyra)}</textarea></td>
-                    <td class="border border-gray-300 p-1"><textarea class="w-full text-sm bg-transparent border-none outline-none resize-none p-2" rows="2">${escapeHtml(act.produkti)}</textarea></td>
-                    <td class="border border-gray-300 p-1 text-center align-middle font-semibold ${statusColor}"><input class="w-full text-center bg-transparent border-none outline-none" value="${escapeHtml(act.statusi)}"></td>
-                    <td class="border border-gray-300 p-1"><textarea class="w-full text-sm bg-transparent border-none outline-none resize-none p-2" rows="2">${escapeHtml(act.pergjegjesi)}</textarea></td>
-                    <td class="border border-gray-300 p-1"><textarea class="w-full text-sm bg-transparent border-none outline-none resize-none p-2" rows="2">${escapeHtml(act.raportohet)}</textarea></td>
-                    <td class="border border-gray-300 p-1"><input class="w-full text-center text-sm bg-transparent border-none outline-none p-2" value="${escapeHtml(act.afati)}"></td>
-                    <td class="border border-gray-300 p-1"><textarea class="w-full text-sm bg-transparent border-none outline-none resize-none p-2" rows="2">${escapeHtml(act.problematika)}</textarea></td>
+                    <td class="border border-gray-300 p-2 text-center align-middle font-bold text-gray-800">${index + 1}</td>
+                    <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.objektivi)}</textarea></td>
+                    <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.detyra)}</textarea></td>
+                    <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.produkti)}</textarea></td>
+                    <td class="border border-gray-300 p-1 text-center align-middle font-bold ${statusColor}"><input class="w-full text-center bg-transparent border-none outline-none text-[12pt]" value="${escapeHtml(act.statusi)}"></td>
+                    <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.pergjegjesi)}</textarea></td>
+                    <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.info || "")}</textarea></td>
+                    <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.problematika)}</textarea></td>
+                    <td class="border border-gray-300 p-1"><input class="w-full text-center bg-transparent border-none outline-none p-2 text-[12pt]" value="${escapeHtml(act.afati)}"></td>
+                    <td class="border border-gray-300 p-1"><textarea class="w-full bg-transparent border-none outline-none resize-none p-2 text-[12pt]" rows="2">${escapeHtml(act.raportohet)}</textarea></td>
                     <td class="border border-gray-300 p-2 text-center no-print">
                         <button onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700 font-semibold text-xs opacity-0 group-hover:opacity-100 transition-opacity">Hiq</button>
                     </td>
@@ -535,13 +538,13 @@
             const specialisti = document.getElementById('rep-specialisti').value || 'Raporti';
             
             let tableHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body>`;
-            tableHtml += `<table border="1" style="font-family: Arial, sans-serif; font-size: 11pt;">`;
+            tableHtml += `<table border="1" style="font-family: 'Times New Roman', Times, serif; font-size: 12pt;">`;
             
             const headerText = document.getElementById('print-header').textContent;
-            tableHtml += `<tr><td colspan="9" style="text-align:center; font-weight:bold; font-size: 14pt; height: 40px; vertical-align:middle;">${escapeHtml(headerText)}</td></tr>`;
+            tableHtml += `<tr><td colspan="10" style="text-align:center; font-weight:bold; font-size: 14pt; height: 40px; vertical-align:middle;">${escapeHtml(headerText)}</td></tr>`;
             
             tableHtml += `<tr style="background-color: #f3f4f6; font-weight: bold; text-align: center;">`;
-            const cols = ['Nr.', 'Objektivi', 'Detyrat Individuale', 'Produkti Final', 'Statusi', 'Personi Përgjegjës', 'Kujt i Raportohet', 'Afati', 'Problematika'];
+            const cols = ['Nr.', 'OBJEKTIVI', 'DETYRAT INDIVIDUALE', 'PRODUKTI FINAL', 'STATUSI', 'PERSONI PËRGJEGJËS', 'INFORMACION', 'PROBLEMATIKAT', 'AFATI', 'KUJT I RAPORTOHET'];
             cols.forEach(c => tableHtml += `<th>${c}</th>`);
             tableHtml += `</tr>`;
 
@@ -549,14 +552,18 @@
             rows.forEach(tr => {
                 tableHtml += `<tr>`;
                 const cells = tr.querySelectorAll('td:not(.no-print)');
-                cells.forEach(td => {
+                cells.forEach((td, index) => {
                     let val = "";
                     if(td.querySelector('textarea')) val = td.querySelector('textarea').value;
                     else if(td.querySelector('input')) val = td.querySelector('input').value;
                     else val = td.innerText;
                     
                     val = escapeHtml(val).replace(/\n/g, '<br>');
-                    tableHtml += `<td style="vertical-align: top;">${val}</td>`;
+
+                    let align = "vertical-align: top;";
+                    if (index === 0 || index === 4 || index === 8) align += " text-align: center;"; 
+
+                    tableHtml += `<td style="${align}">${val}</td>`;
                 });
                 tableHtml += `</tr>`;
             });
@@ -898,9 +905,15 @@
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">8. Problematika</label>
-                                <textarea id="act-problematika" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500" placeholder="Shëno nëse ka probleme..."></textarea>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">8. Informacion (Shtesë)</label>
+                                    <textarea id="act-info" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500" placeholder="Informacion shtesë..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">9. Problematika</label>
+                                    <textarea id="act-problematika" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500" placeholder="Shëno nëse ka probleme..."></textarea>
+                                </div>
                             </div>
 
                             <button onclick="window.saveActivity()" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-bold text-sm shadow-md transition-all mt-2">
@@ -968,19 +981,20 @@
                 </div>
 
                 <!-- Print Table Structure -->
-                <div class="bg-white border-2 border-gray-200 overflow-x-auto rounded-none w-full shadow-sm">
-                    <table class="w-full text-left border-collapse min-w-[1000px]">
+                <div class="bg-white border-2 border-gray-200 overflow-x-auto rounded-none w-full shadow-sm" style="font-family: 'Times New Roman', Times, serif;">
+                    <table class="w-full text-left border-collapse min-w-[1200px]">
                         <thead>
-                            <tr class="bg-gray-100 text-[11px] font-bold text-gray-700 uppercase">
+                            <tr class="bg-gray-100 text-[12pt] font-bold text-gray-800 uppercase">
                                 <th class="border border-gray-300 p-2 text-center w-10">Nr.</th>
-                                <th class="border border-gray-300 p-2 w-[12%]">Objektivi</th>
-                                <th class="border border-gray-300 p-2 w-[18%]">Detyrat Individuale</th>
-                                <th class="border border-gray-300 p-2 w-[12%]">Produkti Final</th>
-                                <th class="border border-gray-300 p-2 w-[8%] text-center">Statusi</th>
-                                <th class="border border-gray-300 p-2 w-[10%]">Personi Përgjegjës</th>
-                                <th class="border border-gray-300 p-2 w-[10%]">Kujt i Raportohet</th>
-                                <th class="border border-gray-300 p-2 w-[8%] text-center">Afati</th>
-                                <th class="border border-gray-300 p-2 w-[12%]">Problematika</th>
+                                <th class="border border-gray-300 p-2 w-[12%]">OBJEKTIVI</th>
+                                <th class="border border-gray-300 p-2 w-[16%]">DETYRAT INDIVIDUALE</th>
+                                <th class="border border-gray-300 p-2 w-[12%]">PRODUKTI FINAL</th>
+                                <th class="border border-gray-300 p-2 w-[8%] text-center">STATUSI</th>
+                                <th class="border border-gray-300 p-2 w-[10%]">PERSONI PËRGJEGJËS</th>
+                                <th class="border border-gray-300 p-2 w-[12%]">INFORMACION</th>
+                                <th class="border border-gray-300 p-2 w-[10%]">PROBLEMATIKAT</th>
+                                <th class="border border-gray-300 p-2 w-[8%] text-center">AFATI</th>
+                                <th class="border border-gray-300 p-2 w-[10%]">KUJT I RAPORTOHET</th>
                                 <th class="border border-gray-300 p-2 w-10 text-center no-print"></th>
                             </tr>
                         </thead>
