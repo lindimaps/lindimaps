@@ -197,7 +197,8 @@
         const loadConfig = async () => {
             if (!window.appState.user) return;
             try {
-                const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'settings');
+                // Shtohet 'config' si segmenti i 6-të për të formuar një rrugë të vlefshme dokumenti (çift)
+                const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'settings', 'config');
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     window.appState.config = docSnap.data();
@@ -217,6 +218,7 @@
             if (!window.appState.user) return;
             if (window.appState.unsubscribeActivities) window.appState.unsubscribeActivities();
 
+            // Kjo eshte reference e vlefshme per Collection (5 segmente: tek)
             const colRef = collection(db, 'artifacts', appId, 'users', window.appState.user.uid, 'activities');
             
             window.appState.unsubscribeActivities = onSnapshot(colRef, (snapshot) => {
@@ -248,13 +250,14 @@
             
             try {
                 showLoading();
-                const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'settings');
+                // Rruga me 6 segmente
+                const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'settings', 'config');
                 await setDoc(docRef, window.appState.config);
                 hideLoading();
                 window.showToast("Profili u ruajt me sukses!");
             } catch (error) {
                 hideLoading();
-                console.error("Arsyeja e gabimit ne profil:", error); // <-- Shtohet logimi
+                console.error("Arsyeja e gabimit ne profil:", error);
                 window.showToast("Gabim në ruajtjen e profilit. Shiko Console.", "error");
             }
         };
@@ -269,11 +272,13 @@
                 inputEl.value = '';
                 
                 try {
-                    const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'settings');
+                    // Rruga me 6 segmente
+                    const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'settings', 'config');
                     await setDoc(docRef, window.appState.config);
                     renderList(listName);
                     window.showToast("U shtua me sukses!");
                 } catch (error) {
+                    console.error(error);
                     window.showToast("Gabim në ruajtje", "error");
                     window.appState.config.lists[listName].pop(); 
                 }
@@ -286,7 +291,8 @@
             renderList(listName);
 
             try {
-                const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'settings');
+                // Rruga me 6 segmente
+                const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'settings', 'config');
                 await setDoc(docRef, window.appState.config);
                 window.showToast("U fshi me sukses!");
             } catch (error) {
@@ -389,7 +395,7 @@
                 
             } catch (error) {
                 hideLoading();
-                console.error("Arsyeja e gabimit ne aktivitet:", error); // <-- Shtohet logimi
+                console.error("Arsyeja e gabimit ne aktivitet:", error);
                 window.showToast("Gabim në ruajtje. Shiko Console.", "error");
             }
         };
