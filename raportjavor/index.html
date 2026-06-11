@@ -10,7 +10,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAG56-nHpfwzEw2noQZh3hrCbvcMWXShsg",
@@ -31,6 +31,12 @@
         window.doc = doc;
         window.setDoc = setDoc;
         window.getDoc = getDoc;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.deleteDoc = deleteDoc;
+        window.query = query;
+        window.orderBy = orderBy;
         window.__app_id = 'raportimi-javor-asig'; 
 
         onAuthStateChanged(auth, async (user) => {
@@ -470,6 +476,11 @@
         <div class="max-w-[1400px] mx-auto mb-2 flex justify-between items-end no-print">
             <div class="text-sm font-bold text-gray-600">Statusi: <span class="text-green-600">I lidhur</span></div>
             <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border">
+                <button onclick="window.hapHistorikun()" class="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Historiku
+                </button>
+                <div class="w-px h-4 bg-gray-300"></div>
                 <div class="text-sm font-bold text-gray-700">Llogaria: <span id="user-email-display" class="text-blue-600 font-normal">...</span></div>
                 <div class="w-px h-4 bg-gray-300"></div>
                 <button onclick="window.dilNgaLlogaria()" class="text-sm font-bold text-red-500 hover:text-red-700 transition-colors flex items-center gap-1">
@@ -538,6 +549,12 @@
                     ↶ Rikthe Fshirjen
                 </button>
                 <div class="flex-grow"></div>
+                <button onclick="window.ruajNeHistorik()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    Ruaj në Arkivë
+                </button>
                 <button onclick="eksportoExcel()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -630,6 +647,21 @@
                 <div class="flex justify-end gap-2 mt-4">
                     <button onclick="mbyllModalAfat()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">Anulo</button>
                     <button onclick="ruajAfatModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Ruaj</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal per Historikun -->
+        <div id="modal-historiku" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl w-[800px] max-w-[90vw] max-h-[90vh] flex flex-col transform transition-all">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Arkiva e Raporteve</h2>
+                    <button onclick="window.mbyllHistorikun()" class="text-gray-500 hover:text-red-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                <div id="historiku-list" class="overflow-y-auto flex-grow flex flex-col gap-3">
+                    <div class="text-center text-gray-500 py-8">Po ngarkoj të dhënat...</div>
                 </div>
             </div>
         </div>
@@ -1168,6 +1200,238 @@
             window.fshiRreshtin = fshiRreshtin;
             window.riktheFshirjen = riktheFshirjen;
             window.riNumerim = riNumerim;
+
+            // --- Funksionet e Historikut (Arkivës) ---
+            window.mbyllHistorikun = function() {
+                document.getElementById('modal-historiku').classList.add('hidden');
+                document.getElementById('modal-historiku').classList.remove('flex');
+            }
+
+            window.hapHistorikun = async function() {
+                if (!window.userId) return;
+                const modal = document.getElementById('modal-historiku');
+                const listDiv = document.getElementById('historiku-list');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                listDiv.innerHTML = '<div class="text-center text-gray-500 py-8">Po ngarkoj të dhënat...</div>';
+
+                try {
+                    const q = window.query(window.collection(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'raportet'), window.orderBy('timestamp', 'desc'));
+                    const querySnapshot = await window.getDocs(q);
+                    
+                    if (querySnapshot.empty) {
+                        listDiv.innerHTML = '<div class="text-center text-gray-500 py-8">Nuk keni asnjë raport të ruajtur në arkivë.</div>';
+                        return;
+                    }
+
+                    listDiv.innerHTML = '';
+                    querySnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        const dateObj = new Date(data.timestamp);
+                        const dataFormatume = dateObj.toLocaleDateString('sq-AL') + ' ' + dateObj.toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
+                        
+                        const item = document.createElement('div');
+                        item.className = 'border p-4 rounded bg-gray-50 flex justify-between items-center hover:shadow transition-shadow';
+                        item.innerHTML = `
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-lg">${escapeHtml(data.emri)}</h4>
+                                <div class="text-sm text-gray-500">Ruajtur më: ${dataFormatume}</div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.ngarkoNgaHistoriku('${docSnap.id}')" class="bg-blue-100 text-blue-600 hover:bg-blue-500 hover:text-white px-3 py-1 rounded font-bold transition-colors">
+                                    Ngarko
+                                </button>
+                                <button onclick="window.fshiNgaHistoriku('${docSnap.id}')" class="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white px-3 py-1 rounded font-bold transition-colors">
+                                    Fshi
+                                </button>
+                            </div>
+                        `;
+                        listDiv.appendChild(item);
+                    });
+                } catch (error) {
+                    console.error("Gabim gjatë ngarkimit të historikut:", error);
+                    listDiv.innerHTML = '<div class="text-center text-red-500 py-8">Ndodhi një gabim gjatë ngarkimit. Sigurohuni që rregullat e Firestore janë të sakta.</div>';
+                }
+            }
+
+            window.ruajNeHistorik = async function() {
+                if (!window.userId) { alert("Duhet të jeni të loguar për të ruajtur në arkivë!"); return; }
+                
+                // Mblidh te dhenat qe jane aktualisht ne ekran
+                const headerData = {
+                    drejtoria: document.getElementById('inp-drejtoria').value,
+                    sektori: document.getElementById('inp-sektori').value,
+                    specialisti: document.getElementById('main-specialist').value,
+                    periudha: document.getElementById('inp-periudha').value
+                };
+
+                const tableRows = [];
+                const rows = document.getElementById('table-body').querySelectorAll('tr');
+                rows.forEach(tr => {
+                    const firstCell = tr.firstElementChild;
+                    if (firstCell && firstCell.hasAttribute('colspan')) {
+                        const input = tr.querySelector('input');
+                        tableRows.push({ type: 'title', text: input ? input.value : tr.innerText });
+                    } else {
+                        const rowData = { type: 'data', cells: [] };
+                        const cells = tr.querySelectorAll('td:not(.no-print)');
+                        cells.forEach((td, index) => {
+                            let value = "";
+                            if (td.querySelector('textarea')) value = td.querySelector('textarea').value;
+                            else if (td.querySelector('select')) value = td.querySelector('select').value;
+                            else if (td.querySelector('input')) value = td.querySelector('input').value;
+                            else value = td.innerText;
+                            rowData.cells.push({ index: index, value: value });
+                        });
+                        tableRows.push(rowData);
+                    }
+                });
+
+                const dataToSave = {
+                    emri: `Raporti i Javës: ${headerData.periudha || 'E Papërcaktuar'}`,
+                    timestamp: new Date().getTime(),
+                    header: headerData,
+                    rows: tableRows,
+                    specialistet: window.specialistet,
+                    objektivat: window.objektivat,
+                    afatet: window.afatet,
+                    kolonaTeFshehura: window.kolonaTeFshehura
+                };
+
+                try {
+                    const btn = event.currentTarget;
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = 'Duke ruajtur...';
+                    btn.classList.replace('bg-blue-600', 'bg-gray-500');
+                    
+                    await window.addDoc(window.collection(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'raportet'), dataToSave);
+                    
+                    btn.innerHTML = '✓ U Ruajt';
+                    btn.classList.replace('bg-gray-500', 'bg-green-600');
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.classList.replace('bg-green-600', 'bg-blue-600');
+                    }, 2000);
+                } catch(e) {
+                    console.error("Gabim ne ruajtje:", e);
+                    alert("Ndodhi një gabim gjatë ruajtjes në arkivë. Mungojnë të drejtat nga Firebase Firestore Rules.");
+                }
+            }
+
+            window.fshiNgaHistoriku = async function(docId) {
+                if(confirm('A jeni të sigurt që doni ta fshini këtë raport nga arkiva përgjithmonë?')) {
+                    try {
+                        await window.deleteDoc(window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'raportet', docId));
+                        window.hapHistorikun(); // Rifresko listen
+                    } catch(e) {
+                        console.error("Gabim ne fshirje:", e);
+                        alert("Ndodhi një gabim gjatë fshirjes.");
+                    }
+                }
+            }
+
+            window.ngarkoNgaHistoriku = async function(docId) {
+                if(!confirm('Kujdes! Ngarkimi i një raporti të vjetër do të mbishkruajë të dhënat aktuale që keni në ekran. Doni të vazhdoni?')) return;
+                
+                window.mbyllHistorikun();
+                const statusIndicator = document.getElementById('save-status');
+                if(statusIndicator) {
+                     statusIndicator.textContent = 'Duke ngarkuar...';
+                     statusIndicator.classList.remove('opacity-0');
+                     statusIndicator.classList.add('opacity-100');
+                }
+
+                try {
+                    const docSnap = await window.getDoc(window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'raportet', docId));
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        
+                        // Populimi - njejte si auto-load
+                        if (data.specialistet) { window.specialistet.length = 0; window.specialistet.push(...data.specialistet); }
+                        if (data.objektivat) { window.objektivat.length = 0; window.objektivat.push(...data.objektivat); }
+                        if (data.afatet) { window.afatet.length = 0; window.afatet.push(...data.afatet); }
+                        if (data.kolonaTeFshehura) { window.kolonaTeFshehura.length = 0; window.kolonaTeFshehura.push(...data.kolonaTeFshehura); }
+                        
+                        window.perditesoDropdownSpecialistet();
+                        window.perditesoDropdownObjektivat();
+                        window.perditesoDropdownAfatet();
+
+                        if (data.header) {
+                            document.getElementById('inp-drejtoria').value = data.header.drejtoria || '';
+                            document.getElementById('inp-sektori').value = data.header.sektori || '';
+                            document.getElementById('inp-periudha').value = data.header.periudha || '';
+                            setTimeout(() => { document.getElementById('main-specialist').value = data.header.specialisti || ''; }, 50);
+                        }
+
+                        if (data.rows && data.rows.length > 0) {
+                            const tbody = document.getElementById('table-body');
+                            tbody.innerHTML = '';
+                            window.numeruesiRreshtave = 0;
+                            window.historiaFshirjeve.length = 0;
+                            
+                            // Shfaq te gjitha kolonat fillimisht perpara se te aplikojme fshehjet e ketij raporti
+                            const thead = document.querySelector('thead tr');
+                            Array.from(thead.children).forEach(th => th.style.display = '');
+
+                            // Fshih ato qe ishin te fshehura ne kete raport specifik
+                            window.kolonaTeFshehura.forEach(colIdx => {
+                                if(thead.children[colIdx]) thead.children[colIdx].style.display = 'none';
+                            });
+
+                            data.rows.forEach(rowData => {
+                                if (rowData.type === 'title') {
+                                    window.shtoTitullSektori(null, rowData.text); 
+                                } else if (rowData.type === 'data') {
+                                    window.shtoRresht();
+                                    const newRow = tbody.lastElementChild;
+                                    
+                                    rowData.cells.forEach(cell => {
+                                        if (cell.index > 0) {
+                                            const td = newRow.children[cell.index];
+                                            if (td) {
+                                                const textarea = td.querySelector('textarea');
+                                                const select = td.querySelector('select:not(.row-objektiv):not(.row-afat)');
+                                                const objSelect = td.querySelector('.row-objektiv');
+                                                const afatSelect = td.querySelector('.row-afat');
+                                                const input = td.querySelector('input');
+                                                
+                                                if (objSelect && textarea) {
+                                                     const matchedObj = window.objektivat.find(o => o.text === cell.value);
+                                                     if (matchedObj) objSelect.value = matchedObj.id;
+                                                     textarea.value = cell.value;
+                                                }
+                                                else if (afatSelect && input) {
+                                                     if (window.afatet.includes(cell.value)) afatSelect.value = cell.value;
+                                                     input.value = cell.value;
+                                                }
+                                                else if (textarea) textarea.value = cell.value;
+                                                else if (select) {
+                                                    select.value = cell.value;
+                                                    if(select.classList.contains('status-select')) window.ndryshoNgjyrenStatusit(select);
+                                                }
+                                                else if (input) input.value = cell.value;
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                            window.riNumerim();
+                            // Bejme save ne sfond qe te rifreskohet puna aktuale me raportin e ngarkuar
+                            window.saveDataToFirebase();
+                        }
+                    }
+                    if(statusIndicator) {
+                        statusIndicator.textContent = 'Raporti u ngarkua ✓';
+                        setTimeout(() => {
+                            statusIndicator.classList.remove('opacity-100');
+                            statusIndicator.classList.add('opacity-0');
+                        }, 2000);
+                    }
+                } catch(e) {
+                    console.error("Gabim ne ngarkim:", e);
+                    alert("Ndodhi një gabim gjatë ngarkimit të raportit.");
+                }
+            }
         </script>
     </div>
 </body>
