@@ -459,7 +459,7 @@
     <div id="main-app" class="hidden">
         
         <!-- Navbar i lëmuar tip LindiMaps -->
-        <header class="glass-card sticky top-0 z-50 px-4 sm:px-8 py-4 flex justify-between items-center no-print">
+        <header class="glass-card sticky top-0 z-50 px-4 sm:px-8 py-4 flex justify-between items-center no-print w-full">
             <div class="flex items-center gap-3 logo-container">
                 <div class="logo-bg h-10 w-10 flex items-center justify-center bg-slate-900 rounded-xl shadow-md">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -477,48 +477,48 @@
             </div>
 
             <div class="flex items-center gap-4">
-                <button onclick="window.hapHistorikun()" class="text-[12px] font-extrabold text-blue-600 uppercase tracking-widest hover:text-blue-800 transition-colors hidden sm:block">
+                <button onclick="window.hapHistorikun()" class="text-[14px] font-extrabold text-blue-600 uppercase tracking-widest hover:text-blue-800 transition-colors hidden sm:block">
                     Arkiva e Raporteve
                 </button>
                 <div class="w-px h-5 bg-slate-200 hidden sm:block"></div>
-                <span id="user-email-display" class="text-[12px] font-bold text-slate-600 truncate max-w-[120px] sm:max-w-xs">...</span>
-                <button onclick="window.dilNgaLlogaria()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-[12px] font-extrabold transition-colors">
+                <span id="user-email-display" class="text-[14px] font-bold text-slate-600 truncate max-w-[120px] sm:max-w-xs">...</span>
+                <button onclick="window.dilNgaLlogaria()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-[14px] font-extrabold transition-colors">
                     Dil
                 </button>
             </div>
         </header>
 
-        <div class="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8 space-y-6 print-container">
+        <div class="w-full px-4 sm:px-6 lg:px-8 space-y-6 print-container mt-6">
             
             <!-- Pjesa e Kokës së Dokumentit -->
             <div id="print-header" class="print-only-header"></div>
             
-            <div class="bg-white rounded-[2rem] p-6 md:p-8 shadow-xl shadow-slate-200/40 border border-slate-100 transition-all hover:shadow-2xl interactive-header">
+            <div class="bg-white rounded-[2rem] p-6 md:p-10 shadow-xl shadow-slate-200/40 border border-slate-100 transition-all hover:shadow-2xl interactive-header w-full">
                 <h1 class="text-2xl md:text-3xl font-black text-center mb-8 uppercase tracking-widest text-slate-800">
                     Raporti Javor i Aktiviteteve
                 </h1>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <!-- Fusha: Drejtoria -->
                     <div class="space-y-2">
-                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Drejtoria</label>
-                        <input id="inp-drejtoria" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm text-slate-700" placeholder="P.sh. Drejtoria..." value="DREJTORIA E PËRPUNIMIT TË TË DHËNAVE REMOTE SENSING">
+                        <label class="text-[12px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Drejtoria</label>
+                        <input id="inp-drejtoria" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-base text-slate-700" placeholder="P.sh. Drejtoria..." value="DREJTORIA E PËRPUNIMIT TË TË DHËNAVE REMOTE SENSING">
                     </div>
                     
                     <!-- Fusha: Sektori -->
                     <div class="space-y-2">
-                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Sektori</label>
-                        <input id="inp-sektori" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm text-slate-700" placeholder="P.sh. Sektori i Përpunimit..." value="SEKTORI I PËRPUNIMIT TË IMAZHERIVE SATELITORE">
+                        <label class="text-[12px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Sektori</label>
+                        <input id="inp-sektori" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-base text-slate-700" placeholder="P.sh. Sektori i Përpunimit..." value="SEKTORI I PËRPUNIMIT TË IMAZHERIVE SATELITORE">
                     </div>
 
                     <!-- Fusha: Specialisti -->
                     <div class="space-y-2">
-                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Specialisti</label>
+                        <label class="text-[12px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Specialisti</label>
                         <div class="flex gap-2">
-                            <select id="main-specialist" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm text-slate-700 appearance-none cursor-pointer">
+                            <select id="main-specialist" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-base text-slate-700 appearance-none cursor-pointer">
                                 <!-- Opsionet mbushen nga JavaScript -->
                             </select>
-                            <button onclick="hapModalSpecialist()" class="bg-slate-900 text-white px-5 rounded-2xl font-bold shadow-lg shadow-slate-900/20 hover:bg-black active:scale-95 transition-all text-xl no-print" title="Shto Specialist të ri">
+                            <button onclick="hapModalSpecialist()" class="bg-slate-900 text-white px-6 rounded-2xl font-bold shadow-lg shadow-slate-900/20 hover:bg-black active:scale-95 transition-all text-2xl no-print" title="Shto Specialist të ri">
                                 +
                             </button>
                         </div>
@@ -526,82 +526,82 @@
 
                     <!-- Fusha: Periudha/Data -->
                     <div class="space-y-2">
-                        <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Periudha (Java)</label>
-                        <input id="inp-periudha" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm text-slate-700" placeholder="P.sh. 08-12.05.2026" value="08-12.05.2026">
+                        <label class="text-[12px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Periudha (Java)</label>
+                        <input id="inp-periudha" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-base text-slate-700" placeholder="P.sh. 08-12.05.2026" value="08-12.05.2026">
                     </div>
                 </div>
             </div>
 
             <!-- Tabela dhe Butonat -->
-            <div class="bg-white rounded-[2rem] p-4 md:p-8 shadow-xl shadow-slate-200/40 border border-slate-100 transition-all hover:shadow-2xl">
+            <div class="bg-white rounded-[2rem] p-4 md:p-8 shadow-xl shadow-slate-200/40 border border-slate-100 transition-all hover:shadow-2xl w-full">
                 
                 <!-- Butonat e Veprimeve -->
-                <div class="mb-6 flex flex-wrap gap-3 no-print">
-                    <button onclick="shtoRresht()" class="bg-blue-600 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-blue-600/30 hover:bg-blue-700 active:scale-95 transition-all text-[11px] uppercase tracking-wider">
+                <div class="mb-6 flex flex-wrap gap-4 no-print">
+                    <button onclick="shtoRresht()" class="bg-blue-600 text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-blue-600/30 hover:bg-blue-700 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
                         + Aktivitet
                     </button>
-                    <button onclick="shtoTitullSektori()" class="bg-slate-100 text-slate-600 px-5 py-3 rounded-xl font-bold hover:bg-slate-200 active:scale-95 transition-all text-[11px] uppercase tracking-wider">
+                    <button onclick="shtoTitullSektori()" class="bg-slate-100 text-slate-600 px-6 py-4 rounded-xl font-bold hover:bg-slate-200 active:scale-95 transition-all text-[12px] uppercase tracking-wider border-2 border-slate-200">
                         + Nëntitull
                     </button>
-                    <button onclick="hapModalObjektiv()" class="bg-emerald-500 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-emerald-500/30 hover:bg-emerald-600 active:scale-95 transition-all text-[11px] uppercase tracking-wider">
+                    <button onclick="hapModalObjektiv()" class="bg-emerald-500 text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-emerald-500/30 hover:bg-emerald-600 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
                         + Objektiv
                     </button>
-                    <button onclick="hapModalAfat()" class="bg-orange-500 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-orange-500/30 hover:bg-orange-600 active:scale-95 transition-all text-[11px] uppercase tracking-wider">
+                    <button onclick="hapModalAfat()" class="bg-orange-500 text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-orange-500/30 hover:bg-orange-600 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
                         + Afat
                     </button>
-                    <button id="btn-rikthe" onclick="riktheFshirjen()" class="hidden bg-slate-900 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-slate-900/30 hover:bg-black active:scale-95 transition-all text-[11px] uppercase tracking-wider">
+                    <button id="btn-rikthe" onclick="riktheFshirjen()" class="hidden bg-slate-900 text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-slate-900/30 hover:bg-black active:scale-95 transition-all text-[12px] uppercase tracking-wider">
                         ↶ Undo
                     </button>
                     
                     <div class="flex-grow w-full md:w-auto"></div>
                     
-                    <div class="flex gap-2 w-full md:w-auto justify-end">
-                        <button onclick="window.ruajNeHistorik(event)" class="btn-primary-custom flex-1 md:flex-none px-5 py-3 rounded-xl font-bold shadow-lg transition-all active:scale-95 text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg> Arkivo
+                    <div class="flex gap-3 w-full md:w-auto justify-end">
+                        <button onclick="window.ruajNeHistorik(event)" class="btn-primary-custom flex-1 md:flex-none px-6 py-4 rounded-xl font-bold shadow-lg transition-all active:scale-95 text-[12px] uppercase tracking-wider flex items-center justify-center gap-2">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg> Arkivo
                         </button>
-                        <button onclick="eksportoExcel()" class="bg-emerald-600 text-white flex-1 md:flex-none px-5 py-3 rounded-xl font-bold shadow-lg shadow-emerald-600/30 hover:bg-emerald-700 transition-all active:scale-95 text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Excel
+                        <button onclick="eksportoExcel()" class="bg-emerald-600 text-white flex-1 md:flex-none px-6 py-4 rounded-xl font-bold shadow-lg shadow-emerald-600/30 hover:bg-emerald-700 transition-all active:scale-95 text-[12px] uppercase tracking-wider flex items-center justify-center gap-2">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Excel
                         </button>
-                        <button onclick="window.print()" class="bg-slate-900 text-white flex-1 md:flex-none px-5 py-3 rounded-xl font-bold shadow-lg shadow-slate-900/30 hover:bg-black transition-all active:scale-95 text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg> PDF
+                        <button onclick="window.print()" class="bg-slate-900 text-white flex-1 md:flex-none px-6 py-4 rounded-xl font-bold shadow-lg shadow-slate-900/30 hover:bg-black transition-all active:scale-95 text-[12px] uppercase tracking-wider flex items-center justify-center gap-2">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg> PDF
                         </button>
                     </div>
                 </div>
 
-                <!-- Tabela -->
-                <div class="overflow-x-auto custom-scrollbar border border-slate-200/60 rounded-2xl">
-                    <table class="w-full text-sm text-left border-collapse">
-                        <thead class="bg-slate-50 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest border-b border-slate-200/60">
+                <!-- Tabela me hapësirë të plotë -->
+                <div class="overflow-x-auto custom-scrollbar border-2 border-slate-200/80 rounded-2xl w-full">
+                    <table class="w-full text-base text-left border-collapse">
+                        <thead class="bg-slate-100 text-[11px] font-extrabold text-slate-600 uppercase tracking-widest border-b-2 border-slate-200/80">
                             <tr>
-                                <th class="border-r border-slate-100 p-3 text-center w-12">Nr.</th>
-                                <th class="border-r border-slate-100 p-3 min-w-[220px]">
-                                    <div class="flex justify-between items-center gap-1"><span>Objektivi</span> <button onclick="fshiKolone(1)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
+                                <th class="border-r border-slate-200 p-4 text-center w-16">Nr.</th>
+                                <th class="border-r border-slate-200 p-4 min-w-[280px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Objektivi</span> <button onclick="fshiKolone(1)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
                                 </th>
-                                <th class="border-r border-slate-100 p-3 min-w-[220px]">
-                                    <div class="flex justify-between items-center gap-1"><span>Detyrat Individuale</span> <button onclick="fshiKolone(2)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
+                                <th class="border-r border-slate-200 p-4 min-w-[280px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Detyrat Individuale</span> <button onclick="fshiKolone(2)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
                                 </th>
-                                <th class="border-r border-slate-100 p-3 min-w-[180px]">
-                                    <div class="flex justify-between items-center gap-1"><span>Produkti Final</span> <button onclick="fshiKolone(3)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
+                                <th class="border-r border-slate-200 p-4 min-w-[220px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Produkti Final</span> <button onclick="fshiKolone(3)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
                                 </th>
-                                <th class="border-r border-slate-100 p-3 min-w-[140px]">
-                                    <div class="flex justify-between items-center gap-1"><span>Statusi</span> <button onclick="fshiKolone(4)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
+                                <th class="border-r border-slate-200 p-4 min-w-[160px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Statusi</span> <button onclick="fshiKolone(4)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
                                 </th>
-                                <th class="border-r border-slate-100 p-3 min-w-[180px]">
-                                    <div class="flex justify-between items-center gap-1"><span>Personi Përgjegjës</span> <button onclick="fshiKolone(5)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
+                                <th class="border-r border-slate-200 p-4 min-w-[200px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Personi Përgjegjës</span> <button onclick="fshiKolone(5)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
                                 </th>
-                                <th class="border-r border-slate-100 p-3 min-w-[280px]">
-                                    <div class="flex justify-between items-center gap-1"><span>Informacion</span> <button onclick="fshiKolone(6)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
+                                <th class="border-r border-slate-200 p-4 min-w-[320px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Informacion</span> <button onclick="fshiKolone(6)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
                                 </th>
-                                <th class="border-r border-slate-100 p-3 min-w-[180px]">
-                                    <div class="flex justify-between items-center gap-1"><span>Problematikat</span> <button onclick="fshiKolone(7)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
+                                <th class="border-r border-slate-200 p-4 min-w-[220px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Problematikat</span> <button onclick="fshiKolone(7)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
                                 </th>
-                                <th class="border-r border-slate-100 p-3 min-w-[140px]">
-                                    <div class="flex justify-between items-center gap-1"><span>Afati</span> <button onclick="fshiKolone(8)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
+                                <th class="border-r border-slate-200 p-4 min-w-[160px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Afati</span> <button onclick="fshiKolone(8)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
                                 </th>
-                                <th class="border-r border-slate-100 p-3 min-w-[180px]">
-                                    <div class="flex justify-between items-center gap-1"><span>Kujt i Raportohet</span> <button onclick="fshiKolone(9)" class="text-red-400 hover:text-red-600 no-print text-lg leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
+                                <th class="border-r border-slate-200 p-4 min-w-[200px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Kujt i Raportohet</span> <button onclick="fshiKolone(9)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
                                 </th>
-                                <th class="p-3 w-16 no-print text-center">Veprime</th>
+                                <th class="p-4 w-20 no-print text-center">Veprime</th>
                             </tr>
                         </thead>
                         <tbody id="table-body">
@@ -617,11 +617,11 @@
             <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full space-y-4 shadow-2xl border border-slate-100">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-xl font-black text-slate-800">Shto Specialist</h3>
-                    <button onclick="mbyllModalSpecialist()" class="text-slate-400 hover:text-slate-600">
+                    <button onclick="mbyllModalSpecialist()" class="text-slate-400 hover:text-slate-600 bg-slate-100 p-2 rounded-full">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-                <input type="text" id="inp-new-specialist" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm text-slate-700" placeholder="Shkruaj emrin dhe mbiemrin...">
+                <input type="text" id="inp-new-specialist" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/60 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-base text-slate-700" placeholder="Shkruaj emrin dhe mbiemrin...">
                 <div id="modal-error" class="text-red-500 text-sm hidden font-bold">Ky specialist ekziston tashmë!</div>
                 <div class="flex gap-3 pt-2">
                     <button onclick="mbyllModalSpecialist()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-4 rounded-xl font-bold transition-colors text-sm">Anulo</button>
@@ -631,18 +631,18 @@
         </div>
 
         <div id="modal-objektiv" class="hidden fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div class="bg-white rounded-[2rem] p-8 max-w-2xl w-full space-y-4 shadow-2xl border border-slate-100">
+            <div class="bg-white rounded-[2rem] p-8 max-w-3xl w-full space-y-4 shadow-2xl border border-slate-100">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-xl font-black text-slate-800">Shto Objektiv të ri</h3>
-                    <button onclick="mbyllModalObjektiv()" class="text-slate-400 hover:text-slate-600">
+                    <button onclick="mbyllModalObjektiv()" class="text-slate-400 hover:text-slate-600 bg-slate-100 p-2 rounded-full">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-                <textarea id="inp-new-objektiv" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm text-slate-700 resize-none" rows="4" placeholder="Shkruaj përshkrimin e plotë..."></textarea>
+                <textarea id="inp-new-objektiv" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/60 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-base text-slate-700 resize-none" rows="5" placeholder="Shkruaj përshkrimin e plotë..."></textarea>
                 <div id="modal-error-obj" class="text-red-500 text-sm hidden font-bold">Ju lutem shkruani një tekst për objektivin!</div>
                 <div class="flex gap-3 pt-2 justify-end">
-                    <button onclick="mbyllModalObjektiv()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-4 rounded-xl font-bold transition-colors text-sm">Anulo</button>
-                    <button onclick="ruajObjektivModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-colors text-sm">Ruaj</button>
+                    <button onclick="mbyllModalObjektiv()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-4 rounded-xl font-bold transition-colors text-sm">Anulo</button>
+                    <button onclick="ruajObjektivModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-colors text-sm">Ruaj</button>
                 </div>
             </div>
         </div>
@@ -651,11 +651,11 @@
             <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full space-y-4 shadow-2xl border border-slate-100">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-xl font-black text-slate-800">Shto Afat të ri</h3>
-                    <button onclick="mbyllModalAfat()" class="text-slate-400 hover:text-slate-600">
+                    <button onclick="mbyllModalAfat()" class="text-slate-400 hover:text-slate-600 bg-slate-100 p-2 rounded-full">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-                <input type="text" id="inp-new-afat" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200/60 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm text-slate-700" placeholder="P.sh. Janar-Dhjetor">
+                <input type="text" id="inp-new-afat" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/60 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-base text-slate-700" placeholder="P.sh. Janar-Dhjetor">
                 <div id="modal-error-afat" class="text-red-500 text-sm hidden font-bold">Ky afat ekziston tashmë!</div>
                 <div class="flex gap-3 pt-2">
                     <button onclick="mbyllModalAfat()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-4 rounded-xl font-bold transition-colors text-sm">Anulo</button>
@@ -665,17 +665,17 @@
         </div>
 
         <div id="modal-historiku" class="hidden fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div class="bg-white rounded-[2rem] p-8 max-w-4xl w-full max-h-[85vh] flex flex-col space-y-6 shadow-2xl border border-slate-100">
+            <div class="bg-white rounded-[2rem] p-8 max-w-5xl w-full max-h-[85vh] flex flex-col space-y-6 shadow-2xl border border-slate-100">
                 <div class="flex justify-between items-center pb-4 border-b border-slate-100">
                     <h3 class="text-2xl font-black text-slate-800">Arkiva e Raporteve</h3>
-                    <button onclick="window.mbyllHistorikun()" class="text-slate-400 hover:text-red-500 transition-colors bg-slate-50 p-2 rounded-full hover:bg-red-50">
+                    <button onclick="window.mbyllHistorikun()" class="text-slate-400 hover:text-red-500 transition-colors bg-slate-50 p-3 rounded-full hover:bg-red-50">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-                <div id="historiku-list" class="overflow-y-auto flex-grow flex flex-col gap-3 custom-scrollbar pr-2">
+                <div id="historiku-list" class="overflow-y-auto flex-grow flex flex-col gap-4 custom-scrollbar pr-4">
                     <div class="flex flex-col items-center justify-center text-slate-500 py-12">
-                        <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-                        <p class="font-bold text-sm tracking-wider">Po ngarkoj të dhënat...</p>
+                        <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                        <p class="font-bold text-base tracking-wider">Po ngarkoj të dhënat...</p>
                     </div>
                 </div>
             </div>
@@ -882,12 +882,12 @@
             function ndryshoNgjyrenStatusit(selectElement) {
                 if (selectElement.value === 'Në proces') {
                     selectElement.classList.remove('text-slate-700');
-                    selectElement.classList.add('text-orange-500');
+                    selectElement.classList.add('text-orange-600');
                 } else if (selectElement.value === 'Përfunduar') {
-                    selectElement.classList.remove('text-orange-500');
-                    selectElement.classList.add('text-slate-700');
+                    selectElement.classList.remove('text-orange-600');
+                    selectElement.classList.add('text-slate-800');
                 } else {
-                    selectElement.classList.remove('text-orange-500', 'text-slate-700');
+                    selectElement.classList.remove('text-orange-600', 'text-slate-800');
                 }
             }
 
@@ -896,7 +896,7 @@
                 numeruesiRreshtave++;
                 const tbody = document.getElementById('table-body');
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition-colors bg-white";
+                tr.className = "hover:bg-blue-50/50 transition-colors bg-white";
                 
                 // Merr specialistin kryesor aktual për t'ia vendosur by default rreshtit
                 const specialistiAktual = document.getElementById('main-specialist').value;
@@ -906,44 +906,44 @@
                     `<option value="${s}" ${s === specialistiAktual ? 'selected' : ''}>${s}</option>`
                 ).join('');
 
-                // Stilizim LindiMaps për inputet brenda tabelës
-                const commonInputClass = "w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 font-bold text-[11px] text-slate-700 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all";
+                // Stilizim i zmadhuar i fushave
+                const commonInputClass = "w-full p-3.5 rounded-xl bg-slate-50 border-2 border-slate-200/80 font-bold text-[14px] text-slate-800 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all";
 
                 tr.innerHTML = `
-                    <td class="border-b border-slate-100 p-2 text-center align-top font-black text-slate-400">${numeruesiRreshtave}</td>
-                    <td class="border-b border-slate-100 p-2 align-top relative">
-                        <select class="${commonInputClass} mb-1 cursor-pointer no-print row-objektiv" onchange="ndryshoTekstinObjektivit(this)"></select>
-                        <textarea class="${commonInputClass} resize-none" rows="2" placeholder="Zgjidh sipër ose shkruaj..."></textarea>
+                    <td class="border-b border-slate-200/80 p-4 text-center align-top font-black text-slate-400 text-base">${numeruesiRreshtave}</td>
+                    <td class="border-b border-slate-200/80 p-3 align-top relative">
+                        <select class="${commonInputClass} mb-2 cursor-pointer no-print row-objektiv" onchange="ndryshoTekstinObjektivit(this)"></select>
+                        <textarea class="${commonInputClass} resize-none" rows="3" placeholder="Zgjidh sipër ose shkruaj..."></textarea>
                     </td>
-                    <td class="border-b border-slate-100 p-2 align-top"><textarea class="${commonInputClass} resize-none" rows="3" placeholder="Përshkruaj detyrat..."></textarea></td>
-                    <td class="border-b border-slate-100 p-2 align-top"><textarea class="${commonInputClass} resize-none" rows="2" placeholder="Produkti final..."></textarea></td>
-                    <td class="border-b border-slate-100 p-2 align-top">
-                        <select class="${commonInputClass} cursor-pointer status-select text-orange-500" onchange="ndryshoNgjyrenStatusit(this)">
-                            <option value="Në proces" class="text-orange-500 font-bold">Në proces</option>
-                            <option value="Përfunduar" class="text-slate-700 font-bold">Përfunduar</option>
+                    <td class="border-b border-slate-200/80 p-3 align-top"><textarea class="${commonInputClass} resize-none" rows="4" placeholder="Përshkruaj detyrat..."></textarea></td>
+                    <td class="border-b border-slate-200/80 p-3 align-top"><textarea class="${commonInputClass} resize-none" rows="3" placeholder="Produkti final..."></textarea></td>
+                    <td class="border-b border-slate-200/80 p-3 align-top">
+                        <select class="${commonInputClass} cursor-pointer status-select text-orange-600" onchange="ndryshoNgjyrenStatusit(this)">
+                            <option value="Në proces" class="text-orange-600 font-bold">Në proces</option>
+                            <option value="Përfunduar" class="text-slate-800 font-bold">Përfunduar</option>
                         </select>
                     </td>
-                    <td class="border-b border-slate-100 p-2 align-top">
+                    <td class="border-b border-slate-200/80 p-3 align-top">
                         <select class="${commonInputClass} row-specialist">${opsionetS}</select>
                     </td>
-                    <td class="border-b border-slate-100 p-2 align-top"><textarea class="${commonInputClass} resize-none" rows="3" placeholder="Informacion shtesë..."></textarea></td>
-                    <td class="border-b border-slate-100 p-2 align-top"><textarea class="${commonInputClass} resize-none" rows="2" placeholder="-"></textarea></td>
-                    <td class="border-b border-slate-100 p-2 align-top">
-                        <select class="${commonInputClass} mb-1 cursor-pointer no-print row-afat" onchange="ndryshoTekstinAfatit(this)"></select>
+                    <td class="border-b border-slate-200/80 p-3 align-top"><textarea class="${commonInputClass} resize-none" rows="4" placeholder="Informacion shtesë..."></textarea></td>
+                    <td class="border-b border-slate-200/80 p-3 align-top"><textarea class="${commonInputClass} resize-none" rows="3" placeholder="-"></textarea></td>
+                    <td class="border-b border-slate-200/80 p-3 align-top">
+                        <select class="${commonInputClass} mb-2 cursor-pointer no-print row-afat" onchange="ndryshoTekstinAfatit(this)"></select>
                         <input type="text" class="${commonInputClass}" placeholder="Zgjidh ose shkruaj...">
                     </td>
-                    <td class="border-b border-slate-100 p-2 align-top">
+                    <td class="border-b border-slate-200/80 p-3 align-top">
                         <select class="${commonInputClass}">
                             <option>Përgjegjësi i Sektorit</option>
                             <option>Drejtor i Drejtorisë</option>
                         </select>
                     </td>
-                    <td class="border-b border-slate-100 p-2 align-middle text-center no-print">
-                        <div class="flex flex-col gap-1.5 items-center justify-center">
-                            <button onclick="shtoTitullSektori(this)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2 rounded-lg font-bold text-[10px] uppercase tracking-wider transition-colors w-full shadow-sm">
+                    <td class="border-b border-slate-200/80 p-3 align-middle text-center no-print">
+                        <div class="flex flex-col gap-2 items-center justify-center">
+                            <button onclick="shtoTitullSektori(this)" class="bg-white border-2 border-slate-200 hover:bg-slate-100 text-slate-700 p-3 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors w-full shadow-sm">
                                 + Titull
                             </button>
-                            <button onclick="fshiRreshtin(this)" class="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-lg font-bold text-[10px] uppercase tracking-wider transition-colors w-full shadow-sm border border-red-100/50">
+                            <button onclick="fshiRreshtin(this)" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 p-3 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors w-full shadow-sm">
                                 Fshi
                             </button>
                         </div>
@@ -974,15 +974,15 @@
                 else if (btnRef === null) valueAttr = `value="SEKTORI I PËRPUNIMIT TË IMAZHERIVE SATELITORE"`;
 
                 tr.innerHTML = `
-                    <td colspan="${activeColspan}" class="border-b border-slate-100 p-3 bg-blue-50/30">
-                        <input type="text" class="w-full text-center font-black uppercase bg-transparent border-0 focus:ring-2 focus:ring-blue-500/20 rounded-xl p-2 tracking-widest text-slate-800 outline-none text-xs" placeholder="SHKRUAJ TITULLIN KËTU..." ${valueAttr}>
+                    <td colspan="${activeColspan}" class="border-b border-slate-200/80 p-4 bg-slate-100">
+                        <input type="text" class="w-full text-center font-black uppercase bg-transparent border-0 focus:ring-4 focus:ring-blue-500/20 rounded-xl p-3 tracking-widest text-slate-800 outline-none text-base" placeholder="SHKRUAJ TITULLIN KËTU..." ${valueAttr}>
                     </td>
-                    <td class="border-b border-slate-100 p-2 text-center no-print bg-blue-50/30">
-                        <div class="flex flex-col gap-1.5 items-center justify-center h-full">
-                            <button onclick="shtoTitullSektori(this)" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 p-2 rounded-lg font-bold text-[10px] uppercase tracking-wider transition-colors w-full shadow-sm">
+                    <td class="border-b border-slate-200/80 p-3 text-center no-print bg-slate-100">
+                        <div class="flex flex-col gap-2 items-center justify-center h-full">
+                            <button onclick="shtoTitullSektori(this)" class="bg-white border-2 border-slate-300 text-slate-700 hover:bg-slate-200 p-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors w-full shadow-sm">
                                 + Titull
                             </button>
-                            <button onclick="fshiRreshtin(this, true)" class="bg-red-50 border border-red-100/50 text-red-600 hover:bg-red-100 p-2 rounded-lg font-bold text-[10px] uppercase tracking-wider transition-colors w-full shadow-sm">
+                            <button onclick="fshiRreshtin(this, true)" class="bg-red-100 border border-red-200 text-red-700 hover:bg-red-200 p-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors w-full shadow-sm">
                                 Fshi
                             </button>
                         </div>
@@ -1230,14 +1230,14 @@
                 const listDiv = document.getElementById('historiku-list');
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
-                listDiv.innerHTML = '<div class="flex flex-col items-center justify-center text-slate-500 py-12"><div class="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div><p class="font-bold text-sm tracking-wider">Po ngarkoj të dhënat...</p></div>';
+                listDiv.innerHTML = '<div class="flex flex-col items-center justify-center text-slate-500 py-12"><div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div><p class="font-bold text-base tracking-wider">Po ngarkoj të dhënat...</p></div>';
 
                 try {
                     const q = window.query(window.collection(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'raportet'), window.orderBy('timestamp', 'desc'));
                     const querySnapshot = await window.getDocs(q);
                     
                     if (querySnapshot.empty) {
-                        listDiv.innerHTML = '<div class="text-center text-slate-500 py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-300 font-bold text-sm">Nuk keni asnjë raport të ruajtur në arkivë.</div>';
+                        listDiv.innerHTML = '<div class="text-center text-slate-500 py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-300 font-bold text-base">Nuk keni asnjë raport të ruajtur në arkivë.</div>';
                         return;
                     }
 
@@ -1248,24 +1248,23 @@
                         const dataFormatume = dateObj.toLocaleDateString('sq-AL') + ' ' + dateObj.toLocaleTimeString('sq-AL', {hour: '2-digit', minute:'2-digit'});
                         
                         const item = document.createElement('div');
-                        // Stili i LindiMaps për listat
-                        item.className = 'bg-slate-50 border border-slate-200/60 p-5 rounded-2xl flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:bg-white hover:shadow-lg transition-all';
+                        item.className = 'bg-white border border-slate-200 p-6 rounded-2xl flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:bg-blue-50 hover:border-blue-200 hover:shadow-lg transition-all cursor-pointer';
                         item.innerHTML = `
                             <div>
-                                <h4 class="font-black text-slate-800 text-lg flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <h4 class="font-black text-slate-800 text-xl flex items-center gap-2">
+                                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                     ${escapeHtml(data.emri)}
                                 </h4>
-                                <div class="text-xs font-bold text-slate-400 mt-1 flex items-center gap-1 uppercase tracking-wider">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <div class="text-sm font-bold text-slate-500 mt-2 flex items-center gap-1 uppercase tracking-wider">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     Ruajtur më: ${dataFormatume}
                                 </div>
                             </div>
-                            <div class="flex gap-2">
-                                <button onclick="window.ngarkoNgaHistoriku('${docSnap.id}')" class="flex-1 sm:flex-none btn-custom btn-primary-custom text-[11px] uppercase tracking-wider shadow-lg shadow-blue-500/30">
+                            <div class="flex gap-3">
+                                <button onclick="window.ngarkoNgaHistoriku('${docSnap.id}')" class="flex-1 sm:flex-none btn-custom btn-primary-custom text-[13px] uppercase tracking-wider shadow-lg shadow-blue-500/30 px-6 py-3">
                                     Ngarko
                                 </button>
-                                <button onclick="window.fshiNgaHistoriku('${docSnap.id}')" class="flex-1 sm:flex-none bg-white border border-slate-200 text-red-500 hover:bg-red-50 hover:border-red-200 px-5 py-3 rounded-xl font-bold transition-colors text-[11px] uppercase tracking-wider">
+                                <button onclick="window.fshiNgaHistoriku('${docSnap.id}')" class="flex-1 sm:flex-none bg-white border-2 border-red-100 text-red-600 hover:bg-red-50 hover:border-red-200 px-6 py-3 rounded-xl font-bold transition-colors text-[13px] uppercase tracking-wider">
                                     Fshi
                                 </button>
                             </div>
@@ -1274,14 +1273,13 @@
                     });
                 } catch (error) {
                     console.error("Gabim gjatë ngarkimit të historikut:", error);
-                    listDiv.innerHTML = '<div class="text-center text-red-500 py-8 bg-red-50 rounded-2xl font-bold text-sm">Ndodhi një gabim gjatë ngarkimit.</div>';
+                    listDiv.innerHTML = '<div class="text-center text-red-500 py-8 bg-red-50 rounded-2xl font-bold text-base">Ndodhi një gabim gjatë ngarkimit.</div>';
                 }
             }
 
             window.ruajNeHistorik = async function(event) {
                 if (!window.userId) { alert("Duhet të jeni të loguar për të ruajtur në arkivë!"); return; }
                 
-                // Mblidh te dhenat qe jane aktualisht ne ekran
                 const headerData = {
                     drejtoria: document.getElementById('inp-drejtoria').value,
                     sektori: document.getElementById('inp-sektori').value,
@@ -1325,13 +1323,13 @@
                 try {
                     const btn = event.currentTarget;
                     const originalHTML = btn.innerHTML;
-                    btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Duke ruajtur...';
+                    btn.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Duke ruajtur...';
                     btn.classList.add('opacity-80', 'cursor-not-allowed');
                     btn.disabled = true;
                     
                     await window.addDoc(window.collection(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'raportet'), dataToSave);
                     
-                    btn.innerHTML = '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> U Ruajt';
+                    btn.innerHTML = '<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> U Ruajt';
                     btn.classList.add('btn-success-custom');
                     btn.classList.remove('btn-primary-custom');
                     
@@ -1355,7 +1353,7 @@
                 if(confirm('A jeni të sigurt që doni ta fshini këtë raport nga arkiva përgjithmonë?')) {
                     try {
                         await window.deleteDoc(window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'raportet', docId));
-                        window.hapHistorikun(); // Rifresko listen
+                        window.hapHistorikun(); 
                     } catch(e) {
                         console.error("Gabim ne fshirje:", e);
                         alert("Ndodhi një gabim gjatë fshirjes.");
@@ -1379,7 +1377,6 @@
                     if (docSnap.exists()) {
                         const data = docSnap.data();
                         
-                        // Populimi - njejte si auto-load
                         if (data.specialistet) { window.specialistet.length = 0; window.specialistet.push(...data.specialistet); }
                         if (data.objektivat) { window.objektivat.length = 0; window.objektivat.push(...data.objektivat); }
                         if (data.afatet) { window.afatet.length = 0; window.afatet.push(...data.afatet); }
@@ -1402,11 +1399,9 @@
                             window.numeruesiRreshtave = 0;
                             window.historiaFshirjeve.length = 0;
                             
-                            // Shfaq te gjitha kolonat fillimisht perpara se te aplikojme fshehjet e ketij raporti
                             const thead = document.querySelector('thead tr');
                             Array.from(thead.children).forEach(th => th.style.display = '');
 
-                            // Fshih ato qe ishin te fshehura ne kete raport specifik
                             window.kolonaTeFshehura.forEach(colIdx => {
                                 if(thead.children[colIdx]) thead.children[colIdx].style.display = 'none';
                             });
@@ -1449,7 +1444,6 @@
                                 }
                             });
                             window.riNumerim();
-                            // Bejme save ne sfond qe te rifreskohet puna aktuale me raportin e ngarkuar
                             window.saveDataToFirebase();
                         }
                     }
