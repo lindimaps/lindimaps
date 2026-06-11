@@ -43,7 +43,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // Firebase Initialization
         let firebaseConfig = {};
@@ -72,7 +72,7 @@
             user: null,
             config: {
                 profile: { specialisti: '', sektori: '', drejtoria: '' },
-                lists: { objektivat: [], statuset: [], pergjegjesit: [], raportimet: [], afatet: [], detyrat: [] }
+                lists: { objektivat: [], statuset: [], pergjegjesit: [], raportimet: [], afatet: [] }
             },
             activities: [],
             unsubscribeActivities: null
@@ -203,8 +203,7 @@
                 if (docSnap.exists()) {
                     window.appState.config = docSnap.data();
                     if(!window.appState.config.profile) window.appState.config.profile = { specialisti: '', sektori: '', drejtoria: '' };
-                    if(!window.appState.config.lists) window.appState.config.lists = { objektivat: [], statuset: [], pergjegjesit: [], raportimet: [], afatet: [], detyrat: [] };
-                    else if (!window.appState.config.lists.detyrat) window.appState.config.lists.detyrat = [];
+                    if(!window.appState.config.lists) window.appState.config.lists = { objektivat: [], statuset: [], pergjegjesit: [], raportimet: [], afatet: [] };
                 } else {
                     await setDoc(docRef, window.appState.config);
                 }
@@ -307,7 +306,7 @@
             document.getElementById('prof-specialisti').value = window.appState.config.profile.specialisti || '';
             document.getElementById('prof-sektori').value = window.appState.config.profile.sektori || '';
             document.getElementById('prof-drejtoria').value = window.appState.config.profile.drejtoria || '';
-            ['objektivat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet', 'detyrat'].forEach(renderList);
+            ['objektivat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet'].forEach(renderList);
         };
 
         const renderList = (listName) => {
@@ -328,14 +327,14 @@
         // --- 2. Regjistro Aktivitet (Logic) ---
 
         const populateDropdowns = () => {
-            const populate = (elementId, listName, defaultText = "-- Zgjidh --") => {
+            const populate = (elementId, listName) => {
                 const el = document.getElementById(elementId);
                 if (!el) return;
                 const currentVal = el.value;
                 const options = window.appState.config.lists[listName] || [];
-                el.innerHTML = `<option value="">${defaultText}</option>` + 
+                el.innerHTML = '<option value="">-- Zgjidh --</option>' + 
                     options.map(opt => `<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join('');
-                if (options.includes(currentVal) && elementId !== 'act-detyra-list') el.value = currentVal;
+                if (options.includes(currentVal)) el.value = currentVal;
             };
 
             populate('act-objektivi', 'objektivat');
@@ -343,7 +342,6 @@
             populate('act-pergjegjesi', 'pergjegjesit');
             populate('act-raportohet', 'raportimet');
             populate('act-afati', 'afatet');
-            populate('act-detyra-list', 'detyrat', '+ Shto nga lista...');
             
             if(!document.getElementById('act-date').value) {
                 document.getElementById('act-date').valueAsDate = new Date();
@@ -358,58 +356,6 @@
             const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
             const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1)/7);
             return `${d.getUTCFullYear()}-W${weekNo.toString().padStart(2, '0')}`;
-        };
-
-        window.editingActivityId = null;
-
-        window.editActivity = (id) => {
-            const act = window.appState.activities.find(a => a.id === id);
-            if(!act) return;
-            
-            document.getElementById('act-date').value = act.date;
-            document.getElementById('act-objektivi').value = act.objektivi || '';
-            document.getElementById('act-statusi').value = act.statusi || '';
-            document.getElementById('act-detyra').value = act.detyra || '';
-            document.getElementById('act-produkti').value = act.produkti || '';
-            document.getElementById('act-pergjegjesi').value = act.pergjegjesi || '';
-            document.getElementById('act-raportohet').value = act.raportohet || '';
-            document.getElementById('act-afati').value = act.afati || '';
-            document.getElementById('act-problematika').value = act.problematika || '';
-            
-            window.editingActivityId = id;
-            document.getElementById('act-form-title').textContent = "Edito Aktivitet";
-            document.getElementById('btn-ruaj-aktivitet').textContent = "Përditëso Aktivitetin";
-            document.getElementById('btn-ruaj-aktivitet').className = "flex-1 bg-orange-500 hover:bg-orange-600 text-white p-4 rounded-xl font-bold text-sm shadow-md transition-all";
-            document.getElementById('btn-cancel-edit').classList.remove('hidden');
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        window.copyActivity = (id) => {
-            const act = window.appState.activities.find(a => a.id === id);
-            if(!act) return;
-            
-            document.getElementById('act-date').value = act.date;
-            document.getElementById('act-objektivi').value = act.objektivi || '';
-            document.getElementById('act-statusi').value = act.statusi || '';
-            document.getElementById('act-detyra').value = act.detyra || '';
-            document.getElementById('act-produkti').value = act.produkti || '';
-            document.getElementById('act-pergjegjesi').value = act.pergjegjesi || '';
-            document.getElementById('act-raportohet').value = act.raportohet || '';
-            document.getElementById('act-afati').value = act.afati || '';
-            document.getElementById('act-problematika').value = act.problematika || '';
-            
-            window.cancelEdit(); // Reset form to "Add New" mode so it saves a copy
-            window.showToast("Aktiviteti u kopjua! Mund t'i ndryshoni datën dhe ta ruani.", "success");
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        window.cancelEdit = () => {
-            window.editingActivityId = null;
-            document.getElementById('act-form-title').textContent = "Shto Aktivitet";
-            document.getElementById('btn-ruaj-aktivitet').textContent = "Ruaj Aktivitetin e Ditës";
-            document.getElementById('btn-ruaj-aktivitet').className = "flex-1 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-bold text-sm shadow-md transition-all";
-            document.getElementById('btn-cancel-edit').classList.add('hidden');
         };
 
         window.saveActivity = async () => {
@@ -435,28 +381,19 @@
             const timestamp = Date.now();
 
             const activityData = {
-                date: dateVal, week: weekString, objektivi, statusi, detyra, produkti, pergjegjesi, raportohet, afati, problematika
+                date: dateVal, week: weekString, objektivi, statusi, detyra, produkti, pergjegjesi, raportohet, afati, info, problematika, timestamp
             };
 
             try {
                 showLoading();
-                if (window.editingActivityId) {
-                    const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'activities', window.editingActivityId);
-                    await updateDoc(docRef, activityData);
-                    window.showToast("Aktiviteti u përditësua me sukses!");
-                } else {
-                    activityData.timestamp = timestamp;
-                    await addDoc(collection(db, 'artifacts', appId, 'users', window.appState.user.uid, 'activities'), activityData);
-                    window.showToast("Aktiviteti u ruajt!");
-                }
-                
+                await addDoc(collection(db, 'artifacts', appId, 'users', window.appState.user.uid, 'activities'), activityData);
                 hideLoading();
+                window.showToast("Aktiviteti u ruajt!");
                 
-                // Clear fields & reset form
                 document.getElementById('act-detyra').value = '';
                 document.getElementById('act-produkti').value = '';
+                if(document.getElementById('act-info')) document.getElementById('act-info').value = '';
                 document.getElementById('act-problematika').value = '';
-                window.cancelEdit();
                 
             } catch (error) {
                 hideLoading();
@@ -498,27 +435,27 @@
                 const weekStr = getISOWeekString(selectedDate);
                 filteredActs = filteredActs.filter(a => a.week === weekStr);
             }
-            container.innerHTML = daysActivities.map((act, idx) => `
+            
+            filteredActs.sort((a, b) => a.timestamp - b.timestamp);
+
+            if (filteredActs.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">Asnjë aktivitet i gjetur.</p>';
+                return;
+            }
+
+            container.innerHTML = filteredActs.map((act, idx) => `
                 <div class="bg-white border border-gray-100 p-4 rounded-xl shadow-sm relative group">
-                    <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                        <button onclick="window.copyActivity('${act.id}')" class="text-gray-400 hover:text-blue-500 bg-gray-50 hover:bg-blue-50 p-1.5 rounded-lg transition-colors" title="Kopjo Detyrën">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                        </button>
-                        <button onclick="window.editActivity('${act.id}')" class="text-gray-400 hover:text-orange-500 bg-gray-50 hover:bg-orange-50 p-1.5 rounded-lg transition-colors" title="Edito">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        </button>
-                        <button onclick="window.deleteActivity('${act.id}')" class="text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-1.5 rounded-lg transition-colors" title="Fshi">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        </button>
-                    </div>
+                    <button onclick="window.deleteActivity('${act.id}')" class="absolute top-2 right-2 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
                     <div class="flex gap-3">
                         <div class="bg-blue-100 text-blue-700 font-bold h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs">${idx + 1}</div>
-                        <div class="pr-24">
-                            <h4 class="font-bold text-gray-800 text-sm mb-1 whitespace-pre-wrap">${escapeHtml(act.detyra)}</h4>
-                            <p class="text-xs text-gray-500"><span class="font-semibold text-gray-700">Objektivi:</span> ${escapeHtml(act.objektivi)}</p>
-                            <div class="flex items-center gap-2 mt-2">
-                                ${act.statusi ? `<span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded uppercase">${escapeHtml(act.statusi)}</span>` : ''}
-                                <span class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded">📅 ${escapeHtml(act.date)} | ${escapeHtml(act.week.split('-')[1])}</span>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-gray-800 text-sm mb-1 truncate">${escapeHtml(act.detyra)}</h4>
+                            <p class="text-xs text-gray-500 truncate"><span class="font-semibold text-gray-700">Objektivi:</span> ${escapeHtml(act.objektivi)}</p>
+                            <div class="flex items-center justify-between mt-2 gap-2">
+                                ${act.statusi ? `<span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded uppercase truncate max-w-[50%]">${escapeHtml(act.statusi)}</span>` : '<span></span>'}
+                                <span class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded whitespace-nowrap">📅 ${escapeHtml(act.date)} | ${escapeHtml(act.week.split('-')[1])}</span>
                             </div>
                         </div>
                     </div>
@@ -748,7 +685,7 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            ['objektivat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet', 'detyrat'].forEach(id => {
+            ['objektivat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet'].forEach(id => {
                 const input = document.getElementById(`input-${id}`);
                 if(input) input.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') window.addToList(id);
@@ -973,19 +910,6 @@
                         </div>
                     </div>
 
-                    <!-- Detyrat Individuale -->
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[400px]">
-                        <div class="flex justify-between items-center mb-4 border-b pb-2">
-                            <h3 class="font-bold text-gray-800">6. Detyrat Individuale</h3>
-                            <span id="count-detyrat" class="bg-teal-100 text-teal-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
-                        </div>
-                        <div id="list-detyrat" class="flex-1 overflow-y-auto pr-1"></div>
-                        <div class="mt-3 pt-3 border-t flex gap-2">
-                            <input id="input-detyrat" type="text" placeholder="Shto detyrë standarde..." class="flex-1 p-2 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none">
-                            <button onclick="window.addToList('detyrat')" class="bg-gray-800 text-white px-3 rounded-md hover:bg-black">+</button>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
@@ -1000,7 +924,7 @@
                     <!-- Form -->
                     <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                         <div class="flex justify-between items-center mb-6 border-b pb-4">
-                            <h3 id="act-form-title" class="text-lg font-bold text-gray-800">Shto Aktivitet</h3>
+                            <h3 class="text-lg font-bold text-gray-800">Shto Aktivitet</h3>
                             <input type="date" id="act-date" class="p-2 border border-gray-300 rounded-lg text-sm font-bold text-blue-700 bg-blue-50 outline-none" onchange="window.renderDailyActivities()">
                         </div>
 
@@ -1017,12 +941,7 @@
                             </div>
 
                             <div>
-                                <div class="flex justify-between items-end mb-1">
-                                    <label class="block text-xs font-bold text-gray-500 uppercase">3. Detyrat individuale *</label>
-                                    <select id="act-detyra-list" onchange="if(this.value) { document.getElementById('act-detyra').value = this.value; this.value = ''; }" class="text-xs bg-gray-100 border border-gray-200 rounded px-2 py-1 outline-none text-blue-600 font-bold max-w-[180px] truncate cursor-pointer">
-                                        <option value="">+ Shto nga lista...</option>
-                                    </select>
-                                </div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">3. Detyrat individuale *</label>
                                 <textarea id="act-detyra" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500" placeholder="Përshkruaj detyrën..."></textarea>
                             </div>
 
@@ -1033,18 +952,33 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">8. Problematika</label>
-                                <textarea id="act-problematika" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500" placeholder="Shëno nëse ka probleme..."></textarea>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">5. Përgjegjësi</label>
+                                    <select id="act-pergjegjesi" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">6. Raportohet</label>
+                                    <select id="act-raportohet" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">7. Afati</label>
+                                    <select id="act-afati" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500"></select>
+                                </div>
                             </div>
 
-                            <div class="flex gap-2 mt-2">
-                                <button id="btn-ruaj-aktivitet" onclick="window.saveActivity()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-bold text-sm shadow-md transition-all">
-                                    Ruaj Aktivitetin e Ditës
-                                </button>
-                                <button id="btn-cancel-edit" onclick="window.cancelEdit()" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-700 p-4 rounded-xl font-bold text-sm shadow-md transition-all">
-                                    Anulo
-                                </button>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">8. Informacion (Shtesë)</label>
+                                    <textarea id="act-info" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500" placeholder="Informacion shtesë..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">9. Problematika</label>
+                                    <textarea id="act-problematika" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500" placeholder="Shëno nëse ka probleme..."></textarea>
+                                </div>
                             </div>
+
+                            <button onclick="window.saveActivity()" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-bold text-sm shadow-md transition-all mt-2">
+                                Ruaj Aktivitetin e Ditës
+                            </button>
                         </div>
                     </div>
 
