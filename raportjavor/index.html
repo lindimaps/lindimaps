@@ -135,7 +135,7 @@
             document.getElementById('form-' + forma).classList.remove('hidden');
         };
 
-        // Ruaj listat e personalizuara në Firebase
+        // Funksioni thelbësor që mungonte për të ruajtur ndryshimet e listave!
         window.saveCustomListsToFirebase = async function() {
             if (!window.userId) return;
             try {
@@ -145,6 +145,7 @@
                     objektivat: window.objektivat,
                     afatet: window.afatet
                 });
+                console.log("Listat u ruajtën me sukses!");
             } catch (e) {
                 console.error("Gabim gjatë ruajtjes së listave:", e);
             }
@@ -226,15 +227,24 @@
         window.loadDataFromFirebase = async function() {
             if (!window.userId) return;
             try {
-                // Ngarko listat e ruajtura
+                // Ngarko listat e ruajtura PERSONALE te userit
                 const listsRef = window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'listat_e_mia');
                 const listsSnap = await window.getDoc(listsRef);
                 
                 if (listsSnap.exists()) {
                     const listsData = listsSnap.data();
-                    if (listsData.specialistet) { window.specialistet.length = 0; window.specialistet.push(...listsData.specialistet); }
-                    if (listsData.objektivat) { window.objektivat.length = 0; window.objektivat.push(...listsData.objektivat); }
-                    if (listsData.afatet) { window.afatet.length = 0; window.afatet.push(...listsData.afatet); }
+                    if (listsData.specialistet && listsData.specialistet.length > 0) { 
+                        window.specialistet.length = 0; 
+                        window.specialistet.push(...listsData.specialistet); 
+                    }
+                    if (listsData.objektivat && listsData.objektivat.length > 0) { 
+                        window.objektivat.length = 0; 
+                        window.objektivat.push(...listsData.objektivat); 
+                    }
+                    if (listsData.afatet && listsData.afatet.length > 0) { 
+                        window.afatet.length = 0; 
+                        window.afatet.push(...listsData.afatet); 
+                    }
                 }
 
                 window.perditesoDropdownSpecialistet();
@@ -393,7 +403,7 @@
         }
     </style>
 </head>
-<body class="bg-[#f8fafc] min-h-screen text-slate-900 pb-12">
+<body class="bg-[#f8fafc] min-h-screen text-slate-900 pb-12 w-full m-0 p-0 overflow-x-hidden">
 
     <!-- === KONTENIERI I AUTENTIFIKIMIT === -->
     <div id="auth-container" class="fixed inset-0 z-[400] bg-white flex items-center justify-center p-6 hidden">
@@ -456,10 +466,10 @@
     </div>
 
     <!-- === APLIKACIONI KRYESOR === -->
-    <div id="main-app" class="hidden">
+    <div id="main-app" class="hidden w-full h-full min-h-screen flex flex-col">
         
         <!-- Navbar i lëmuar tip LindiMaps -->
-        <header class="glass-card sticky top-0 z-50 px-4 sm:px-8 py-4 flex justify-between items-center no-print w-full">
+        <header class="glass-card sticky top-0 z-50 px-4 sm:px-8 py-4 flex justify-between items-center no-print w-full border-b border-slate-200/60 shadow-sm bg-white/90 backdrop-blur-md">
             <div class="flex items-center gap-3 logo-container">
                 <div class="logo-bg h-10 w-10 flex items-center justify-center bg-slate-900 rounded-xl shadow-md">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -477,23 +487,23 @@
             </div>
 
             <div class="flex items-center gap-4">
-                <button onclick="window.hapHistorikun()" class="text-[14px] font-extrabold text-blue-600 uppercase tracking-widest hover:text-blue-800 transition-colors hidden sm:block">
+                <button onclick="window.hapHistorikun()" class="text-[13px] font-extrabold text-blue-600 uppercase tracking-widest hover:text-blue-800 transition-colors hidden sm:block bg-blue-50 px-4 py-2 rounded-xl border border-blue-100 shadow-sm">
                     Arkiva e Raporteve
                 </button>
-                <div class="w-px h-5 bg-slate-200 hidden sm:block"></div>
-                <span id="user-email-display" class="text-[14px] font-bold text-slate-600 truncate max-w-[120px] sm:max-w-xs">...</span>
-                <button onclick="window.dilNgaLlogaria()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-[14px] font-extrabold transition-colors">
+                <div class="w-px h-6 bg-slate-200 hidden sm:block"></div>
+                <span id="user-email-display" class="text-[13px] font-bold text-slate-600 truncate max-w-[120px] sm:max-w-xs">...</span>
+                <button onclick="window.dilNgaLlogaria()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl text-[13px] font-extrabold transition-colors border border-red-100 shadow-sm">
                     Dil
                 </button>
             </div>
         </header>
 
-        <div class="w-full px-4 sm:px-6 lg:px-8 space-y-6 print-container mt-6">
+        <div class="w-full flex-grow p-4 sm:p-6 lg:p-8 space-y-6 print-container" style="max-width: 100%; margin: 0; display: block;">
             
             <!-- Pjesa e Kokës së Dokumentit -->
             <div id="print-header" class="print-only-header"></div>
             
-            <div class="bg-white rounded-[2rem] p-6 md:p-10 shadow-xl shadow-slate-200/40 border border-slate-100 transition-all hover:shadow-2xl interactive-header w-full">
+            <div class="bg-white rounded-[2rem] p-6 md:p-8 shadow-xl shadow-slate-200/40 border border-slate-200 transition-all hover:shadow-2xl interactive-header w-full">
                 <h1 class="text-2xl md:text-3xl font-black text-center mb-8 uppercase tracking-widest text-slate-800">
                     Raporti Javor i Aktiviteteve
                 </h1>
@@ -502,23 +512,23 @@
                     <!-- Fusha: Drejtoria -->
                     <div class="space-y-2">
                         <label class="text-[12px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Drejtoria</label>
-                        <input id="inp-drejtoria" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-base text-slate-700" placeholder="P.sh. Drejtoria..." value="DREJTORIA E PËRPUNIMIT TË TË DHËNAVE REMOTE SENSING">
+                        <input id="inp-drejtoria" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm text-slate-700" placeholder="P.sh. Drejtoria..." value="DREJTORIA E PËRPUNIMIT TË TË DHËNAVE REMOTE SENSING">
                     </div>
                     
                     <!-- Fusha: Sektori -->
                     <div class="space-y-2">
                         <label class="text-[12px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Sektori</label>
-                        <input id="inp-sektori" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-base text-slate-700" placeholder="P.sh. Sektori i Përpunimit..." value="SEKTORI I PËRPUNIMIT TË IMAZHERIVE SATELITORE">
+                        <input id="inp-sektori" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm text-slate-700" placeholder="P.sh. Sektori i Përpunimit..." value="SEKTORI I PËRPUNIMIT TË IMAZHERIVE SATELITORE">
                     </div>
 
                     <!-- Fusha: Specialisti -->
                     <div class="space-y-2">
                         <label class="text-[12px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Specialisti</label>
                         <div class="flex gap-2">
-                            <select id="main-specialist" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-base text-slate-700 appearance-none cursor-pointer">
+                            <select id="main-specialist" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm text-slate-700 appearance-none cursor-pointer">
                                 <!-- Opsionet mbushen nga JavaScript -->
                             </select>
-                            <button onclick="hapModalSpecialist()" class="bg-slate-900 text-white px-6 rounded-2xl font-bold shadow-lg shadow-slate-900/20 hover:bg-black active:scale-95 transition-all text-2xl no-print" title="Shto Specialist të ri">
+                            <button onclick="hapModalSpecialist()" class="bg-slate-900 text-white px-5 rounded-2xl font-bold shadow-lg shadow-slate-900/20 hover:bg-black active:scale-95 transition-all text-xl no-print" title="Shto Specialist të ri">
                                 +
                             </button>
                         </div>
@@ -527,81 +537,81 @@
                     <!-- Fusha: Periudha/Data -->
                     <div class="space-y-2">
                         <label class="text-[12px] font-extrabold text-slate-400 uppercase tracking-widest ml-1">Periudha (Java)</label>
-                        <input id="inp-periudha" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-base text-slate-700" placeholder="P.sh. 08-12.05.2026" value="08-12.05.2026">
+                        <input id="inp-periudha" type="text" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/80 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm text-slate-700" placeholder="P.sh. 08-12.05.2026" value="08-12.05.2026">
                     </div>
                 </div>
             </div>
 
             <!-- Tabela dhe Butonat -->
-            <div class="bg-white rounded-[2rem] p-4 md:p-8 shadow-xl shadow-slate-200/40 border border-slate-100 transition-all hover:shadow-2xl w-full">
+            <div class="bg-white rounded-[2rem] p-4 md:p-8 shadow-xl shadow-slate-200/40 border border-slate-200 transition-all hover:shadow-2xl w-full" style="max-width: 100%; display: block;">
                 
                 <!-- Butonat e Veprimeve -->
-                <div class="mb-6 flex flex-wrap gap-4 no-print">
-                    <button onclick="shtoRresht()" class="bg-blue-600 text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-blue-600/30 hover:bg-blue-700 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
+                <div class="mb-6 flex flex-wrap gap-3 no-print">
+                    <button onclick="shtoRresht()" class="bg-blue-600 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-blue-600/30 hover:bg-blue-700 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
                         + Aktivitet
                     </button>
-                    <button onclick="shtoTitullSektori()" class="bg-slate-100 text-slate-600 px-6 py-4 rounded-xl font-bold hover:bg-slate-200 active:scale-95 transition-all text-[12px] uppercase tracking-wider border-2 border-slate-200">
+                    <button onclick="shtoTitullSektori()" class="bg-slate-100 text-slate-700 px-5 py-3 rounded-xl font-bold border-2 border-slate-200 hover:bg-slate-200 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
                         + Nëntitull
                     </button>
-                    <button onclick="hapModalObjektiv()" class="bg-emerald-500 text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-emerald-500/30 hover:bg-emerald-600 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
+                    <button onclick="hapModalObjektiv()" class="bg-emerald-500 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-emerald-500/30 hover:bg-emerald-600 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
                         + Objektiv
                     </button>
-                    <button onclick="hapModalAfat()" class="bg-orange-500 text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-orange-500/30 hover:bg-orange-600 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
+                    <button onclick="hapModalAfat()" class="bg-orange-500 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-orange-500/30 hover:bg-orange-600 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
                         + Afat
                     </button>
-                    <button id="btn-rikthe" onclick="riktheFshirjen()" class="hidden bg-slate-900 text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-slate-900/30 hover:bg-black active:scale-95 transition-all text-[12px] uppercase tracking-wider">
+                    <button id="btn-rikthe" onclick="riktheFshirjen()" class="hidden bg-yellow-500 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-yellow-500/30 hover:bg-yellow-600 active:scale-95 transition-all text-[12px] uppercase tracking-wider">
                         ↶ Undo
                     </button>
                     
                     <div class="flex-grow w-full md:w-auto"></div>
                     
-                    <div class="flex gap-3 w-full md:w-auto justify-end">
-                        <button onclick="window.ruajNeHistorik(event)" class="btn-primary-custom flex-1 md:flex-none px-6 py-4 rounded-xl font-bold shadow-lg transition-all active:scale-95 text-[12px] uppercase tracking-wider flex items-center justify-center gap-2">
-                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg> Arkivo
+                    <div class="flex gap-2 w-full md:w-auto justify-end">
+                        <button onclick="window.ruajNeHistorik(event)" class="bg-slate-900 text-white flex-1 md:flex-none px-6 py-3 rounded-xl font-bold shadow-lg shadow-slate-900/30 hover:bg-black transition-all active:scale-95 text-[12px] uppercase tracking-wider flex items-center justify-center gap-2">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg> Arkivo
                         </button>
-                        <button onclick="eksportoExcel()" class="bg-emerald-600 text-white flex-1 md:flex-none px-6 py-4 rounded-xl font-bold shadow-lg shadow-emerald-600/30 hover:bg-emerald-700 transition-all active:scale-95 text-[12px] uppercase tracking-wider flex items-center justify-center gap-2">
-                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Excel
+                        <button onclick="eksportoExcel()" class="bg-emerald-600 text-white flex-1 md:flex-none px-6 py-3 rounded-xl font-bold shadow-lg shadow-emerald-600/30 hover:bg-emerald-700 transition-all active:scale-95 text-[12px] uppercase tracking-wider flex items-center justify-center gap-2">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Excel
                         </button>
-                        <button onclick="window.print()" class="bg-slate-900 text-white flex-1 md:flex-none px-6 py-4 rounded-xl font-bold shadow-lg shadow-slate-900/30 hover:bg-black transition-all active:scale-95 text-[12px] uppercase tracking-wider flex items-center justify-center gap-2">
-                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg> PDF
+                        <button onclick="window.print()" class="bg-slate-800 text-white flex-1 md:flex-none px-6 py-3 rounded-xl font-bold shadow-lg shadow-slate-800/30 hover:bg-slate-900 transition-all active:scale-95 text-[12px] uppercase tracking-wider flex items-center justify-center gap-2">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg> PDF
                         </button>
                     </div>
                 </div>
 
-                <!-- Tabela me hapësirë të plotë -->
-                <div class="overflow-x-auto custom-scrollbar border-2 border-slate-200/80 rounded-2xl w-full">
-                    <table class="w-full text-base text-left border-collapse">
+                <!-- Tabela -->
+                <div class="overflow-x-auto custom-scrollbar border-2 border-slate-200/80 rounded-2xl w-full" style="display: block; width: 100%;">
+                    <table class="w-full text-base text-left border-collapse" style="min-width: max-content;">
                         <thead class="bg-slate-100 text-[11px] font-extrabold text-slate-600 uppercase tracking-widest border-b-2 border-slate-200/80">
                             <tr>
                                 <th class="border-r border-slate-200 p-4 text-center w-16">Nr.</th>
-                                <th class="border-r border-slate-200 p-4 min-w-[280px]">
-                                    <div class="flex justify-between items-center gap-2"><span>Objektivi</span> <button onclick="fshiKolone(1)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
+                                <th class="border-r border-slate-200 p-4 min-w-[300px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Objektivi</span> <button onclick="fshiKolone(1)" class="text-red-400 hover:text-red-600 no-print text-xl bg-white px-2 py-1 rounded shadow-sm leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
                                 </th>
-                                <th class="border-r border-slate-200 p-4 min-w-[280px]">
-                                    <div class="flex justify-between items-center gap-2"><span>Detyrat Individuale</span> <button onclick="fshiKolone(2)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
+                                <th class="border-r border-slate-200 p-4 min-w-[300px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Detyrat Individuale</span> <button onclick="fshiKolone(2)" class="text-red-400 hover:text-red-600 no-print text-xl bg-white px-2 py-1 rounded shadow-sm leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
                                 </th>
-                                <th class="border-r border-slate-200 p-4 min-w-[220px]">
-                                    <div class="flex justify-between items-center gap-2"><span>Produkti Final</span> <button onclick="fshiKolone(3)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
+                                <th class="border-r border-slate-200 p-4 min-w-[250px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Produkti Final</span> <button onclick="fshiKolone(3)" class="text-red-400 hover:text-red-600 no-print text-xl bg-white px-2 py-1 rounded shadow-sm leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
                                 </th>
                                 <th class="border-r border-slate-200 p-4 min-w-[160px]">
-                                    <div class="flex justify-between items-center gap-2"><span>Statusi</span> <button onclick="fshiKolone(4)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
+                                    <div class="flex justify-between items-center gap-2"><span>Statusi</span> <button onclick="fshiKolone(4)" class="text-red-400 hover:text-red-600 no-print text-xl bg-white px-2 py-1 rounded shadow-sm leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
                                 </th>
                                 <th class="border-r border-slate-200 p-4 min-w-[200px]">
-                                    <div class="flex justify-between items-center gap-2"><span>Personi Përgjegjës</span> <button onclick="fshiKolone(5)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
+                                    <div class="flex justify-between items-center gap-2"><span>Personi Përgjegjës</span> <button onclick="fshiKolone(5)" class="text-red-400 hover:text-red-600 no-print text-xl bg-white px-2 py-1 rounded shadow-sm leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
                                 </th>
                                 <th class="border-r border-slate-200 p-4 min-w-[320px]">
-                                    <div class="flex justify-between items-center gap-2"><span>Informacion</span> <button onclick="fshiKolone(6)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
+                                    <div class="flex justify-between items-center gap-2"><span>Informacion</span> <button onclick="fshiKolone(6)" class="text-red-400 hover:text-red-600 no-print text-xl bg-white px-2 py-1 rounded shadow-sm leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
+                                </th>
+                                <th class="border-r border-slate-200 p-4 min-w-[250px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Problematikat</span> <button onclick="fshiKolone(7)" class="text-red-400 hover:text-red-600 no-print text-xl bg-white px-2 py-1 rounded shadow-sm leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
+                                </th>
+                                <th class="border-r border-slate-200 p-4 min-w-[180px]">
+                                    <div class="flex justify-between items-center gap-2"><span>Afati</span> <button onclick="fshiKolone(8)" class="text-red-400 hover:text-red-600 no-print text-xl bg-white px-2 py-1 rounded shadow-sm leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
                                 </th>
                                 <th class="border-r border-slate-200 p-4 min-w-[220px]">
-                                    <div class="flex justify-between items-center gap-2"><span>Problematikat</span> <button onclick="fshiKolone(7)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
+                                    <div class="flex justify-between items-center gap-2"><span>Kujt i Raportohet</span> <button onclick="fshiKolone(9)" class="text-red-400 hover:text-red-600 no-print text-xl bg-white px-2 py-1 rounded shadow-sm leading-none transition-colors" title="Hiq Kolonën">✕</button></div>
                                 </th>
-                                <th class="border-r border-slate-200 p-4 min-w-[160px]">
-                                    <div class="flex justify-between items-center gap-2"><span>Afati</span> <button onclick="fshiKolone(8)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
-                                </th>
-                                <th class="border-r border-slate-200 p-4 min-w-[200px]">
-                                    <div class="flex justify-between items-center gap-2"><span>Kujt i Raportohet</span> <button onclick="fshiKolone(9)" class="text-red-400 hover:text-red-600 no-print text-xl leading-none transition-colors bg-white px-2 py-1 rounded-md shadow-sm" title="Hiq Kolonën">✕</button></div>
-                                </th>
-                                <th class="p-4 w-20 no-print text-center">Veprime</th>
+                                <th class="p-4 w-24 no-print text-center">Veprime</th>
                             </tr>
                         </thead>
                         <tbody id="table-body">
@@ -906,11 +916,11 @@
                     `<option value="${s}" ${s === specialistiAktual ? 'selected' : ''}>${s}</option>`
                 ).join('');
 
-                // Stilizim i zmadhuar i fushave
-                const commonInputClass = "w-full p-3.5 rounded-xl bg-slate-50 border-2 border-slate-200/80 font-bold text-[14px] text-slate-800 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all";
+                // Stilizim i zmadhuar i fushave me pamjen e re
+                const commonInputClass = "w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200/80 font-bold text-base text-slate-800 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all";
 
                 tr.innerHTML = `
-                    <td class="border-b border-slate-200/80 p-4 text-center align-top font-black text-slate-400 text-base">${numeruesiRreshtave}</td>
+                    <td class="border-b border-slate-200/80 p-4 text-center align-top font-black text-slate-400 text-lg">${numeruesiRreshtave}</td>
                     <td class="border-b border-slate-200/80 p-3 align-top relative">
                         <select class="${commonInputClass} mb-2 cursor-pointer no-print row-objektiv" onchange="ndryshoTekstinObjektivit(this)"></select>
                         <textarea class="${commonInputClass} resize-none" rows="3" placeholder="Zgjidh sipër ose shkruaj..."></textarea>
@@ -940,10 +950,10 @@
                     </td>
                     <td class="border-b border-slate-200/80 p-3 align-middle text-center no-print">
                         <div class="flex flex-col gap-2 items-center justify-center">
-                            <button onclick="shtoTitullSektori(this)" class="bg-white border-2 border-slate-200 hover:bg-slate-100 text-slate-700 p-3 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors w-full shadow-sm">
+                            <button onclick="shtoTitullSektori(this)" class="bg-white border-2 border-slate-200 hover:bg-slate-100 text-slate-700 p-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors w-full shadow-sm">
                                 + Titull
                             </button>
-                            <button onclick="fshiRreshtin(this)" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 p-3 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors w-full shadow-sm">
+                            <button onclick="fshiRreshtin(this)" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 p-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors w-full shadow-sm">
                                 Fshi
                             </button>
                         </div>
@@ -974,15 +984,15 @@
                 else if (btnRef === null) valueAttr = `value="SEKTORI I PËRPUNIMIT TË IMAZHERIVE SATELITORE"`;
 
                 tr.innerHTML = `
-                    <td colspan="${activeColspan}" class="border-b border-slate-200/80 p-4 bg-slate-100">
-                        <input type="text" class="w-full text-center font-black uppercase bg-transparent border-0 focus:ring-4 focus:ring-blue-500/20 rounded-xl p-3 tracking-widest text-slate-800 outline-none text-base" placeholder="SHKRUAJ TITULLIN KËTU..." ${valueAttr}>
+                    <td colspan="${activeColspan}" class="border-b border-slate-200/80 p-4 bg-slate-100/80">
+                        <input type="text" class="w-full text-center font-black uppercase bg-transparent border-0 focus:ring-4 focus:ring-blue-500/20 rounded-xl p-3 tracking-widest text-slate-800 outline-none text-lg" placeholder="SHKRUAJ TITULLIN KËTU..." ${valueAttr}>
                     </td>
-                    <td class="border-b border-slate-200/80 p-3 text-center no-print bg-slate-100">
+                    <td class="border-b border-slate-200/80 p-3 text-center no-print bg-slate-100/80">
                         <div class="flex flex-col gap-2 items-center justify-center h-full">
-                            <button onclick="shtoTitullSektori(this)" class="bg-white border-2 border-slate-300 text-slate-700 hover:bg-slate-200 p-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors w-full shadow-sm">
+                            <button onclick="shtoTitullSektori(this)" class="bg-white border-2 border-slate-300 text-slate-700 hover:bg-slate-200 p-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors w-full shadow-sm">
                                 + Titull
                             </button>
-                            <button onclick="fshiRreshtin(this, true)" class="bg-red-100 border border-red-200 text-red-700 hover:bg-red-200 p-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors w-full shadow-sm">
+                            <button onclick="fshiRreshtin(this, true)" class="bg-red-100 border border-red-200 text-red-700 hover:bg-red-200 p-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors w-full shadow-sm">
                                 Fshi
                             </button>
                         </div>
