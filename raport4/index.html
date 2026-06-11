@@ -16,11 +16,9 @@
         let isCanvasEnvironment = false;
 
         if (typeof __firebase_config !== 'undefined') {
-            // Përdorim databazën e integruar të platformës për të garantuar ruajtjen
             firebaseConfig = JSON.parse(__firebase_config);
             isCanvasEnvironment = true;
         } else {
-            // Kthim tek konfigurimi juaj lokal
             firebaseConfig = {
                 apiKey: "AIzaSyAG56-nHpfwzEw2noQZh3hrCbvcMWXShsg",
                 authDomain: "raportimi-javor-asig.firebaseapp.com",
@@ -48,10 +46,8 @@
         window.orderBy = orderBy;
         window.where = where;
         
-        // Përshtatje e ID-së së aplikacionit
         window.__app_id = typeof __app_id !== 'undefined' ? __app_id : 'raportimi-javor-asig'; 
 
-        // Nëse jemi në mjedisin e platformës, bëjmë lidhje të sigurt automatike për t'i dhënë leje DB-së të shkruajë
         if (isCanvasEnvironment) {
             const initAuth = async () => {
                 try {
@@ -78,13 +74,11 @@
                 
                 authContainer.classList.add('hidden');
                 mainApp.classList.remove('hidden');
-                mainApp.classList.add('flex', 'flex-col', 'md:flex-row'); // KORRIGJIM: Shtuar klasa për mobile-responsive
+                mainApp.classList.add('flex', 'flex-col', 'md:flex-row'); 
                 
-                // Ngarko të dhënat dhe vizato faqen
                 await window.ngarkoKonfigurimet();
                 window.ndryshoPamjen('shto-aktivitet'); 
                 
-                // Rregullim për timezones të datës që të mos kthehet një ditë mbrapa
                 const today = new Date();
                 const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
                 document.getElementById('kalendari-data').value = localDate;
@@ -101,7 +95,6 @@
 
         window.hyrNeLlogari = function(e) { 
             e.preventDefault(); 
-            // Bypass vizual për mjedisin e platformës
             if(isCanvasEnvironment) { signInAnonymously(auth); return; }
             
             const email = document.getElementById('auth-email').value; 
@@ -204,7 +197,8 @@
 
     <div id="main-app" class="hidden h-full w-full">
         
-        <div id="sidebar" class="w-full md:w-72 flex-shrink-0 bg-white border-r border-slate-200 h-auto md:h-full flex flex-col no-print z-40"> <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+        <div id="sidebar" class="w-full md:w-72 flex-shrink-0 bg-white border-r border-slate-200 h-auto md:h-full flex flex-col no-print z-40"> 
+            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
                 <div class="h-10 w-10 flex items-center justify-center bg-slate-900 rounded-xl">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
                 </div>
@@ -500,7 +494,6 @@
     </div>
 
     <script>
-        // --- 1. TË DHËNAT E STRUKTURUARA (LISTAT STANDARDE FILLLESTARE) ---
         window.konfigurimet = {
             objektivat: [
                 "Bashkërendimi ndërinstitucional", 
@@ -520,7 +513,6 @@
             }
         };
 
-        // --- 2. LOGJIKA E NDËRRIMIT TË PAMJES ---
         window.ndryshoPamjen = function(pamjaID) {
             document.querySelectorAll('#main-content > div').forEach(div => div.classList.add('hidden'));
             document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.remove('active'));
@@ -532,30 +524,39 @@
                 document.getElementById('raporti-data-zgjedhur').valueAsDate = new Date();
                 window.gjeneroRaportinNgaData();
             } else if (pamjaID === 'shto-aktivitet') {
-                // Sigurohemi që sa herë hapim aktivitetin, listat të jenë të freskëta
                 window.mbushDropdownetNeForme();
             }
         }
 
-        // --- 3. MENAXHIMI I KONFIGURIMEVE (Listat & Firebase) ---
         window.ngarkoKonfigurimet = async function() {
-            if (!window.userId) { window.mbushDropdownetNeForme(); return; } // KORRIGJIM: Garantohet mbushja
+            if (!window.userId) { window.mbushDropdownetNeForme(); return; } 
             try {
                 const docSnap = await window.getDoc(window.doc(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'konfigurimet'));
+                
                 if (docSnap.exists()) {
-                    window.konfigurimet = { ...window.konfigurimet, ...docSnap.data() };
+                    const dbData = docSnap.data();
+                    
+                    // KORRIGJIMI KRYESOR: "Deep Merge" i sigurt për të shmangur zëvendësimin e listave me 'undefined'
+                    window.konfigurimet.objektivat = (dbData.objektivat && dbData.objektivat.length > 0) ? dbData.objektivat : window.konfigurimet.objektivat;
+                    window.konfigurimet.statuset = (dbData.statuset && dbData.statuset.length > 0) ? dbData.statuset : window.konfigurimet.statuset;
+                    window.konfigurimet.pergjegjesit = (dbData.pergjegjesit && dbData.pergjegjesit.length > 0) ? dbData.pergjegjesit : window.konfigurimet.pergjegjesit;
+                    window.konfigurimet.raportimet = (dbData.raportimet && dbData.raportimet.length > 0) ? dbData.raportimet : window.konfigurimet.raportimet;
+                    window.konfigurimet.afatet = (dbData.afatet && dbData.afatet.length > 0) ? dbData.afatet : window.konfigurimet.afatet;
+                    
+                    if (dbData.profil) {
+                        window.konfigurimet.profil = { ...window.konfigurimet.profil, ...dbData.profil };
+                    }
                 } else {
                     await window.ruajKonfigurimetNeDB(); 
                 }
                 
-                // KORRIGJIM: Mbrojtje nga fshirja e aksidentale e "profil" nga DB (që shkaktonte crash dhe pamundësonte mbushjen e listave)
                 document.getElementById('conf-specialisti').value = window.konfigurimet.profil?.specialisti || "";
                 document.getElementById('conf-sektori').value = window.konfigurimet.profil?.sektori || "";
                 document.getElementById('conf-drejtoria').value = window.konfigurimet.profil?.drejtoria || "";
 
             } catch (e) { 
                 console.error("Gabim ne ngarkim konfig:", e); 
-            } finally { // KORRIGJIM: Blloku finally bën të mundur që listat rënëse (Dropdownet) të mbushen gjithmonë, pavarësisht vonesës së databazës
+            } finally { 
                 window.vizatoPaneletEKonfigurimeve();
                 window.mbushDropdownetNeForme();
             }
@@ -569,7 +570,6 @@
         }
 
         window.ruajProfilin = async function() {
-            // Krijo profilin nëse mungon
             if (!window.konfigurimet.profil) window.konfigurimet.profil = {};
             window.konfigurimet.profil.specialisti = document.getElementById('conf-specialisti').value;
             window.konfigurimet.profil.sektori = document.getElementById('conf-sektori').value;
@@ -586,7 +586,8 @@
                 const countBadge = document.getElementById(`count-${listaId}`);
                 if(!container) return;
                 
-                const elementet = window.konfigurimet[listaId] || [];
+                // Mbrojtje gjatë vizatimit
+                const elementet = Array.isArray(window.konfigurimet[listaId]) ? window.konfigurimet[listaId] : [];
                 countBadge.textContent = elementet.length;
 
                 container.innerHTML = elementet.map((item, index) => `
@@ -599,18 +600,22 @@
         }
 
         window.shtoNeListe = async function(listaId) {
+            // Mbrojtje para shtimit
+            if (!Array.isArray(window.konfigurimet[listaId])) {
+                window.konfigurimet[listaId] = [];
+            }
+            
             const input = document.getElementById(`input-${listaId}`);
             const vlera = input.value.trim();
             if(vlera && !window.konfigurimet[listaId].includes(vlera)) {
                 window.konfigurimet[listaId].push(vlera);
-                input.value = ''; // Pastro fushen
+                input.value = ''; 
                 await window.ruajKonfigurimetNeDB();
                 window.vizatoPaneletEKonfigurimeve();
                 window.mbushDropdownetNeForme();
             }
         }
 
-        // Lejo shtypjen e Enter per te shtuar ne lista
         ['objektivat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet'].forEach(id => {
             const inp = document.getElementById(`input-${id}`);
             if(inp) inp.addEventListener('keypress', function(e) { if (e.key === 'Enter') window.shtoNeListe(id); });
@@ -618,10 +623,12 @@
 
         window.fshiNgaLista = async function(listaId, index) {
             if(confirm('Jeni të sigurt që doni ta fshini këtë opsion?')) {
-                window.konfigurimet[listaId].splice(index, 1);
-                await window.ruajKonfigurimetNeDB();
-                window.vizatoPaneletEKonfigurimeve();
-                window.mbushDropdownetNeForme();
+                if (Array.isArray(window.konfigurimet[listaId])) {
+                    window.konfigurimet[listaId].splice(index, 1);
+                    await window.ruajKonfigurimetNeDB();
+                    window.vizatoPaneletEKonfigurimeve();
+                    window.mbushDropdownetNeForme();
+                }
             }
         }
 
@@ -629,15 +636,17 @@
             const mbushes = (idElementi, lista) => {
                 const el = document.getElementById(idElementi);
                 if(!el) return;
-                const vleraAktuale = el.value; // Ruaj vleren nese kishte nje te zgjedhur
+                const vleraAktuale = el.value; 
                 
-                el.innerHTML = '<option value="">-- Zgjidh Opsionin --</option>' + (lista || []).map(item => {
+                // Mbrojtje gjatë mbushjes
+                const listaSigurt = Array.isArray(lista) ? lista : [];
+                
+                el.innerHTML = '<option value="">-- Zgjidh Opsionin --</option>' + listaSigurt.map(item => {
                     const shortText = item.length > 60 ? item.substring(0, 60) + '...' : item;
                     return `<option value="${window.escapeHtml(item)}">${window.escapeHtml(shortText)}</option>`;
                 }).join('');
                 
-                // Riven vleren nese ende ekziston
-                if(lista.includes(vleraAktuale)) el.value = vleraAktuale;
+                if(listaSigurt.includes(vleraAktuale)) el.value = vleraAktuale;
             };
 
             mbushes('form-objektivi', window.konfigurimet.objektivat);
@@ -647,7 +656,6 @@
             mbushes('form-afati', window.konfigurimet.afatet);
         }
 
-        // --- 4. LOGJIKA E AKTIVITETEVE DITORE ---
         window.getIsoWeekData = function(dateObj) {
             const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
             const dayNum = d.getUTCDay() || 7;
@@ -678,7 +686,7 @@
                 listaDiv.innerHTML = '';
                 const docs = [];
                 querySnapshot.forEach(d => docs.push({id: d.id, ...d.data()}));
-                docs.sort((a,b) => a.nrJavor - b.nrJavor); // Rendit nga 1, 2, 3... per kete jave
+                docs.sort((a,b) => a.nrJavor - b.nrJavor); 
 
                 docs.forEach(data => {
                     listaDiv.innerHTML += `
@@ -708,7 +716,6 @@
             const dateObj = new Date(dStr);
             const weekStr = window.getIsoWeekData(dateObj);
 
-            // Marrim te dhenat nga fushat poshte (nga dropdowns dhe textarea)
             const obj = document.getElementById('form-objektivi').value;
             const stat = document.getElementById('form-statusi').value;
             const pergj = document.getElementById('form-pergjegjesi').value;
@@ -751,7 +758,6 @@
 
                 await window.addDoc(window.collection(window.db, 'artifacts', window.__app_id, 'users', window.userId, 'aktivitetet_ditore'), dataToSave);
                 
-                // Pastro fushat e shkrimit, por ruaj opsionet e Dropdown ne menyre qe nese user shton disa pune resht mos ti zgjedhe prap nga e para
                 document.getElementById('form-detyra').value = '';
                 document.getElementById('form-produkti').value = '';
                 document.getElementById('form-info').value = '';
@@ -771,7 +777,6 @@
             }
         }
 
-        // --- 5. LOGJIKA E GJENERIMIT TË RAPORTIT JAVOR ---
         window.getWeekBounds = function(dateObj) {
             const day = dateObj.getDay() || 7; 
             if (day !== 1) dateObj.setHours(-24 * (day - 1)); 
@@ -795,7 +800,6 @@
             const weekStr = window.getIsoWeekData(dateObj);
             const bounds = window.getWeekBounds(dateObj);
             
-            // Ploteso koken automatikisht nga Profili
             document.getElementById('inp-drejtoria').value = window.konfigurimet.profil?.drejtoria || "";
             document.getElementById('inp-sektori').value = window.konfigurimet.profil?.sektori || "";
             document.getElementById('inp-specialisti').value = window.konfigurimet.profil?.specialisti || "";
@@ -817,7 +821,6 @@
 
                 tbody.innerHTML = '';
 
-                // Shto titullin e Sektorit by default tek Tabela e Madhe
                 window.shtoTitullSektoriHTML(window.konfigurimet.profil?.sektori || "SEKTORI");
 
                 if (aktivitete.length === 0) {
@@ -833,7 +836,6 @@
             }
         }
 
-        // Fusha te perbashketa per tu dukur tamam si excel vizual
         const commonInputClass = "w-full p-3.5 bg-transparent font-bold text-[13px] text-slate-800 outline-none resize-none overflow-hidden text-center";
 
         window.shtoTitullSektoriHTML = function(titulli) {
@@ -888,7 +890,6 @@
             });
         }
 
-        // --- 6. LOGJIKA E EXCELIT ---
         window.eksportoExcel = function() {
             const drejtoria = document.getElementById('inp-drejtoria').value || "";
             const sektori = document.getElementById('inp-sektori').value || "";
