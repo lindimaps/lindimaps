@@ -45,7 +45,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        // SHTUAR: import i deleteUser për fshirjen e llogarisë
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, updateDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // Firebase Initialization
@@ -319,16 +320,105 @@
             }
         };
 
+        // PËRMIRËSUAR: Fix për Logout (Mbyllja e Listeners para signOut)
         window.handleLogout = async () => {
             showLoading();
-            await signOut(auth);
+            try {
+                // 1. Mbyll listener-at e hapur (për të shmangur Permission Errors)
+                if (window.appState.unsubscribeActivities) {
+                    window.appState.unsubscribeActivities();
+                    window.appState.unsubscribeActivities = null;
+                }
+                if (window.appState.unsubscribeTrash) {
+                    window.appState.unsubscribeTrash();
+                    window.appState.unsubscribeTrash = null;
+                }
+                
+                // 2. Pastro state-in global
+                window.appState.activities = [];
+                window.appState.trash = [];
+                window.appState.config = {
+                    profile: { specialisti: '', sektori: '', drejtoria: '' },
+                    lists: { objektivat: [], detyrat: [], statuset: [], pergjegjesit: [], raportimet: [], afatet: [] },
+                    extraColumns: [] 
+                };
+                
+                // 3. Fshi llogarinë
+                await signOut(auth);
+            } catch (error) {
+                console.error("Gabim gjatë shkëputjes:", error);
+            }
             hideLoading();
+        };
+
+        // SHTUAR: Funksioni për Fshirjen e gjithë dokumenteve të user-it
+        window.deleteAllUserData = async () => {
+            if (!auth.currentUser) return;
+            const uid = auth.currentUser.uid;
+
+            // Sigurohemi që mbyllim listener-at fillimisht që të mos thërrasin evente teksa po fshijmë
+            if (window.appState.unsubscribeActivities) {
+                window.appState.unsubscribeActivities();
+                window.appState.unsubscribeActivities = null;
+            }
+
+            const collectionsToDelete = ['activities', 'trash', 'settings'];
+            
+            for (const colName of collectionsToDelete) {
+                try {
+                    const colRef = collection(db, 'artifacts', appId, 'users', uid, colName);
+                    const snapshot = await getDocs(colRef);
+                    const deletePromises = [];
+                    snapshot.forEach(docSnap => {
+                        deletePromises.push(deleteDoc(doc(db, 'artifacts', appId, 'users', uid, colName, docSnap.id)));
+                    });
+                    await Promise.all(deletePromises);
+                } catch (e) {
+                    console.error(`Gabim gjatë fshirjes së koleksionit ${colName}:`, e);
+                }
+            }
+        };
+
+        // SHTUAR: Funksioni për Fshirjen e Llogarisë Auth me Konfirmim të Dyfishtë
+        window.handleDeleteAccount = async () => {
+            if (!auth.currentUser) return;
+
+            window.customConfirm(
+                "KUJDES!",
+                "Kjo do të fshijë përgjithmonë:\n- llogarinë\n- aktivitetet\n- konfigurimet\n- koshin\n- çdo dokument që i përket përdoruesit\n\nKy veprim nuk mund të kthehet pas.",
+                async () => {
+                    showLoading();
+                    try {
+                        // 1. Fshi të gjitha të dhënat e përdoruesit nga Firestore
+                        await window.deleteAllUserData();
+
+                        // 2. Fshi përdoruesin nga Firebase Auth
+                        await deleteUser(auth.currentUser);
+
+                        // Logout dhe zhvendosja në login do të menaxhohet nga onAuthStateChanged automatikisht
+                        window.showToast("Llogaria dhe të gjitha të dhënat u fshinë me sukses!", "success");
+                    } catch (error) {
+                        console.error("Gabim gjatë fshirjes së llogarisë:", error);
+                        hideLoading();
+                        
+                        // Menaxho rastin kur Firebase kërkon re-autentifikim para fshirjes
+                        if (error.code === 'auth/requires-recent-login') {
+                            window.showToast("Për arsye sigurie, duhet të identifikoheni sërish për të fshirë llogarinë.", "error");
+                            await window.handleLogout();
+                            window.toggleAuthView('login-form');
+                        } else {
+                            window.showToast("Gabim: " + error.message, "error");
+                        }
+                    }
+                }
+            );
         };
 
         // --- Firebase Data Fetching ---
 
         const loadConfig = async () => {
-            if (!window.appState.user) return;
+            // SHTUAR: Guard Check
+            if (!auth.currentUser || !window.appState.user) return;
             try {
                 const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'settings', 'config');
                 const docSnap = await getDoc(docRef);
@@ -350,7 +440,8 @@
         };
 
         const subscribeToActivities = () => {
-            if (!window.appState.user) return;
+            // SHTUAR: Guard Check
+            if (!auth.currentUser || !window.appState.user) return;
             if (window.appState.unsubscribeActivities) window.appState.unsubscribeActivities();
 
             const colRef = collection(db, 'artifacts', appId, 'users', window.appState.user.uid, 'activities');
@@ -374,7 +465,8 @@
         // --- Koshi (Trash) Logic ---
         
         window.moveToTrash = async (type, data) => {
-            if (!window.appState.user) return;
+            // SHTUAR: Guard Check
+            if (!auth.currentUser || !window.appState.user) return;
             try {
                 const trashData = {
                     type: type, 
@@ -388,7 +480,8 @@
         };
 
         const loadTrash = async () => {
-            if (!window.appState.user) return;
+            // SHTUAR: Guard Check
+            if (!auth.currentUser || !window.appState.user) return;
             showLoading();
             try {
                 const colRef = collection(db, 'artifacts', appId, 'users', window.appState.user.uid, 'trash');
@@ -407,7 +500,8 @@
         };
 
         window.restoreFromTrash = async (trashId) => {
-            if (!window.appState.user) return;
+            // SHTUAR: Guard Check
+            if (!auth.currentUser || !window.appState.user) return;
             const item = window.appState.trash.find(t => t.id === trashId);
             if(!item) return;
 
@@ -437,7 +531,8 @@
         };
 
         window.deleteFromTrash = async (trashId) => {
-            if (!window.appState.user) return;
+            // SHTUAR: Guard Check
+            if (!auth.currentUser || !window.appState.user) return;
             window.customConfirm("Fshij Përgjithmonë", "Jeni i sigurt që doni ta fshini përgjithmonë këtë element?", async () => {
                 showLoading();
                 try {
@@ -452,7 +547,8 @@
         };
 
         window.emptyTrash = async () => {
-            if (!window.appState.user) return;
+            // SHTUAR: Guard Check
+            if (!auth.currentUser || !window.appState.user) return;
             if(window.appState.trash.length === 0) return;
             window.customConfirm("Pastro Koshin", "Kujdes: Kjo do të fshijë PËRGJITHMONË të gjitha elementet nga koshi. Vazhdoni?", async () => {
                 showLoading();
@@ -510,7 +606,8 @@
         // --- 1. Konfigurimet (Logic) ---
 
         window.saveProfile = async () => {
-            if (!window.appState.user) return;
+            // SHTUAR: Guard Check
+            if (!auth.currentUser || !window.appState.user) return;
             const profile = {
                 specialisti: document.getElementById('prof-specialisti').value.trim(),
                 sektori: document.getElementById('prof-sektori').value.trim(),
@@ -532,7 +629,8 @@
         };
 
         window.addToList = async (listName) => {
-            if (!window.appState.user) return;
+            // SHTUAR: Guard Check
+            if (!auth.currentUser || !window.appState.user) return;
             const inputEl = document.getElementById(`input-${listName}`);
             const val = inputEl.value.trim();
             
@@ -596,7 +694,8 @@
         };
 
         window.removeFromList = async (listName, index) => {
-            if (!window.appState.user) return;
+            // SHTUAR: Guard Check
+            if (!auth.currentUser || !window.appState.user) return;
             const removedItem = window.appState.config.lists[listName][index];
             
             await window.moveToTrash('list_item', { listName: listName, value: removedItem });
@@ -617,6 +716,7 @@
 
         // --- Kolonat Shtese Logjika ---
         window.addExtraColumn = async () => {
+            if (!auth.currentUser || !window.appState.user) return;
             const inputName = document.getElementById('new-column-name');
             const name = inputName.value.trim();
             if(!name) return;
@@ -644,6 +744,7 @@
         };
 
         window.editExtraColumnName = (colId) => {
+            if (!auth.currentUser || !window.appState.user) return;
             const col = window.appState.config.extraColumns.find(c => c.id === colId);
             if(!col) return;
             window.customPrompt("Edito Emrin", "Ndrysho emrin e kolonës shtesë:", col.name, async (newVal) => {
@@ -663,6 +764,7 @@
         };
 
         window.removeExtraColumn = async (id) => {
+            if (!auth.currentUser || !window.appState.user) return;
             window.customConfirm("Kujdes!", "Nëse e fshini, kjo kolonë do të hiqet edhe nga raportet dhe aktivitetet e regjistruara. Vazhdoni?", async () => {
                 const index = window.appState.config.extraColumns.findIndex(c => c.id === id);
                 if(index > -1) {
@@ -685,6 +787,7 @@
         };
 
         window.addToExtraList = async (colId) => {
+            if (!auth.currentUser || !window.appState.user) return;
             const inputEl = document.getElementById(`input-ext-${colId}`);
             const val = inputEl.value.trim();
             if(!val) return;
@@ -704,6 +807,7 @@
         };
 
         window.editExtraListItem = (colId, index) => {
+            if (!auth.currentUser || !window.appState.user) return;
             const col = window.appState.config.extraColumns.find(c => c.id === colId);
             if(!col) return;
             window.customPrompt("Edito Vlerën", "Ndrysho vlerën e elementit:", col.list[index], async (newVal) => {
@@ -720,6 +824,7 @@
         };
 
         window.removeFromExtraList = async (colId, index) => {
+            if (!auth.currentUser || !window.appState.user) return;
             const col = window.appState.config.extraColumns.find(c => c.id === colId);
             if(col) {
                 const removed = col.list[index];
@@ -874,7 +979,6 @@
             renderExtraActivityFields();
             
             if(!document.getElementById('act-date').value) {
-                // Modified fix for correct local date regardless of timezone UTC
                 const today = new Date();
                 const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
                 document.getElementById('act-date').value = localDate;
@@ -892,7 +996,8 @@
         };
 
         window.saveActivity = async () => {
-            if (!window.appState.user) return;
+            // SHTUAR: Guard Check
+            if (!auth.currentUser || !window.appState.user) return;
             
             const dateVal = document.getElementById('act-date').value;
             const objektivi = document.getElementById('act-objektivi').value;
@@ -910,7 +1015,6 @@
                 return;
             }
             
-            // Merr te dhenat dinamike
             const extraData = {};
             (window.appState.config.extraColumns || []).forEach(col => {
                 const el = document.getElementById(`act-ext-${col.id}`);
@@ -1033,7 +1137,8 @@
         };
 
         window.deleteActivity = async (id) => {
-            if (!window.appState.user) return;
+            // SHTUAR: Guard Check
+            if (!auth.currentUser || !window.appState.user) return;
             window.customConfirm("Kujdes", "Dëshironi ta fshini këtë aktivitet? (Do të dërgohet në Kosh)", async () => {
                 showLoading();
                 try {
@@ -1043,7 +1148,6 @@
                     }
                     await deleteDoc(doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'activities', id));
                     
-                    // Heqja e menjehershme nga dom
                     window.appState.activities = window.appState.activities.filter(a => a.id !== id);
                     window.renderDailyActivities();
                     
@@ -1290,7 +1394,6 @@
         window.renderWeeklyReport = () => {
             const dateInput = document.getElementById('report-week-date');
             if(!dateInput.value) {
-                // Modified fix for correct local date
                 const today = new Date();
                 const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
                 dateInput.value = localDate;
@@ -1447,7 +1550,6 @@
             
             autoResizeTextareas();
 
-            // Clear history and save initial state for this new load
             setTimeout(() => {
                 window.reportHistory = [];
                 window.reportHistoryIndex = -1;
@@ -1584,17 +1686,15 @@
         // --- Logjika për Export dhe Import (Backup) ---
 
         window.exportBackup = async () => {
-            if (!window.appState.user) return;
+            if (!auth.currentUser || !window.appState.user) return;
             showLoading();
             try {
-                // Marrim me siguri koshin e fundit nëse s'është i ngarkuar plotësisht
                 const trashSnap = await getDocs(collection(db, 'artifacts', appId, 'users', window.appState.user.uid, 'trash'));
                 const trashData = [];
                 trashSnap.forEach(doc => {
                     trashData.push({ id: doc.id, ...doc.data() });
                 });
 
-                // Marrim me siguri aktivitetet e fundit nga Database
                 const actsSnap = await getDocs(collection(db, 'artifacts', appId, 'users', window.appState.user.uid, 'activities'));
                 const actsData = [];
                 actsSnap.forEach(doc => {
@@ -1653,12 +1753,10 @@
                             let currentConfig = window.appState.config;
                             let importedConfig = data.config;
                             
-                            // Bashkojmë profilin (nëse fusha është bosh, merr nga importi)
                             if(!currentConfig.profile.specialisti && importedConfig.profile.specialisti) currentConfig.profile.specialisti = importedConfig.profile.specialisti;
                             if(!currentConfig.profile.sektori && importedConfig.profile.sektori) currentConfig.profile.sektori = importedConfig.profile.sektori;
                             if(!currentConfig.profile.drejtoria && importedConfig.profile.drejtoria) currentConfig.profile.drejtoria = importedConfig.profile.drejtoria;
                             
-                            // Bashkojmë listat pa i dublikuar
                             const listsToMerge = ['objektivat', 'detyrat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet'];
                             listsToMerge.forEach(listName => {
                                 if(importedConfig.lists && importedConfig.lists[listName]) {
@@ -1676,17 +1774,14 @@
                                 }
                             });
 
-                            // Bashkojmë kolonat ekstra pa i dublikuar (bazuar në emër)
                             if (importedConfig.extraColumns) {
                                 importedConfig.extraColumns.forEach(impCol => {
                                     let existingCol = currentConfig.extraColumns.find(c => c.name === impCol.name);
                                     if(existingCol) {
-                                        // Bashkojmë listat brenda kolonës
                                         impCol.list.forEach(item => {
                                             if(!existingCol.list.includes(item)) existingCol.list.push(item);
                                         });
                                     } else {
-                                        // Krijo kolonë të re nëse s'ekziston
                                         currentConfig.extraColumns.push(impCol);
                                     }
                                 });
@@ -1694,19 +1789,18 @@
 
                             await setDoc(doc(db, 'artifacts', appId, 'users', uid, 'settings', 'config'), currentConfig);
 
-                            // 2. RIKTHEJMË AKTIVITETET (Duka ruajtur ID origjinale që të mos krijohen dublikata)
+                            // 2. RIKTHEJMË AKTIVITETET
                             if(data.activities && data.activities.length > 0) {
                                 const actRef = collection(db, 'artifacts', appId, 'users', uid, 'activities');
                                 const actPromises = data.activities.map(act => {
                                     const { id, ...actData } = act;
-                                    // Përdorim setDoc me ID specifike në vend të addDoc, kështu nqs ka ekzistuar nuk do të krijohet një i dytë
                                     const docRef = id ? doc(actRef, id) : doc(actRef);
                                     return setDoc(docRef, actData, { merge: true });
                                 });
                                 await Promise.all(actPromises);
                             }
 
-                            // 3. RIKTHEJMË KOSHIN (Ngjashëm, pa dublikuar dokumentet e koshit)
+                            // 3. RIKTHEJMË KOSHIN
                             if(data.trash && data.trash.length > 0) {
                                 const trashRef = collection(db, 'artifacts', appId, 'users', uid, 'trash');
                                 const trashPromises = data.trash.map(t => {
@@ -1733,7 +1827,6 @@
                     console.error(err);
                     window.showToast("Gabim në leximin e skedarit (JSON jo i vlefshëm)!", "error");
                 }
-                // Pastrojmë inputin për ta lejuar ri-përdorimin e tij
                 event.target.value = '';
             };
             reader.readAsText(file);
@@ -1751,6 +1844,7 @@
             hideLoading();
         };
 
+        // PËRMIRËSUAR: Siguria në onAuthStateChanged
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 window.appState.user = user;
@@ -1764,7 +1858,20 @@
                 window.switchTab('aktiviteti'); 
                 hideLoading();
             } else {
+                // Siguri shtesë: Pastro listener-at nëse shkëputja ka ardhur nga jashtë
+                if (window.appState.unsubscribeActivities) {
+                    window.appState.unsubscribeActivities();
+                    window.appState.unsubscribeActivities = null;
+                }
+                if (window.appState.unsubscribeTrash) {
+                    window.appState.unsubscribeTrash();
+                    window.appState.unsubscribeTrash = null;
+                }
+
                 window.appState.user = null;
+                window.appState.activities = [];
+                window.appState.trash = [];
+
                 elements.authScreen().classList.remove('hidden');
                 elements.appScreen().classList.add('hidden');
                 hideLoading();
@@ -1806,7 +1913,8 @@
     <div id="custom-modal" class="hidden fixed inset-0 z-[300] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform transition-all">
             <h3 id="modal-title" class="text-lg font-black text-gray-900 mb-2"></h3>
-            <p id="modal-text" class="text-sm text-gray-600 mb-4 font-medium"></p>
+            <!-- SHTUAR: whitespace-pre-line që teksti i paralajmërimit të ndahet në rreshta të rinj -->
+            <p id="modal-text" class="text-sm text-gray-600 mb-4 font-medium whitespace-pre-line"></p>
             <input type="text" id="modal-input" class="hidden w-full p-3 bg-gray-50 border border-gray-200 rounded-lg mb-4 outline-none focus:border-blue-500 font-medium">
             <div class="flex justify-end gap-3">
                 <button onclick="window.closeModal()" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-bold text-sm transition-colors">Anulo</button>
@@ -1915,8 +2023,12 @@
                         <p class="text-[10px] text-green-600 font-bold uppercase">Aktiv</p>
                     </div>
                 </div>
-                <button onclick="window.handleLogout()" class="w-full bg-white border border-gray-200 text-gray-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 py-2 rounded-lg text-xs font-bold transition-colors">
+                <button onclick="window.handleLogout()" class="w-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 py-2 rounded-lg text-xs font-bold transition-colors">
                     Dil nga Llogaria
+                </button>
+                <!-- SHTUAR: Butoni për Fshirjen e Llogarisë -->
+                <button onclick="window.handleDeleteAccount()" class="w-full bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 py-2 rounded-lg text-xs font-bold transition-colors">
+                    Fshi Llogarinë
                 </button>
             </div>
 
