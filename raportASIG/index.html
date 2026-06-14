@@ -2094,6 +2094,18 @@
         };
 
         window.openEmailModal = () => {
+            const period = document.getElementById('rep-periudha').value || '';
+            document.getElementById('email-subject').value = period ? `Raporti Javor i Aktiviteteve dhe Detyrave të Realizuara (${period})` : `Raporti Javor i Aktiviteteve dhe Detyrave të Realizuara`;
+            
+            let message = `Përshëndetje,\n\n`;
+            message += `Po ju përcjell në bashkëlidhje raportin javor të aktiviteteve dhe detyrave të realizuara gjatë periudhës ${period}.\n\n`;
+            message += `Për çdo sqarim apo informacion shtesë, mbetem në dispozicion.\n`;
+            message += `Faleminderit.\n\n`;
+            message += `Me respekt,\n`;
+            message += `Erland Alla`;
+            
+            document.getElementById('email-body').value = message;
+
             const modal = document.getElementById('email-modal');
             modal.classList.remove('hidden');
         };
@@ -2106,17 +2118,7 @@
             e.preventDefault();
             const emailTo = document.getElementById('email-to').value;
             const emailSubject = document.getElementById('email-subject').value;
-            
-            const prof = window.appState.profile || {};
-            const specialist = `${prof.emer || ''} ${prof.mbiemer || ''}`.trim() || "";
-            const period = document.getElementById('rep-periudha').value;
-            
-            let message = `Përshëndetje,\n\n`;
-            message += `Po ju përcjell në bashkëlidhje raportin javor të aktiviteteve dhe detyrave të realizuara gjatë periudhës ${period}.\n\n`;
-            message += `Për çdo sqarim apo informacion shtesë, mbetem në dispozicion.\n`;
-            message += `Faleminderit.\n\n`;
-            message += `Me respekt,\n`;
-            message += `Erland Alla`;
+            const message = document.getElementById('email-body').value;
 
             const mailtoLink = `mailto:${encodeURIComponent(emailTo)}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(message)}`;
             
@@ -2432,6 +2434,10 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Titulli (Subject)</label>
                     <input id="email-subject" type="text" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500" value="Raporti Javor i Aktiviteteve">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Përmbajtja (Body)</label>
+                    <textarea id="email-body" rows="6" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm"></textarea>
                 </div>
                 <p class="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100 italic">Klikimi i butonit më poshtë do të hapë aplikacionin tuaj të emailit. Mos harroni të bashkëngjisni file-in PDF/Excel/Backup që sapo shkarkuat para se ta dërgoni.</p>
                 <div class="flex justify-end gap-3 mt-4">
