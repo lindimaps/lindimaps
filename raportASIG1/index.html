@@ -86,8 +86,8 @@
         // Global State (Modified with new profile fields)
         window.appState = {
             user: null,
+            profile: { emer: '', mbiemer: '', institucioni: '', drejtoria: '', sektori: '', detyra: '', telefon: '', foto: '' },
             config: {
-                profile: { emer_mbiemer: '', institucioni: '', drejtoria: '', sektori: '', specialisti: '', detyra: '', foto: '' },
                 lists: { objektivat: [], detyrat: [], statuset: [], pergjegjesit: [], raportimet: [], afatet: [] },
                 extraColumns: [] 
             },
@@ -312,13 +312,29 @@
             e.preventDefault();
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-password').value;
+            
+            const emer = document.getElementById('reg-emer').value.trim();
+            const mbiemer = document.getElementById('reg-mbiemer').value.trim();
+            const institucioni = document.getElementById('reg-institucioni').value.trim();
+            const drejtoria = document.getElementById('reg-drejtoria').value.trim();
+            const sektori = document.getElementById('reg-sektori').value.trim();
+            const detyra = document.getElementById('reg-detyra').value.trim();
+            const telefon = document.getElementById('reg-telefon').value.trim();
+
             if(pass.length < 6) {
                 showAuthError("Fjalëkalimi duhet të ketë të paktën 6 karaktere.");
                 return;
             }
             showLoading();
             try {
-                await createUserWithEmailAndPassword(auth, email, pass);
+                const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+                const user = userCredential.user;
+                
+                // Ruaj profilin tek settings i User-it pas regjistrimit
+                await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'), {
+                    emer, mbiemer, institucioni, drejtoria, sektori, detyra, telefon, foto: ''
+                });
+                
                 hideLoading();
             } catch(err) {
                 hideLoading();
@@ -355,8 +371,8 @@
                 
                 window.appState.activities = [];
                 window.appState.trash = [];
+                window.appState.profile = { emer: '', mbiemer: '', institucioni: '', drejtoria: '', sektori: '', detyra: '', telefon: '', foto: '' };
                 window.appState.config = {
-                    profile: { emer_mbiemer: '', institucioni: '', drejtoria: '', sektori: '', specialisti: '', detyra: '', foto: '' },
                     lists: { objektivat: [], detyrat: [], statuset: [], pergjegjesit: [], raportimet: [], afatet: [] },
                     extraColumns: [] 
                 };
@@ -377,7 +393,7 @@
                 window.appState.unsubscribeActivities = null;
             }
 
-            const collectionsToDelete = ['activities', 'trash', 'settings'];
+            const collectionsToDelete = ['activities', 'trash', 'settings', 'profile'];
             
             for (const colName of collectionsToDelete) {
                 try {
@@ -431,22 +447,9 @@
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     window.appState.config = docSnap.data();
-                    if(!window.appState.config.profile) window.appState.config.profile = { emer_mbiemer: '', institucioni: '', specialisti: '', sektori: '', drejtoria: '', detyra: '', foto: '' };
                     if(!window.appState.config.lists) window.appState.config.lists = { objektivat: [], detyrat: [], statuset: [], pergjegjesit: [], raportimet: [], afatet: [] };
                     if(!window.appState.config.lists.detyrat) window.appState.config.lists.detyrat = [];
                     if(!window.appState.config.extraColumns) window.appState.config.extraColumns = [];
-                    
-                    // SHTUAR: Përditëso UI profilin me foton
-                    if(window.appState.config.profile.foto) {
-                        const avatarEl = document.getElementById('sidebar-user-avatar');
-                        if(avatarEl) {
-                            avatarEl.innerHTML = `<img src="${window.appState.config.profile.foto}" class="w-full h-full object-cover">`;
-                        }
-                    }
-                    if(window.appState.config.profile.emer_mbiemer) {
-                        const nameEl = document.getElementById('sidebar-user-name');
-                        if(nameEl) nameEl.textContent = window.appState.config.profile.emer_mbiemer;
-                    }
                 } else {
                     window.appState.config.extraColumns = [];
                     await setDoc(docRef, window.appState.config);
@@ -456,6 +459,26 @@
                 console.error("Error loading config:", error);
                 window.showToast("Gabim në ngarkimin e konfigurimeve", "error");
             }
+        };
+
+        const loadProfile = async () => {
+            if (!auth.currentUser) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'profile', 'info');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    window.appState.profile = { ...window.appState.profile, ...docSnap.data() };
+                }
+                
+                const fullName = `${window.appState.profile.emer || ''} ${window.appState.profile.mbiemer || ''}`.trim() || 'Përdorues';
+                const nameEl = document.getElementById('sidebar-user-name');
+                if(nameEl) nameEl.textContent = fullName;
+                
+                if(window.appState.profile.foto) {
+                    const avatarEl = document.getElementById('sidebar-user-avatar');
+                    if(avatarEl) avatarEl.innerHTML = `<img src="${window.appState.profile.foto}" class="w-full h-full object-cover">`;
+                }
+            } catch(e) { console.error("Error loading profile", e); }
         };
 
         const subscribeToActivities = () => {
@@ -612,15 +635,37 @@
         };
 
 
-        // --- 1. Konfigurimet (Logic) ---
+        // --- 1. Konfigurimet dhe Profili (Logic) ---
 
-        // SHTUAR: Logjika për konvertimin e fotos në Base64
-        window.handleProfilePhoto = (e) => {
+        window.openSettingsModal = () => {
+            const prof = window.appState.profile;
+            document.getElementById('set-emer').value = prof.emer || '';
+            document.getElementById('set-mbiemer').value = prof.mbiemer || '';
+            document.getElementById('set-institucioni').value = prof.institucioni || '';
+            document.getElementById('set-drejtoria').value = prof.drejtoria || '';
+            document.getElementById('set-sektori').value = prof.sektori || '';
+            document.getElementById('set-detyra').value = prof.detyra || '';
+            document.getElementById('set-telefon').value = prof.telefon || '';
+            
+            if(prof.foto) {
+                document.getElementById('set-foto-preview').src = prof.foto;
+                document.getElementById('set-foto-preview').classList.remove('hidden');
+            } else {
+                document.getElementById('set-foto-preview').classList.add('hidden');
+            }
+            
+            document.getElementById('settings-modal').classList.remove('hidden');
+        };
+
+        window.closeSettingsModal = () => {
+            document.getElementById('settings-modal').classList.add('hidden');
+        };
+
+        window.handleSettingsPhoto = (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = (event) => {
-                // Resize image to save space
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
@@ -631,50 +676,61 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     const base64 = canvas.toDataURL('image/jpeg', 0.7);
-                    document.getElementById('prof-foto-preview').src = base64;
-                    document.getElementById('prof-foto-preview').classList.remove('hidden');
-                    window.appState.config.profile.foto = base64;
+                    document.getElementById('set-foto-preview').src = base64;
+                    document.getElementById('set-foto-preview').classList.remove('hidden');
+                    window.appState.profile.foto = base64;
                 }
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
         };
 
-        window.saveProfile = async () => {
+        window.saveSettingsProfile = async () => {
             if (!auth.currentUser || !window.appState.user) return;
             
-            // SHTUAR: Përditësim i profilet me fushat e reja
             const profile = {
-                emer_mbiemer: document.getElementById('prof-emer-mbiemer').value.trim(),
-                institucioni: document.getElementById('prof-institucioni').value.trim(),
-                detyra: document.getElementById('prof-detyra').value.trim(),
-                specialisti: document.getElementById('prof-specialisti').value.trim(),
-                sektori: document.getElementById('prof-sektori').value.trim(),
-                drejtoria: document.getElementById('prof-drejtoria').value.trim(),
-                foto: window.appState.config.profile.foto || ''
+                emer: document.getElementById('set-emer').value.trim(),
+                mbiemer: document.getElementById('set-mbiemer').value.trim(),
+                institucioni: document.getElementById('set-institucioni').value.trim(),
+                drejtoria: document.getElementById('set-drejtoria').value.trim(),
+                sektori: document.getElementById('set-sektori').value.trim(),
+                detyra: document.getElementById('set-detyra').value.trim(),
+                telefon: document.getElementById('set-telefon').value.trim(),
+                foto: window.appState.profile.foto || ''
             };
-            window.appState.config.profile = profile;
+            window.appState.profile = profile;
             
             try {
                 showLoading();
-                const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'settings', 'config');
-                await setDoc(docRef, window.appState.config);
+                const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'profile', 'info');
+                await setDoc(docRef, window.appState.profile);
                 
                 if(profile.foto) {
                     const avatarEl = document.getElementById('sidebar-user-avatar');
                     if(avatarEl) avatarEl.innerHTML = `<img src="${profile.foto}" class="w-full h-full object-cover">`;
                 }
-                if(profile.emer_mbiemer) {
-                    const nameEl = document.getElementById('sidebar-user-name');
-                    if(nameEl) nameEl.textContent = profile.emer_mbiemer;
-                }
+                const nameEl = document.getElementById('sidebar-user-name');
+                if(nameEl) nameEl.textContent = `${profile.emer} ${profile.mbiemer}`.trim() || 'Përdorues';
 
                 hideLoading();
-                window.showToast("Profili u ruajt me sukses!");
+                window.closeSettingsModal();
+                window.showToast("Profili u përditësua me sukses!");
             } catch (error) {
                 hideLoading();
-                console.error("Arsyeja e gabimit ne profil:", error);
-                window.showToast("Gabim në ruajtjen e profilit. Shiko Console.", "error");
+                window.showToast("Gabim në ruajtjen e profilit.", "error");
+            }
+        };
+
+        window.sendPasswordReset = async () => {
+            if (!auth.currentUser) return;
+            showLoading();
+            try {
+                await sendPasswordResetEmail(auth, auth.currentUser.email);
+                hideLoading();
+                window.showToast("Email për rivendosjen e fjalëkalimit u dërgua!", "success");
+            } catch(e) {
+                hideLoading();
+                window.showToast("Gabim gjatë dërgimit të email-it.", "error");
             }
         };
 
@@ -939,19 +995,6 @@
         };
 
         const renderConfigTab = () => {
-            // SHTUAR: Profilet e reja
-            document.getElementById('prof-emer-mbiemer').value = window.appState.config.profile.emer_mbiemer || '';
-            document.getElementById('prof-institucioni').value = window.appState.config.profile.institucioni || '';
-            document.getElementById('prof-detyra').value = window.appState.config.profile.detyra || '';
-            document.getElementById('prof-specialisti').value = window.appState.config.profile.specialisti || '';
-            document.getElementById('prof-sektori').value = window.appState.config.profile.sektori || '';
-            document.getElementById('prof-drejtoria').value = window.appState.config.profile.drejtoria || '';
-            
-            if(window.appState.config.profile.foto) {
-                document.getElementById('prof-foto-preview').src = window.appState.config.profile.foto;
-                document.getElementById('prof-foto-preview').classList.remove('hidden');
-            }
-
             ['objektivat', 'detyrat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet'].forEach(renderList);
             renderExtraColumnsConfig();
         };
@@ -1580,13 +1623,14 @@
 
             filteredActs.sort((a, b) => a.timestamp - b.timestamp); // E vjetra lart - e reja poshte
 
-            const prof = window.appState.config.profile;
+            const prof = window.appState.profile || {};
             document.getElementById('rep-drejtoria').value = prof.drejtoria || '';
             document.getElementById('rep-sektori').value = prof.sektori || '';
-            document.getElementById('rep-specialisti').value = (prof.emer_mbiemer || prof.specialisti) || '';
+            const specialistiFullName = `${prof.emer || ''} ${prof.mbiemer || ''}`.trim() || '';
+            document.getElementById('rep-specialisti').value = specialistiFullName;
             document.getElementById('rep-periudha').value = dateRangeTitle;
 
-            document.getElementById('print-header').textContent = `RAPORTI I SPECIALISTIT ${(prof.emer_mbiemer || prof.specialisti).toUpperCase()} - ${prof.drejtoria.toUpperCase()} / ${prof.sektori.toUpperCase()} (${dateRangeTitle})`;
+            document.getElementById('print-header').textContent = `RAPORTI I SPECIALISTIT ${specialistiFullName.toUpperCase()} - ${(prof.drejtoria || '').toUpperCase()} / ${(prof.sektori || '').toUpperCase()} (${dateRangeTitle})`;
 
             const theadTr = document.getElementById('report-thead-tr');
             const extraCols = window.appState.config.extraColumns || [];
@@ -1898,7 +1942,8 @@
             const emailTo = document.getElementById('email-to').value;
             const emailSubject = document.getElementById('email-subject').value;
             
-            const specialist = window.appState.config.profile.emer_mbiemer || window.appState.config.profile.specialisti || "";
+            const prof = window.appState.profile || {};
+            const specialist = `${prof.emer || ''} ${prof.mbiemer || ''}`.trim() || "";
             const period = document.getElementById('rep-periudha').value;
             
             let message = `Përshëndetje,\n\nJu lutem gjeni bashkëngjitur Raportin Javor nga: ${specialist}\nPër periudhën: ${period}\n\n`;
@@ -1981,14 +2026,6 @@
                             // 1. BASHKIMI (MERGE) I KONFIGURIMEVE
                             let currentConfig = window.appState.config;
                             let importedConfig = data.config;
-                            
-                            // Merge profile if empty
-                            if(!currentConfig.profile.emer_mbiemer && importedConfig.profile.emer_mbiemer) currentConfig.profile.emer_mbiemer = importedConfig.profile.emer_mbiemer;
-                            if(!currentConfig.profile.specialisti && importedConfig.profile.specialisti) currentConfig.profile.specialisti = importedConfig.profile.specialisti;
-                            if(!currentConfig.profile.sektori && importedConfig.profile.sektori) currentConfig.profile.sektori = importedConfig.profile.sektori;
-                            if(!currentConfig.profile.drejtoria && importedConfig.profile.drejtoria) currentConfig.profile.drejtoria = importedConfig.profile.drejtoria;
-                            if(!currentConfig.profile.institucioni && importedConfig.profile.institucioni) currentConfig.profile.institucioni = importedConfig.profile.institucioni;
-                            if(!currentConfig.profile.foto && importedConfig.profile.foto) currentConfig.profile.foto = importedConfig.profile.foto;
                             
                             const listsToMerge = ['objektivat', 'detyrat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet'];
                             listsToMerge.forEach(listName => {
@@ -2088,6 +2125,7 @@
                 
                 document.getElementById('sidebar-user-email').textContent = user.email || 'Përdorues Anonim';
 
+                await loadProfile();
                 await loadConfig();
                 subscribeToActivities();
                 window.switchTab('aktiviteti'); 
@@ -2156,7 +2194,67 @@
         </div>
     </div>
 
-    <!-- SHTUAR: Modal për Email -->
+    <!-- SHTUAR: Modal i Settings (Profili dhe Llogaria e Plote) -->
+    <div id="settings-modal" class="hidden fixed inset-0 z-[400] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden transform transition-all">
+            <div class="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
+                    <h3 class="text-xl font-black text-gray-900">Cilësimet & Profili</h3>
+                </div>
+                <button onclick="window.closeSettingsModal()" class="text-gray-400 hover:text-red-500 bg-gray-100 hover:bg-red-50 p-2 rounded-lg transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+                
+                <!-- Foto & Info Baze -->
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex flex-col items-center gap-3 shrink-0">
+                        <div class="w-24 h-24 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center relative overflow-hidden group">
+                            <img id="set-foto-preview" src="" class="hidden w-full h-full object-cover absolute inset-0">
+                            <svg class="w-6 h-6 text-gray-400 group-hover:text-blue-500 transition-colors z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-20" onchange="window.handleSettingsPhoto(event)" title="Ngarko Foto">
+                        </div>
+                        <span class="text-xs font-bold text-gray-500">Ndrysho Foton</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Emër</label><input id="set-emer" type="text" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Mbiemër</label><input id="set-mbiemer" type="text" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
+                        <div class="col-span-1 md:col-span-2"><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Institucioni</label><input id="set-institucioni" type="text" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Drejtoria</label><input id="set-drejtoria" type="text" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Sektori</label><input id="set-sektori" type="text" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Detyra</label><input id="set-detyra" type="text" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Nr. Telefoni</label><input id="set-telefon" type="tel" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100 pt-6">
+                    <h4 class="text-sm font-bold text-gray-900 mb-3">Menaxhimi i Llogarisë</h4>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="window.sendPasswordReset()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                            Rivendos Fjalëkalimin
+                        </button>
+                        <button onclick="window.handleDeleteAccount()" class="bg-red-50 border border-red-200 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Fshi Llogarinë
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="p-5 border-t border-gray-100 bg-white flex justify-end gap-3">
+                <button onclick="window.closeSettingsModal()" class="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-bold text-sm transition-colors">Anulo</button>
+                <button onclick="window.saveSettingsProfile()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm shadow-md transition-colors">Ruaj Ndryshimet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal për Email -->
     <div id="email-modal" class="hidden fixed inset-0 z-[300] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all">
             <div class="flex items-center gap-3 mb-4 border-b pb-4">
@@ -2208,15 +2306,49 @@
                 <p class="text-center text-sm text-gray-600 mt-4">Nuk keni llogari? <button type="button" onclick="window.toggleAuthView('register-form')" class="font-bold text-blue-600 hover:underline">Regjistrohu</button></p>
             </form>
 
-            <!-- REGISTER FORM -->
-            <form id="register-form" onsubmit="window.handleRegister(event)" class="hidden space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Email për Llogarinë e Re</label>
-                    <input id="reg-email" type="email" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 focus:bg-white transition-colors" placeholder="email@adresa.com">
+            <!-- REGISTER FORM (SHTUAR TË GJITHA TË DHËNAT E PLOTA) -->
+            <form id="register-form" onsubmit="window.handleRegister(event)" class="hidden space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Emër *</label>
+                        <input id="reg-emer" type="text" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Mbiemër *</label>
+                        <input id="reg-mbiemer" type="text" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Fjalëkalimi (Min. 6 Karaktere)</label>
-                    <input id="reg-password" type="password" required minlength="6" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 focus:bg-white transition-colors" placeholder="••••••••">
+                    <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Institucioni *</label>
+                    <input id="reg-institucioni" type="text" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Drejtoria *</label>
+                        <input id="reg-drejtoria" type="text" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Sektori *</label>
+                        <input id="reg-sektori" type="text" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Detyra *</label>
+                        <input id="reg-detyra" type="text" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Nr. Telefoni *</label>
+                        <input id="reg-telefon" type="tel" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Email *</label>
+                    <input id="reg-email" type="email" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm" placeholder="email@adresa.com">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Fjalëkalimi (Min. 6) *</label>
+                    <input id="reg-password" type="password" required minlength="6" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm" placeholder="••••••••">
                 </div>
                 <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition-colors mt-2">Krijo Llogarinë</button>
                 <p class="text-center text-sm text-gray-600 mt-4">Keni tashmë llogari? <button type="button" onclick="window.toggleAuthView('login-form')" class="font-bold text-blue-600 hover:underline">Identifikohu</button></p>
@@ -2235,7 +2367,7 @@
         </div>
     </div>
 
-    <!-- SHTUAR: Toggle Buton Global për Mobile dhe Windows Toolbar (Në rastin kur menu është e mbyllur) -->
+    <!-- Toggle Buton Global për Mobile -->
     <button id="sidebar-toggle-btn" onclick="window.toggleSidebar()" class="fixed top-3 left-3 z-[60] bg-white p-2.5 rounded-xl shadow-md border border-gray-200 text-gray-600 hover:text-blue-600 transition-colors md:hidden">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
     </button>
@@ -2243,12 +2375,12 @@
     <!-- Main App Screen -->
     <div id="app-screen" class="hidden h-full flex flex-col md:flex-row w-full relative">
         
-        <!-- Sidebar (I modifikuar me klasat toggle) -->
+        <!-- Sidebar -->
         <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col z-50 h-full absolute md:relative sidebar-collapsed md:sidebar-collapsed-none">
             
-            <!-- SHTUAR: Shigjeta për Desktop/Windows Pull-Out -->
-            <button onclick="window.toggleSidebar()" class="absolute -right-4 top-1/2 transform -translate-y-1/2 bg-white border border-gray-200 shadow-md rounded-full p-1.5 z-50 text-gray-500 hover:text-blue-600 hidden md:block">
-                <svg id="sidebar-arrow" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            <!-- SHTUAR: Shigjeta për Desktop/Windows Pull-Out (Më e dukshme dhe moderne) -->
+            <button onclick="window.toggleSidebar()" class="absolute -right-5 top-1/2 transform -translate-y-1/2 bg-blue-600 border-2 border-white shadow-xl rounded-full p-2.5 z-[100] text-white hover:bg-blue-700 hover:scale-110 transition-all duration-300 hidden md:flex items-center justify-center group">
+                <svg id="sidebar-arrow" class="w-5 h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
             </button>
 
             <div class="p-6 border-b border-gray-100 flex items-center justify-between">
@@ -2271,7 +2403,7 @@
                 </button>
                 <button id="nav-konfigurime" onclick="window.switchTab('konfigurime'); if(window.innerWidth < 768) window.toggleSidebar();" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    Konfigurimet
+                    Konfigurimet e Listave
                 </button>
                 <button id="nav-raporti" onclick="window.switchTab('raporti'); if(window.innerWidth < 768) window.toggleSidebar();" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -2288,24 +2420,23 @@
             </nav>
 
             <!-- User Profile Bottom Sidebar -->
-            <div class="p-4 border-t border-gray-100 bg-gray-50 mt-auto flex flex-col gap-3">
-                <div class="flex items-center gap-3">
-                    <div id="sidebar-user-avatar" class="bg-blue-200 text-blue-700 w-10 h-10 rounded-full flex items-center justify-center font-bold overflow-hidden shadow-sm shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            <div class="p-3 border-t border-gray-100 bg-gray-50 mt-auto flex flex-col gap-2">
+                <!-- SHTUAR: Thërret Settings Modalin -->
+                <button onclick="window.openSettingsModal()" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 rounded-xl transition-colors group">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div id="sidebar-user-avatar" class="bg-blue-200 text-blue-700 w-10 h-10 rounded-full flex items-center justify-center font-bold overflow-hidden shadow-sm shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        </div>
+                        <div class="flex-1 overflow-hidden text-left">
+                            <p class="text-xs font-bold text-gray-900 truncate" id="sidebar-user-name">Përdorues</p>
+                            <p class="text-[10px] font-medium text-gray-500 truncate" id="sidebar-user-email">Duke u ngarkuar...</p>
+                        </div>
                     </div>
-                    <div class="flex-1 overflow-hidden">
-                        <p class="text-xs font-bold text-gray-900 truncate" id="sidebar-user-name">Përdorues</p>
-                        <p class="text-[10px] font-medium text-gray-500 truncate" id="sidebar-user-email">Duke u ngarkuar...</p>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="window.handleLogout()" class="flex-1 bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 py-1.5 rounded-lg text-[10px] uppercase font-bold transition-colors">
-                        Dil nga Llogaria
-                    </button>
-                    <button onclick="window.handleDeleteAccount()" class="bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 py-1.5 px-3 rounded-lg text-[10px] uppercase font-bold transition-colors" title="Fshi Llogarinë">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
-                </div>
+                    <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+                <button onclick="window.handleLogout()" class="w-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 py-2 rounded-lg text-xs font-bold transition-colors">
+                    Dil nga Llogaria
+                </button>
             </div>
 
         </aside>
@@ -2411,12 +2542,13 @@
                                 Filtrat e avancuar
                             </button>
 
+                            <!-- DEFAULT: DATA E SOTME DHE TË FSHEHURA -->
                             <div id="advanced-filters-container" class="hidden space-y-2 bg-white p-3 rounded-lg border border-gray-200 mt-2">
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
                                         <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Periudha</label>
                                         <select id="act-filter-type" onchange="window.renderDailyActivities()" class="w-full text-xs bg-gray-50 border border-gray-200 rounded p-1.5 outline-none cursor-pointer">
-                                            <option value="date">Sipas Datës saktë</option>
+                                            <option value="date" selected>Sipas Datës saktë</option>
                                             <option value="week">Gjatë Javës</option>
                                             <option value="all">Të Gjitha (Historiku)</option>
                                         </select>
@@ -2444,66 +2576,11 @@
                 </div>
             </div>
 
-            <!-- TAB 1: KONFIGURIMET (PROFILI I ZGJERUAR) -->
+            <!-- TAB 1: KONFIGURIMET E LISTAVE (PA PROFILIN) -->
             <div id="tab-konfigurime" class="tab-content hidden max-w-6xl mx-auto space-y-8 pb-20">
                 <div class="mb-2">
                     <h2 class="text-2xl font-bold text-gray-900">Konfigurimi i Sistemit</h2>
-                    <p class="text-gray-500 text-sm">Menaxho profilin dhe listat që do të përdoren në formularë.</p>
-                </div>
-
-                <!-- Profile Section (Zgjeruar sipas kërkesës 9) -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
-                    <h3 class="text-lg font-bold text-gray-800 mb-6 border-b pb-2 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                        Profili Im i Plotë
-                    </h3>
-                    
-                    <div class="flex flex-col md:flex-row gap-8">
-                        <!-- Fotoja e Profilit -->
-                        <div class="flex flex-col items-center gap-3 shrink-0">
-                            <div class="w-28 h-28 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center relative overflow-hidden group">
-                                <img id="prof-foto-preview" src="" class="hidden w-full h-full object-cover absolute inset-0">
-                                <svg class="w-8 h-8 text-gray-400 group-hover:text-blue-500 transition-colors z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-20" onchange="window.handleProfilePhoto(event)" title="Ngarko Foto">
-                            </div>
-                            <span class="text-xs font-bold text-gray-500">Ngarko Foto</span>
-                        </div>
-
-                        <!-- Fushat e Profilit -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 flex-1">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Emër Mbiemër</label>
-                                <input id="prof-emer-mbiemer" type="text" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:border-blue-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Institucioni</label>
-                                <input id="prof-institucioni" type="text" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:border-blue-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Drejtoria</label>
-                                <input id="prof-drejtoria" type="text" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:border-blue-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Sektori</label>
-                                <input id="prof-sektori" type="text" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:border-blue-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Detyra (Titulli i Punës)</label>
-                                <input id="prof-detyra" type="text" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:border-blue-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Titulli në Raport (Opsional)</label>
-                                <input id="prof-specialisti" type="text" placeholder="Gjenerohet nga emri nëse bosh" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:border-blue-500 outline-none">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 flex justify-end">
-                        <button onclick="window.saveProfile()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            Ruaj Profilin
-                        </button>
-                    </div>
+                    <p class="text-gray-500 text-sm">Menaxho listat dhe variablat që do të përdoren në formularë. Për profilin vizitoni menynë e Cilësimeve.</p>
                 </div>
 
                 <!-- Lists Section -->
