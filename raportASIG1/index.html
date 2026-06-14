@@ -102,7 +102,18 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'sistemi-raportimit';
 
-        // Global State (Modified with new profile fields)
+        // Global Utility: Escape HTML (Moved to Top to prevent ReferenceError)
+        window.escapeHtml = (str) => {
+            return (str || "").toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        };
+        const escapeHtml = window.escapeHtml;
+
+        // Global State
         window.appState = {
             user: null,
             profile: { emer: '', mbiemer: '', institucioni: '', drejtoria: '', sektori: '', detyra: '', telefon: '', foto: '' },
@@ -1747,6 +1758,9 @@
             
             theadHtml += `<th class="border border-gray-300 p-2 text-center align-middle w-10 no-print bg-gray-100"></th>`;
             theadTr.innerHTML = theadHtml;
+
+            const existingFilterRow = document.getElementById('report-filter-row');
+            if(existingFilterRow) existingFilterRow.remove();
 
             const tbody = document.getElementById('report-tbody');
             tbody.innerHTML = '';
