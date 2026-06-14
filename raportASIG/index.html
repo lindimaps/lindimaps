@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistemi i Raportimit Javor</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Libraria për Export PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -25,7 +23,7 @@
         /* Print Styles */
         @media print {
             body { background-color: white; }
-            #sidebar, .no-print, #toast-container, #sidebar-toggle-btn { display: none !important; }
+            #sidebar, .no-print, #toast-container { display: none !important; }
             #main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
             .print-container { padding: 0 !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
             table { width: 100%; border-collapse: collapse; page-break-inside: auto; font-family: 'Times New Roman', Times, serif !important; }
@@ -43,45 +41,11 @@
 
         /* Drag and drop indication */
         .dragging { opacity: 0.5; background-color: #f8fafc; }
-
-        /* Klasa për Sidebar Toggle - RREGULLIM PËR DESKTOP DHE MOBILE */
-        #sidebar { transition: transform 0.3s ease, margin-left 0.3s ease; }
-        @media (max-width: 767px) {
-            #sidebar { position: fixed; height: 100vh; z-index: 999; transform: translateX(-100%); box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
-            #sidebar.mobile-open { transform: translateX(0); }
-        }
-        @media (min-width: 768px) {
-            #sidebar { position: relative; z-index: 40; margin-left: 0; transform: none; }
-            #sidebar.desktop-closed { margin-left: -16rem; }
-        }
-        
-        /* Stilizimi i Autocomplete dropdown */
-        .autocomplete-list { max-height: 150px; overflow-y: auto; position: absolute; z-index: 50; background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; width: 100%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .autocomplete-item { padding: 8px 12px; cursor: pointer; font-size: 0.875rem; border-bottom: 1px solid #f3f4f6; }
-        .autocomplete-item:hover { background-color: #eff6ff; color: #1d4ed8; }
-
-        /* Dark Theme Variables & Rules */
-        body.dark-theme { background-color: #0f172a; color: #f8fafc; }
-        .dark-theme #sidebar { background-color: #1e293b; border-color: #334155; }
-        .dark-theme .bg-white { background-color: #1e293b !important; border-color: #334155 !important; }
-        .dark-theme .bg-gray-50, .dark-theme .bg-gray-100, .dark-theme .bg-blue-50, .dark-theme .bg-indigo-50 { background-color: #0f172a !important; border-color: #334155 !important; color: #f8fafc !important;}
-        .dark-theme .text-gray-800, .dark-theme .text-gray-900, .dark-theme .text-gray-700 { color: #f8fafc !important; }
-        .dark-theme .text-gray-500, .dark-theme .text-gray-600 { color: #94a3b8 !important; }
-        .dark-theme input, .dark-theme select, .dark-theme textarea { background-color: #0f172a !important; color: #f8fafc !important; border-color: #334155 !important; }
-        .dark-theme th, .dark-theme td { border-color: #334155 !important; }
-        .dark-theme .border-gray-200, .dark-theme .border-gray-300, .dark-theme .border-b, .dark-theme .border-t, .dark-theme .border-r, .dark-theme .border-l { border-color: #334155 !important; }
-        .dark-theme .hover\:bg-gray-50:hover { background-color: #334155 !important; }
-        .dark-theme .hover\:bg-gray-200:hover { background-color: #475569 !important; }
-        .dark-theme #custom-modal > div, .dark-theme #settings-modal > div, .dark-theme #email-modal > div, .dark-theme #auth-screen > div { background-color: #1e293b !important; border: 1px solid #334155; }
-        .dark-theme .nav-item:hover { background-color: #334155 !important; }
-        .dark-theme .nav-item.active { background-color: #3b82f6 !important; color: #ffffff !important; }
-        .dark-theme .autocomplete-list { background-color: #1e293b !important; border-color: #334155 !important; }
-        .dark-theme .autocomplete-item { border-bottom-color: #334155 !important; }
-        .dark-theme .autocomplete-item:hover { background-color: #334155 !important; color: #60a5fa !important; }
     </style>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        // SHTUAR: import i deleteUser për fshirjen e llogarisë
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, updateDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -90,6 +54,7 @@
         if (typeof __firebase_config !== 'undefined') {
             firebaseConfig = JSON.parse(__firebase_config);
         } else {
+            // Konfigurimi REAL i Projektit Tuaj
             firebaseConfig = {
                 apiKey: "AIzaSyAG56-nHpfwzEw2noQZh3hrCbvcMWXShsg",
                 authDomain: "raportimi-javor-asig.firebaseapp.com",
@@ -106,22 +71,11 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'sistemi-raportimit';
 
-        // Global Utility: Escape HTML
-        window.escapeHtml = (str) => {
-            return (str || "").toString()
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        };
-        const escapeHtml = window.escapeHtml;
-
         // Global State
         window.appState = {
             user: null,
-            profile: { emer: '', mbiemer: '', institucioni: '', drejtoria: '', sektori: '', detyra: '', telefon: '', foto: '' },
             config: {
+                profile: { specialisti: '', sektori: '', drejtoria: '' },
                 lists: { objektivat: [], detyrat: [], statuset: [], pergjegjesit: [], raportimet: [], afatet: [] },
                 extraColumns: [] 
             },
@@ -172,14 +126,6 @@
             }
         };
 
-        // Dark Mode Toggle Logic
-        window.toggleDarkMode = () => {
-            document.body.classList.toggle('dark-theme');
-            const isDark = document.body.classList.contains('dark-theme');
-            document.getElementById('dark-text').innerText = isDark ? 'Dark Mode: On' : 'Dark Mode: Off';
-            localStorage.setItem('darkMode', isDark);
-        };
-
         // Report History (Undo/Redo)
         window.reportHistory = [];
         window.reportHistoryIndex = -1;
@@ -203,10 +149,9 @@
             const table = document.getElementById('report-table');
             if(!table) return;
             
+            // Flush values to DOM attributes to persist HTML state
             table.querySelectorAll('input').forEach(el => {
-                if(el.type !== 'checkbox' && el.type !== 'radio' && !el.classList.contains('report-col-filter')) {
-                    el.setAttribute('value', el.value);
-                }
+                if(el.type !== 'checkbox' && el.type !== 'radio') el.setAttribute('value', el.value);
             });
             table.querySelectorAll('textarea').forEach(el => {
                 el.textContent = el.value;
@@ -225,11 +170,10 @@
 
         window.undoReportState = () => {
             if (window.reportHistoryIndex > 0) {
+                // Save current state inputs first before going back
                 const table = document.getElementById('report-table');
                 table.querySelectorAll('input').forEach(el => {
-                    if(el.type !== 'checkbox' && el.type !== 'radio' && !el.classList.contains('report-col-filter')) {
-                        el.setAttribute('value', el.value);
-                    }
+                    if(el.type !== 'checkbox' && el.type !== 'radio') el.setAttribute('value', el.value);
                 });
                 table.querySelectorAll('textarea').forEach(el => el.textContent = el.value);
                 window.reportHistory[window.reportHistoryIndex] = table.innerHTML;
@@ -262,18 +206,6 @@
             autoResizeTextareas();
         };
 
-        window.reindexRows = () => {
-            const tbody = document.getElementById('report-tbody');
-            if(!tbody) return;
-            let nr = 1;
-            Array.from(tbody.children).forEach(tr => {
-                if(!tr.classList.contains('sector-row') && tr.style.display !== 'none') {
-                    const nrSpan = tr.querySelector('.row-nr-txt');
-                    if(nrSpan) nrSpan.textContent = nr++;
-                }
-            });
-        };
-
         // UI Helpers
         const elements = {
             loader: () => document.getElementById('loader'),
@@ -286,7 +218,7 @@
             const container = elements.toastContainer();
             const toast = document.createElement('div');
             const bgColor = type === 'success' ? 'bg-green-600' : (type === 'error' ? 'bg-red-600' : 'bg-blue-600');
-            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg font-medium text-sm transform transition-all duration-300 translate-y-10 opacity-0 flex items-center gap-2 pointer-events-auto`;
+            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg font-medium text-sm transform transition-all duration-300 translate-y-10 opacity-0 flex items-center gap-2`;
             toast.innerHTML = `
                 ${type === 'success' ? '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' : ''}
                 ${message}
@@ -303,6 +235,7 @@
         const showLoading = () => elements.loader().classList.remove('hidden');
         const hideLoading = () => elements.loader().classList.add('hidden');
 
+        // Navigation
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -312,42 +245,20 @@
 
             if (tabId === 'aktiviteti') {
                 populateDropdowns();
-                window.renderDailyActivities();
+                renderDailyActivities();
             } else if (tabId === 'raporti') {
-                window.renderWeeklyReport();
+                renderWeeklyReport();
             } else if (tabId === 'koshi') {
                 loadTrash();
             } else if (tabId === 'konfigurime') {
                 renderConfigTab();
+            } else if (tabId === 'backup') {
+                // No special initialization required immediately
             }
         };
 
-        // --- Toggle Sidebar ---
-        window.toggleSidebar = () => {
-            const sidebar = document.getElementById('sidebar');
-            const toggleBtn = document.getElementById('sidebar-toggle-btn');
-            const arrow = document.getElementById('sidebar-arrow');
-            
-            if (window.innerWidth >= 768) {
-                // Rregullimi në Desktop (Shigjeta)
-                sidebar.classList.toggle('desktop-closed');
-                if (sidebar.classList.contains('desktop-closed')) {
-                    if(arrow) arrow.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>`;
-                } else {
-                    if(arrow) arrow.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>`;
-                }
-            } else {
-                // Rregullimi në Mobile (Menuja dhe Butoni ☰)
-                sidebar.classList.toggle('mobile-open');
-                if (sidebar.classList.contains('mobile-open')) {
-                    if(toggleBtn) { toggleBtn.style.opacity = '0'; toggleBtn.style.pointerEvents = 'none'; }
-                } else {
-                    if(toggleBtn) { toggleBtn.style.opacity = '1'; toggleBtn.style.pointerEvents = 'auto'; }
-                }
-            }
-        };
-
-        // --- Auth Logic ---
+        // --- Auth Logic (Email/Password) ---
+        
         window.toggleAuthView = (viewId) => {
             ['login-form', 'register-form', 'reset-form'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
@@ -380,28 +291,13 @@
             e.preventDefault();
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-password').value;
-            
-            const emer = document.getElementById('reg-emer').value.trim();
-            const mbiemer = document.getElementById('reg-mbiemer').value.trim();
-            const institucioni = document.getElementById('reg-institucioni').value.trim();
-            const drejtoria = document.getElementById('reg-drejtoria').value.trim();
-            const sektori = document.getElementById('reg-sektori').value.trim();
-            const detyra = document.getElementById('reg-detyra').value.trim();
-            const telefon = document.getElementById('reg-telefon').value.trim();
-
             if(pass.length < 6) {
                 showAuthError("Fjalëkalimi duhet të ketë të paktën 6 karaktere.");
                 return;
             }
             showLoading();
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-                const user = userCredential.user;
-                
-                await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'), {
-                    emer, mbiemer, institucioni, drejtoria, sektori, detyra, telefon, foto: ''
-                });
-                
+                await createUserWithEmailAndPassword(auth, email, pass);
                 hideLoading();
             } catch(err) {
                 hideLoading();
@@ -424,9 +320,11 @@
             }
         };
 
+        // PËRMIRËSUAR: Fix për Logout (Mbyllja e Listeners para signOut)
         window.handleLogout = async () => {
             showLoading();
             try {
+                // 1. Mbyll listener-at e hapur (për të shmangur Permission Errors)
                 if (window.appState.unsubscribeActivities) {
                     window.appState.unsubscribeActivities();
                     window.appState.unsubscribeActivities = null;
@@ -436,14 +334,16 @@
                     window.appState.unsubscribeTrash = null;
                 }
                 
+                // 2. Pastro state-in global
                 window.appState.activities = [];
                 window.appState.trash = [];
-                window.appState.profile = { emer: '', mbiemer: '', institucioni: '', drejtoria: '', sektori: '', detyra: '', telefon: '', foto: '' };
                 window.appState.config = {
+                    profile: { specialisti: '', sektori: '', drejtoria: '' },
                     lists: { objektivat: [], detyrat: [], statuset: [], pergjegjesit: [], raportimet: [], afatet: [] },
                     extraColumns: [] 
                 };
                 
+                // 3. Fshi llogarinë
                 await signOut(auth);
             } catch (error) {
                 console.error("Gabim gjatë shkëputjes:", error);
@@ -451,16 +351,18 @@
             hideLoading();
         };
 
+        // SHTUAR: Funksioni për Fshirjen e gjithë dokumenteve të user-it
         window.deleteAllUserData = async () => {
             if (!auth.currentUser) return;
             const uid = auth.currentUser.uid;
 
+            // Sigurohemi që mbyllim listener-at fillimisht që të mos thërrasin evente teksa po fshijmë
             if (window.appState.unsubscribeActivities) {
                 window.appState.unsubscribeActivities();
                 window.appState.unsubscribeActivities = null;
             }
 
-            const collectionsToDelete = ['activities', 'trash', 'settings', 'profile'];
+            const collectionsToDelete = ['activities', 'trash', 'settings'];
             
             for (const colName of collectionsToDelete) {
                 try {
@@ -477,6 +379,7 @@
             }
         };
 
+        // SHTUAR: Funksioni për Fshirjen e Llogarisë Auth me Konfirmim të Dyfishtë
         window.handleDeleteAccount = async () => {
             if (!auth.currentUser) return;
 
@@ -486,13 +389,19 @@
                 async () => {
                     showLoading();
                     try {
+                        // 1. Fshi të gjitha të dhënat e përdoruesit nga Firestore
                         await window.deleteAllUserData();
+
+                        // 2. Fshi përdoruesin nga Firebase Auth
                         await deleteUser(auth.currentUser);
+
+                        // Logout dhe zhvendosja në login do të menaxhohet nga onAuthStateChanged automatikisht
                         window.showToast("Llogaria dhe të gjitha të dhënat u fshinë me sukses!", "success");
                     } catch (error) {
                         console.error("Gabim gjatë fshirjes së llogarisë:", error);
                         hideLoading();
                         
+                        // Menaxho rastin kur Firebase kërkon re-autentifikim para fshirjes
                         if (error.code === 'auth/requires-recent-login') {
                             window.showToast("Për arsye sigurie, duhet të identifikoheni sërish për të fshirë llogarinë.", "error");
                             await window.handleLogout();
@@ -508,12 +417,14 @@
         // --- Firebase Data Fetching ---
 
         const loadConfig = async () => {
+            // SHTUAR: Guard Check
             if (!auth.currentUser || !window.appState.user) return;
             try {
                 const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'settings', 'config');
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     window.appState.config = docSnap.data();
+                    if(!window.appState.config.profile) window.appState.config.profile = { specialisti: '', sektori: '', drejtoria: '' };
                     if(!window.appState.config.lists) window.appState.config.lists = { objektivat: [], detyrat: [], statuset: [], pergjegjesit: [], raportimet: [], afatet: [] };
                     if(!window.appState.config.lists.detyrat) window.appState.config.lists.detyrat = [];
                     if(!window.appState.config.extraColumns) window.appState.config.extraColumns = [];
@@ -528,27 +439,8 @@
             }
         };
 
-        const loadProfile = async () => {
-            if (!auth.currentUser) return;
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'profile', 'info');
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    window.appState.profile = { ...window.appState.profile, ...docSnap.data() };
-                }
-                
-                const fullName = `${window.appState.profile.emer || ''} ${window.appState.profile.mbiemer || ''}`.trim() || 'Përdorues';
-                const nameEl = document.getElementById('sidebar-user-name');
-                if(nameEl) nameEl.textContent = fullName;
-                
-                if(window.appState.profile.foto) {
-                    const avatarEl = document.getElementById('sidebar-user-avatar');
-                    if(avatarEl) avatarEl.innerHTML = `<img src="${window.appState.profile.foto}" class="w-full h-full object-cover">`;
-                }
-            } catch(e) { console.error("Error loading profile", e); }
-        };
-
         const subscribeToActivities = () => {
+            // SHTUAR: Guard Check
             if (!auth.currentUser || !window.appState.user) return;
             if (window.appState.unsubscribeActivities) window.appState.unsubscribeActivities();
 
@@ -561,8 +453,8 @@
                 });
                 
                 const activeTab = document.querySelector('.nav-item.active')?.id;
-                if(activeTab === 'nav-aktiviteti') window.renderDailyActivities();
-                if(activeTab === 'nav-raporti') window.renderWeeklyReport();
+                if(activeTab === 'nav-aktiviteti') renderDailyActivities();
+                if(activeTab === 'nav-raporti') renderWeeklyReport();
                 
             }, (error) => {
                 console.error("Error listening to activities:", error);
@@ -573,9 +465,14 @@
         // --- Koshi (Trash) Logic ---
         
         window.moveToTrash = async (type, data) => {
+            // SHTUAR: Guard Check
             if (!auth.currentUser || !window.appState.user) return;
             try {
-                const trashData = { type: type, data: data, deletedAt: Date.now() };
+                const trashData = {
+                    type: type, 
+                    data: data,
+                    deletedAt: Date.now()
+                };
                 await addDoc(collection(db, 'artifacts', appId, 'users', window.appState.user.uid, 'trash'), trashData);
             } catch(e) {
                 console.error("Gabim në zhvendosjen në kosh:", e);
@@ -583,6 +480,7 @@
         };
 
         const loadTrash = async () => {
+            // SHTUAR: Guard Check
             if (!auth.currentUser || !window.appState.user) return;
             showLoading();
             try {
@@ -602,6 +500,7 @@
         };
 
         window.restoreFromTrash = async (trashId) => {
+            // SHTUAR: Guard Check
             if (!auth.currentUser || !window.appState.user) return;
             const item = window.appState.trash.find(t => t.id === trashId);
             if(!item) return;
@@ -632,6 +531,7 @@
         };
 
         window.deleteFromTrash = async (trashId) => {
+            // SHTUAR: Guard Check
             if (!auth.currentUser || !window.appState.user) return;
             window.customConfirm("Fshij Përgjithmonë", "Jeni i sigurt që doni ta fshini përgjithmonë këtë element?", async () => {
                 showLoading();
@@ -647,6 +547,7 @@
         };
 
         window.emptyTrash = async () => {
+            // SHTUAR: Guard Check
             if (!auth.currentUser || !window.appState.user) return;
             if(window.appState.trash.length === 0) return;
             window.customConfirm("Pastro Koshin", "Kujdes: Kjo do të fshijë PËRGJITHMONË të gjitha elementet nga koshi. Vazhdoni?", async () => {
@@ -702,106 +603,33 @@
         };
 
 
-        // --- 1. Konfigurimet dhe Profili (Logic) ---
+        // --- 1. Konfigurimet (Logic) ---
 
-        window.openSettingsModal = () => {
-            const prof = window.appState.profile;
-            document.getElementById('set-emer').value = prof.emer || '';
-            document.getElementById('set-mbiemer').value = prof.mbiemer || '';
-            document.getElementById('set-institucioni').value = prof.institucioni || '';
-            document.getElementById('set-drejtoria').value = prof.drejtoria || '';
-            document.getElementById('set-sektori').value = prof.sektori || '';
-            document.getElementById('set-detyra').value = prof.detyra || '';
-            document.getElementById('set-telefon').value = prof.telefon || '';
-            
-            if(prof.foto) {
-                document.getElementById('set-foto-preview').src = prof.foto;
-                document.getElementById('set-foto-preview').classList.remove('hidden');
-            } else {
-                document.getElementById('set-foto-preview').classList.add('hidden');
-            }
-            
-            document.getElementById('settings-modal').classList.remove('hidden');
-        };
-
-        window.closeSettingsModal = () => {
-            document.getElementById('settings-modal').classList.add('hidden');
-        };
-
-        window.handleSettingsPhoto = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 150;
-                    const scaleSize = MAX_WIDTH / img.width;
-                    canvas.width = MAX_WIDTH;
-                    canvas.height = img.height * scaleSize;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const base64 = canvas.toDataURL('image/jpeg', 0.7);
-                    document.getElementById('set-foto-preview').src = base64;
-                    document.getElementById('set-foto-preview').classList.remove('hidden');
-                    window.appState.profile.foto = base64;
-                }
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        };
-
-        window.saveSettingsProfile = async () => {
+        window.saveProfile = async () => {
+            // SHTUAR: Guard Check
             if (!auth.currentUser || !window.appState.user) return;
-            
             const profile = {
-                emer: document.getElementById('set-emer').value.trim(),
-                mbiemer: document.getElementById('set-mbiemer').value.trim(),
-                institucioni: document.getElementById('set-institucioni').value.trim(),
-                drejtoria: document.getElementById('set-drejtoria').value.trim(),
-                sektori: document.getElementById('set-sektori').value.trim(),
-                detyra: document.getElementById('set-detyra').value.trim(),
-                telefon: document.getElementById('set-telefon').value.trim(),
-                foto: window.appState.profile.foto || ''
+                specialisti: document.getElementById('prof-specialisti').value.trim(),
+                sektori: document.getElementById('prof-sektori').value.trim(),
+                drejtoria: document.getElementById('prof-drejtoria').value.trim()
             };
-            window.appState.profile = profile;
+            window.appState.config.profile = profile;
             
             try {
                 showLoading();
-                const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'profile', 'info');
-                await setDoc(docRef, window.appState.profile);
-                
-                if(profile.foto) {
-                    const avatarEl = document.getElementById('sidebar-user-avatar');
-                    if(avatarEl) avatarEl.innerHTML = `<img src="${profile.foto}" class="w-full h-full object-cover">`;
-                }
-                const nameEl = document.getElementById('sidebar-user-name');
-                if(nameEl) nameEl.textContent = `${profile.emer} ${profile.mbiemer}`.trim() || 'Përdorues';
-
+                const docRef = doc(db, 'artifacts', appId, 'users', window.appState.user.uid, 'settings', 'config');
+                await setDoc(docRef, window.appState.config);
                 hideLoading();
-                window.closeSettingsModal();
-                window.showToast("Profili u përditësua me sukses!");
+                window.showToast("Profili u ruajt me sukses!");
             } catch (error) {
                 hideLoading();
-                window.showToast("Gabim në ruajtjen e profilit.", "error");
-            }
-        };
-
-        window.sendPasswordReset = async () => {
-            if (!auth.currentUser) return;
-            showLoading();
-            try {
-                await sendPasswordResetEmail(auth, auth.currentUser.email);
-                hideLoading();
-                window.showToast("Email për rivendosjen e fjalëkalimit u dërgua!", "success");
-            } catch(e) {
-                hideLoading();
-                window.showToast("Gabim gjatë dërgimit të email-it.", "error");
+                console.error("Arsyeja e gabimit ne profil:", error);
+                window.showToast("Gabim në ruajtjen e profilit. Shiko Console.", "error");
             }
         };
 
         window.addToList = async (listName) => {
+            // SHTUAR: Guard Check
             if (!auth.currentUser || !window.appState.user) return;
             const inputEl = document.getElementById(`input-${listName}`);
             const val = inputEl.value.trim();
@@ -866,6 +694,7 @@
         };
 
         window.removeFromList = async (listName, index) => {
+            // SHTUAR: Guard Check
             if (!auth.currentUser || !window.appState.user) return;
             const removedItem = window.appState.config.lists[listName][index];
             
@@ -1062,6 +891,9 @@
         };
 
         const renderConfigTab = () => {
+            document.getElementById('prof-specialisti').value = window.appState.config.profile.specialisti || '';
+            document.getElementById('prof-sektori').value = window.appState.config.profile.sektori || '';
+            document.getElementById('prof-drejtoria').value = window.appState.config.profile.drejtoria || '';
             ['objektivat', 'detyrat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet'].forEach(renderList);
             renderExtraColumnsConfig();
         };
@@ -1101,92 +933,42 @@
 
         // --- 2. Regjistro Aktivitet (Logic) ---
 
-        const setupAutocomplete = (inputId, dataField) => {
-            const input = document.getElementById(inputId);
-            if(!input) return;
-            
-            if(input.parentNode.classList.contains('autocomplete-wrapper')) return;
-
-            const wrapper = document.createElement('div');
-            wrapper.className = "relative w-full autocomplete-wrapper";
-            input.parentNode.insertBefore(wrapper, input);
-            wrapper.appendChild(input);
-
-            const list = document.createElement('div');
-            list.className = "autocomplete-list hidden";
-            wrapper.appendChild(list);
-
-            input.addEventListener('input', () => {
-                const val = input.value.toLowerCase();
-                if (!val) { list.classList.add('hidden'); return; }
-
-                const allVals = window.appState.activities.map(a => a[dataField]).filter(v => v);
-                const uniqueVals = [...new Set(allVals)].filter(v => v.toLowerCase().includes(val));
-
-                if (uniqueVals.length > 0) {
-                    list.innerHTML = uniqueVals.map(v => `<div class="autocomplete-item">${escapeHtml(v)}</div>`).join('');
-                    list.classList.remove('hidden');
-                    
-                    list.querySelectorAll('div').forEach(div => {
-                        div.addEventListener('click', () => {
-                            input.value = div.textContent;
-                            list.classList.add('hidden');
-                        });
-                    });
-                } else {
-                    list.classList.add('hidden');
-                }
-            });
-
-            document.addEventListener('click', (e) => {
-                if (e.target !== input && e.target !== list) list.classList.add('hidden');
-            });
-        };
-
         const renderExtraActivityFields = () => {
             const container = document.getElementById('dynamic-extra-fields');
             if(!container) return;
             const extraCols = window.appState.config.extraColumns || [];
             
             container.innerHTML = extraCols.map(col => {
-                if (col.list && col.list.length > 0) {
-                    const optionsHtml = '<option value="">-- Zgjidh --</option>' + 
-                        col.list.map(opt => `<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join('');
-                    return `
-                    <div>
-                        <label class="block text-xs font-bold text-indigo-500 uppercase mb-1">${escapeHtml(col.name)} *</label>
-                        <select id="act-ext-${col.id}" class="w-full p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-sm font-medium outline-none focus:border-indigo-500">
-                            ${optionsHtml}
-                        </select>
-                    </div>
-                    `;
-                } else {
-                    return `
-                    <div>
-                        <label class="block text-xs font-bold text-indigo-500 uppercase mb-1">${escapeHtml(col.name)} *</label>
-                        <input type="text" id="act-ext-${col.id}" placeholder="Shkruaj..." class="w-full p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-sm font-medium outline-none focus:border-indigo-500">
-                    </div>
-                    `;
-                }
+                const optionsHtml = '<option value="">-- Zgjidh --</option>' + 
+                    col.list.map(opt => `<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join('');
+                
+                return `
+                <div>
+                    <label class="block text-xs font-bold text-indigo-500 uppercase mb-1">${escapeHtml(col.name)}</label>
+                    <select id="act-ext-${col.id}" class="w-full p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-sm font-medium outline-none focus:border-indigo-500">
+                        ${optionsHtml}
+                    </select>
+                </div>
+                `;
             }).join('');
         };
 
-        const populate = (elementId, listName, placeholderText = '-- Zgjidh --') => {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            const currentVal = el.value;
-            const options = window.appState.config.lists[listName] || [];
-            
-            el.innerHTML = `<option value="">${placeholderText}</option>` + 
-                options.map(opt => {
-                    const val = typeof opt === 'object' ? opt.name : opt;
-                    return `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`;
-                }).join('');
-            
-            if (options.some(opt => (typeof opt === 'object' ? opt.name : opt) === currentVal)) el.value = currentVal;
-        };
-
         const populateDropdowns = () => {
+            const populate = (elementId, listName) => {
+                const el = document.getElementById(elementId);
+                if (!el) return;
+                const currentVal = el.value;
+                const options = window.appState.config.lists[listName] || [];
+                
+                el.innerHTML = '<option value="">-- Zgjidh --</option>' + 
+                    options.map(opt => {
+                        const val = typeof opt === 'object' ? opt.name : opt;
+                        return `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`;
+                    }).join('');
+                
+                if (options.some(opt => (typeof opt === 'object' ? opt.name : opt) === currentVal)) el.value = currentVal;
+            };
+
             populate('act-objektivi', 'objektivat');
             populate('act-detyra-select', 'detyrat');
             populate('act-statusi', 'statuset');
@@ -1194,16 +976,6 @@
             populate('act-raportohet', 'raportimet');
             populate('act-afati', 'afatet');
             
-            populate('filter-objektivi', 'objektivat');
-            populate('filter-statusi', 'statuset');
-            populate('filter-pergjegjesi', 'pergjegjesit');
-
-            populate('rep-filter-objektivi', 'objektivat', '-- Zgjidh Objektivin --');
-            populate('rep-filter-statusi', 'statuset', '-- Zgjidh Statusin --');
-            populate('rep-filter-pergjegjesi', 'pergjegjesit', '-- Zgjidh Përgjegjësin --');
-            populate('rep-filter-raportohet', 'raportimet', '-- Zgjidh Raportohet --');
-            populate('rep-filter-afati', 'afatet', '-- Zgjidh Afatin --');
-
             renderExtraActivityFields();
             
             if(!document.getElementById('act-date').value) {
@@ -1211,9 +983,6 @@
                 const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
                 document.getElementById('act-date').value = localDate;
             }
-
-            setupAutocomplete('act-produkti', 'produkti');
-            setupAutocomplete('act-info', 'info');
         };
 
         const getISOWeekString = (dateString) => {
@@ -1227,6 +996,7 @@
         };
 
         window.saveActivity = async () => {
+            // SHTUAR: Guard Check
             if (!auth.currentUser || !window.appState.user) return;
             
             const dateVal = document.getElementById('act-date').value;
@@ -1240,25 +1010,16 @@
             const info = document.getElementById('act-info') ? document.getElementById('act-info').value.trim() : "";
             const problematika = document.getElementById('act-problematika').value.trim();
 
-            if (!dateVal || !objektivi || !statusi || !detyra || !produkti || !pergjegjesi || !raportohet || !afati || !info || !problematika) {
-                window.showToast("Ju lutem plotësoni TË GJITHA fushat (përfshirë Info dhe Problematika)!", "error");
+            if (!dateVal || !objektivi || !detyra) {
+                window.showToast("Data, Objektivi dhe Detyra janë fusha të detyrueshme!", "error");
                 return;
             }
             
             const extraData = {};
-            let extraFieldsMissing = false;
             (window.appState.config.extraColumns || []).forEach(col => {
                 const el = document.getElementById(`act-ext-${col.id}`);
-                if(el) {
-                    if(!el.value.trim()) extraFieldsMissing = true;
-                    extraData[col.id] = el.value.trim();
-                }
+                if(el) extraData[col.id] = el.value.trim();
             });
-
-            if(extraFieldsMissing) {
-                window.showToast("Plotësoni dhe fushat shtesë!", "error");
-                return;
-            }
 
             const weekString = getISOWeekString(dateVal);
             const timestamp = Date.now();
@@ -1376,6 +1137,7 @@
         };
 
         window.deleteActivity = async (id) => {
+            // SHTUAR: Guard Check
             if (!auth.currentUser || !window.appState.user) return;
             window.customConfirm("Kujdes", "Dëshironi ta fshini këtë aktivitet? (Do të dërgohet në Kosh)", async () => {
                 showLoading();
@@ -1397,21 +1159,11 @@
             });
         };
 
-        window.toggleAdvancedFilters = () => {
-            const el = document.getElementById('advanced-filters-container');
-            el.classList.toggle('hidden');
-        };
-
         window.renderDailyActivities = () => {
             const container = document.getElementById('daily-activities-list');
             const selectedDate = document.getElementById('act-date').value;
             const filterType = document.getElementById('act-filter-type') ? document.getElementById('act-filter-type').value : 'date';
             
-            const searchText = document.getElementById('act-search-text') ? document.getElementById('act-search-text').value.toLowerCase() : '';
-            const fObjektivi = document.getElementById('filter-objektivi') ? document.getElementById('filter-objektivi').value : '';
-            const fStatusi = document.getElementById('filter-statusi') ? document.getElementById('filter-statusi').value : '';
-            const fPergjegjesi = document.getElementById('filter-pergjegjesi') ? document.getElementById('filter-pergjegjesi').value : '';
-
             let filteredActs = window.appState.activities;
             
             if (filterType === 'date') {
@@ -1429,21 +1181,10 @@
                 filteredActs = filteredActs.filter(a => a.week === weekStr);
             }
             
-            if(fObjektivi) filteredActs = filteredActs.filter(a => a.objektivi === fObjektivi);
-            if(fStatusi) filteredActs = filteredActs.filter(a => a.statusi === fStatusi);
-            if(fPergjegjesi) filteredActs = filteredActs.filter(a => a.pergjegjesi === fPergjegjesi);
-
-            if(searchText) {
-                filteredActs = filteredActs.filter(a => {
-                    const fullText = `${a.objektivi} ${a.detyra} ${a.produkti} ${a.statusi} ${a.pergjegjesi} ${a.info} ${a.problematika} ${a.afati} ${a.raportohet}`.toLowerCase();
-                    return fullText.includes(searchText);
-                });
-            }
-
             filteredActs.sort((a, b) => b.timestamp - a.timestamp);
 
             if (filteredActs.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">Asnjë aktivitet i gjetur me këto filtra.</p>';
+                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">Asnjë aktivitet i gjetur.</p>';
                 return;
             }
 
@@ -1497,8 +1238,7 @@
                         </div>
                     </div>
                 </div>
-                `;
-            }).join('');
+            `}).join('');
         };
 
         // --- Drag and Drop Logic (HTML Table) ---
@@ -1532,13 +1272,20 @@
             if(draggedRow) draggedRow.classList.remove('dragging');
             draggedRow = null;
             
-            window.reindexRows();
+            // Rifresko numrat rendore
+            const tbody = document.getElementById('report-tbody');
+            let nr = 1;
+            Array.from(tbody.children).forEach(tr => {
+                if(!tr.classList.contains('sector-row')) {
+                    const nrSpan = tr.querySelector('.row-nr-txt');
+                    if(nrSpan) nrSpan.textContent = nr++;
+                }
+            });
             window.saveReportState();
         };
 
         window.removeReportRow = (btn) => {
             btn.closest('tr').remove();
-            window.reindexRows();
             window.saveReportState();
         };
 
@@ -1548,6 +1295,7 @@
             const tr = th.parentElement;
             const index = Array.from(tr.children).indexOf(th);
             
+            // Nuk lejojme levizjen e 'Nr.' (0) apo 'Action/Hiq' ne fund
             if (index === 0 || index === tr.children.length - 1) return;
             
             const targetIndex = index + direction;
@@ -1557,6 +1305,7 @@
             const rows = table.querySelectorAll('tr');
             
             rows.forEach(row => {
+                // Shmangim rreshtat e sektoreve
                 if (row.classList.contains('sector-row')) return;
                 
                 const cells = row.children;
@@ -1611,8 +1360,8 @@
                 const nextColspan = parseInt(nextTd.getAttribute('colspan') || '1');
                 td.setAttribute('colspan', currentColspan + nextColspan);
                 
-                const currentInputs = td.querySelectorAll('textarea, input:not(.report-col-filter)');
-                const nextInputs = nextTd.querySelectorAll('textarea, input:not(.report-col-filter)');
+                const currentInputs = td.querySelectorAll('textarea, input');
+                const nextInputs = nextTd.querySelectorAll('textarea, input');
                 
                 if (currentInputs.length > 0 && nextInputs.length > 0) {
                     const ta1 = currentInputs[0];
@@ -1642,98 +1391,29 @@
             return `${formatDate(mon)} - ${formatDate(fri)}`;
         };
 
-        window.toggleReportType = () => {
-            const type = document.getElementById('report-type-selector').value;
-            if (type === 'week') {
-                document.getElementById('report-week-container').classList.remove('hidden');
-                document.getElementById('report-range-container').classList.add('hidden');
-            } else {
-                document.getElementById('report-week-container').classList.add('hidden');
-                document.getElementById('report-range-container').classList.remove('hidden');
-            }
-            window.renderWeeklyReport();
-        };
-
-        window.applyReportFilters = () => {
-            const fObj = document.getElementById('rep-filter-objektivi').value.toLowerCase();
-            const fStat = document.getElementById('rep-filter-statusi').value.toLowerCase();
-            const fPerg = document.getElementById('rep-filter-pergjegjesi').value.toLowerCase();
-            const fRap = document.getElementById('rep-filter-raportohet').value.toLowerCase();
-            const fAfati = document.getElementById('rep-filter-afati').value.toLowerCase();
-            const fText = document.getElementById('rep-filter-text').value.toLowerCase();
-            
-            const rows = document.getElementById('report-tbody').querySelectorAll('tr');
-            rows.forEach(tr => {
-                if (tr.classList.contains('sector-row')) return; 
-                
-                const getVal = (idx) => {
-                    const cell = tr.children[idx];
-                    if(!cell) return "";
-                    const inp = cell.querySelector('input, textarea');
-                    return inp ? inp.value.toLowerCase() : cell.textContent.toLowerCase();
-                };
-
-                const valObj = getVal(1);
-                const valStat = getVal(4);
-                const valPerg = getVal(5);
-                const valAfat = getVal(8);
-                const valRap = getVal(9);
-                
-                const rowText = tr.textContent.toLowerCase() + Array.from(tr.querySelectorAll('input, textarea')).map(el=>el.value).join(' ').toLowerCase();
-
-                let match = true;
-                if(fObj && valObj !== fObj) match = false;
-                if(fStat && valStat !== fStat) match = false;
-                if(fPerg && valPerg !== fPerg) match = false;
-                if(fRap && valRap !== fRap) match = false;
-                if(fAfati && valAfat !== fAfati) match = false;
-                if(fText && !rowText.includes(fText)) match = false;
-                
-                tr.style.display = match ? '' : 'none';
-            });
-            window.reindexRows();
-        };
-
         window.renderWeeklyReport = () => {
-            const type = document.getElementById('report-type-selector').value;
-            let dateRangeTitle = "";
-            let filteredActs = [];
-
-            if (type === 'week') {
-                const dateInput = document.getElementById('report-week-date');
-                if(!dateInput.value) {
-                    const today = new Date();
-                    const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-                    dateInput.value = localDate;
-                }
-                const weekStr = getISOWeekString(dateInput.value);
-                dateRangeTitle = getWeekBounds(dateInput.value);
-                filteredActs = window.appState.activities.filter(a => a.week === weekStr);
-            } else {
-                const startInput = document.getElementById('report-start-date').value;
-                const endInput = document.getElementById('report-end-date').value;
-                if(startInput && endInput) {
-                    const sDate = new Date(startInput);
-                    const eDate = new Date(endInput);
-                    const fD = d => ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth()+1)).slice(-2) + '.' + d.getFullYear();
-                    dateRangeTitle = `${fD(sDate)} - ${fD(eDate)}`;
-                    
-                    filteredActs = window.appState.activities.filter(a => a.date >= startInput && a.date <= endInput);
-                } else {
-                    dateRangeTitle = "Zgjidh Datat";
-                }
+            const dateInput = document.getElementById('report-week-date');
+            if(!dateInput.value) {
+                const today = new Date();
+                const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+                dateInput.value = localDate;
             }
+            
+            const selectedDate = dateInput.value;
+            const weekStr = getISOWeekString(selectedDate);
+            const dateRange = getWeekBounds(selectedDate);
 
-            filteredActs.sort((a, b) => a.timestamp - b.timestamp);
-
-            const prof = window.appState.profile || {};
+            const prof = window.appState.config.profile;
             document.getElementById('rep-drejtoria').value = prof.drejtoria || '';
             document.getElementById('rep-sektori').value = prof.sektori || '';
-            const specialistiFullName = `${prof.emer || ''} ${prof.mbiemer || ''}`.trim() || '';
-            document.getElementById('rep-specialisti').value = specialistiFullName;
-            document.getElementById('rep-periudha').value = dateRangeTitle;
+            document.getElementById('rep-specialisti').value = prof.specialisti || '';
+            document.getElementById('rep-periudha').value = dateRange;
 
-            document.getElementById('print-header').textContent = `RAPORTI I SPECIALISTIT ${specialistiFullName.toUpperCase()} - ${(prof.drejtoria || '').toUpperCase()} / ${(prof.sektori || '').toUpperCase()} (${dateRangeTitle})`;
+            document.getElementById('print-header').textContent = `RAPORTI JAVOR I SPECIALISTIT ${prof.specialisti.toUpperCase()} - ${prof.drejtoria.toUpperCase()} / ${prof.sektori.toUpperCase()} (${dateRange})`;
+
+            const weeklyActs = window.appState.activities
+                .filter(a => a.week === weekStr)
+                .sort((a, b) => a.timestamp - b.timestamp); // E vjetra lart - e reja poshte
 
             const theadTr = document.getElementById('report-thead-tr');
             const extraCols = window.appState.config.extraColumns || [];
@@ -1770,9 +1450,6 @@
             theadHtml += `<th class="border border-gray-300 p-2 text-center align-middle w-10 no-print bg-gray-100"></th>`;
             theadTr.innerHTML = theadHtml;
 
-            const existingFilterRow = document.getElementById('report-filter-row');
-            if(existingFilterRow) existingFilterRow.remove();
-
             const tbody = document.getElementById('report-tbody');
             tbody.innerHTML = '';
 
@@ -1797,8 +1474,8 @@
                 </tr>
             `;
 
-            if (filteredActs.length === 0) {
-                tbody.innerHTML += `<tr><td colspan="${totalCols + 1}" class="text-center py-10 text-gray-500 font-medium text-[12pt] align-middle">Nuk ka asnjë aktivitet të regjistruar për këtë periudhë.</td></tr>`;
+            if (weeklyActs.length === 0) {
+                tbody.innerHTML += `<tr><td colspan="${totalCols + 1}" class="text-center py-10 text-gray-500 font-medium text-[12pt] align-middle">Nuk ka asnjë aktivitet të regjistruar për këtë javë.</td></tr>`;
             } else {
                 const buildTd = (val, customClass="", customStyle="", extraAttr="", isStatus=false, textClass="") => {
                     let inputHtml = '';
@@ -1816,7 +1493,7 @@
                     </td>`;
                 };
 
-                filteredActs.forEach((act, index) => {
+                weeklyActs.forEach((act, index) => {
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-gray-50 bg-white transition-colors group text-[12pt] text-center align-middle cursor-move";
                     tr.setAttribute('draggable', 'true');
@@ -1872,10 +1549,8 @@
             }
             
             autoResizeTextareas();
-            window.applyReportFilters();
 
             setTimeout(() => {
-                window.reindexRows();
                 window.reportHistory = [];
                 window.reportHistoryIndex = -1;
                 window.saveReportState();
@@ -1946,7 +1621,6 @@
 
             const rows = document.getElementById('report-tbody').querySelectorAll('tr');
             rows.forEach(tr => {
-                if (tr.style.display === 'none') return;
                 
                 if (tr.classList.contains('sector-row')) {
                     tableHtml += `<tr style="height: 20px;">`;
@@ -1964,7 +1638,7 @@
                     cells.forEach((td, index) => {
                         let val = "";
                         if(td.querySelector('textarea')) val = td.querySelector('textarea').value;
-                        else if(td.querySelector('input:not(.report-col-filter)')) val = td.querySelector('input:not(.report-col-filter)').value;
+                        else if(td.querySelector('input')) val = td.querySelector('input').value;
                         else {
                             const nrSpan = td.querySelector('.row-nr-txt');
                             val = nrSpan ? nrSpan.textContent : td.innerText;
@@ -1974,7 +1648,7 @@
 
                         let align = "vertical-align: middle; text-align: center;";
                         
-                        const inputEl = td.querySelector('input:not(.report-col-filter)');
+                        const inputEl = td.querySelector('input');
                         if(inputEl && inputEl.hasAttribute('data-color')) {
                              const explicitColor = inputEl.getAttribute('data-color');
                              if (explicitColor) {
@@ -2009,119 +1683,6 @@
             document.body.removeChild(a);
         };
 
-        window.exportToPDF = () => {
-            const dateRange = document.getElementById('rep-periudha').value;
-            const specialisti = document.getElementById('rep-specialisti').value || 'Raporti';
-            const filename = `Raporti_${specialisti.replace(/\s+/g, '_')}_${dateRange.replace(/\s+/g, '')}.pdf`;
-            
-            showLoading();
-            
-            const isDark = document.body.classList.contains('dark-theme');
-            if(isDark) document.body.classList.remove('dark-theme');
-
-            const originalTable = document.getElementById('report-table');
-            const cloneContainer = document.createElement('div');
-            cloneContainer.style.padding = '10px';
-            cloneContainer.style.backgroundColor = '#fff';
-            cloneContainer.style.width = '1400px'; 
-            
-            const headerText = document.getElementById('print-header').textContent;
-            const headerEl = document.createElement('h1');
-            headerEl.textContent = headerText;
-            headerEl.style.textAlign = 'center';
-            headerEl.style.fontSize = '14px';
-            headerEl.style.fontWeight = 'bold';
-            headerEl.style.marginBottom = '15px';
-            headerEl.style.color = '#000';
-            headerEl.style.fontFamily = "'Times New Roman', Times, serif";
-            cloneContainer.appendChild(headerEl);
-            
-            const tableClone = originalTable.cloneNode(true);
-            
-            tableClone.querySelectorAll('.no-print').forEach(el => el.remove());
-            
-            tableClone.querySelectorAll('textarea, input').forEach(el => {
-                const val = el.value || el.innerText;
-                const div = document.createElement('div');
-                div.innerHTML = escapeHtml(val).replace(/\n/g, '<br>');
-                div.style.fontSize = '10px';
-                div.style.whiteSpace = 'normal'; 
-                div.style.wordBreak = 'break-word';
-                if(el.style.color) div.style.color = el.style.color;
-                if(el.style.fontWeight) div.style.fontWeight = el.style.fontWeight;
-                if(el.style.textAlign) div.style.textAlign = el.style.textAlign;
-                el.parentNode.replaceChild(div, el);
-            });
-            
-            tableClone.style.width = '100%';
-            tableClone.style.tableLayout = 'fixed'; 
-            tableClone.style.borderCollapse = 'collapse';
-            tableClone.style.fontFamily = "'Times New Roman', Times, serif";
-            
-            tableClone.querySelectorAll('th, td').forEach(cell => {
-                cell.style.border = '1px solid #d1d5db';
-                cell.style.padding = '6px 4px';
-                cell.style.fontSize = '10px'; 
-                cell.style.verticalAlign = 'top'; 
-                cell.style.textAlign = 'left';
-                cell.style.wordBreak = 'break-word';
-                if (!cell.style.color) cell.style.color = '#1f2937';
-            });
-
-            tableClone.querySelectorAll('tr').forEach(tr => {
-                if(tr.style.display === 'none') {
-                    tr.remove(); 
-                } else if(tr.children.length > 0 && !tr.classList.contains('sector-row')) {
-                    tr.children[0].style.textAlign = 'center'; 
-                    if(tr.children[4]) tr.children[4].style.textAlign = 'center'; 
-                }
-            });
-            
-            cloneContainer.appendChild(tableClone);
-            
-            const opt = {
-                margin:       [10, 10, 10, 10], 
-                filename:     filename,
-                image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 2, useCORS: true, windowWidth: 1400 }, 
-                jsPDF:        { unit: 'mm', format: 'a3', orientation: 'landscape' }
-            };
-
-            html2pdf().set(opt).from(cloneContainer).save().then(() => {
-                if(isDark) document.body.classList.add('dark-theme');
-                hideLoading();
-            });
-        };
-
-        window.openEmailModal = () => {
-            const modal = document.getElementById('email-modal');
-            modal.classList.remove('hidden');
-        };
-
-        window.closeEmailModal = () => {
-            document.getElementById('email-modal').classList.add('hidden');
-        };
-
-        window.sendViaEmail = (e) => {
-            e.preventDefault();
-            const emailTo = document.getElementById('email-to').value;
-            const emailSubject = document.getElementById('email-subject').value;
-            
-            const prof = window.appState.profile || {};
-            const specialist = `${prof.emer || ''} ${prof.mbiemer || ''}`.trim() || "";
-            const period = document.getElementById('rep-periudha').value;
-            
-            let message = `Përshëndetje,\n\nJu lutem gjeni bashkëngjitur Raportin Javor nga: ${specialist}\nPër periudhën: ${period}\n\n`;
-            message += `(KUJDES: Sigurohuni që të bashkëngjisni file-in PDF, Excel ose JSON që keni shkarkuar nga sistemi para se ta dërgoni këtë email.)\n\n`;
-            message += `Gjeneruar nga Sistemi i Raportimit.`;
-
-            const mailtoLink = `mailto:${encodeURIComponent(emailTo)}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(message)}`;
-            
-            window.location.href = mailtoLink;
-            window.closeEmailModal();
-            window.showToast("Klienti juaj i email-it po hapet...", "success");
-        };
-
         // --- Logjika për Export dhe Import (Backup) ---
 
         window.exportBackup = async () => {
@@ -2142,7 +1703,7 @@
 
                 const backupObj = {
                     timestamp: Date.now(),
-                    version: "1.1",
+                    version: "1.0",
                     config: window.appState.config,
                     activities: actsData,
                     trash: trashData
@@ -2191,6 +1752,10 @@
                             // 1. BASHKIMI (MERGE) I KONFIGURIMEVE
                             let currentConfig = window.appState.config;
                             let importedConfig = data.config;
+                            
+                            if(!currentConfig.profile.specialisti && importedConfig.profile.specialisti) currentConfig.profile.specialisti = importedConfig.profile.specialisti;
+                            if(!currentConfig.profile.sektori && importedConfig.profile.sektori) currentConfig.profile.sektori = importedConfig.profile.sektori;
+                            if(!currentConfig.profile.drejtoria && importedConfig.profile.drejtoria) currentConfig.profile.drejtoria = importedConfig.profile.drejtoria;
                             
                             const listsToMerge = ['objektivat', 'detyrat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet'];
                             listsToMerge.forEach(listName => {
@@ -2271,34 +1836,29 @@
 
         const initAuth = async () => {
             showLoading();
-            if(localStorage.getItem('darkMode') === 'true') window.toggleDarkMode();
-            
-            if (typeof __firebase_config !== 'undefined' && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            if (typeof __firebase_config !== 'undefined' && typeof __initial_auth_token !== 'undefined') {
                 try {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } catch (error) { console.error("Canvas Auth Error:", error); }
-            } else {
-               // Fallback për vizitorë lokal nëse ka 
-               // await signInAnonymously(auth);  
             }
             hideLoading();
         };
 
+        // PËRMIRËSUAR: Siguria në onAuthStateChanged
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 window.appState.user = user;
                 elements.authScreen().classList.add('hidden');
                 elements.appScreen().classList.remove('hidden');
-                document.getElementById('sidebar-toggle-btn').classList.remove('hidden');
                 
                 document.getElementById('sidebar-user-email').textContent = user.email || 'Përdorues Anonim';
 
-                await loadProfile();
                 await loadConfig();
                 subscribeToActivities();
                 window.switchTab('aktiviteti'); 
                 hideLoading();
             } else {
+                // Siguri shtesë: Pastro listener-at nëse shkëputja ka ardhur nga jashtë
                 if (window.appState.unsubscribeActivities) {
                     window.appState.unsubscribeActivities();
                     window.appState.unsubscribeActivities = null;
@@ -2314,10 +1874,18 @@
 
                 elements.authScreen().classList.remove('hidden');
                 elements.appScreen().classList.add('hidden');
-                document.getElementById('sidebar-toggle-btn').classList.add('hidden');
                 hideLoading();
             }
         });
+
+        const escapeHtml = (str) => {
+            return (str || "").toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             ['objektivat', 'detyrat', 'statuset', 'pergjegjesit', 'raportimet', 'afatet'].forEach(id => {
@@ -2333,18 +1901,19 @@
 </head>
 <body class="h-screen overflow-hidden flex flex-col text-gray-800">
 
-    <!-- Toast Container (Z-index 9999 qe te jete mbi çdo dritare tjetër) -->
-    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[999999] flex flex-col gap-2 pointer-events-none"></div>
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2"></div>
 
     <!-- Loader -->
     <div id="loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[200] flex items-center justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
     </div>
     
-    <!-- Custom Confirm/Prompt Modal (Z-INDEX MAKSIMAL QE TE JETE MBI PROFILIN DHE CDO GJE TJETER) -->
-    <div id="custom-modal" class="hidden fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <!-- Custom Confirm/Prompt Modal -->
+    <div id="custom-modal" class="hidden fixed inset-0 z-[300] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform transition-all">
             <h3 id="modal-title" class="text-lg font-black text-gray-900 mb-2"></h3>
+            <!-- SHTUAR: whitespace-pre-line që teksti i paralajmërimit të ndahet në rreshta të rinj -->
             <p id="modal-text" class="text-sm text-gray-600 mb-4 font-medium whitespace-pre-line"></p>
             <input type="text" id="modal-input" class="hidden w-full p-3 bg-gray-50 border border-gray-200 rounded-lg mb-4 outline-none focus:border-blue-500 font-medium">
             <div class="flex justify-end gap-3">
@@ -2354,93 +1923,8 @@
         </div>
     </div>
 
-    <!-- Modal i Settings (Profili dhe Llogaria e Plote) -->
-    <div id="settings-modal" class="hidden fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden transform transition-all">
-            <div class="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50">
-                <div class="flex items-center gap-3">
-                    <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
-                    <h3 class="text-xl font-black text-gray-900">Cilësimet & Profili</h3>
-                </div>
-                <button onclick="window.closeSettingsModal()" class="text-gray-400 hover:text-red-500 bg-gray-100 hover:bg-red-50 p-2 rounded-lg transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
-                
-                <!-- Foto & Info Baze -->
-                <div class="flex flex-col md:flex-row gap-6">
-                    <div class="flex flex-col items-center gap-3 shrink-0">
-                        <div class="w-24 h-24 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center relative overflow-hidden group">
-                            <img id="set-foto-preview" src="" class="hidden w-full h-full object-cover absolute inset-0">
-                            <svg class="w-6 h-6 text-gray-400 group-hover:text-blue-500 transition-colors z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-20" onchange="window.handleSettingsPhoto(event)" title="Ngarko Foto">
-                        </div>
-                        <span class="text-xs font-bold text-gray-500">Ndrysho Foton</span>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Emër</label><input id="set-emer" type="text" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Mbiemër</label><input id="set-mbiemer" type="text" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
-                        <div class="col-span-1 md:col-span-2"><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Institucioni</label><input id="set-institucioni" type="text" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Drejtoria</label><input id="set-drejtoria" type="text" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Sektori</label><input id="set-sektori" type="text" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Detyra</label><input id="set-detyra" type="text" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Nr. Telefoni</label><input id="set-telefon" type="tel" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"></div>
-                    </div>
-                </div>
-
-                <div class="border-t border-gray-100 pt-6">
-                    <h4 class="text-sm font-bold text-gray-900 mb-3">Menaxhimi i Llogarisë</h4>
-                    <div class="flex flex-wrap gap-3">
-                        <button onclick="window.sendPasswordReset()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                            Rivendos Fjalëkalimin
-                        </button>
-                        <button onclick="window.handleDeleteAccount()" class="bg-red-50 border border-red-200 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            Fshi Llogarinë
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-            
-            <div class="p-5 border-t border-gray-100 bg-white flex justify-end gap-3">
-                <button onclick="window.closeSettingsModal()" class="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-bold text-sm transition-colors">Anulo</button>
-                <button onclick="window.saveSettingsProfile()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm shadow-md transition-colors">Ruaj Ndryshimet</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal për Email -->
-    <div id="email-modal" class="hidden fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all">
-            <div class="flex items-center gap-3 mb-4 border-b pb-4">
-                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
-                <h3 class="text-lg font-black text-gray-900">Dërgo Dokumentin me Email</h3>
-            </div>
-            <form onsubmit="window.sendViaEmail(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Drejtuar: (Email)</label>
-                    <input id="email-to" type="email" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500" placeholder="dikushe@institucioni.gov.al">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Titulli (Subject)</label>
-                    <input id="email-subject" type="text" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500" value="Raporti Javor i Aktiviteteve">
-                </div>
-                <p class="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100 italic">Klikimi i butonit më poshtë do të hapë aplikacionin tuaj të emailit. Mos harroni të bashkëngjisni file-in PDF/Excel/Backup që sapo shkarkuat para se ta dërgoni.</p>
-                <div class="flex justify-end gap-3 mt-4">
-                    <button type="button" onclick="window.closeEmailModal()" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-bold text-sm transition-colors">Anulo</button>
-                    <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm shadow-md transition-colors">Hap Dritaren e Emailit</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Auth Screen -->
-    <div id="auth-screen" class="hidden fixed inset-0 z-[50] flex items-center justify-center bg-gray-100 p-4">
+    <div id="auth-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-100 p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative overflow-hidden">
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-black text-gray-900 tracking-tight">Raportimi<span class="text-blue-600">Javor</span></h1>
@@ -2467,48 +1951,14 @@
             </form>
 
             <!-- REGISTER FORM -->
-            <form id="register-form" onsubmit="window.handleRegister(event)" class="hidden space-y-3">
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Emër *</label>
-                        <input id="reg-emer" type="text" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Mbiemër *</label>
-                        <input id="reg-mbiemer" type="text" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
-                    </div>
+            <form id="register-form" onsubmit="window.handleRegister(event)" class="hidden space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Email për Llogarinë e Re</label>
+                    <input id="reg-email" type="email" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 focus:bg-white transition-colors" placeholder="email@adresa.com">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Institucioni *</label>
-                    <input id="reg-institucioni" type="text" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Drejtoria *</label>
-                        <input id="reg-drejtoria" type="text" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Sektori *</label>
-                        <input id="reg-sektori" type="text" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Detyra *</label>
-                        <input id="reg-detyra" type="text" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Nr. Telefoni *</label>
-                        <input id="reg-telefon" type="tel" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Email *</label>
-                    <input id="reg-email" type="email" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm" placeholder="email@adresa.com">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Fjalëkalimi (Min. 6) *</label>
-                    <input id="reg-password" type="password" required minlength="6" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm" placeholder="••••••••">
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Fjalëkalimi (Min. 6 Karaktere)</label>
+                    <input id="reg-password" type="password" required minlength="6" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 focus:bg-white transition-colors" placeholder="••••••••">
                 </div>
                 <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition-colors mt-2">Krijo Llogarinë</button>
                 <p class="text-center text-sm text-gray-600 mt-4">Keni tashmë llogari? <button type="button" onclick="window.toggleAuthView('login-form')" class="font-bold text-blue-600 hover:underline">Identifikohu</button></p>
@@ -2527,113 +1977,89 @@
         </div>
     </div>
 
-    <!-- Toggle Buton Global për Mobile -->
-    <button id="sidebar-toggle-btn" onclick="window.toggleSidebar()" class="hidden fixed top-3 left-3 z-[60] bg-white p-2.5 rounded-xl shadow-md border border-gray-200 text-gray-600 hover:text-blue-600 transition-colors md:hidden">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-    </button>
-
     <!-- Main App Screen -->
-    <div id="app-screen" class="hidden h-full flex flex-col md:flex-row w-full relative">
+    <div id="app-screen" class="hidden h-full flex flex-col md:flex-row w-full">
         
         <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col z-50 h-full absolute md:relative sidebar-collapsed md:sidebar-collapsed-none">
-            
-            <!-- Shigjeta për Desktop/Windows Pull-Out -->
-            <button onclick="window.toggleSidebar()" class="absolute right-0 translate-x-full top-1/2 transform -translate-y-1/2 bg-blue-600 border-2 border-white shadow-xl rounded-r-xl p-2 z-[100] text-white hover:bg-blue-700 transition-all duration-300 hidden md:flex items-center justify-center group w-10 h-14">
-                <svg id="sidebar-arrow" class="w-6 h-6 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-
-            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
-                <div>
-                    <h1 class="font-black text-xl tracking-tight text-gray-900">
-                        Raportimi<span class="text-blue-600">Javor</span>
-                    </h1>
-                    <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mt-1">Sistemi i Menaxhimit</p>
-                </div>
-                <!-- Mbyll Buton (Vetëm Mobile) -->
-                <button onclick="window.toggleSidebar()" class="text-gray-400 hover:text-gray-800 md:hidden p-1">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+        <aside id="sidebar" class="w-full md:w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col z-40 h-auto md:h-full">
+            <div class="p-6 border-b border-gray-100">
+                <h1 class="font-black text-xl tracking-tight text-gray-900">
+                    Raportimi<span class="text-blue-600">Javor</span>
+                </h1>
+                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mt-1">Sistemi i Menaxhimit</p>
             </div>
             
-            <nav class="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
-                <button id="nav-aktiviteti" onclick="window.switchTab('aktiviteti'); if(window.innerWidth < 768) window.toggleSidebar();" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors active">
+            <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+                <button id="nav-aktiviteti" onclick="window.switchTab('aktiviteti')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors active">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     Regjistro Aktivitet
                 </button>
-                <button id="nav-konfigurime" onclick="window.switchTab('konfigurime'); if(window.innerWidth < 768) window.toggleSidebar();" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                <button id="nav-konfigurime" onclick="window.switchTab('konfigurime')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    Konfigurimet e Listave
+                    Konfigurimet
                 </button>
-                <button id="nav-raporti" onclick="window.switchTab('raporti'); if(window.innerWidth < 768) window.toggleSidebar();" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                <button id="nav-raporti" onclick="window.switchTab('raporti')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Raporti / Periudha
+                    Raporti Javor
                 </button>
-                <button id="nav-backup" onclick="window.switchTab('backup'); if(window.innerWidth < 768) window.toggleSidebar();" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors mt-4 border-t border-gray-100">
+                <button id="nav-backup" onclick="window.switchTab('backup')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors mt-4 border-t border-gray-100">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
                     Backup / Export
                 </button>
-                <button id="nav-koshi" onclick="window.switchTab('koshi'); if(window.innerWidth < 768) window.toggleSidebar();" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors mt-2">
+                <button id="nav-koshi" onclick="window.switchTab('koshi')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors mt-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     Koshi
                 </button>
             </nav>
 
             <!-- User Profile Bottom Sidebar -->
-            <div class="p-3 border-t border-gray-100 bg-gray-50 mt-auto flex flex-col gap-2">
-                <!-- Dark Mode Toggle -->
-                <button onclick="window.toggleDarkMode()" class="w-full flex items-center gap-3 p-2 hover:bg-gray-200 rounded-xl transition-colors text-left text-gray-700 group">
-                    <div class="text-gray-400 group-hover:text-blue-600 transition-colors shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <div class="p-4 border-t border-gray-100 bg-gray-50 mt-auto flex flex-col gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-200 text-blue-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     </div>
-                    <span id="dark-text" class="text-sm font-bold flex-1">Dark Mode: Off</span>
-                </button>
-
-                <button onclick="window.openSettingsModal()" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 rounded-xl transition-colors group text-left">
-                    <div class="flex items-center gap-3 overflow-hidden">
-                        <div id="sidebar-user-avatar" class="bg-blue-200 text-blue-700 w-10 h-10 rounded-full flex items-center justify-center font-bold overflow-hidden shadow-sm shrink-0">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                        </div>
-                        <div class="flex-1 overflow-hidden">
-                            <p class="text-xs font-bold text-gray-900 truncate" id="sidebar-user-name">Përdorues</p>
-                            <p class="text-[10px] font-medium text-gray-500 truncate" id="sidebar-user-email">Duke u ngarkuar...</p>
-                        </div>
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-xs font-bold text-gray-800 truncate" id="sidebar-user-email">Duke u ngarkuar...</p>
+                        <p class="text-[10px] text-green-600 font-bold uppercase">Aktiv</p>
                     </div>
-                    <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                </button>
+                </div>
                 <button onclick="window.handleLogout()" class="w-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 py-2 rounded-lg text-xs font-bold transition-colors">
                     Dil nga Llogaria
+                </button>
+                <!-- SHTUAR: Butoni për Fshirjen e Llogarisë -->
+                <button onclick="window.handleDeleteAccount()" class="w-full bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 py-2 rounded-lg text-xs font-bold transition-colors">
+                    Fshi Llogarinë
                 </button>
             </div>
 
         </aside>
 
         <!-- Main Content Area -->
-        <main id="main-content" class="flex-1 h-full overflow-y-auto relative p-4 pt-16 md:pt-8 md:p-8 w-full transition-all duration-300">
+        <main id="main-content" class="flex-1 h-full overflow-y-auto relative p-4 md:p-8">
 
             <!-- TAB 2: REGJISTRO AKTIVITET -->
             <div id="tab-aktiviteti" class="tab-content max-w-6xl mx-auto space-y-6 pb-20">
                 <div class="mb-4">
                     <h2 class="text-2xl font-bold text-gray-900">Ditari i Aktiviteteve</h2>
-                    <p class="text-gray-500 text-sm">Plotëso detyrat ditore. Të gjitha fushat kryesore janë të detyrueshme.</p>
+                    <p class="text-gray-500 text-sm">Plotëso detyrat ditore. Këto do të grumbullohen tek raporti javor.</p>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Form -->
-                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-6">
-                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6 border-b pb-4">
+                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <div class="flex justify-between items-center mb-6 border-b pb-4">
                             <h3 class="text-lg font-bold text-gray-800">Shto Aktivitet</h3>
-                            <input type="date" id="act-date" class="p-2 border border-gray-300 rounded-lg text-sm font-bold text-blue-700 bg-blue-50 outline-none w-full sm:w-auto" onchange="window.renderDailyActivities()">
+                            <input type="date" id="act-date" class="p-2 border border-gray-300 rounded-lg text-sm font-bold text-blue-700 bg-blue-50 outline-none" onchange="window.renderDailyActivities()">
                         </div>
 
                         <div class="space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">1. Objektivi *</label>
                                     <select id="act-objektivi" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500"></select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">2. Statusi *</label>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">2. Statusi</label>
                                     <select id="act-statusi" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500"></select>
                                 </div>
                             </div>
@@ -2647,35 +2073,36 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">4. Produkti final * <span class="text-gray-400 font-normal lowercase">(Vetë-plotësohet automatikisht nëse shkruan diçka të mëparshme)</span></label>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">4. Produkti final</label>
                                 <textarea id="act-produkti" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500" placeholder="Rezultati..."></textarea>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">5. Përgjegjësi *</label>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">5. Përgjegjësi</label>
                                     <select id="act-pergjegjesi" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500"></select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">6. Raportohet *</label>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">6. Raportohet</label>
                                     <select id="act-raportohet" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500"></select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">7. Afati *</label>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">7. Afati</label>
                                     <select id="act-afati" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500"></select>
                                 </div>
                             </div>
                             
+                            <!-- Fushat Dinamike Shtese -->
                             <div id="dynamic-extra-fields" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">8. Informacion (Shtesë) * <span class="text-gray-400 font-normal lowercase">(Kërkon sugjerime teksa shkruani)</span></label>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">8. Informacion (Shtesë)</label>
                                     <textarea id="act-info" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500" placeholder="Informacion shtesë..."></textarea>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">9. Problematika * <span class="text-gray-400 font-normal lowercase">(Shkruani "Nuk ka" nëse s'ka)</span></label>
-                                    <textarea id="act-problematika" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500" placeholder="Shëno nëse ka probleme, ose shkruaj 'Nuk ka'..."></textarea>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">9. Problematika</label>
+                                    <textarea id="act-problematika" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500" placeholder="Shëno nëse ka probleme..."></textarea>
                                 </div>
                             </div>
 
@@ -2691,92 +2118,92 @@
                     </div>
 
                     <!-- Sidebar List -->
-                    <div class="bg-gray-50 rounded-2xl border border-gray-200 p-4 md:p-6 flex flex-col max-h-[850px]">
-                        
-                        <div class="mb-4 pb-4 border-b border-gray-200 space-y-3">
-                            <h3 class="text-lg font-bold text-gray-800 mb-1">Kërko & Filtro</h3>
-                            
-                            <div class="relative">
-                                <input type="text" id="act-search-text" placeholder="Kërko në të gjitha fushat..." class="w-full pl-8 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-500" oninput="window.renderDailyActivities()">
-                                <svg class="w-4 h-4 text-gray-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            </div>
-
-                            <button onclick="window.toggleAdvancedFilters()" class="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                                Filtrat e avancuar
-                            </button>
-
-                            <div id="advanced-filters-container" class="hidden space-y-2 bg-white p-3 rounded-lg border border-gray-200 mt-2">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Periudha</label>
-                                        <select id="act-filter-type" onchange="window.renderDailyActivities()" class="w-full text-xs bg-gray-50 border border-gray-200 rounded p-1.5 outline-none cursor-pointer">
-                                            <option value="date" selected>Sipas Datës saktë</option>
-                                            <option value="week">Gjatë Javës</option>
-                                            <option value="all">Të Gjitha (Historiku)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Statusi</label>
-                                        <select id="filter-statusi" onchange="window.renderDailyActivities()" class="w-full text-xs bg-gray-50 border border-gray-200 rounded p-1.5 outline-none cursor-pointer"></select>
-                                    </div>
-                                    <div class="col-span-2">
-                                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Objektivi</label>
-                                        <select id="filter-objektivi" onchange="window.renderDailyActivities()" class="w-full text-xs bg-gray-50 border border-gray-200 rounded p-1.5 outline-none cursor-pointer"></select>
-                                    </div>
-                                    <div class="col-span-2">
-                                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Përgjegjësi</label>
-                                        <select id="filter-pergjegjesi" onchange="window.renderDailyActivities()" class="w-full text-xs bg-gray-50 border border-gray-200 rounded p-1.5 outline-none cursor-pointer"></select>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="bg-gray-50 rounded-2xl border border-gray-200 p-6 flex flex-col max-h-[750px]">
+                        <div class="flex justify-between items-center mb-4 border-b pb-2 gap-2">
+                            <h3 class="text-lg font-bold text-gray-800">Të ruajtura</h3>
+                            <select id="act-filter-type" onchange="window.renderDailyActivities()" class="text-[10px] uppercase font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded px-2 py-1.5 outline-none cursor-pointer">
+                                <option value="date">Kjo Datë</option>
+                                <option value="week">Kjo Javë</option>
+                                <option value="all">Të Gjitha</option>
+                            </select>
                         </div>
-
-                        <div id="daily-activities-list" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1 md:pr-2">
+                        <div id="daily-activities-list" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-2">
                             <!-- Populated via JS -->
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 1: KONFIGURIMET E LISTAVE -->
+            <!-- TAB 1: KONFIGURIMET -->
             <div id="tab-konfigurime" class="tab-content hidden max-w-6xl mx-auto space-y-8 pb-20">
                 <div class="mb-2">
                     <h2 class="text-2xl font-bold text-gray-900">Konfigurimi i Sistemit</h2>
-                    <p class="text-gray-500 text-sm">Menaxho listat dhe variablat që do të përdoren në formularë. Për profilin vizitoni menynë e Cilësimeve.</p>
+                    <p class="text-gray-500 text-sm">Menaxho profilin dhe listat që do të përdoren në formularë.</p>
                 </div>
 
+                <!-- Profile Section -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Profili Im
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">1. Specialisti (Emër Mbiemër)</label>
+                            <input id="prof-specialisti" type="text" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:border-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">2. Sektori</label>
+                            <input id="prof-sektori" type="text" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:border-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">3. Drejtoria</label>
+                            <input id="prof-drejtoria" type="text" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:border-blue-500 outline-none">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end">
+                        <button onclick="window.saveProfile()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md transition-all">
+                            Ruaj Profilin
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lists Section -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Objektivat -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-gray-800">1. Objektivat</h3>
                             <span id="count-objektivat" class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
                         </div>
-                        <div id="list-objektivat" class="flex-1 overflow-y-auto pr-1 custom-scrollbar"></div>
+                        <div id="list-objektivat" class="flex-1 overflow-y-auto pr-1"></div>
                         <div class="mt-3 pt-3 border-t flex gap-2">
                             <input id="input-objektivat" type="text" placeholder="Shto objektiv..." class="flex-1 p-2 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none">
                             <button onclick="window.addToList('objektivat')" class="bg-gray-800 text-white px-3 rounded-md hover:bg-black">+</button>
                         </div>
                     </div>
 
+                    <!-- Detyrat Individuale -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-gray-800">2. Detyrat Individuale</h3>
                             <span id="count-detyrat" class="bg-teal-100 text-teal-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
                         </div>
-                        <div id="list-detyrat" class="flex-1 overflow-y-auto pr-1 custom-scrollbar"></div>
+                        <div id="list-detyrat" class="flex-1 overflow-y-auto pr-1"></div>
                         <div class="mt-3 pt-3 border-t flex gap-2">
                             <input id="input-detyrat" type="text" placeholder="Shto detyrë..." class="flex-1 p-2 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none">
                             <button onclick="window.addToList('detyrat')" class="bg-gray-800 text-white px-3 rounded-md hover:bg-black">+</button>
                         </div>
                     </div>
 
+                    <!-- Statusi -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-gray-800">3. Statusi</h3>
                             <span id="count-statuset" class="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
                         </div>
-                        <div id="list-statuset" class="flex-1 overflow-y-auto pr-1 custom-scrollbar"></div>
+                        <div id="list-statuset" class="flex-1 overflow-y-auto pr-1"></div>
                         <div class="mt-3 pt-3 border-t flex gap-2">
                             <input id="input-statuset-color" type="color" value="#000000" class="w-10 h-10 p-0 border-0 rounded cursor-pointer shrink-0 bg-transparent" title="Zgjidh Ngjyrën për këtë status">
                             <input id="input-statuset" type="text" placeholder="Shto status..." class="flex-1 p-2 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none">
@@ -2784,36 +2211,39 @@
                         </div>
                     </div>
 
+                    <!-- Personi Përgjegjës -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-gray-800">4. Personi Përgjegjës</h3>
                             <span id="count-pergjegjesit" class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
                         </div>
-                        <div id="list-pergjegjesit" class="flex-1 overflow-y-auto pr-1 custom-scrollbar"></div>
+                        <div id="list-pergjegjesit" class="flex-1 overflow-y-auto pr-1"></div>
                         <div class="mt-3 pt-3 border-t flex gap-2">
                             <input id="input-pergjegjesit" type="text" placeholder="Shto përgjegjës..." class="flex-1 p-2 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none">
                             <button onclick="window.addToList('pergjegjesit')" class="bg-gray-800 text-white px-3 rounded-md hover:bg-black">+</button>
                         </div>
                     </div>
 
+                    <!-- Kujt i raportohet -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-gray-800">5. Kujt i raportohet</h3>
                             <span id="count-raportimet" class="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
                         </div>
-                        <div id="list-raportimet" class="flex-1 overflow-y-auto pr-1 custom-scrollbar"></div>
+                        <div id="list-raportimet" class="flex-1 overflow-y-auto pr-1"></div>
                         <div class="mt-3 pt-3 border-t flex gap-2">
                             <input id="input-raportimet" type="text" placeholder="Shto emër..." class="flex-1 p-2 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none">
                             <button onclick="window.addToList('raportimet')" class="bg-gray-800 text-white px-3 rounded-md hover:bg-black">+</button>
                         </div>
                     </div>
 
+                    <!-- Afatet -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-gray-800">6. Afatet</h3>
                             <span id="count-afatet" class="bg-pink-100 text-pink-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
                         </div>
-                        <div id="list-afatet" class="flex-1 overflow-y-auto pr-1 custom-scrollbar"></div>
+                        <div id="list-afatet" class="flex-1 overflow-y-auto pr-1"></div>
                         <div class="mt-3 pt-3 border-t flex gap-2">
                             <input id="input-afatet" type="text" placeholder="Shto afat..." class="flex-1 p-2 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none">
                             <button onclick="window.addToList('afatet')" class="bg-gray-800 text-white px-3 rounded-md hover:bg-black">+</button>
@@ -2827,11 +2257,11 @@
                         <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                         Kolonat Shtesë (Dinamike)
                     </h3>
-                    <p class="text-sm text-gray-500 mb-6">Krijo lista të reja të cilat do të shfaqen automatikisht si fusha gjatë regjistrimit të aktiviteteve dhe si kolona në Raportin Javor. Nëse kolonën e re e lini BOSH pa i shtuar vlera listës, automatikisht do jetë një Fushë për Tekst të Lirë gjatë regjistrimit!</p>
+                    <p class="text-sm text-gray-500 mb-6">Krijo lista të reja të cilat do të shfaqen automatikisht si fusha gjatë regjistrimit të aktiviteteve dhe si kolona në Raportin Javor.</p>
                     
-                    <div class="flex flex-col sm:flex-row gap-2 mb-6 w-full lg:w-1/2">
+                    <div class="flex gap-2 mb-6 w-full md:w-1/2">
                         <input id="new-column-name" type="text" placeholder="Shkruaj emrin e kolonës së re..." class="flex-1 p-2 border border-gray-300 rounded-md text-sm outline-none focus:border-indigo-500">
-                        <button onclick="window.addExtraColumn()" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm font-bold shadow-sm transition-colors whitespace-nowrap">Krijo Kolonën</button>
+                        <button onclick="window.addExtraColumn()" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm font-bold shadow-sm transition-colors">Krijo Kolonën</button>
                     </div>
 
                     <div id="extra-columns-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -2846,49 +2276,19 @@
                 
                 <h1 id="print-header" class="report-header-print text-sm font-bold uppercase"></h1>
 
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-6 no-print">
-                    <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 no-print">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-900">Gjenerimi i Raportit</h2>
-                            <p class="text-gray-500 text-sm">Zgjidhni formën e raportimit dhe tërhiqni rreshtat (☰) për t'i renditur.</p>
+                            <h2 class="text-2xl font-bold text-gray-900">Raporti Javor</h2>
+                            <p class="text-gray-500 text-sm">Tërhiqe secilin rresht nga ☰ (drag & drop) për t'i renditur sipas dëshirës.</p>
                         </div>
-                        
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-gray-50 p-2.5 rounded-lg border border-gray-200">
-                            <select id="report-type-selector" onchange="window.toggleReportType()" class="p-2 border border-blue-200 rounded-md text-sm font-bold outline-none bg-blue-50 text-blue-700 cursor-pointer w-full sm:w-auto">
-                                <option value="week">Një Javë / 5 Ditë (Standard)</option>
-                                <option value="range">Interval Dator (Personalizuar)</option>
-                            </select>
-
-                            <div id="report-week-container" class="flex items-center gap-2">
-                                <label class="text-xs font-bold text-gray-500 uppercase px-1 hidden sm:block">Zgjidh:</label>
-                                <input type="date" id="report-week-date" class="p-2 border border-gray-300 rounded-md text-sm font-bold outline-none bg-white w-full sm:w-auto" onchange="window.renderWeeklyReport()">
-                            </div>
-
-                            <div id="report-range-container" class="hidden flex flex-col sm:flex-row items-center gap-2">
-                                <input type="date" id="report-start-date" class="p-2 border border-gray-300 rounded-md text-sm font-bold outline-none bg-white w-full sm:w-auto" onchange="window.renderWeeklyReport()" title="Data e Fillimit">
-                                <span class="text-gray-400 font-bold hidden sm:inline">-</span>
-                                <input type="date" id="report-end-date" class="p-2 border border-gray-300 rounded-md text-sm font-bold outline-none bg-white w-full sm:w-auto" onchange="window.renderWeeklyReport()" title="Data e Mbarimit">
-                            </div>
+                        <div class="flex items-center gap-3 bg-gray-50 p-2 rounded-lg border border-gray-200">
+                            <label class="text-xs font-bold text-gray-500 uppercase px-2">Zgjidh Javën:</label>
+                            <input type="date" id="report-week-date" class="p-2 border border-gray-300 rounded-md text-sm font-bold outline-none bg-white" onchange="window.renderWeeklyReport()">
                         </div>
                     </div>
 
-                    <!-- SHTUAR: FILTRAT E RAPORTIT -->
-                    <div class="bg-gray-50 rounded-xl border border-gray-200 p-4 mb-6">
-                        <div class="flex items-center gap-2 mb-3 text-gray-600 font-bold text-xs uppercase tracking-wider">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                            Filtra të Avancuar për Tabelën
-                        </div>
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                            <select id="rep-filter-objektivi" class="w-full text-xs bg-white border border-gray-300 rounded-md p-2 outline-none" onchange="window.applyReportFilters()"><option value="">-- Objektivi --</option></select>
-                            <select id="rep-filter-statusi" class="w-full text-xs bg-white border border-gray-300 rounded-md p-2 outline-none" onchange="window.applyReportFilters()"><option value="">-- Statusi --</option></select>
-                            <select id="rep-filter-pergjegjesi" class="w-full text-xs bg-white border border-gray-300 rounded-md p-2 outline-none" onchange="window.applyReportFilters()"><option value="">-- Përgjegjësi --</option></select>
-                            <select id="rep-filter-raportohet" class="w-full text-xs bg-white border border-gray-300 rounded-md p-2 outline-none" onchange="window.applyReportFilters()"><option value="">-- Raportohet --</option></select>
-                            <select id="rep-filter-afati" class="w-full text-xs bg-white border border-gray-300 rounded-md p-2 outline-none" onchange="window.applyReportFilters()"><option value="">-- Afati --</option></select>
-                            <input type="text" id="rep-filter-text" placeholder="Kërko tekst..." class="w-full text-xs bg-white border border-gray-300 rounded-md p-2 outline-none" oninput="window.applyReportFilters()">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
                         <div>
                             <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Drejtoria</label>
                             <input id="rep-drejtoria" class="w-full bg-transparent font-bold text-sm text-gray-800 outline-none" readonly>
@@ -2902,7 +2302,7 @@
                             <input id="rep-specialisti" class="w-full bg-transparent font-bold text-sm text-gray-800 outline-none" readonly>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Periudha (Zgjedhur)</label>
+                            <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Periudha</label>
                             <input id="rep-periudha" class="w-full bg-transparent font-bold text-sm text-gray-800 outline-none" readonly>
                         </div>
                     </div>
@@ -2918,29 +2318,25 @@
                                 Para
                             </button>
                         </div>
-                        <div class="flex gap-2 flex-wrap sm:flex-nowrap">
-                            <button onclick="window.addSubheader()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2.5 rounded-lg text-xs font-bold shadow transition-all flex items-center gap-2">
+                        <div class="flex gap-2">
+                            <button onclick="window.addSubheader()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-5 py-2.5 rounded-lg text-sm font-bold shadow transition-all flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                Shto Titull
+                                Shto Titull Sektori
                             </button>
-                            <button onclick="window.exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold shadow transition-all flex items-center gap-2">
+                            <button onclick="window.exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow transition-all flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                 Eksporto Excel
                             </button>
-                            <button onclick="window.exportToPDF()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold shadow transition-all flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                Eksporto PDF
-                            </button>
-                            <button onclick="window.openEmailModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold shadow transition-all flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                Dërgo në Email
+                            <button onclick="window.print()" class="bg-gray-800 hover:bg-black text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow transition-all flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                Printo / PDF
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Print Table Structure -->
-                <div class="bg-white border-2 border-gray-200 overflow-x-auto rounded-none w-full shadow-sm custom-scrollbar" style="font-family: 'Times New Roman', Times, serif;">
+                <div class="bg-white border-2 border-gray-200 overflow-x-auto rounded-none w-full shadow-sm" style="font-family: 'Times New Roman', Times, serif;">
                     <table id="report-table" class="w-full text-left border-collapse min-w-[1200px]">
                         <thead>
                             <tr id="report-thead-tr" class="bg-gray-100 text-[12pt] font-bold text-gray-800 uppercase text-center align-middle">
@@ -2984,7 +2380,7 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                             </div>
                             <h3 class="text-lg font-bold text-gray-800 mb-2">Importo të Dhënat</h3>
-                            <p class="text-sm text-gray-500 mb-6">Ngarko një skedar .json të marrë më parë nga ky sistem. <br><span class="text-red-500 font-medium">Kujdes:</span> Ky veprim do të bashkojë (merge) të dhënat ekzistuese me të rejat!</p>
+                            <p class="text-sm text-gray-500 mb-6">Ngarko një skedar .json të marrë më parë nga ky sistem. <br><span class="text-red-500 font-medium">Kujdes:</span> Ky veprim do të shtojë dhe mbishkruajë mbi të dhënat aktuale të llogarisë!</p>
                         </div>
                         <input type="file" id="import-file-input" accept=".json" class="hidden" onchange="window.handleFileImport(event)">
                         <button onclick="window.triggerImport()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
@@ -3003,7 +2399,7 @@
                     </div>
                     <button onclick="window.emptyTrash()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg text-sm font-bold shadow transition-all flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        Pastro Koshin
+                        Pastro Gjithë Koshin
                     </button>
                 </div>
 
