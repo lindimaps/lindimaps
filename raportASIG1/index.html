@@ -2908,4 +2908,39 @@
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
                         <div>
                             <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-4">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">Importo të Dhënat</h3>
+                            <p class="text-sm text-gray-500 mb-6">Ngarko një skedar .json të marrë më parë nga ky sistem. <br><span class="text-red-500 font-medium">Kujdes:</span> Ky veprim do të bashkojë (merge) të dhënat ekzistuese me të rejat!</p>
+                        </div>
+                        <input type="file" id="import-file-input" accept=".json" class="hidden" onchange="window.handleFileImport(event)">
+                        <button onclick="window.triggerImport()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
+                            Ngarko Skedarin (Importo)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: KOSHI -->
+            <div id="tab-koshi" class="tab-content hidden max-w-4xl mx-auto space-y-6 pb-20">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Koshi i Mbeturinave</h2>
+                        <p class="text-gray-500 text-sm">Aktivitetet apo konfigurimet që keni fshirë mund të rikthehen këtu.</p>
+                    </div>
+                    <button onclick="window.emptyTrash()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg text-sm font-bold shadow transition-all flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        Pastro Koshin
+                    </button>
+                </div>
+
+                <div id="trash-list-container" class="space-y-4">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>
