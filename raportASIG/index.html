@@ -1733,7 +1733,7 @@
             document.getElementById('rep-specialisti').value = specialistiFullName;
             document.getElementById('rep-periudha').value = dateRangeTitle;
 
-            document.getElementById('print-header').textContent = `RAPORTI I SPECIALISTIT ${specialistiFullName.toUpperCase()} - ${(prof.drejtoria || '').toUpperCase()} / ${(prof.sektori || '').toUpperCase()} (${dateRangeTitle})`;
+            document.getElementById('print-header').textContent = `RAPORTI JAVOR I SPECIALISTIT ${specialistiFullName.toUpperCase()} - ${(prof.drejtoria || '').toUpperCase()} / ${(prof.sektori || '').toUpperCase()} (${dateRangeTitle})`;
 
             const theadTr = document.getElementById('report-thead-tr');
             const extraCols = window.appState.config.extraColumns || [];
