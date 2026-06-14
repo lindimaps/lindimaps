@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistemi i Raportimit Javor</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Shtuar: Libraria për Export PDF -->
+    <!-- Libraria për Export PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
@@ -44,14 +44,14 @@
         /* Drag and drop indication */
         .dragging { opacity: 0.5; background-color: #f8fafc; }
 
-        /* SHTUAR: Klasa për Sidebar Toggle */
+        /* Klasa për Sidebar Toggle */
         #sidebar { transition: all 0.3s ease; }
         .sidebar-collapsed { transform: translateX(-100%); position: absolute; }
         @media (min-width: 768px) {
             .sidebar-collapsed { margin-left: -16rem; position: relative; transform: none; }
         }
         
-        /* SHTUAR: Stilizimi i Autocomplete dropdown */
+        /* Stilizimi i Autocomplete dropdown */
         .autocomplete-list { max-height: 150px; overflow-y: auto; position: absolute; z-index: 50; background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; width: 100%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .autocomplete-item { padding: 8px 12px; cursor: pointer; font-size: 0.875rem; border-bottom: 1px solid #f3f4f6; }
         .autocomplete-item:hover { background-color: #eff6ff; color: #1d4ed8; }
@@ -162,7 +162,9 @@
             if(!table) return;
             
             table.querySelectorAll('input').forEach(el => {
-                if(el.type !== 'checkbox' && el.type !== 'radio') el.setAttribute('value', el.value);
+                if(el.type !== 'checkbox' && el.type !== 'radio' && !el.classList.contains('report-col-filter')) {
+                    el.setAttribute('value', el.value);
+                }
             });
             table.querySelectorAll('textarea').forEach(el => {
                 el.textContent = el.value;
@@ -183,7 +185,9 @@
             if (window.reportHistoryIndex > 0) {
                 const table = document.getElementById('report-table');
                 table.querySelectorAll('input').forEach(el => {
-                    if(el.type !== 'checkbox' && el.type !== 'radio') el.setAttribute('value', el.value);
+                    if(el.type !== 'checkbox' && el.type !== 'radio' && !el.classList.contains('report-col-filter')) {
+                        el.setAttribute('value', el.value);
+                    }
                 });
                 table.querySelectorAll('textarea').forEach(el => el.textContent = el.value);
                 window.reportHistory[window.reportHistoryIndex] = table.innerHTML;
@@ -267,15 +271,15 @@
             }
         };
 
-        // --- SHTUAR: Toggle Sidebar ---
+        // --- Toggle Sidebar ---
         window.toggleSidebar = () => {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('sidebar-collapsed');
             const arrow = document.getElementById('sidebar-arrow');
             if(sidebar.classList.contains('sidebar-collapsed')){
-                arrow.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>`;
+                arrow.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>`;
             } else {
-                arrow.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>`;
+                arrow.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>`;
             }
         };
 
@@ -1164,7 +1168,6 @@
             const info = document.getElementById('act-info') ? document.getElementById('act-info').value.trim() : "";
             const problematika = document.getElementById('act-problematika').value.trim();
 
-            // SHTUAR: Të gjitha fushat janë të detyrueshme (bazuar në kërkesën 10)
             if (!dateVal || !objektivi || !statusi || !detyra || !produkti || !pergjegjesi || !raportohet || !afati || !info || !problematika) {
                 window.showToast("Ju lutem plotësoni TË GJITHA fushat (përfshirë Info dhe Problematika)!", "error");
                 return;
@@ -1322,7 +1325,6 @@
             });
         };
 
-        // SHTUAR: Fshih/Shfaq Filtrat
         window.toggleAdvancedFilters = () => {
             const el = document.getElementById('advanced-filters-container');
             el.classList.toggle('hidden');
@@ -1333,7 +1335,6 @@
             const selectedDate = document.getElementById('act-date').value;
             const filterType = document.getElementById('act-filter-type') ? document.getElementById('act-filter-type').value : 'date';
             
-            // FILTRAT E RINJ (SHTUAR)
             const searchText = document.getElementById('act-search-text') ? document.getElementById('act-search-text').value.toLowerCase() : '';
             const fObjektivi = document.getElementById('filter-objektivi') ? document.getElementById('filter-objektivi').value : '';
             const fStatusi = document.getElementById('filter-statusi') ? document.getElementById('filter-statusi').value : '';
@@ -1341,7 +1342,6 @@
 
             let filteredActs = window.appState.activities;
             
-            // 1. Filtro nga Data/Java
             if (filterType === 'date') {
                 if(!selectedDate) {
                     container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Zgjidhni datën për të parë listën.</p>';
@@ -1357,12 +1357,10 @@
                 filteredActs = filteredActs.filter(a => a.week === weekStr);
             }
             
-            // 2. Filtro nga Dropdowns
             if(fObjektivi) filteredActs = filteredActs.filter(a => a.objektivi === fObjektivi);
             if(fStatusi) filteredActs = filteredActs.filter(a => a.statusi === fStatusi);
             if(fPergjegjesi) filteredActs = filteredActs.filter(a => a.pergjegjesi === fPergjegjesi);
 
-            // 3. Filtro nga Fjalët (Search) në të gjitha fushat
             if(searchText) {
                 filteredActs = filteredActs.filter(a => {
                     const fullText = `${a.objektivi} ${a.detyra} ${a.produkti} ${a.statusi} ${a.pergjegjesi} ${a.info} ${a.problematika} ${a.afati} ${a.raportohet}`.toLowerCase();
@@ -1547,8 +1545,8 @@
                 const nextColspan = parseInt(nextTd.getAttribute('colspan') || '1');
                 td.setAttribute('colspan', currentColspan + nextColspan);
                 
-                const currentInputs = td.querySelectorAll('textarea, input');
-                const nextInputs = nextTd.querySelectorAll('textarea, input');
+                const currentInputs = td.querySelectorAll('textarea, input:not(.report-col-filter)');
+                const nextInputs = nextTd.querySelectorAll('textarea, input:not(.report-col-filter)');
                 
                 if (currentInputs.length > 0 && nextInputs.length > 0) {
                     const ta1 = currentInputs[0];
@@ -1589,6 +1587,35 @@
                 document.getElementById('report-range-container').classList.remove('hidden');
             }
             window.renderWeeklyReport();
+        };
+
+        // SHTUAR: Aplikimi i Filtrave Dynamikë në Tabelën e Raportit
+        window.applyReportFilters = () => {
+            const filters = Array.from(document.querySelectorAll('.report-col-filter')).map(input => ({
+                index: parseInt(input.getAttribute('data-col')),
+                value: input.value.toLowerCase().trim()
+            }));
+            
+            const rows = document.getElementById('report-tbody').querySelectorAll('tr');
+            rows.forEach(tr => {
+                if (tr.classList.contains('sector-row')) return; 
+                
+                let match = true;
+                filters.forEach(f => {
+                    if (f.value) {
+                        const cell = tr.children[f.index];
+                        if (cell) {
+                            const inputEl = cell.querySelector('input:not(.report-col-filter), textarea');
+                            const text = inputEl ? inputEl.value.toLowerCase() : cell.textContent.toLowerCase();
+                            if (!text.includes(f.value)) {
+                                match = false;
+                            }
+                        }
+                    }
+                });
+                
+                tr.style.display = match ? '' : 'none';
+            });
         };
 
         window.renderWeeklyReport = () => {
@@ -1666,6 +1693,29 @@
             
             theadHtml += `<th class="border border-gray-300 p-2 text-center align-middle w-10 no-print bg-gray-100"></th>`;
             theadTr.innerHTML = theadHtml;
+
+            // SHTUAR: Rreshti i filtrave sipas kokave të kolonave
+            const existingFilterRow = document.getElementById('report-filter-row');
+            if(existingFilterRow) existingFilterRow.remove();
+
+            let filterRowHtml = `<th class="border border-gray-300 p-1"></th>`; 
+            let colIndex = 1;
+            baseHeaders.forEach(colName => {
+                filterRowHtml += `<th class="border border-gray-300 p-1 font-normal"><input type="text" placeholder="Filtro..." class="w-full text-[10px] p-1.5 border border-indigo-200 rounded outline-none report-col-filter bg-white text-gray-700 placeholder-gray-400 font-medium" data-col="${colIndex}" oninput="window.applyReportFilters()"></th>`;
+                colIndex++;
+            });
+            extraCols.forEach(col => {
+                filterRowHtml += `<th class="border border-gray-300 p-1 font-normal"><input type="text" placeholder="Filtro..." class="w-full text-[10px] p-1.5 border border-indigo-200 rounded outline-none report-col-filter bg-white text-gray-700 placeholder-gray-400 font-medium" data-col="${colIndex}" oninput="window.applyReportFilters()"></th>`;
+                colIndex++;
+            });
+            filterRowHtml += `<th class="border border-gray-300 p-1"></th>`;
+
+            let filterRow = document.createElement('tr');
+            filterRow.id = 'report-filter-row';
+            filterRow.className = 'no-print bg-indigo-50 border-b border-gray-300';
+            filterRow.innerHTML = filterRowHtml;
+            theadTr.parentNode.appendChild(filterRow);
+
 
             const tbody = document.getElementById('report-tbody');
             tbody.innerHTML = '';
@@ -1838,6 +1888,8 @@
 
             const rows = document.getElementById('report-tbody').querySelectorAll('tr');
             rows.forEach(tr => {
+                // SHTUAR: Mos i shto rreshtat e fshehur nga filtrat në Excel
+                if (tr.style.display === 'none') return;
                 
                 if (tr.classList.contains('sector-row')) {
                     tableHtml += `<tr style="height: 20px;">`;
@@ -1855,7 +1907,7 @@
                     cells.forEach((td, index) => {
                         let val = "";
                         if(td.querySelector('textarea')) val = td.querySelector('textarea').value;
-                        else if(td.querySelector('input')) val = td.querySelector('input').value;
+                        else if(td.querySelector('input:not(.report-col-filter)')) val = td.querySelector('input:not(.report-col-filter)').value;
                         else {
                             const nrSpan = td.querySelector('.row-nr-txt');
                             val = nrSpan ? nrSpan.textContent : td.innerText;
@@ -1865,7 +1917,7 @@
 
                         let align = "vertical-align: middle; text-align: center;";
                         
-                        const inputEl = td.querySelector('input');
+                        const inputEl = td.querySelector('input:not(.report-col-filter)');
                         if(inputEl && inputEl.hasAttribute('data-color')) {
                              const explicitColor = inputEl.getAttribute('data-color');
                              if (explicitColor) {
@@ -1900,34 +1952,75 @@
             document.body.removeChild(a);
         };
 
-        // SHTUAR: Eksporto në PDF duke përdorur html2pdf
+        // PERMIRESUAR: Optimizim i Export PDF që të duket si Excel/Sistemi
         window.exportToPDF = () => {
-            const element = document.getElementById('report-table');
             const dateRange = document.getElementById('rep-periudha').value;
             const specialisti = document.getElementById('rep-specialisti').value || 'Raporti';
             const filename = `Raporti_${specialisti.replace(/\s+/g, '_')}_${dateRange.replace(/\s+/g, '')}.pdf`;
             
             showLoading();
             
-            // Fshih përkohësisht butonat no-print
-            const noPrintElements = document.querySelectorAll('.no-print');
-            noPrintElements.forEach(el => el.style.display = 'none');
+            // Krijojmë një klonim të pastër vetëm për PDF
+            const originalTable = document.getElementById('report-table');
+            const cloneContainer = document.createElement('div');
+            cloneContainer.style.padding = '15px';
+            cloneContainer.style.backgroundColor = '#fff';
+            
+            // Titulli
+            const headerText = document.getElementById('print-header').textContent;
+            const headerEl = document.createElement('h1');
+            headerEl.textContent = headerText;
+            headerEl.style.textAlign = 'center';
+            headerEl.style.fontSize = '16px';
+            headerEl.style.fontWeight = 'bold';
+            headerEl.style.marginBottom = '20px';
+            headerEl.style.fontFamily = "'Times New Roman', Times, serif";
+            cloneContainer.appendChild(headerEl);
+            
+            // Klonojmë tabelën
+            const tableClone = originalTable.cloneNode(true);
+            
+            // Heqim elementet e panevojshme
+            tableClone.querySelectorAll('.no-print').forEach(el => el.remove());
+            
+            // Për të mos u zgjatur format, kthejmë textarea/input në tekst statik DIV
+            tableClone.querySelectorAll('textarea, input').forEach(el => {
+                const val = el.value || el.innerText;
+                const span = document.createElement('div');
+                span.innerHTML = escapeHtml(val).replace(/\n/g, '<br>');
+                span.style.fontSize = '11px';
+                span.style.wordBreak = 'break-word';
+                if(el.style.color) span.style.color = el.style.color;
+                if(el.style.fontWeight) span.style.fontWeight = el.style.fontWeight;
+                if(el.style.textAlign) span.style.textAlign = el.style.textAlign;
+                el.parentNode.replaceChild(span, el);
+            });
+            
+            // Stilizim për ta bërë PDF kompakte si Excel
+            tableClone.style.width = '100%';
+            tableClone.style.borderCollapse = 'collapse';
+            tableClone.querySelectorAll('th, td').forEach(cell => {
+                cell.style.border = '1px solid #000';
+                cell.style.padding = '6px';
+                cell.style.fontSize = '11px'; 
+                cell.style.verticalAlign = 'middle';
+            });
+            
+            cloneContainer.appendChild(tableClone);
             
             const opt = {
                 margin:       10,
                 filename:     filename,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
+                html2canvas:  { scale: 2, useCORS: true, windowWidth: 1600 }, 
                 jsPDF:        { unit: 'mm', format: 'a3', orientation: 'landscape' }
             };
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                noPrintElements.forEach(el => el.style.display = '');
+            html2pdf().set(opt).from(cloneContainer).save().then(() => {
                 hideLoading();
             });
         };
 
-        // SHTUAR: Dërgimi me Email (Hap formën e emailit me të dhënat bazë)
         window.openEmailModal = () => {
             const modal = document.getElementById('email-modal');
             modal.classList.remove('hidden');
@@ -2194,7 +2287,7 @@
         </div>
     </div>
 
-    <!-- SHTUAR: Modal i Settings (Profili dhe Llogaria e Plote) -->
+    <!-- Modal i Settings (Profili dhe Llogaria e Plote) -->
     <div id="settings-modal" class="hidden fixed inset-0 z-[400] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden transform transition-all">
             <div class="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50">
@@ -2306,7 +2399,7 @@
                 <p class="text-center text-sm text-gray-600 mt-4">Nuk keni llogari? <button type="button" onclick="window.toggleAuthView('register-form')" class="font-bold text-blue-600 hover:underline">Regjistrohu</button></p>
             </form>
 
-            <!-- REGISTER FORM (SHTUAR TË GJITHA TË DHËNAT E PLOTA) -->
+            <!-- REGISTER FORM -->
             <form id="register-form" onsubmit="window.handleRegister(event)" class="hidden space-y-3">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -2378,9 +2471,9 @@
         <!-- Sidebar -->
         <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col z-50 h-full absolute md:relative sidebar-collapsed md:sidebar-collapsed-none">
             
-            <!-- SHTUAR: Shigjeta për Desktop/Windows Pull-Out (Më e dukshme dhe moderne) -->
-            <button onclick="window.toggleSidebar()" class="absolute -right-5 top-1/2 transform -translate-y-1/2 bg-blue-600 border-2 border-white shadow-xl rounded-full p-2.5 z-[100] text-white hover:bg-blue-700 hover:scale-110 transition-all duration-300 hidden md:flex items-center justify-center group">
-                <svg id="sidebar-arrow" class="w-5 h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+            <!-- SHTUAR: Shigjeta për Desktop/Windows Pull-Out (Më e dukshme dhe e ekspozuar majtas) -->
+            <button onclick="window.toggleSidebar()" class="absolute right-0 translate-x-full top-1/2 transform -translate-y-1/2 bg-blue-600 border-2 border-white shadow-xl rounded-r-xl p-2 z-[100] text-white hover:bg-blue-700 transition-all duration-300 hidden md:flex items-center justify-center group w-10 h-14">
+                <svg id="sidebar-arrow" class="w-6 h-6 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
             </button>
 
             <div class="p-6 border-b border-gray-100 flex items-center justify-between">
@@ -2396,7 +2489,7 @@
                 </button>
             </div>
             
-            <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+            <nav class="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
                 <button id="nav-aktiviteti" onclick="window.switchTab('aktiviteti'); if(window.innerWidth < 768) window.toggleSidebar();" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors active">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     Regjistro Aktivitet
@@ -2422,12 +2515,12 @@
             <!-- User Profile Bottom Sidebar -->
             <div class="p-3 border-t border-gray-100 bg-gray-50 mt-auto flex flex-col gap-2">
                 <!-- SHTUAR: Thërret Settings Modalin -->
-                <button onclick="window.openSettingsModal()" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 rounded-xl transition-colors group">
+                <button onclick="window.openSettingsModal()" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 rounded-xl transition-colors group text-left">
                     <div class="flex items-center gap-3 overflow-hidden">
                         <div id="sidebar-user-avatar" class="bg-blue-200 text-blue-700 w-10 h-10 rounded-full flex items-center justify-center font-bold overflow-hidden shadow-sm shrink-0">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         </div>
-                        <div class="flex-1 overflow-hidden text-left">
+                        <div class="flex-1 overflow-hidden">
                             <p class="text-xs font-bold text-gray-900 truncate" id="sidebar-user-name">Përdorues</p>
                             <p class="text-[10px] font-medium text-gray-500 truncate" id="sidebar-user-email">Duke u ngarkuar...</p>
                         </div>
@@ -2753,7 +2846,6 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                 Titull Sektori
                             </button>
-                            <!-- SHTUAR: Dërgo me Email -->
                             <button onclick="window.openEmailModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold shadow transition-all flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                                 Email
@@ -2762,7 +2854,6 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                 Excel
                             </button>
-                            <!-- SHTUAR: Export PDF -->
                             <button onclick="window.exportToPDF()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold shadow transition-all flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                 PDF
@@ -2817,39 +2908,4 @@
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
                         <div>
                             <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-4">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-gray-800 mb-2">Importo të Dhënat</h3>
-                            <p class="text-sm text-gray-500 mb-6">Ngarko një skedar .json të marrë më parë nga ky sistem. <br><span class="text-red-500 font-medium">Kujdes:</span> Ky veprim do të bashkojë (merge) të dhënat ekzistuese me të rejat!</p>
-                        </div>
-                        <input type="file" id="import-file-input" accept=".json" class="hidden" onchange="window.handleFileImport(event)">
-                        <button onclick="window.triggerImport()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
-                            Ngarko Skedarin (Importo)
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 4: KOSHI -->
-            <div id="tab-koshi" class="tab-content hidden max-w-4xl mx-auto space-y-6 pb-20">
-                <div class="flex justify-between items-center mb-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900">Koshi i Mbeturinave</h2>
-                        <p class="text-gray-500 text-sm">Aktivitetet apo konfigurimet që keni fshirë mund të rikthehen këtu.</p>
-                    </div>
-                    <button onclick="window.emptyTrash()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg text-sm font-bold shadow transition-all flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        Pastro Koshin
-                    </button>
-                </div>
-
-                <div id="trash-list-container" class="space-y-4">
-                    <!-- Populated via JS -->
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-</body>
-</html>
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24
