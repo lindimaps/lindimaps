@@ -44,15 +44,15 @@
         /* Drag and drop indication */
         .dragging { opacity: 0.5; background-color: #f8fafc; }
 
-        /* Klasa për Sidebar Toggle */
-        #sidebar { transition: transform 0.3s ease; }
-        .sidebar-collapsed { transform: translateX(-100%); }
-        @media (min-width: 768px) {
-            .sidebar-collapsed { margin-left: -16rem; position: relative; transform: translateX(0); }
-            #sidebar { position: relative; z-index: 40; }
-        }
+        /* Klasa për Sidebar Toggle - RREGULLIM PËR DESKTOP DHE MOBILE */
+        #sidebar { transition: transform 0.3s ease, margin-left 0.3s ease; }
         @media (max-width: 767px) {
-            #sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+            #sidebar { position: fixed; height: 100vh; z-index: 999; transform: translateX(-100%); box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+            #sidebar.mobile-open { transform: translateX(0); }
+        }
+        @media (min-width: 768px) {
+            #sidebar { position: relative; z-index: 40; margin-left: 0; transform: none; }
+            #sidebar.desktop-closed { margin-left: -16rem; }
         }
         
         /* Stilizimi i Autocomplete dropdown */
@@ -322,23 +322,27 @@
             }
         };
 
-        // --- Toggle Sidebar (PËRMIRËSUAR: Fshehja e butonit gjatë hapjes) ---
+        // --- Toggle Sidebar (PËRMIRËSUAR DHE KORRIGJUAR PËR DESKTOP DHE MOBILE) ---
         window.toggleSidebar = () => {
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.getElementById('sidebar-toggle-btn');
             const arrow = document.getElementById('sidebar-arrow');
             
-            sidebar.classList.toggle('sidebar-collapsed');
-            
-            if(sidebar.classList.contains('sidebar-collapsed')){
-                arrow.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>`;
-                toggleBtn.style.opacity = '1';
-                toggleBtn.style.pointerEvents = 'auto';
+            if (window.innerWidth >= 768) {
+                // Rregullimi në Desktop (Shigjeta)
+                sidebar.classList.toggle('desktop-closed');
+                if (sidebar.classList.contains('desktop-closed')) {
+                    if(arrow) arrow.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>`;
+                } else {
+                    if(arrow) arrow.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>`;
+                }
             } else {
-                arrow.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>`;
-                if(window.innerWidth < 768) {
-                    toggleBtn.style.opacity = '0';
-                    toggleBtn.style.pointerEvents = 'none';
+                // Rregullimi në Mobile (Menuja dhe Butoni ☰)
+                sidebar.classList.toggle('mobile-open');
+                if (sidebar.classList.contains('mobile-open')) {
+                    if(toggleBtn) { toggleBtn.style.opacity = '0'; toggleBtn.style.pointerEvents = 'none'; }
+                } else {
+                    if(toggleBtn) { toggleBtn.style.opacity = '1'; toggleBtn.style.pointerEvents = 'auto'; }
                 }
             }
         };
@@ -2285,8 +2289,6 @@
                 window.appState.user = user;
                 elements.authScreen().classList.add('hidden');
                 elements.appScreen().classList.remove('hidden');
-                
-                // PERMIRESUAR: Shfaqja e butonit Mobile Vetëm pas Login
                 document.getElementById('sidebar-toggle-btn').classList.remove('hidden');
                 
                 document.getElementById('sidebar-user-email').textContent = user.email || 'Përdorues Anonim';
@@ -2312,8 +2314,6 @@
 
                 elements.authScreen().classList.remove('hidden');
                 elements.appScreen().classList.add('hidden');
-                
-                // PERMIRESUAR: Fshehja e butonit Mobile gjatë Login
                 document.getElementById('sidebar-toggle-btn').classList.add('hidden');
                 hideLoading();
             }
@@ -2341,7 +2341,7 @@
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
     </div>
     
-    <!-- Custom Confirm/Prompt Modal -->
+    <!-- Custom Confirm/Prompt Modal (Z-INDEX MAKSIMAL QE TE JETE MBI PROFILIN DHE CDO GJE TJETER) -->
     <div id="custom-modal" class="hidden fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform transition-all">
             <h3 id="modal-title" class="text-lg font-black text-gray-900 mb-2"></h3>
