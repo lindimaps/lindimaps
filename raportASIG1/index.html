@@ -45,10 +45,14 @@
         .dragging { opacity: 0.5; background-color: #f8fafc; }
 
         /* Klasa për Sidebar Toggle */
-        #sidebar { transition: all 0.3s ease; }
-        .sidebar-collapsed { transform: translateX(-100%); position: absolute; }
+        #sidebar { transition: transform 0.3s ease; }
+        .sidebar-collapsed { transform: translateX(-100%); }
         @media (min-width: 768px) {
-            .sidebar-collapsed { margin-left: -16rem; position: relative; transform: none; }
+            .sidebar-collapsed { margin-left: -16rem; position: relative; transform: translateX(0); }
+            #sidebar { position: relative; z-index: 40; }
+        }
+        @media (max-width: 767px) {
+            #sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         }
         
         /* Stilizimi i Autocomplete dropdown */
@@ -102,7 +106,7 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'sistemi-raportimit';
 
-        // Global Utility: Escape HTML (Moved to Top to prevent ReferenceError)
+        // Global Utility: Escape HTML
         window.escapeHtml = (str) => {
             return (str || "").toString()
                 .replace(/&/g, "&amp;")
@@ -258,7 +262,6 @@
             autoResizeTextareas();
         };
 
-        // Rindërtimi i numrave të rreshtave
         window.reindexRows = () => {
             const tbody = document.getElementById('report-tbody');
             if(!tbody) return;
@@ -283,7 +286,7 @@
             const container = elements.toastContainer();
             const toast = document.createElement('div');
             const bgColor = type === 'success' ? 'bg-green-600' : (type === 'error' ? 'bg-red-600' : 'bg-blue-600');
-            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg font-medium text-sm transform transition-all duration-300 translate-y-10 opacity-0 flex items-center gap-2`;
+            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg font-medium text-sm transform transition-all duration-300 translate-y-10 opacity-0 flex items-center gap-2 pointer-events-auto`;
             toast.innerHTML = `
                 ${type === 'success' ? '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' : ''}
                 ${message}
@@ -300,7 +303,6 @@
         const showLoading = () => elements.loader().classList.remove('hidden');
         const hideLoading = () => elements.loader().classList.add('hidden');
 
-        // Navigation
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -317,24 +319,31 @@
                 loadTrash();
             } else if (tabId === 'konfigurime') {
                 renderConfigTab();
-            } else if (tabId === 'backup') {
-                // No special initialization required immediately
             }
         };
 
-        // --- Toggle Sidebar ---
+        // --- Toggle Sidebar (PËRMIRËSUAR: Fshehja e butonit gjatë hapjes) ---
         window.toggleSidebar = () => {
             const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('sidebar-collapsed');
+            const toggleBtn = document.getElementById('sidebar-toggle-btn');
             const arrow = document.getElementById('sidebar-arrow');
+            
+            sidebar.classList.toggle('sidebar-collapsed');
+            
             if(sidebar.classList.contains('sidebar-collapsed')){
                 arrow.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>`;
+                toggleBtn.style.opacity = '1';
+                toggleBtn.style.pointerEvents = 'auto';
             } else {
                 arrow.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>`;
+                if(window.innerWidth < 768) {
+                    toggleBtn.style.opacity = '0';
+                    toggleBtn.style.pointerEvents = 'none';
+                }
             }
         };
 
-        // --- Auth Logic (Email/Password) ---
+        // --- Auth Logic ---
         window.toggleAuthView = (viewId) => {
             ['login-form', 'register-form', 'reset-form'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
@@ -385,7 +394,6 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
                 
-                // Ruaj profilin tek settings i User-it pas regjistrimit
                 await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'), {
                     emer, mbiemer, institucioni, drejtoria, sektori, detyra, telefon, foto: ''
                 });
@@ -1089,7 +1097,6 @@
 
         // --- 2. Regjistro Aktivitet (Logic) ---
 
-        // Funksioni për Autocomplete (Informacion / Produkt)
         const setupAutocomplete = (inputId, dataField) => {
             const input = document.getElementById(inputId);
             if(!input) return;
@@ -2278,6 +2285,8 @@
                 window.appState.user = user;
                 elements.authScreen().classList.add('hidden');
                 elements.appScreen().classList.remove('hidden');
+                
+                // PERMIRESUAR: Shfaqja e butonit Mobile Vetëm pas Login
                 document.getElementById('sidebar-toggle-btn').classList.remove('hidden');
                 
                 document.getElementById('sidebar-user-email').textContent = user.email || 'Përdorues Anonim';
@@ -2303,6 +2312,8 @@
 
                 elements.authScreen().classList.remove('hidden');
                 elements.appScreen().classList.add('hidden');
+                
+                // PERMIRESUAR: Fshehja e butonit Mobile gjatë Login
                 document.getElementById('sidebar-toggle-btn').classList.add('hidden');
                 hideLoading();
             }
@@ -2323,7 +2334,7 @@
 <body class="h-screen overflow-hidden flex flex-col text-gray-800">
 
     <!-- Toast Container (Z-index 9999 qe te jete mbi çdo dritare tjetër) -->
-    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-2"></div>
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[999999] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Loader -->
     <div id="loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[200] flex items-center justify-center">
@@ -2331,7 +2342,7 @@
     </div>
     
     <!-- Custom Confirm/Prompt Modal -->
-    <div id="custom-modal" class="hidden fixed inset-0 z-[300] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="custom-modal" class="hidden fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform transition-all">
             <h3 id="modal-title" class="text-lg font-black text-gray-900 mb-2"></h3>
             <p id="modal-text" class="text-sm text-gray-600 mb-4 font-medium whitespace-pre-line"></p>
@@ -2344,7 +2355,7 @@
     </div>
 
     <!-- Modal i Settings (Profili dhe Llogaria e Plote) -->
-    <div id="settings-modal" class="hidden fixed inset-0 z-[400] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="settings-modal" class="hidden fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden transform transition-all">
             <div class="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50">
                 <div class="flex items-center gap-3">
@@ -2404,7 +2415,7 @@
     </div>
 
     <!-- Modal për Email -->
-    <div id="email-modal" class="hidden fixed inset-0 z-[300] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="email-modal" class="hidden fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all">
             <div class="flex items-center gap-3 mb-4 border-b pb-4">
                 <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
@@ -2429,7 +2440,7 @@
     </div>
 
     <!-- Auth Screen -->
-    <div id="auth-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-100 p-4">
+    <div id="auth-screen" class="hidden fixed inset-0 z-[50] flex items-center justify-center bg-gray-100 p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative overflow-hidden">
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-black text-gray-900 tracking-tight">Raportimi<span class="text-blue-600">Javor</span></h1>
@@ -2516,22 +2527,17 @@
         </div>
     </div>
 
-    <!-- Toggle Buton Global për Mobile (I fshehur kur nuk ka përdorues) -->
-    <button id="sidebar-toggle-btn" onclick="window.toggleSidebar()" class="hidden fixed top-3 left-3 z-[60] bg-white p-2.5 rounded-xl shadow-md border border-gray-200 text-gray-600 hover:text-blue-600 transition-colors md:hidden">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+    <!-- Toggle Buton Global për Mobile (I fshehur kur nuk ka përdorues) PERMIRESUAR: Me sfond te bardhe/border per dukshmeri, z-index 990, qe nuk mbivendos kur sidebar eshte i hapur sepse fshihet -->
+    <button id="sidebar-toggle-btn" onclick="window.toggleSidebar()" class="hidden fixed top-3 left-3 z-[990] bg-white p-2.5 rounded-xl shadow-md border border-gray-200 text-gray-600 hover:text-blue-600 transition-all duration-300 md:hidden">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
     </button>
 
     <!-- Main App Screen -->
     <div id="app-screen" class="hidden h-full flex flex-col md:flex-row w-full relative">
         
-        <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col z-50 h-full absolute md:relative sidebar-collapsed md:sidebar-collapsed-none">
+        <!-- Sidebar PERMIRESUAR: z-[999] ne menyre qe te mbuloje gjithcka tjeter ne mobile overlay poshte modaleve -->
+        <aside id="sidebar" class="w-72 md:w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col h-full absolute md:relative sidebar-collapsed md:sidebar-collapsed-none z-[999]">
             
-            <!-- Shigjeta për Desktop/Windows Pull-Out -->
-            <button onclick="window.toggleSidebar()" class="absolute right-0 translate-x-full top-1/2 transform -translate-y-1/2 bg-blue-600 border-2 border-white shadow-xl rounded-r-xl p-2 z-[100] text-white hover:bg-blue-700 transition-all duration-300 hidden md:flex items-center justify-center group w-10 h-14">
-                <svg id="sidebar-arrow" class="w-6 h-6 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-
             <div class="p-6 border-b border-gray-100 flex items-center justify-between">
                 <div>
                     <h1 class="font-black text-xl tracking-tight text-gray-900">
@@ -2540,7 +2546,7 @@
                     <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mt-1">Sistemi i Menaxhimit</p>
                 </div>
                 <!-- Mbyll Buton (Vetëm Mobile) -->
-                <button onclick="window.toggleSidebar()" class="text-gray-400 hover:text-gray-800 md:hidden p-1">
+                <button onclick="window.toggleSidebar()" class="text-gray-400 hover:text-gray-800 md:hidden p-1 ml-4">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -2590,9 +2596,11 @@
                     </div>
                     <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 </button>
-                <button onclick="window.handleLogout()" class="w-full bg-white border border-gray-200 text-gray-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 py-2 rounded-lg text-xs font-bold transition-colors">
-                    Dil nga Llogaria
-                </button>
+                <div class="flex gap-2 w-full px-1">
+                    <button onclick="window.handleLogout()" class="flex-1 bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 py-1.5 rounded-lg text-xs font-bold transition-colors">
+                        Dil nga Llogaria
+                    </button>
+                </div>
             </div>
 
         </aside>
