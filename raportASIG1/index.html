@@ -1103,22 +1103,22 @@
             }).join('');
         };
 
-        const populateDropdowns = () => {
-            const populate = (elementId, listName) => {
-                const el = document.getElementById(elementId);
-                if (!el) return;
-                const currentVal = el.value;
-                const options = window.appState.config.lists[listName] || [];
-                
-                el.innerHTML = '<option value="">-- Zgjidh --</option>' + 
-                    options.map(opt => {
-                        const val = typeof opt === 'object' ? opt.name : opt;
-                        return `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`;
-                    }).join('');
-                
-                if (options.some(opt => (typeof opt === 'object' ? opt.name : opt) === currentVal)) el.value = currentVal;
-            };
+        const populate = (elementId, listName, placeholderText = '-- Zgjidh --') => {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const currentVal = el.value;
+            const options = window.appState.config.lists[listName] || [];
+            
+            el.innerHTML = `<option value="">${placeholderText}</option>` + 
+                options.map(opt => {
+                    const val = typeof opt === 'object' ? opt.name : opt;
+                    return `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`;
+                }).join('');
+            
+            if (options.some(opt => (typeof opt === 'object' ? opt.name : opt) === currentVal)) el.value = currentVal;
+        };
 
+        const populateDropdowns = () => {
             populate('act-objektivi', 'objektivat');
             populate('act-detyra-select', 'detyrat');
             populate('act-statusi', 'statuset');
@@ -1126,10 +1126,17 @@
             populate('act-raportohet', 'raportimet');
             populate('act-afati', 'afatet');
             
-            // SHTUAR: Filtra Dinamik Dropdowns
+            // Filtra Dinamik Dropdowns
             populate('filter-objektivi', 'objektivat');
             populate('filter-statusi', 'statuset');
             populate('filter-pergjegjesi', 'pergjegjesit');
+
+            // Filtrat në panelin e Raportit (SHTUAR)
+            populate('rep-filter-objektivi', 'objektivat', '-- Zgjidh Objektivin --');
+            populate('rep-filter-statusi', 'statuset', '-- Zgjidh Statusin --');
+            populate('rep-filter-pergjegjesi', 'pergjegjesit', '-- Zgjidh Përgjegjësin --');
+            populate('rep-filter-raportohet', 'raportimet', '-- Zgjidh Raportohet --');
+            populate('rep-filter-afati', 'afatet', '-- Zgjidh Afatin --');
 
             renderExtraActivityFields();
             
@@ -1576,7 +1583,6 @@
             return `${formatDate(mon)} - ${formatDate(fri)}`;
         };
 
-        // SHTUAR: Ndryshimi i tipit të Raportit
         window.toggleReportType = () => {
             const type = document.getElementById('report-type-selector').value;
             if (type === 'week') {
@@ -1589,30 +1595,41 @@
             window.renderWeeklyReport();
         };
 
-        // SHTUAR: Aplikimi i Filtrave Dynamikë në Tabelën e Raportit
+        // SHTUAR: Aplikimi i Filtrave Dynamikë në Tabelën e Raportit nga seksioni lart
         window.applyReportFilters = () => {
-            const filters = Array.from(document.querySelectorAll('.report-col-filter')).map(input => ({
-                index: parseInt(input.getAttribute('data-col')),
-                value: input.value.toLowerCase().trim()
-            }));
+            const fObj = document.getElementById('rep-filter-objektivi').value.toLowerCase();
+            const fStat = document.getElementById('rep-filter-statusi').value.toLowerCase();
+            const fPerg = document.getElementById('rep-filter-pergjegjesi').value.toLowerCase();
+            const fRap = document.getElementById('rep-filter-raportohet').value.toLowerCase();
+            const fAfati = document.getElementById('rep-filter-afati').value.toLowerCase();
+            const fText = document.getElementById('rep-filter-text').value.toLowerCase();
             
             const rows = document.getElementById('report-tbody').querySelectorAll('tr');
             rows.forEach(tr => {
                 if (tr.classList.contains('sector-row')) return; 
                 
+                const getVal = (idx) => {
+                    const cell = tr.children[idx];
+                    if(!cell) return "";
+                    const inp = cell.querySelector('input, textarea');
+                    return inp ? inp.value.toLowerCase() : cell.textContent.toLowerCase();
+                };
+
+                const valObj = getVal(1);
+                const valStat = getVal(4);
+                const valPerg = getVal(5);
+                const valAfat = getVal(8);
+                const valRap = getVal(9);
+                
+                const rowText = tr.textContent.toLowerCase() + Array.from(tr.querySelectorAll('input, textarea')).map(el=>el.value).join(' ').toLowerCase();
+
                 let match = true;
-                filters.forEach(f => {
-                    if (f.value) {
-                        const cell = tr.children[f.index];
-                        if (cell) {
-                            const inputEl = cell.querySelector('input:not(.report-col-filter), textarea');
-                            const text = inputEl ? inputEl.value.toLowerCase() : cell.textContent.toLowerCase();
-                            if (!text.includes(f.value)) {
-                                match = false;
-                            }
-                        }
-                    }
-                });
+                if(fObj && valObj !== fObj) match = false;
+                if(fStat && valStat !== fStat) match = false;
+                if(fPerg && valPerg !== fPerg) match = false;
+                if(fRap && valRap !== fRap) match = false;
+                if(fAfati && valAfat !== fAfati) match = false;
+                if(fText && !rowText.includes(fText)) match = false;
                 
                 tr.style.display = match ? '' : 'none';
             });
@@ -1648,7 +1665,7 @@
                 }
             }
 
-            filteredActs.sort((a, b) => a.timestamp - b.timestamp); // E vjetra lart - e reja poshte
+            filteredActs.sort((a, b) => a.timestamp - b.timestamp);
 
             const prof = window.appState.profile || {};
             document.getElementById('rep-drejtoria').value = prof.drejtoria || '';
@@ -1693,29 +1710,6 @@
             
             theadHtml += `<th class="border border-gray-300 p-2 text-center align-middle w-10 no-print bg-gray-100"></th>`;
             theadTr.innerHTML = theadHtml;
-
-            // SHTUAR: Rreshti i filtrave sipas kokave të kolonave
-            const existingFilterRow = document.getElementById('report-filter-row');
-            if(existingFilterRow) existingFilterRow.remove();
-
-            let filterRowHtml = `<th class="border border-gray-300 p-1"></th>`; 
-            let colIndex = 1;
-            baseHeaders.forEach(colName => {
-                filterRowHtml += `<th class="border border-gray-300 p-1 font-normal"><input type="text" placeholder="Filtro..." class="w-full text-[10px] p-1.5 border border-indigo-200 rounded outline-none report-col-filter bg-white text-gray-700 placeholder-gray-400 font-medium" data-col="${colIndex}" oninput="window.applyReportFilters()"></th>`;
-                colIndex++;
-            });
-            extraCols.forEach(col => {
-                filterRowHtml += `<th class="border border-gray-300 p-1 font-normal"><input type="text" placeholder="Filtro..." class="w-full text-[10px] p-1.5 border border-indigo-200 rounded outline-none report-col-filter bg-white text-gray-700 placeholder-gray-400 font-medium" data-col="${colIndex}" oninput="window.applyReportFilters()"></th>`;
-                colIndex++;
-            });
-            filterRowHtml += `<th class="border border-gray-300 p-1"></th>`;
-
-            let filterRow = document.createElement('tr');
-            filterRow.id = 'report-filter-row';
-            filterRow.className = 'no-print bg-indigo-50 border-b border-gray-300';
-            filterRow.innerHTML = filterRowHtml;
-            theadTr.parentNode.appendChild(filterRow);
-
 
             const tbody = document.getElementById('report-tbody');
             tbody.innerHTML = '';
@@ -1816,6 +1810,7 @@
             }
             
             autoResizeTextareas();
+            window.applyReportFilters(); // Aplikojmë filtrat nëse ka fjalë aktive
 
             setTimeout(() => {
                 window.reportHistory = [];
@@ -1888,7 +1883,6 @@
 
             const rows = document.getElementById('report-tbody').querySelectorAll('tr');
             rows.forEach(tr => {
-                // SHTUAR: Mos i shto rreshtat e fshehur nga filtrat në Excel
                 if (tr.style.display === 'none') return;
                 
                 if (tr.classList.contains('sector-row')) {
@@ -1952,7 +1946,7 @@
             document.body.removeChild(a);
         };
 
-        // PERMIRESUAR: Optimizim i Export PDF që të duket si Excel/Sistemi
+        // PERMIRESUAR: Optimizim i Export PDF për t'u ngjarë Excel-it dhe pa tekste të stërzgjatura
         window.exportToPDF = () => {
             const dateRange = document.getElementById('rep-periudha').value;
             const specialisti = document.getElementById('rep-specialisti').value || 'Raporti';
@@ -1963,56 +1957,75 @@
             // Krijojmë një klonim të pastër vetëm për PDF
             const originalTable = document.getElementById('report-table');
             const cloneContainer = document.createElement('div');
-            cloneContainer.style.padding = '15px';
+            cloneContainer.style.padding = '10px';
             cloneContainer.style.backgroundColor = '#fff';
             
-            // Titulli
+            // Titulli (Koka e Excel)
             const headerText = document.getElementById('print-header').textContent;
             const headerEl = document.createElement('h1');
             headerEl.textContent = headerText;
             headerEl.style.textAlign = 'center';
-            headerEl.style.fontSize = '16px';
+            headerEl.style.fontSize = '14px';
             headerEl.style.fontWeight = 'bold';
-            headerEl.style.marginBottom = '20px';
+            headerEl.style.marginBottom = '15px';
             headerEl.style.fontFamily = "'Times New Roman', Times, serif";
             cloneContainer.appendChild(headerEl);
             
             // Klonojmë tabelën
             const tableClone = originalTable.cloneNode(true);
             
-            // Heqim elementet e panevojshme
+            // Heqim elementet e panevojshme (no-print, butona filtri nese u bene clone)
             tableClone.querySelectorAll('.no-print').forEach(el => el.remove());
             
-            // Për të mos u zgjatur format, kthejmë textarea/input në tekst statik DIV
+            // Zëvendësojmë <textarea> dhe <input> me <div> të thjeshtë
             tableClone.querySelectorAll('textarea, input').forEach(el => {
                 const val = el.value || el.innerText;
-                const span = document.createElement('div');
-                span.innerHTML = escapeHtml(val).replace(/\n/g, '<br>');
-                span.style.fontSize = '11px';
-                span.style.wordBreak = 'break-word';
-                if(el.style.color) span.style.color = el.style.color;
-                if(el.style.fontWeight) span.style.fontWeight = el.style.fontWeight;
-                if(el.style.textAlign) span.style.textAlign = el.style.textAlign;
-                el.parentNode.replaceChild(span, el);
+                const div = document.createElement('div');
+                div.innerHTML = escapeHtml(val).replace(/\n/g, '<br>');
+                // Sigurohemi që teksti të thyhet bukur dhe të mos stërzgjatet
+                div.style.fontSize = '10px';
+                div.style.whiteSpace = 'pre-wrap';
+                div.style.wordWrap = 'break-word';
+                if(el.style.color) div.style.color = el.style.color;
+                if(el.style.fontWeight) div.style.fontWeight = el.style.fontWeight;
+                if(el.style.textAlign) div.style.textAlign = el.style.textAlign;
+                el.parentNode.replaceChild(div, el);
             });
             
-            // Stilizim për ta bërë PDF kompakte si Excel
+            // Stilizim për ta bërë PDF kompakte dhe rregullt si Excel
             tableClone.style.width = '100%';
+            tableClone.style.tableLayout = 'auto'; // Lejon që kolonat të përshtaten sipas tekstit
             tableClone.style.borderCollapse = 'collapse';
+            tableClone.style.fontFamily = "'Times New Roman', Times, serif";
+            
             tableClone.querySelectorAll('th, td').forEach(cell => {
-                cell.style.border = '1px solid #000';
-                cell.style.padding = '6px';
-                cell.style.fontSize = '11px'; 
-                cell.style.verticalAlign = 'middle';
+                cell.style.border = '1px solid #d1d5db';
+                cell.style.padding = '6px 4px';
+                cell.style.fontSize = '10px'; 
+                cell.style.verticalAlign = 'top'; // Mbaj lart tekstet e thyera
+                cell.style.textAlign = 'left';
+                cell.style.wordBreak = 'break-word';
+                // Ngjyrat bazë të zeza, përveç atyre me ngjyrë statusi
+                if (!cell.style.color) cell.style.color = '#1f2937';
+            });
+
+            // Qendërzo Numrat dhe Statuset
+            tableClone.querySelectorAll('tr').forEach(tr => {
+                if(tr.style.display === 'none') {
+                    tr.remove(); // Fshih rreshtat e filtruar edhe në PDF
+                } else if(tr.children.length > 0 && !tr.classList.contains('sector-row')) {
+                    tr.children[0].style.textAlign = 'center'; // Nr
+                    if(tr.children[4]) tr.children[4].style.textAlign = 'center'; // Statusi (indeksi 4)
+                }
             });
             
             cloneContainer.appendChild(tableClone);
             
             const opt = {
-                margin:       10,
+                margin:       [10, 10, 10, 10], // Margjina më të vogla për të shfrytëzuar hapësirën
                 filename:     filename,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, windowWidth: 1600 }, 
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true }, 
                 jsPDF:        { unit: 'mm', format: 'a3', orientation: 'landscape' }
             };
 
@@ -2471,7 +2484,7 @@
         <!-- Sidebar -->
         <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col z-50 h-full absolute md:relative sidebar-collapsed md:sidebar-collapsed-none">
             
-            <!-- SHTUAR: Shigjeta për Desktop/Windows Pull-Out (Më e dukshme dhe e ekspozuar majtas) -->
+            <!-- Shigjeta për Desktop/Windows Pull-Out -->
             <button onclick="window.toggleSidebar()" class="absolute right-0 translate-x-full top-1/2 transform -translate-y-1/2 bg-blue-600 border-2 border-white shadow-xl rounded-r-xl p-2 z-[100] text-white hover:bg-blue-700 transition-all duration-300 hidden md:flex items-center justify-center group w-10 h-14">
                 <svg id="sidebar-arrow" class="w-6 h-6 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
             </button>
@@ -2514,7 +2527,6 @@
 
             <!-- User Profile Bottom Sidebar -->
             <div class="p-3 border-t border-gray-100 bg-gray-50 mt-auto flex flex-col gap-2">
-                <!-- SHTUAR: Thërret Settings Modalin -->
                 <button onclick="window.openSettingsModal()" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 rounded-xl transition-colors group text-left">
                     <div class="flex items-center gap-3 overflow-hidden">
                         <div id="sidebar-user-avatar" class="bg-blue-200 text-blue-700 w-10 h-10 rounded-full flex items-center justify-center font-bold overflow-hidden shadow-sm shrink-0">
@@ -2592,7 +2604,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Fushat Dinamike Shtese -->
                             <div id="dynamic-extra-fields" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
@@ -2620,11 +2631,9 @@
                     <!-- Sidebar List -->
                     <div class="bg-gray-50 rounded-2xl border border-gray-200 p-4 md:p-6 flex flex-col max-h-[850px]">
                         
-                        <!-- FILTRAT E RINJ -->
                         <div class="mb-4 pb-4 border-b border-gray-200 space-y-3">
                             <h3 class="text-lg font-bold text-gray-800 mb-1">Kërko & Filtro</h3>
                             
-                            <!-- Kërkim me Fjalë (Global) -->
                             <div class="relative">
                                 <input type="text" id="act-search-text" placeholder="Kërko në të gjitha fushat..." class="w-full pl-8 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-500" oninput="window.renderDailyActivities()">
                                 <svg class="w-4 h-4 text-gray-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -2635,7 +2644,6 @@
                                 Filtrat e avancuar
                             </button>
 
-                            <!-- DEFAULT: DATA E SOTME DHE TË FSHEHURA -->
                             <div id="advanced-filters-container" class="hidden space-y-2 bg-white p-3 rounded-lg border border-gray-200 mt-2">
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
@@ -2669,17 +2677,14 @@
                 </div>
             </div>
 
-            <!-- TAB 1: KONFIGURIMET E LISTAVE (PA PROFILIN) -->
+            <!-- TAB 1: KONFIGURIMET E LISTAVE -->
             <div id="tab-konfigurime" class="tab-content hidden max-w-6xl mx-auto space-y-8 pb-20">
                 <div class="mb-2">
                     <h2 class="text-2xl font-bold text-gray-900">Konfigurimi i Sistemit</h2>
                     <p class="text-gray-500 text-sm">Menaxho listat dhe variablat që do të përdoren në formularë. Për profilin vizitoni menynë e Cilësimeve.</p>
                 </div>
 
-                <!-- Lists Section -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    
-                    <!-- Objektivat -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-gray-800">1. Objektivat</h3>
@@ -2692,7 +2697,6 @@
                         </div>
                     </div>
 
-                    <!-- Detyrat Individuale -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-gray-800">2. Detyrat Individuale</h3>
@@ -2705,7 +2709,6 @@
                         </div>
                     </div>
 
-                    <!-- Statusi -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-gray-800">3. Statusi</h3>
@@ -2719,7 +2722,6 @@
                         </div>
                     </div>
 
-                    <!-- Personi Përgjegjës -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-gray-800">4. Personi Përgjegjës</h3>
@@ -2732,7 +2734,6 @@
                         </div>
                     </div>
 
-                    <!-- Kujt i raportohet -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-gray-800">5. Kujt i raportohet</h3>
@@ -2745,7 +2746,6 @@
                         </div>
                     </div>
 
-                    <!-- Afatet -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-gray-800">6. Afatet</h3>
@@ -2779,7 +2779,7 @@
 
             </div>
 
-            <!-- TAB 3: RAPORTI JAVOR (I Përditësuar me Intervalin) -->
+            <!-- TAB 3: RAPORTI JAVOR -->
             <div id="tab-raporti" class="tab-content hidden max-w-[1400px] mx-auto space-y-6 pb-20 print-container">
                 
                 <h1 id="print-header" class="report-header-print text-sm font-bold uppercase"></h1>
@@ -2791,7 +2791,6 @@
                             <p class="text-gray-500 text-sm">Zgjidhni formën e raportimit dhe tërhiqni rreshtat (☰) për t'i renditur.</p>
                         </div>
                         
-                        <!-- SHTUAR: Zgjedhja e Tipit të Raportit -->
                         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-gray-50 p-2.5 rounded-lg border border-gray-200">
                             <select id="report-type-selector" onchange="window.toggleReportType()" class="p-2 border border-blue-200 rounded-md text-sm font-bold outline-none bg-blue-50 text-blue-700 cursor-pointer w-full sm:w-auto">
                                 <option value="week">Një Javë / 5 Ditë (Standard)</option>
@@ -2811,6 +2810,22 @@
                         </div>
                     </div>
 
+                    <!-- SHTUAR: FILTRAT E RAPORTIT (SI NË FOTO) -->
+                    <div class="bg-gray-50 rounded-xl border border-gray-200 p-4 mb-6">
+                        <div class="flex items-center gap-2 mb-3 text-gray-600 font-bold text-xs uppercase tracking-wider">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            Filtra të Avancuar
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                            <select id="rep-filter-objektivi" class="w-full text-xs bg-white border border-gray-300 rounded-md p-2 outline-none" onchange="window.applyReportFilters()"><option value="">-- Objektivi --</option></select>
+                            <select id="rep-filter-statusi" class="w-full text-xs bg-white border border-gray-300 rounded-md p-2 outline-none" onchange="window.applyReportFilters()"><option value="">-- Statusi --</option></select>
+                            <select id="rep-filter-pergjegjesi" class="w-full text-xs bg-white border border-gray-300 rounded-md p-2 outline-none" onchange="window.applyReportFilters()"><option value="">-- Përgjegjësi --</option></select>
+                            <select id="rep-filter-raportohet" class="w-full text-xs bg-white border border-gray-300 rounded-md p-2 outline-none" onchange="window.applyReportFilters()"><option value="">-- Raportohet --</option></select>
+                            <select id="rep-filter-afati" class="w-full text-xs bg-white border border-gray-300 rounded-md p-2 outline-none" onchange="window.applyReportFilters()"><option value="">-- Afati --</option></select>
+                            <input type="text" id="rep-filter-text" placeholder="Kërko tekst..." class="w-full text-xs bg-white border border-gray-300 rounded-md p-2 outline-none" oninput="window.applyReportFilters()">
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
                         <div>
                             <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Drejtoria</label>
@@ -2825,7 +2840,7 @@
                             <input id="rep-specialisti" class="w-full bg-transparent font-bold text-sm text-gray-800 outline-none" readonly>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Periudha</label>
+                            <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Periudha (Zgjedhur)</label>
                             <input id="rep-periudha" class="w-full bg-transparent font-bold text-sm text-gray-800 outline-none" readonly>
                         </div>
                     </div>
@@ -2844,23 +2859,19 @@
                         <div class="flex gap-2 flex-wrap sm:flex-nowrap">
                             <button onclick="window.addSubheader()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2.5 rounded-lg text-xs font-bold shadow transition-all flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                Titull Sektori
-                            </button>
-                            <button onclick="window.openEmailModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold shadow transition-all flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                Email
+                                Shto Titull
                             </button>
                             <button onclick="window.exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold shadow transition-all flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                Excel
+                                Eksporto Excel
                             </button>
                             <button onclick="window.exportToPDF()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold shadow transition-all flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                PDF
+                                Eksporto PDF
                             </button>
-                            <button onclick="window.print()" class="bg-gray-800 hover:bg-black text-white px-4 py-2.5 rounded-lg text-xs font-bold shadow transition-all flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                                Printo
+                            <button onclick="window.openEmailModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold shadow transition-all flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                Dërgo në Email
                             </button>
                         </div>
                     </div>
