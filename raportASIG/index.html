@@ -2111,9 +2111,12 @@
             const specialist = `${prof.emer || ''} ${prof.mbiemer || ''}`.trim() || "";
             const period = document.getElementById('rep-periudha').value;
             
-            let message = `Përshëndetje,\n\nJu lutem gjeni bashkëngjitur Raportin Javor nga: ${specialist}\nPër periudhën: ${period}\n\n`;
-            message += `(KUJDES: Sigurohuni që të bashkëngjisni file-in PDF, Excel ose JSON që keni shkarkuar nga sistemi para se ta dërgoni këtë email.)\n\n`;
-            message += `Gjeneruar nga Sistemi i Raportimit.`;
+            let message = `Përshëndetje,\n\n`;
+            message += `Po ju përcjell në bashkëlidhje raportin javor të aktiviteteve dhe detyrave të realizuara gjatë periudhës ${period}.\n\n`;
+            message += `Për çdo sqarim apo informacion shtesë, mbetem në dispozicion.\n`;
+            message += `Faleminderit.\n\n`;
+            message += `Me respekt,\n`;
+            message += `Erland Alla`;
 
             const mailtoLink = `mailto:${encodeURIComponent(emailTo)}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(message)}`;
             
