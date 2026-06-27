@@ -50,6 +50,7 @@
             transform-origin: top;
         }
 
+        /* Floating Language Switcher - Same as Index */
         .lang-switcher-side {
             position: fixed;
             left: 20px;
@@ -92,9 +93,9 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
 
-    <!-- SIDE LANGUAGE PANEL -->
+    <!-- SIDE LANGUAGE PANEL (HORIZONTAL) -->
     <div class="lang-switcher-side">
-        <a href="/sq/kontakte/" class="lang-item" title="Albanian">
+        <a href="/sq/kontakte/" class="lang-item" title="Shqip">
             <img src="https://flagcdn.com/w40/al.png" alt="AL" class="flag-icon">
         </a>
         <a href="/en/contact/" class="lang-item active" title="English">
@@ -102,10 +103,10 @@
         </a>
     </div>
 
-    <!-- NAVIGATION -->
+    <!-- NAVIGIMI -->
     <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-[1000] border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="/en/" class="flex items-center gap-3 group logo-container">
+            <a href="/" class="flex items-center gap-3 group logo-container">
                 <div class="logo-bg h-11 w-11 flex items-center justify-center bg-slate-900 rounded-xl shadow-md">
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.2"/>
@@ -120,10 +121,10 @@
             </a>
             
             <div class="hidden md:flex items-center space-x-8 font-bold text-[13px] uppercase tracking-widest text-slate-600">
-                <a href="/en/" class="hover:text-blue-600 transition pb-1">Home</a>
-                <a href="/en/services/" class="hover:text-blue-600 transition pb-1">Services</a>
-                <a href="/en/projects/" class="hover:text-blue-600 transition pb-1">Projects</a>
-                <a href="/en/about/" class="text-blue-600 border-b-2 border-blue-600 pb-1">About Us</a>
+                <a href="/" class="hover:text-blue-600 transition">Home</a>
+                <a href="/en/services/" class="hover:text-blue-600 transition">Services</a>
+                <a href="/en/projects/" class="hover:text-blue-600 transition">Projects</a>
+                <a href="/en/about/" class="hover:text-blue-600 transition">About Us</a>
                 <a href="/en/contact/" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-blue-600 transition shadow-lg shadow-slate-200">Contact</a>
             </div>
 
@@ -136,12 +137,12 @@
             </div>
         </div>
 
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 px-6 py-8 space-y-6 shadow-2xl animate-in slide-in-from-top duration-300">
-            <a href="/en/" class="block text-xl font-black text-slate-700">Home</a>
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 px-6 py-8 space-y-6 shadow-2xl">
+            <a href="/" class="block text-xl font-black text-slate-700">Home</a>
             <a href="/en/services/" class="block text-xl font-black text-slate-700">Services</a>
             <a href="/en/projects/" class="block text-xl font-black text-slate-700">Projects</a>
-            <a href="/en/about/" class="block text-xl font-black text-blue-600">About Us</a>
-            <a href="/en/contact/" class="block text-xl font-black text-slate-700">Contact</a>
+            <a href="/en/about/" class="block text-xl font-black text-slate-700">About Us</a>
+            <a href="/en/contact/" class="block text-xl font-black text-blue-600">Contact</a>
         </div>
     </nav>
 
@@ -151,13 +152,22 @@
         <div class="max-w-7xl mx-auto px-6 relative z-10">
             <span class="inline-block px-4 py-1.5 mb-6 text-[10px] font-black tracking-[0.3em] uppercase bg-blue-600/10 text-blue-600 rounded-full border border-blue-500/20">Let's talk</span>
             <h2 class="text-5xl md:text-7xl font-black text-slate-900 uppercase tracking-tighter leading-[0.9] mb-6">
-                Ready for your <span class="text-blue-600">Next</span> <br/>Project?
+                Ready for your next <br/><span class="text-blue-600">Project</span>?
             </h2>
             <p class="max-w-2xl text-slate-500 text-lg md:text-xl font-medium leading-relaxed">
-                Our team of experts is ready to provide you with the most advanced geospatial solutions. Write to us for any question or request.
+                Our team of experts is ready to provide you with the most advanced geospatial solutions. Write to us for any questions or requests.
             </p>
         </div>
     </header>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z6L11QMGQF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z6L11QMGQF');
+</script>
 
     <!-- MAIN CONTACT CONTENT -->
     <section class="pb-24 px-6">
@@ -165,13 +175,13 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <div class="lg:col-span-5 space-y-6">
                     <!-- Contact Info Cards -->
-                    <a href="mailto:contact.lindimap@gmail.com" class="glass-card p-8 rounded-[2rem] flex items-start gap-6 group cursor-pointer block">
+                    <a href="mailto:contact.lindimaps@gmail.com" class="glass-card p-8 rounded-[2rem] flex items-start gap-6 group cursor-pointer block">
                         <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg flex-shrink-0 group-hover:bg-slate-900 transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                         </div>
                         <div>
                             <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 mb-2">Email</h4>
-                            <p class="text-xl md:text-2xl font-black text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">contact.lindimap@gmail.com</p>
+                            <p class="text-xl md:text-2xl font-black text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">contact.lindimaps@gmail.com</p>
                         </div>
                     </a>
                     
@@ -205,35 +215,43 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="space-y-2">
                                     <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Full Name</label>
-                                    <input type="text" required placeholder="John Doe" class="w-full px-6 py-4 rounded-2xl form-input text-slate-900 font-medium border-slate-100">
+                                    <!-- ADD id="full_name" -->
+                                    <input id="full_name" type="text" required placeholder="First Name Last Name" class="w-full px-6 py-4 rounded-2xl form-input text-slate-900 font-medium border-slate-100">
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Email Address</label>
-                                    <input type="email" required placeholder="name@example.com" class="w-full px-6 py-4 rounded-2xl form-input text-slate-900 font-medium border-slate-100">
+                                    <!-- ADD id="email" -->
+                                    <input id="email" type="email" required placeholder="name@example.com" class="w-full px-6 py-4 rounded-2xl form-input text-slate-900 font-medium border-slate-100">
                                 </div>
                             </div>
                             <div class="space-y-2">
                                 <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Subject</label>
-                                <input type="text" required placeholder="Subject..." class="w-full px-6 py-4 rounded-2xl form-input text-slate-900 font-medium border-slate-100">
+                                <!-- ADD id="subject" -->
+                                <input id="subject" type="text" required placeholder="Subject..." class="w-full px-6 py-4 rounded-2xl form-input text-slate-900 font-medium border-slate-100">
                             </div>
                             <div class="space-y-2">
                                 <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Message</label>
-                                <textarea required rows="5" placeholder="Your message..." class="w-full px-6 py-4 rounded-2xl form-input text-slate-900 font-medium resize-none border-slate-100"></textarea>
+                                <!-- ADD id="message" -->
+                                <textarea id="message" required rows="5" placeholder="Your message..." class="w-full px-6 py-4 rounded-2xl form-input text-slate-900 font-medium resize-none border-slate-100"></textarea>
                             </div>
+
+                            <!-- Honeypot anti-spam -->
+                            <input id="website" type="text" style="display:none">
+
                             <button type="submit" id="submitBtn" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl hover:bg-slate-900 transition-all flex items-center justify-center gap-3">
                                 <span>Send Message</span>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                             </button>
                         </form>
 
-                        <!-- Success Message -->
+                        <!-- Success Message (Hidden) -->
                         <div id="success-overlay" class="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-[3rem] flex flex-col items-center justify-center p-8 text-center opacity-0 pointer-events-none transition-opacity duration-500 z-20">
                             <div class="w-24 h-24 bg-emerald-500 text-white rounded-full flex items-center justify-center mb-6 shadow-2xl shadow-emerald-500/30">
                                 <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                             </div>
                             <h3 class="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-2">Sent!</h3>
-                            <p class="text-slate-500 max-w-xs mb-8">Thank you for contacting us. Our team will get back to you very soon.</p>
-                            <button onclick="resetForm()" class="text-blue-600 font-black uppercase tracking-widest text-xs hover:underline">Send another one</button>
+                            <p class="text-slate-500 max-w-xs mb-8">Thank you for contacting us. Our team will respond very soon.</p>
+                            <button onclick="resetForm()" class="text-blue-600 font-black uppercase tracking-widest text-xs hover:underline">Send another</button>
                         </div>
                     </div>
                 </div>
@@ -261,20 +279,103 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                 </a>
             </div>
+            
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div class="flex flex-col items-center">
+                    <div class="h-24 w-24 bg-blue-600/10 rounded-full flex items-center justify-center animate-pulse">
+                        <div class="h-12 w-12 bg-blue-600/30 rounded-full flex items-center justify-center">
+                            <div class="h-4 h-4 bg-blue-600 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="bg-slate-950 text-white py-24 text-center border-t border-slate-900">
+        <!-- Professional Footer (The Footprint) -->
+    <footer class="bg-slate-950 text-white border-t border-white/5 pt-20 pb-10">
         <div class="max-w-7xl mx-auto px-6">
-            <div class="mb-12 flex flex-col items-center gap-4">
-                 <div class="h-14 w-14 bg-blue-600 rounded-2xl flex items-center justify-center">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
-                 </div>
-                 <h4 class="text-4xl font-black tracking-tighter uppercase leading-none">LINDI<span class="text-blue-500">MAPS</span></h4>
-                 <p class="text-slate-500 font-bold tracking-[0.4em] uppercase text-[10px]">Spatial Intelligence Studio</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <!-- Column 1: Brand -->
+                <div class="space-y-6">
+                    <a href="/" class="flex items-center gap-3">
+                        <div class="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
+                        </div>
+                        <h4 class="text-2xl font-black tracking-tighter uppercase leading-none">LINDI<span class="text-blue-500">MAPS</span></h4>
+                    </a>
+                    <p class="text-slate-400 text-sm leading-relaxed max-w-xs">
+                        Studio specialized in Spatial Intelligence, GIS, and Remote Sensing.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Quick Links -->
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Explore</h5>
+                    <ul class="space-y-4 text-sm text-slate-400 font-medium">
+                        <li><a href="/" class="text-blue-500">Home</a></li>
+                        <li><a href="/en/services/" class="hover:text-blue-500 transition-colors">Services</a></li>
+                        <li><a href="/en/projects/" class="hover:text-blue-500 transition-colors">Project Portfolio</a></li>
+                        <li><a href="/en/about/" class="hover:text-blue-500 transition-colors">About Us</a></li>
+                        <li><a href="/en/contact/" class="hover:text-blue-500 transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Services -->
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">GIS Services</h5>
+                    <ul class="space-y-4 text-sm text-slate-400 font-medium">
+                        <li>Geospatial Analysis</li>
+                        <li>Remote Sensing & Satellites</li>
+                        <li>Digital Cartography</li>
+                        <li>WebGIS Development</li>
+                        <li>Training & Consulting</li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Contact -->
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Office</h5>
+                    <ul class="space-y-4 text-sm text-slate-400">
+                        <li class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span>Tirana, Albania</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                         <a href="mailto:contact.lindimaps@gmail.com" class="flex items-start gap-3">
+                             <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                             </svg>
+                            <span>contact.lindimaps@gmail.com</span>
+                         </a>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Mon - Fri | 09:00 - 17:00</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <p class="text-xs text-slate-600 font-bold tracking-widest uppercase italic">© 2024 LindiMaps Studio.</p>
+
+            <!-- Bottom Bar -->
+            <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-[11px] text-slate-500 font-bold tracking-widest uppercase">
+                    © 2024 LindiMaps Studio. 
+                      All rights reserved.
+                </p>
+                <div class="flex gap-8 text-[11px] text-slate-500 font-bold tracking-widest uppercase">
+                    <a href="/en/privacy" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="/en/termsofuse" class="hover:text-white transition-colors">Terms of Service</a>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -283,18 +384,51 @@
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg>
     </button>
 
+    <!-- Supabase client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
         const menuBtn = document.getElementById('menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
         menuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
 
+        // Supabase setup
+        const SUPABASE_URL = "https://fujqjgcciajwfbsvmlnk.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1anFqZ2NjaWFqd2Zic3ZtbG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MTgwOTQsImV4cCI6MjA4NDk5NDA5NH0.0FGl0sxQTuIkSB_xPmEYwyE4-rsAdIZlIQcRWgtqJh4";
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         const contactForm = document.getElementById('contactForm');
         const successOverlay = document.getElementById('success-overlay');
-        contactForm.addEventListener('submit', (e) => {
+
+        contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            document.getElementById('submitBtn').disabled = true;
-            successOverlay.style.opacity = '1';
-            successOverlay.style.pointerEvents = 'auto';
+
+            // Honeypot anti-spam
+            const websiteVal = (document.getElementById('website')?.value || "").trim();
+            if (websiteVal !== "") return;
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+
+            const full_name = document.getElementById('full_name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const subject = document.getElementById('subject').value.trim();
+            const message = document.getElementById('message').value.trim();
+
+            try {
+                const { error } = await sb.from('contacts').insert([{
+                    full_name, email, subject, message
+                }]);
+
+                if (error) throw error;
+
+                successOverlay.style.opacity = '1';
+                successOverlay.style.pointerEvents = 'auto';
+            } catch (err) {
+                console.error(err);
+                alert("Sending failed. Please try again.");
+                submitBtn.disabled = false;
+            }
         });
 
         function resetForm() {
