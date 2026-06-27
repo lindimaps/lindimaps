@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINDIMAPS | Management Systems</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #020617; /* Midnight Black */
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .logo-gradient {
+            background: linear-gradient(to right, #3b82f6, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .animate-dot {
+            animation: pulse-dot 2s infinite ease-in-out;
+            transform-origin: center;
+        }
+
+        /* Dark Modern Cards */
+        .dark-card {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .dark-card:hover {
+            transform: translateY(-12px);
+            border-color: rgba(59, 130, 246, 0.4);
+            background: rgba(30, 41, 59, 0.6);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Ambient Glow Background */
+        .ambient-glow {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -10%, rgba(59, 130, 246, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at center, black, transparent 85%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .card-icon-container {
+            transition: all 0.5s ease;
+        }
+
+        .dark-card:hover .card-icon-container {
+            transform: scale(1.1) rotate(5deg);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <div class="ambient-glow"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Header / Logo Area -->
+    <header class="w-full py-16 px-6 flex justify-center">
+        <a href="https://lindimaps.com" class="flex items-center gap-5 group cursor-pointer no-underline focus:outline-none">
+            <div class="h-16 w-16 flex items-center justify-center bg-blue-600 rounded-2xl shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all duration-500 group-hover:scale-110 group-hover:shadow-[0_0_40px_rgba(37,99,235,0.6)]">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.2"/>
+                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                    <circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-4xl font-black tracking-tighter leading-none select-none">
+                    <span class="text-white">LINDI</span><span class="logo-gradient">MAPS</span>
+                </h1>
+                <span class="text-[10px] uppercase tracking-[0.6em] font-bold text-slate-500 mt-2 select-none">
+                    Spatial Intelligence
+                </span>
+            </div>
+        </a>
+    </header>
+
+    <!-- Main Navigation Hub -->
+    <main class="flex-grow container mx-auto px-6 py-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            
+            <!-- Card: ACTIVITIES -->
+            <a href="https://lindimaps.com/en/activities/" class="dark-card p-10 rounded-[3rem] flex flex-col items-center group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                <div class="card-icon-container w-20 h-20 bg-slate-800/50 border border-white/10 rounded-3xl flex items-center justify-center mb-8 group-hover:border-blue-500/50 group-hover:bg-blue-500/20 shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                
+                <h2 class="text-2xl font-extrabold tracking-tighter italic mb-1">
+                    <span class="text-white">LINDI</span><span class="logo-gradient">MAPS</span>
+                </h2>
+                <p class="text-[11px] uppercase tracking-[0.5em] font-bold text-blue-500 mb-8">Activities</p>
+                
+                <div class="mt-auto flex items-center gap-3 py-3 px-6 rounded-full bg-white/5 border border-white/10 group-hover:bg-blue-600 group-hover:border-blue-500 transition-all duration-300">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-white">Open System</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-white transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </div>
+            </a>
+
+            <!-- Card: TIME OFF -->
+            <a href="https://lindimaps.com/en/time-off/" class="dark-card p-10 rounded-[3rem] flex flex-col items-center group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-b from-teal-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                <div class="card-icon-container w-20 h-20 bg-slate-800/50 border border-white/10 rounded-3xl flex items-center justify-center mb-8 group-hover:border-teal-500/50 group-hover:bg-teal-500/20 shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                
+                <h2 class="text-2xl font-extrabold tracking-tighter italic mb-1">
+                    <span class="text-white">LINDI</span><span class="logo-gradient">MAPS</span>
+                </h2>
+                <p class="text-[11px] uppercase tracking-[0.5em] font-bold text-teal-500 mb-8">Time Off</p>
+                
+                <div class="mt-auto flex items-center gap-3 py-3 px-6 rounded-full bg-white/5 border border-white/10 group-hover:bg-teal-600 group-hover:border-teal-500 transition-all duration-300">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-white">Open System</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-white transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </div>
+            </a>
+
+            <!-- Card: PAYMENTS -->
+            <a href="https://lindimaps.com/en/payments/" class="dark-card p-10 rounded-[3rem] flex flex-col items-center group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-b from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                <div class="card-icon-container w-20 h-20 bg-slate-800/50 border border-white/10 rounded-3xl flex items-center justify-center mb-8 group-hover:border-emerald-500/50 group-hover:bg-emerald-500/20 shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                
+                <h2 class="text-2xl font-extrabold tracking-tighter italic mb-1">
+                    <span class="text-white">LINDI</span><span class="logo-gradient">MAPS</span>
+                </h2>
+                <p class="text-[11px] uppercase tracking-[0.5em] font-bold text-emerald-500 mb-8">Payments</p>
+                
+                <div class="mt-auto flex items-center gap-3 py-3 px-6 rounded-full bg-white/5 border border-white/10 group-hover:bg-emerald-600 group-hover:border-emerald-500 transition-all duration-300">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-white">Open System</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-white transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-white/5 bg-black/40 backdrop-blur-md">
+        <div class="container mx-auto px-6 flex flex-col items-center gap-6">
+            <div class="flex items-center gap-3">
+                <span class="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6] animate-pulse"></span>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.8em] select-none">Unified Control Systems</p>
+            </div>
+            <div class="flex flex-col items-center gap-2">
+                <p class="text-slate-600 text-[9px] font-bold uppercase tracking-widest select-none">© 2024 LINDIMAPS SPATIAL INTELLIGENCE</p>
+                <div class="h-px w-12 bg-gradient-to-r from-transparent via-slate-700 to-transparent"></div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
