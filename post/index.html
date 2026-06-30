@@ -39,6 +39,13 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        
+        /* Auto-zgjerim per textarea */
+        textarea {
+            resize: none;
+            overflow: hidden;
+            min-height: 104px; /* Default height */
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
@@ -54,11 +61,34 @@
         </div>
 
         <!-- Forma e të dhënave -->
-        <div class="space-y-5 flex-1">
+        <div class="space-y-6 flex-1">
             
+            <!-- Formati / Platforma -->
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-3">1. Formati i Postimit</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="format-btn border-2 border-blue-500 bg-blue-500/10 text-blue-400 rounded-xl py-3 px-2 flex flex-col items-center gap-1 transition-all" data-w="400" data-h="500" data-scale="2.7">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2" stroke-width="2"></rect></svg>
+                        <span class="text-[10px] font-bold uppercase tracking-wide">Instagram (4:5)</span>
+                    </button>
+                    <button class="format-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-xl py-3 px-2 flex flex-col items-center gap-1 transition-all" data-w="315" data-h="560" data-scale="3.43">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2" stroke-width="2"></rect></svg>
+                        <span class="text-[10px] font-bold uppercase tracking-wide">Story / TikTok</span>
+                    </button>
+                    <button class="format-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-xl py-3 px-2 flex flex-col items-center gap-1 transition-all" data-w="400" data-h="400" data-scale="2.7">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" stroke-width="2"></rect></svg>
+                        <span class="text-[10px] font-bold uppercase tracking-wide">Katrore (1:1)</span>
+                    </button>
+                    <button class="format-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-xl py-3 px-2 flex flex-col items-center gap-1 transition-all" data-w="500" data-h="262" data-scale="2.4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2" stroke-width="2"></rect></svg>
+                        <span class="text-[10px] font-bold uppercase tracking-wide">Facebook Land.</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- Ngarkimi i Fotos -->
             <div>
-                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">1. Ngarko Foton e Sfondit</label>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">2. Ngarko Foton e Sfondit</label>
                 <div class="relative group">
                     <input type="file" id="imageInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                     <div class="w-full bg-slate-900 border-2 border-dashed border-slate-700 rounded-xl p-4 flex items-center justify-center gap-3 text-slate-400 group-hover:border-blue-500 group-hover:text-blue-400 transition-colors">
@@ -70,23 +100,23 @@
 
             <!-- Titulli kryesor -->
             <div>
-                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">2. Titulli Kryesor (I bardhë)</label>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">3. Titulli Kryesor (I bardhë)</label>
                 <input type="text" id="titleInput" value="Takimi me drejtuesit për" 
                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors text-sm">
             </div>
 
             <!-- Teksti i Theksuar (Gradient) -->
             <div>
-                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">3. Fjala e theksuar (Gradient)</label>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">4. Fjala e theksuar (Gradient)</label>
                 <input type="text" id="highlightInput" value="Inteligjencën Hapësinore" 
                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500 transition-colors text-sm">
             </div>
 
-            <!-- Përshkrimi -->
+            <!-- Përshkrimi (Zgjerohet automatikisht) -->
             <div>
-                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">4. Përshkrimi i Njoftimit</label>
-                <textarea id="descInput" rows="4" 
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors text-sm resize-none"
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">5. Përshkrimi i Njoftimit</label>
+                <textarea id="descInput" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors text-sm"
                 >Diskutuam mbi forcimin e bashkëpunimit në përdorimin e teknologjisë GIS dhe Remote Sensing. LindiMaps ofron zgjidhje konkrete në analizën e të dhënave komplekse gjeohapësinore.</textarea>
             </div>
         </div>
@@ -100,7 +130,7 @@
     </aside>
 
     <!-- PJESA E DJATHTË: PREVIEW (PAMJA PARAPRAKE) -->
-    <main class="w-full lg:w-2/3 bg-[#020617] flex items-center justify-center p-8 relative">
+    <main class="w-full lg:w-2/3 bg-[#020617] flex items-center justify-center p-8 relative min-h-[600px]">
         
         <!-- Sfond vizual dekorativ për mjedisin e punës -->
         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
@@ -109,8 +139,8 @@
         <!-- ========================================== -->
         <!-- KJO ËSHTË ZONA QË DO TË EKSPORTOHET SI FOTO -->
         <!-- ========================================== -->
-        <!-- Dimensionet 400x500. Gjatë eksportit zmadhohet automatikisht për rezolucion 4K -->
-        <div id="export-area" class="relative w-[400px] h-[500px] bg-slate-800 rounded-none overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transition-all">
+        <!-- Përmasat kontrollohen përmes JavaScript në varësi të formatit të zgjedhur -->
+        <div id="export-area" class="relative bg-slate-800 rounded-none overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transition-all duration-300 ease-in-out" style="width: 400px; height: 500px;">
             
             <!-- Foto e Sfondit -->
             <img id="previewImage" src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80" alt="Sfondi" class="absolute inset-0 w-full h-full object-cover z-0">
@@ -190,18 +220,40 @@
         const descInput = document.getElementById('descInput');
         const previewDesc = document.getElementById('previewDesc');
         
-        const glassCard = document.getElementById('glassCard'); // E SHTUAR: Referenca për kartën
+        const glassCard = document.getElementById('glassCard');
         const downloadBtn = document.getElementById('downloadBtn');
         const exportArea = document.getElementById('export-area');
 
-        // 1. Ndryshimi i Fotos së Sfondit
+        let currentScale = 2.7; // Shkalla bazë për gjenerim HD
+
+        // --- 0. Logjika e Formateve ---
+        const formatBtns = document.querySelectorAll('.format-btn');
+        formatBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Hiq klasat aktive nga të gjithë butonat
+                formatBtns.forEach(b => {
+                    b.classList.remove('border-blue-500', 'bg-blue-500/10', 'text-blue-400');
+                    b.classList.add('border-slate-700', 'text-slate-400');
+                });
+                
+                // Shto klasat aktive tek butoni i klikuar
+                this.classList.remove('border-slate-700', 'text-slate-400');
+                this.classList.add('border-blue-500', 'bg-blue-500/10', 'text-blue-400');
+
+                // Ndrysho madhësitë e panelit preview
+                exportArea.style.width = this.getAttribute('data-w') + 'px';
+                exportArea.style.height = this.getAttribute('data-h') + 'px';
+                
+                // Përditëso shkallën e eksportit për të ruajtur cilësinë 4K / HD
+                currentScale = parseFloat(this.getAttribute('data-scale'));
+            });
+        });
+
+        // --- 1. Ndryshimi i Fotos së Sfondit ---
         imageInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                // Shfaq emrin e file-it në UI
                 fileNameDisplay.textContent = file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name;
-                
-                // Lexo file-in dhe vendose në img src
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     previewImage.src = event.target.result;
@@ -210,15 +262,21 @@
             }
         });
 
-        // 2. Përditësimi i teksteve në kohë reale (Real-time data binding)
+        // --- 2. Përditësimi i teksteve (Dhe zgjerimi automatik i Textarea) ---
         titleInput.addEventListener('input', (e) => { previewTitle.innerHTML = e.target.value.replace(/\n/g, '<br>'); });
         highlightInput.addEventListener('input', (e) => { previewHighlight.textContent = e.target.value; });
-        descInput.addEventListener('input', (e) => { previewDesc.textContent = e.target.value; });
-
-        // 3. Logjika e Shkarkimit (Eksporti i elementit si foto)
-        downloadBtn.addEventListener('click', () => {
+        
+        descInput.addEventListener('input', function(e) {
+            // Zgjerimi automatik i lartësisë së inputit
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
             
-            // Ndrysho butonin për t'i treguar përdoruesit se po ngarkohet
+            // Përditësimi i tekstit në kartë
+            previewDesc.textContent = e.target.value;
+        });
+
+        // --- 3. Logjika e Shkarkimit ---
+        downloadBtn.addEventListener('click', () => {
             const originalText = downloadBtn.innerHTML;
             downloadBtn.innerHTML = `
                 <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -228,48 +286,40 @@
                 Po Gjenerohet...`;
             downloadBtn.disabled = true;
 
-            // PËRSHTATJE PËR HTML2CANVAS PËRPARA SHKARKIMIT
-            // 1. Heqim tekstin me gradient dhe vendosim ngjyrë solide (html2canvas nuk lexon gradientet në tekst)
+            // Fsheh gradientet dhe blur (Rregullim për HTML2Canvas)
             previewHighlight.classList.remove('text-gradient');
             previewHighlight.style.color = '#38bdf8'; 
-
-            // 2. Heqim efektin blur dhe bëjmë kartën më të errët (html2canvas nuk lexon backdrop-filter)
             glassCard.style.background = 'rgba(15, 23, 42, 0.95)';
             glassCard.style.border = '1px solid rgba(255, 255, 255, 0.05)';
 
-            // Përdorim setTimeout që t'i japim kohë (100ms) shfletuesit të aplikojë CSS e reja përpara se të "shkrepë" foton
             setTimeout(() => {
-                // Përdor html2canvas
                 html2canvas(exportArea, {
-                    scale: 3, // Rrit rezolucionin e fotos finale 3 herë
-                    useCORS: true, // Lejon fotot nga domajne të tjera
+                    scale: currentScale, // Përdor shkallën e formatit të zgjedhur
+                    useCORS: true,
                     backgroundColor: null,
                 }).then(canvas => {
-                    // Konverto në imazh PNG
                     const imgData = canvas.toDataURL('image/png');
-                    
-                    // Krijo një link fiktiv për shkarkim
                     const link = document.createElement('a');
-                    link.download = `LindiMaps_Post_${new Date().getTime()}.png`;
+                    
+                    // Emërtoje sipas formatit të platformës
+                    const platformName = document.querySelector('.format-btn.border-blue-500 span').textContent.replace(/[^a-zA-Z]/g, '');
+                    link.download = `LindiMaps_${platformName}_${new Date().getTime()}.png`;
+                    
                     link.href = imgData;
                     link.click();
-
                 }).catch(err => {
                     console.error("Gabim gjatë eksportimit:", err);
                     alert("Ndodhi një gabim gjatë gjenerimit të fotos.");
                 }).finally(() => {
-                    // RIKTHEJMË DIZAJNIN ORIGJINAL TË EKRANIT PASI ËSHTË BËRË SHKARKIMI
+                    // Rikthe dizajnin vizual pas shkarkimit
                     previewHighlight.classList.add('text-gradient');
                     previewHighlight.style.color = '';
-                    
                     glassCard.style.background = '';
                     glassCard.style.border = '';
-
-                    // Rikthe butonin në gjendjen normale
                     downloadBtn.innerHTML = originalText;
                     downloadBtn.disabled = false;
                 });
-            }, 100);
+            }, 150);
         });
     </script>
 </body>
