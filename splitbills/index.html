@@ -9,7 +9,7 @@
     <style id="base-styles">
         @media print {
             body { background-color: white; }
-            .no-print, aside, #mobile-header, #form-section { display: none !important; }
+            .no-print, aside, #mobile-header, #form-section, #auth-screen { display: none !important; }
             #bill-section { width: 100% !important; margin: 0; padding: 0; box-shadow: none; display: block !important; }
             main { overflow: visible !important; height: auto !important; }
         }
@@ -23,7 +23,7 @@
         @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .toast-enter { animation: slideIn 0.3s ease-out forwards; }
     </style>
-    <!-- Dark Mode Styles Override (për të mos prekur HTML klasat origjinale) -->
+    <!-- Dark Mode Styles Override -->
     <style id="dark-mode-styles">
         html.dark body { background-color: #0f172a; color: #f8fafc; }
         html.dark .bg-gray-100 { background-color: #0f172a !important; }
@@ -40,15 +40,115 @@
 <body class="bg-gray-100 font-sans h-screen flex flex-col md:flex-row overflow-hidden transition-colors duration-300">
 
     <!-- Toast Container -->
-    <div id="toast-container" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-3 no-print"></div>
+    <div id="toast-container" class="fixed bottom-4 right-4 z-[99999] flex flex-col gap-3 no-print pointer-events-none"></div>
 
-    <!-- Mobile Header -->
+    <!-- EKRANI I AUTENTIKIMIT (SHTESË) -->
+    <div id="auth-screen" class="fixed inset-0 z-[1000] bg-slate-900 flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="bg-blue-600 p-6 text-center text-white">
+                <i class="fas fa-wallet text-4xl mb-2"></i>
+                <h2 class="text-2xl font-bold">SplitBills Pro</h2>
+                <p class="text-blue-200 text-sm mt-1">Hapësira juaj private e shpenzimeve</p>
+            </div>
+            
+            <div class="p-6 md:p-8 flex-1 relative overflow-x-hidden">
+                <!-- FORMULARI LOGIN -->
+                <div id="auth-login-form" class="w-full transition-transform duration-300 transform translate-x-0">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Hyr në llogari</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label>
+                            <div class="relative">
+                                <i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i>
+                                <input type="email" id="login-email" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Fjalëkalimi</label>
+                            <div class="relative">
+                                <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                                <input type="password" id="login-password" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <label class="flex items-center gap-2 cursor-pointer text-gray-600 dark:text-gray-300">
+                                <input type="checkbox" id="login-remember" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Mba mend
+                            </label>
+                            <button onclick="switchAuthView('reset')" class="text-blue-600 hover:underline font-semibold">Keni harruar fjalëkalimin?</button>
+                        </div>
+                        <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-4 shadow-md">
+                            Hyr <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                    <div class="text-center mt-6 text-sm text-gray-600 dark:text-gray-300">
+                        Nuk keni llogari? <button onclick="switchAuthView('register')" class="text-blue-600 font-bold hover:underline">Regjistrohu</button>
+                    </div>
+                </div>
+
+                <!-- FORMULARI REGJISTRIMIT -->
+                <div id="auth-register-form" class="w-full absolute top-0 left-0 p-6 md:p-8 transition-transform duration-300 transform translate-x-full">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Krijo Llogari të Re</h3>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Emri</label>
+                                <input type="text" id="reg-fname" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Mbiemri</label>
+                                <input type="text" id="reg-lname" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Email</label>
+                            <div class="relative"><i class="fas fa-envelope absolute left-3 top-2.5 text-gray-400 text-sm"></i><input type="email" id="reg-email" class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Fjalëkalimi (Min 8 karaktere, 1 i Madh, 1 i Vogël, 1 Numër)</label>
+                            <div class="relative"><i class="fas fa-lock absolute left-3 top-2.5 text-gray-400 text-sm"></i><input type="password" id="reg-password" class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Konfirmo Fjalëkalimin</label>
+                            <div class="relative"><i class="fas fa-lock absolute left-3 top-2.5 text-gray-400 text-sm"></i><input type="password" id="reg-password-confirm" class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        </div>
+                        <button onclick="handleRegister()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition mt-2 shadow-md">
+                            Regjistrohu <i class="fas fa-user-plus ml-2"></i>
+                        </button>
+                    </div>
+                    <div class="text-center mt-5 text-sm text-gray-600 dark:text-gray-300">
+                        <button onclick="switchAuthView('login')" class="text-blue-600 font-bold hover:underline"><i class="fas fa-arrow-left"></i> Kthehu tek Hyrja</button>
+                    </div>
+                </div>
+
+                <!-- FORMULARI RESET PASSWORD -->
+                <div id="auth-reset-form" class="w-full absolute top-0 left-0 p-6 md:p-8 transition-transform duration-300 transform translate-x-full">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Rivendos Fjalëkalimin</h3>
+                    <p class="text-xs text-gray-500 mb-4">Shënoni emailin tuaj të regjistrimit dhe do t'ju dërgojmë një link për të krijuar një fjalëkalim të ri.</p>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label>
+                            <div class="relative"><i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i><input type="email" id="reset-email" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        </div>
+                        <button onclick="handleResetPassword()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition mt-4 shadow-md">
+                            Dërgo Linkun <i class="fas fa-paper-plane ml-2"></i>
+                        </button>
+                    </div>
+                    <div class="text-center mt-6 text-sm text-gray-600 dark:text-gray-300">
+                        <button onclick="switchAuthView('login')" class="text-blue-600 font-bold hover:underline"><i class="fas fa-arrow-left"></i> Kthehu tek Hyrja</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Header (Ndryshuar për të shtuar Logout) -->
     <header id="mobile-header" class="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center z-20 shadow-md shrink-0">
         <h1 class="text-lg font-bold flex items-center gap-2">
             <i class="fas fa-wallet text-blue-400"></i> Shpenzimet
         </h1>
-        <div class="flex gap-3">
+        <div class="flex gap-3 items-center">
             <button onclick="toggleDarkMode()" class="text-xl focus:outline-none"><i class="fas fa-moon" id="mobile-moon-icon"></i></button>
+            <button onclick="handleLogout()" class="text-red-400 hover:text-red-300 text-xl focus:outline-none" title="Dil"><i class="fas fa-sign-out-alt"></i></button>
             <button onclick="toggleSidebar()" class="text-2xl p-1 focus:outline-none"><i class="fas fa-bars"></i></button>
         </div>
     </header>
@@ -62,7 +162,9 @@
             <h1 class="text-xl font-bold flex items-center gap-2">
                 <i class="fas fa-wallet text-blue-400"></i> Shpenzimet
             </h1>
-            <button onclick="toggleDarkMode()" class="text-slate-300 hover:text-white transition" title="Dark Mode"><i class="fas fa-moon" id="desktop-moon-icon"></i></button>
+            <div class="flex gap-3">
+                <button onclick="toggleDarkMode()" class="text-slate-300 hover:text-white transition" title="Dark Mode"><i class="fas fa-moon" id="desktop-moon-icon"></i></button>
+            </div>
         </div>
         
         <div class="p-4 border-b border-slate-700 bg-slate-800/50 shrink-0">
@@ -82,8 +184,12 @@
             </ul>
         </div>
         
-        <div class="md:hidden p-4 border-t border-slate-700 shrink-0">
-            <button onclick="toggleSidebar()" class="w-full bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-bold text-center">
+        <!-- Shtuar Logout ne fund te menuse -->
+        <div class="p-4 border-t border-slate-700 shrink-0">
+            <button onclick="handleLogout()" class="w-full bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white border border-red-500/30 py-2 rounded-lg font-bold text-center transition flex justify-center items-center gap-2">
+                <i class="fas fa-sign-out-alt"></i> Dil (Logout)
+            </button>
+            <button onclick="toggleSidebar()" class="md:hidden w-full bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-bold text-center mt-3">
                 Mbyll Menunë
             </button>
         </div>
@@ -159,16 +265,20 @@
                             <p class="text-gray-500 mt-1 text-sm md:text-base">Pasqyra e detyrimeve</p>
                         </div>
                         <div class="flex flex-wrap gap-2 text-right w-full md:w-auto no-print">
+                            <button onclick="openProfileAnalytics()" class="bg-purple-100 text-purple-700 px-3 py-2 rounded-lg hover:bg-purple-200 transition text-sm font-bold shadow-sm"><i class="fas fa-chart-pie"></i> Analytics</button>
+                            <input type="file" id="import-json-input" class="hidden" accept=".json" onchange="handleImportJSON(event)">
+                            <button onclick="document.getElementById('import-json-input').click()" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition text-sm font-bold shadow-sm"><i class="fas fa-file-import"></i> Import</button>
                             <button onclick="exportJSON()" class="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-200 transition text-sm font-bold shadow-sm"><i class="fas fa-file-code"></i> JSON</button>
-                            <button onclick="exportCSV()" class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 transition text-sm font-bold shadow-sm"><i class="fas fa-file-excel"></i> CSV</button>
+                            <button onclick="exportCSV()" class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 transition text-sm font-bold shadow-sm"><i class="fas fa-file-excel"></i> Excel/CSV</button>
+                            <button onclick="exportPDF()" class="bg-red-100 text-red-700 px-3 py-2 rounded-lg hover:bg-red-200 transition text-sm font-bold shadow-sm"><i class="fas fa-file-pdf"></i> PDF</button>
                             <button onclick="window.print()" class="w-full md:w-auto bg-slate-800 text-white px-5 py-3 md:py-2 rounded-lg hover:bg-slate-700 transition shadow flex justify-center items-center gap-2 font-bold">
                                 <i class="fas fa-print"></i> <span class="md:inline">Printo</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- DASHBOARD STATS (Shtesë) -->
-                    <div id="advanced-dashboard" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 no-print">
+                    <!-- DASHBOARD STATS -->
+                    <div id="advanced-dashboard" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 mb-6 no-print">
                         <div class="bg-blue-50 border border-blue-100 p-3 rounded-lg shadow-sm">
                             <div class="text-[10px] uppercase font-bold text-blue-400">Total Transaksione</div>
                             <div class="text-xl font-black text-blue-700" id="stat-tx-count">0</div>
@@ -178,16 +288,32 @@
                             <div class="text-xl font-black text-red-700" id="stat-konsum">0 L</div>
                         </div>
                         <div class="bg-green-50 border border-green-100 p-3 rounded-lg shadow-sm">
-                            <div class="text-[10px] uppercase font-bold text-green-400">Shuma Paguar Fizikisht</div>
+                            <div class="text-[10px] uppercase font-bold text-green-400">Paguar Fizikisht</div>
                             <div class="text-xl font-black text-green-700" id="stat-paguar-tot">0 L</div>
                         </div>
                         <div class="bg-orange-50 border border-orange-100 p-3 rounded-lg shadow-sm">
                             <div class="text-[10px] uppercase font-bold text-orange-400">Balanca Totale</div>
                             <div class="text-xl font-black text-orange-700" id="stat-balance-net">0 L</div>
                         </div>
+                        <div class="bg-purple-50 border border-purple-100 p-3 rounded-lg shadow-sm">
+                            <div class="text-[10px] uppercase font-bold text-purple-400">Dhurata Totale</div>
+                            <div class="text-xl font-black text-purple-700" id="stat-dhurata-tot">0 L</div>
+                        </div>
+                        <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-lg shadow-sm">
+                            <div class="text-[10px] uppercase font-bold text-indigo-400">Numri Profileve</div>
+                            <div class="text-xl font-black text-indigo-700" id="stat-profile-tot">0</div>
+                        </div>
+                        <div class="bg-teal-50 border border-teal-100 p-3 rounded-lg shadow-sm">
+                            <div class="text-[10px] uppercase font-bold text-teal-400">Top Paguesi</div>
+                            <div class="text-sm font-black text-teal-700 truncate" id="stat-top-paguesi">-</div>
+                        </div>
+                        <div class="bg-pink-50 border border-pink-100 p-3 rounded-lg shadow-sm">
+                            <div class="text-[10px] uppercase font-bold text-pink-400">Top Borxhliu</div>
+                            <div class="text-sm font-black text-pink-700 truncate" id="stat-top-borxhliu">-</div>
+                        </div>
                     </div>
 
-                    <!-- FILTER/SEARCH TOOLBAR (Shtesë) -->
+                    <!-- FILTER/SEARCH TOOLBAR -->
                     <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-6 flex flex-col md:flex-row gap-3 no-print items-center">
                         <div class="relative flex-1 w-full">
                             <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
@@ -203,13 +329,18 @@
                             <option value="all">Të gjitha Datat</option>
                             <option value="today">Sot</option>
                             <option value="week">7 Ditët e fundit</option>
+                            <option value="30days">30 Ditët e fundit</option>
                             <option value="month">Ky Muaj</option>
+                            <option value="year">Ky Vit</option>
                         </select>
                         <select id="sort-by" onchange="applyFilters()" class="border border-gray-300 p-2 rounded-lg text-sm bg-white outline-none w-full md:w-auto">
                             <option value="date-desc">Data (Më e reja)</option>
                             <option value="date-asc">Data (Më e vjetra)</option>
                             <option value="amount-desc">Shuma (E madhe)</option>
                             <option value="amount-asc">Shuma (E vogël)</option>
+                            <option value="name-asc">Emri (A-Z)</option>
+                            <option value="name-desc">Emri (Z-A)</option>
+                            <option value="type-asc">Lloji (A-Z)</option>
                         </select>
                     </div>
 
@@ -350,9 +481,25 @@
         </div>
     </div>
 
-    <!-- Custom Confirm Modal (Zëvendësimi i window.confirm) -->
-    <div id="custom-confirm-modal" class="fixed inset-0 bg-black/60 z-[999] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm relative">
+    <!-- Modal për Profile Analytics -->
+    <div id="profile-analytics-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg relative max-h-[90vh] flex flex-col dark:bg-slate-900">
+            <button onclick="closeProfileAnalytics()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"><i class="fas fa-times text-xl"></i></button>
+            <h3 class="text-xl font-bold mb-4 text-gray-800 border-b pb-2 flex items-center gap-2 dark:text-white dark:border-slate-700">
+                <i class="fas fa-chart-line text-purple-500"></i> Analitika e Profilit
+            </h3>
+            <div id="analytics-body" class="text-gray-700 text-sm overflow-y-auto flex-1 pr-2 dark:text-gray-300 grid grid-cols-2 gap-4">
+                <!-- Mbushet Dinamikisht -->
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-slate-700 flex justify-end">
+                <button onclick="closeProfileAnalytics()" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-bold dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600">Mbyll</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal -->
+    <div id="custom-confirm-modal" class="fixed inset-0 bg-black/60 z-[9999] hidden flex items-center justify-center p-4 pointer-events-auto">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm relative pointer-events-auto">
             <div class="flex items-center gap-3 mb-4">
                 <div class="bg-red-100 text-red-600 p-3 rounded-full"><i class="fas fa-exclamation-triangle text-xl"></i></div>
                 <h3 class="text-lg font-bold text-gray-800">Kujdes!</h3>
@@ -360,7 +507,7 @@
             <p id="custom-confirm-msg" class="text-gray-600 text-sm mb-6"></p>
             <div class="flex justify-end gap-3">
                 <button id="btn-confirm-cancel" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition">Anulo</button>
-                <button id="btn-confirm-ok" class="px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition">Po, Fshi</button>
+                <button id="btn-confirm-ok" class="px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition">Po, Konfirmo</button>
             </div>
         </div>
     </div>
@@ -368,9 +515,10 @@
     <!-- SCRIPT FIREBASE & LOGJIKA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp, doc, updateDoc, deleteDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp, doc, updateDoc, deleteDoc, setDoc, enableIndexedDbPersistence, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
+        // Konfigurimi yt (Nuk ndryshohet)
         const firebaseConfig = {
             apiKey: "AIzaSyDSqsVkBQ0uW5UViuf_gGckFbuJWT01W-s",
             authDomain: "splitbills-1be64.firebaseapp.com",
@@ -393,6 +541,9 @@
         window.transactions = [];
         window.selectedUserId = null;
         window.isSidebarOpen = false;
+        
+        let unsubUsers = null;
+        let unsubTx = null;
 
         // --- THEME ---
         const initTheme = () => {
@@ -413,9 +564,11 @@
             const toast = document.createElement('div');
             let icon = type === 'success' ? '<i class="fas fa-check-circle text-green-500"></i>' : 
                        type === 'error' ? '<i class="fas fa-times-circle text-red-500"></i>' : 
+                       type === 'warning' ? '<i class="fas fa-exclamation-triangle text-orange-500"></i>' :
                        '<i class="fas fa-info-circle text-blue-500"></i>';
             let bg = type === 'success' ? 'bg-green-50 border-green-200' : 
                      type === 'error' ? 'bg-red-50 border-red-200' : 
+                     type === 'warning' ? 'bg-orange-50 border-orange-200' :
                      'bg-blue-50 border-blue-200';
             
             toast.className = `flex items-center gap-3 p-4 rounded-lg shadow-lg border ${bg} text-gray-800 toast-enter max-w-sm`;
@@ -439,27 +592,166 @@
             btnOk.onclick = () => { close(); callback(); };
         };
 
-        // --- INIT & AUTH ---
-        window.init = () => {
-            onAuthStateChanged(auth, user => {
-                if(!user) signInAnonymously(auth).catch(e => window.showToast('Authentication Error', 'error'));
-            });
-            if (window.innerWidth < 768) window.switchTab('form');
+        // ==========================================
+        // AUTHENTICATION LOGIC (SHTESË)
+        // ==========================================
+        window.switchAuthView = (view) => {
+            const login = document.getElementById('auth-login-form');
+            const register = document.getElementById('auth-register-form');
+            const reset = document.getElementById('auth-reset-form');
+
+            login.style.transform = 'translateX(-100%)';
+            register.style.transform = 'translateX(100%)';
+            reset.style.transform = 'translateX(100%)';
+
+            setTimeout(() => {
+                login.classList.add('hidden'); register.classList.add('hidden'); reset.classList.add('hidden');
+                
+                if(view === 'login') { login.classList.remove('hidden'); setTimeout(() => login.style.transform = 'translateX(0)', 50); }
+                else if(view === 'register') { register.classList.remove('hidden'); setTimeout(() => register.style.transform = 'translateX(0)', 50); }
+                else if(view === 'reset') { reset.classList.remove('hidden'); setTimeout(() => reset.style.transform = 'translateX(0)', 50); }
+            }, 300);
         };
 
-        // --- SYNC REAL-TIME NGA FIRESTORE ---
-        onSnapshot(collection(db, 'users'), snapshot => {
-            window.users = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            window.renderUsers();
-            if(window.selectedUserId) window.renderTransactions();
+        const validatePassword = (pwd) => {
+            const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+            return re.test(pwd);
+        };
+
+        const handleAuthError = (error) => {
+            console.error(error);
+            switch (error.code) {
+                case 'auth/email-already-in-use': window.showToast("Ky email është i regjistruar tashmë.", "error"); break;
+                case 'auth/invalid-email': window.showToast("Formati i email nuk është i vlefshëm.", "error"); break;
+                case 'auth/weak-password': window.showToast("Fjalëkalimi është shumë i dobët.", "warning"); break;
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                case 'auth/invalid-credential': window.showToast("Kredenciale të gabuara. Provo sërish.", "error"); break;
+                case 'auth/network-request-failed': window.showToast("Nuk ka lidhje interneti.", "error"); break;
+                default: window.showToast("Ndodhi një gabim gjatë procesit.", "error"); break;
+            }
+        };
+
+        window.handleRegister = async () => {
+            const fname = document.getElementById('reg-fname').value.trim();
+            const lname = document.getElementById('reg-lname').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const pwd = document.getElementById('reg-password').value;
+            const pwd2 = document.getElementById('reg-password-confirm').value;
+
+            if(!fname || !lname || !email || !pwd || !pwd2) return window.showToast("Plotësoni të gjitha fushat.", "warning");
+            if(pwd !== pwd2) return window.showToast("Fjalëkalimet nuk përputhen.", "error");
+            if(!validatePassword(pwd)) return window.showToast("Fjalëkalimi duhet të ketë min 8 karaktere, 1 të madhe, 1 të vogël dhe 1 numër.", "error");
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, pwd);
+                // Krijo profilin baze ne Firestore (user_accounts) per administrim te ardhshem
+                await setDoc(doc(db, 'user_accounts', userCredential.user.uid), {
+                    uid: userCredential.user.uid,
+                    firstName: fname,
+                    lastName: lname,
+                    fullName: `${fname} ${lname}`,
+                    email: email,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                    lastLogin: serverTimestamp()
+                });
+                window.showToast("Llogaria u krijua me sukses!", "success");
+            } catch (error) { handleAuthError(error); }
+        };
+
+        window.handleLogin = async () => {
+            const email = document.getElementById('login-email').value.trim();
+            const pwd = document.getElementById('login-password').value;
+            const remember = document.getElementById('login-remember').checked;
+
+            if(!email || !pwd) return window.showToast("Plotësoni emailin dhe fjalëkalimin.", "warning");
+
+            try {
+                const persistenceType = remember ? browserLocalPersistence : browserSessionPersistence;
+                await setPersistence(auth, persistenceType);
+                await signInWithEmailAndPassword(auth, email, pwd);
+                window.showToast("Mirësevini!", "success");
+            } catch (error) { handleAuthError(error); }
+        };
+
+        window.handleResetPassword = async () => {
+            const email = document.getElementById('reset-email').value.trim();
+            if(!email) return window.showToast("Shënoni emailin tuaj.", "warning");
+            try {
+                await sendPasswordResetEmail(auth, email);
+                window.showToast("Linku i rivendosjes u dërgua në emailin tuaj.", "success");
+                window.switchAuthView('login');
+            } catch (error) { handleAuthError(error); }
+        };
+
+        window.handleLogout = () => {
+            window.customConfirm("A jeni i sigurt që doni të dilni?", async () => {
+                try {
+                    await signOut(auth);
+                    window.showToast("Keni dalë me sukses.", "info");
+                } catch(e) { window.showToast("Gabim gjatë daljes.", "error"); }
+            });
+        };
+
+        // --- INIT & AUTH STATE LISTENER ---
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                // Fshih Auth Screen
+                document.getElementById('auth-screen').classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => document.getElementById('auth-screen').classList.add('hidden'), 300);
+                
+                // Pastro inputet e login per siguri
+                document.getElementById('login-password').value = '';
+                document.getElementById('reg-password').value = '';
+                document.getElementById('reg-password-confirm').value = '';
+
+                // INIT REALTIME LISTENERS ME SIGURI absolute (Kërkimi vetëm për të dhënat e këtij useri)
+                const qUsers = query(collection(db, 'users'), where('ownerUid', '==', user.uid));
+                unsubUsers = onSnapshot(qUsers, snapshot => {
+                    window.users = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                    window.renderUsers();
+                    if(window.selectedUserId) window.renderTransactions();
+                }, error => {
+                    console.error("User Snapshot Error:", error);
+                    window.showToast("Nuk mund të lexohen të dhënat.", "error");
+                });
+
+                const qTx = query(collection(db, 'transactions'), where('ownerUid', '==', user.uid));
+                unsubTx = onSnapshot(qTx, snapshot => {
+                    window.transactions = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                    if(window.selectedUserId) window.renderTransactions();
+                }, error => {
+                    console.error("TX Snapshot Error:", error);
+                });
+
+                if (window.innerWidth < 768) window.switchTab('form');
+            } else {
+                // Show Auth Screen
+                document.getElementById('auth-screen').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                
+                // Pastro memorien & degjuesit (Securtiy)
+                if(unsubUsers) unsubUsers();
+                if(unsubTx) unsubTx();
+                
+                window.users = [];
+                window.transactions = [];
+                window.selectedUserId = null;
+                
+                // Reset UI
+                window.renderUsers();
+                document.getElementById('tabela-transaksioneve').innerHTML = '';
+                document.getElementById('empty-state').classList.remove('hidden');
+                document.getElementById('bill-content').classList.add('hidden');
+                document.getElementById('welcome-message').classList.remove('hidden');
+                window.switchAuthView('login');
+            }
         });
 
-        onSnapshot(collection(db, 'transactions'), snapshot => {
-            window.transactions = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            if(window.selectedUserId) window.renderTransactions();
-        });
+        // ==========================================
+        // UI & LOGJIKA E VJETËR (ME SHTESAT E SIGURISË DHE DASHBOARDIT)
+        // ==========================================
 
-        // --- MOBILE UI FUNKSIONET EKZISTUESE ---
         window.toggleSidebar = () => {
             const sidebar = document.getElementById('mobile-sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -482,14 +774,16 @@
             }
         };
 
-        // --- PËRDORUESIT (Me Firebase) ---
+        // --- PËRDORUESIT ---
         window.addUser = async () => {
+            if(!auth.currentUser) return;
             const name = document.getElementById('new-user-name').value.trim();
             if (name === '') return window.showToast('Emri nuk mund të jetë bosh.', 'error');
             if (window.users.some(u => u.name.toLowerCase() === name.toLowerCase())) return window.showToast('Ky emër ekziston tashmë!', 'error');
 
             try {
-                await addDoc(collection(db, 'users'), { name: name, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+                // SHTUAR: ownerUid = auth.currentUser.uid
+                await addDoc(collection(db, 'users'), { name: name, ownerUid: auth.currentUser.uid, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
                 document.getElementById('new-user-name').value = '';
                 window.showToast('Profili u shtua me sukses!', 'success');
             } catch(e) { window.showToast('Gabim gjatë ruajtjes.', 'error'); }
@@ -507,7 +801,7 @@
                         document.getElementById('welcome-message').classList.remove('hidden');
                     }
                     window.showToast('Profili u fshi!', 'info');
-                } catch(e) { window.showToast('Gabim gjatë fshirjes.', 'error'); }
+                } catch(e) { window.showToast('Gabim gjatë fshirjes. (Nuk keni akses)', 'error'); }
             });
         };
 
@@ -583,8 +877,9 @@
             if(window.innerWidth < 768) { window.toggleSidebar(); window.switchTab('bill'); }
         };
 
-        // --- TRANSAKSIONET (Me Firebase) ---
+        // --- TRANSAKSIONET ---
         window.addTransaction = async () => {
+            if(!auth.currentUser) return;
             const tipi = document.getElementById('t-tipi').value;
             const paidBy = document.getElementById('t-paguar-nga').value;
             const pershkrimi = document.getElementById('t-pershkrimi').value.trim();
@@ -598,9 +893,11 @@
             if (perfshin.length === 0) return window.showToast("Zgjidhni të paktën një person për të cilin po bëhet ndarja.", "error");
 
             try {
+                // SHTUAR: ownerUid = auth.currentUser.uid
                 await addDoc(collection(db, 'transactions'), {
                     type: tipi, description: pershkrimi, totalAmount: vlera, 
                     date: new Date().toISOString(), paidBy: paidBy, involvedUsers: perfshin,
+                    ownerUid: auth.currentUser.uid, 
                     createdAt: serverTimestamp(), updatedAt: serverTimestamp()
                 });
                 document.getElementById('t-pershkrimi').value = ''; document.getElementById('t-vlera').value = '';
@@ -635,8 +932,8 @@
             window.users.forEach(u => {
                 const isChecked = tx.involvedUsers.includes(u.id) ? 'checked' : '';
                 checkEl.innerHTML += `
-                    <label class="inline-flex items-center bg-white border border-gray-300 px-3 py-2 rounded-lg cursor-pointer hover:bg-blue-50 transition dark:bg-slate-800">
-                        <input type="checkbox" value="${u.id}" class="edit-chk-user w-4 h-4 text-blue-600 rounded" ${isChecked}>
+                    <label class="inline-flex items-center bg-white border border-gray-300 px-3 py-2 rounded-lg cursor-pointer hover:bg-blue-50 transition dark:bg-slate-800 dark:border-slate-600">
+                        <input type="checkbox" value="${u.id}" class="edit-chk-user w-4 h-4 text-blue-600 rounded border-gray-400" ${isChecked}>
                         <span class="ml-2 text-sm font-medium text-slate-700 dark:text-slate-300">${u.name}</span>
                     </label>
                 `;
@@ -684,7 +981,6 @@
 
             let userTx = window.transactions.filter(t => t.involvedUsers.includes(window.selectedUserId) || t.paidBy === window.selectedUserId);
 
-            // Filtro Search
             if(searchQ) {
                 userTx = userTx.filter(t => {
                     const payer = window.users.find(u => u.id === t.paidBy)?.name.toLowerCase() || '';
@@ -692,39 +988,67 @@
                     return desc.includes(searchQ) || payer.includes(searchQ);
                 });
             }
-            // Filtro Tipi
             if(filterType !== 'all') userTx = userTx.filter(t => t.type === filterType);
             
-            // Filtro Data
             if(filterDate !== 'all') {
                 const now = new Date();
                 userTx = userTx.filter(t => {
                     const txD = new Date(t.date);
                     if(filterDate === 'today') return txD.toDateString() === now.toDateString();
                     if(filterDate === 'week') return (now - txD) / (1000 * 3600 * 24) <= 7;
+                    if(filterDate === '30days') return (now - txD) / (1000 * 3600 * 24) <= 30;
                     if(filterDate === 'month') return txD.getMonth() === now.getMonth() && txD.getFullYear() === now.getFullYear();
+                    if(filterDate === 'year') return txD.getFullYear() === now.getFullYear();
                     return true;
                 });
             }
 
-            // Renditja
             userTx.sort((a, b) => {
                 if(sortBy === 'date-desc') return new Date(b.date) - new Date(a.date);
                 if(sortBy === 'date-asc') return new Date(a.date) - new Date(b.date);
                 if(sortBy === 'amount-desc') return b.totalAmount - a.totalAmount;
                 if(sortBy === 'amount-asc') return a.totalAmount - b.totalAmount;
+                if(sortBy === 'name-asc') return a.description.localeCompare(b.description);
+                if(sortBy === 'name-desc') return b.description.localeCompare(a.description);
+                if(sortBy === 'type-asc') return a.type.localeCompare(b.type);
+                return 0;
             });
 
-            // Llogaritja per Dashboard Globalte pa prekur Filtrat
+            // Llogaritja per Dashboard
             let totalDashboardTx = window.transactions.filter(t => t.involvedUsers.includes(window.selectedUserId) || t.paidBy === window.selectedUserId);
-            let dashShpenzim = 0, dashPaguar = 0;
+            let dashShpenzim = 0, dashPaguar = 0, dashDhurata = 0;
+            let userPayments = {};
+            let userDebts = {};
+            
             totalDashboardTx.forEach(t => {
                 if(t.paidBy === window.selectedUserId) dashPaguar += t.totalAmount;
-                if(t.involvedUsers.includes(window.selectedUserId)) dashShpenzim += (t.totalAmount / t.involvedUsers.length);
+                if(t.involvedUsers.includes(window.selectedUserId)) {
+                    if(t.type === 'shpenzim') dashShpenzim += (t.totalAmount / t.involvedUsers.length);
+                    if(t.type === 'dhurate') dashDhurata += (t.totalAmount / t.involvedUsers.length);
+                }
             });
+            
+            window.users.forEach(u => {
+                let p = 0, s = 0;
+                window.transactions.forEach(tx => {
+                    if(tx.paidBy === u.id) p += tx.totalAmount;
+                    if(tx.involvedUsers.includes(u.id) && tx.type === 'shpenzim') s += (tx.totalAmount / tx.involvedUsers.length);
+                });
+                userPayments[u.id] = p;
+                userDebts[u.id] = s - p; 
+            });
+            
+            let topPaguesiId = Object.keys(userPayments).length > 0 ? Object.keys(userPayments).reduce((a, b) => userPayments[a] > userPayments[b] ? a : b, Object.keys(userPayments)[0]) : null;
+            let topBorxhliuId = Object.keys(userDebts).length > 0 ? Object.keys(userDebts).reduce((a, b) => userDebts[a] > userDebts[b] ? a : b, Object.keys(userDebts)[0]) : null;
+
             document.getElementById('stat-tx-count').innerText = totalDashboardTx.length;
             document.getElementById('stat-konsum').innerText = `${dashShpenzim.toFixed(0)} L`;
             document.getElementById('stat-paguar-tot').innerText = `${dashPaguar.toFixed(0)} L`;
+            document.getElementById('stat-dhurata-tot').innerText = `${dashDhurata.toFixed(0)} L`;
+            document.getElementById('stat-profile-tot').innerText = window.users.length;
+            document.getElementById('stat-top-paguesi').innerText = (topPaguesiId && userPayments[topPaguesiId] > 0) ? (window.users.find(u=>u.id===topPaguesiId)?.name || '-') : '-';
+            document.getElementById('stat-top-borxhliu').innerText = (topBorxhliuId && userDebts[topBorxhliuId] > 0) ? (window.users.find(u=>u.id===topBorxhliuId)?.name || '-') : '-';
+
             let netB = dashShpenzim - dashPaguar;
             document.getElementById('stat-balance-net').innerText = `${Math.abs(netB).toFixed(0)} L ${netB>0?'(Borxh)':'(Plus)'}`;
             document.getElementById('stat-balance-net').className = `text-xl font-black ${netB > 0 ? 'text-red-700' : 'text-green-700'}`;
@@ -755,20 +1079,20 @@
                     const dateStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')} <span class="text-[10px] text-gray-400 block md:inline">${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}</span>`;
 
                     tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition border-b border-gray-100 group dark:hover:bg-slate-800">
+                        <tr class="hover:bg-slate-50 transition border-b border-gray-100 group dark:hover:bg-slate-800 dark:border-slate-700">
                             <td class="px-2 md:px-4 py-3 whitespace-nowrap text-gray-500 leading-tight align-top">${dateStr}</td>
                             <td class="px-2 md:px-4 py-3 align-top">
-                                <div class="font-semibold text-slate-800 text-xs md:text-sm">${t.description}</div>
+                                <div class="font-semibold text-slate-800 text-xs md:text-sm dark:text-gray-200">${t.description}</div>
                                 <span class="inline-flex items-center text-[9px] md:text-[10px] uppercase font-bold px-1.5 py-0.5 rounded mt-1 ${badge}">${icon} ${t.type}</span>
-                                <div class="text-[10px] text-gray-500 mt-1">Paguar nga: <span class="font-bold text-slate-700">${payerName}</span></div>
+                                <div class="text-[10px] text-gray-500 mt-1 dark:text-gray-400">Paguar nga: <span class="font-bold text-slate-700 dark:text-slate-300">${payerName}</span></div>
                                 <div class="mt-2 flex gap-3 text-[10px] md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                     <button onclick="editTransaction('${t.id}')" class="text-blue-600 hover:text-blue-800 font-bold"><i class="fas fa-pen"></i> Ndrysho</button>
                                     <button onclick="deleteTransaction('${t.id}')" class="text-red-500 hover:text-red-700 font-bold"><i class="fas fa-trash"></i> Fshi</button>
                                 </div>
                             </td>
-                            <td class="px-2 md:px-4 py-3 font-medium text-slate-700 hidden md:table-cell align-top">${t.totalAmount.toFixed(2)} L</td>
+                            <td class="px-2 md:px-4 py-3 font-medium text-slate-700 hidden md:table-cell align-top dark:text-gray-300">${t.totalAmount.toFixed(2)} L</td>
                             <td class="px-2 md:px-4 py-3 hidden sm:table-cell align-top">
-                                <div class="text-[10px] md:text-xs font-bold text-slate-500 bg-slate-100 inline-block px-1.5 py-1 rounded">/${nrPersonave}</div>
+                                <div class="text-[10px] md:text-xs font-bold text-slate-500 bg-slate-100 inline-block px-1.5 py-1 rounded dark:bg-slate-700 dark:text-gray-300">/${nrPersonave}</div>
                                 <div class="text-[9px] md:text-[11px] text-gray-400 mt-1 max-w-[80px] md:max-w-[150px] truncate" title="${emrat}">${emrat}</div>
                             </td>
                             <td class="px-2 md:px-4 py-3 text-right align-top">
@@ -783,15 +1107,14 @@
             document.getElementById('tot-shpenzime').innerText = `${totShpenzimePersona.toFixed(2)} L`;
             document.getElementById('tot-paguar').innerText = `${totPaguarFizik.toFixed(2)} L`;
 
-            // KONKLUZIONI I SAKTË PAIRWISE 
             let { debts, credits } = window.calculatePairwise(window.selectedUserId);
             let konkluzioniHtml = '';
             if (debts.length > 0) {
-                let crStrings = debts.map(d => `<div onclick="showBreakdown('${d.id}', 'debt')" class="font-extrabold text-red-700 bg-white px-3 py-2 rounded border border-red-200 mt-2 shadow-sm cursor-pointer hover:bg-red-50 hover:border-red-400 transition flex justify-between items-center group dark:bg-slate-800 dark:border-slate-600"><span><i class="fas fa-arrow-right text-[10px] mr-1 text-red-400 group-hover:text-red-600"></i> ${d.name}</span><span class="flex items-center gap-2">${d.amount.toFixed(2)} L <i class="fas fa-info-circle text-gray-300 group-hover:text-red-400 transition"></i></span></div>`).join('');
+                let crStrings = debts.map(d => `<div onclick="showBreakdown('${d.id}', 'debt')" class="font-extrabold text-red-700 bg-white px-3 py-2 rounded border border-red-200 mt-2 shadow-sm cursor-pointer hover:bg-red-50 hover:border-red-400 transition flex justify-between items-center group dark:bg-slate-800 dark:border-slate-600 dark:hover:border-red-500"><span><i class="fas fa-arrow-right text-[10px] mr-1 text-red-400 group-hover:text-red-600"></i> ${d.name}</span><span class="flex items-center gap-2">${d.amount.toFixed(2)} L <i class="fas fa-info-circle text-gray-300 group-hover:text-red-400 transition"></i></span></div>`).join('');
                 konkluzioniHtml += `<div class="p-3 bg-red-50 border-2 border-red-200 rounded-lg text-sm text-red-900 mb-2 dark:bg-red-900/20 dark:text-red-300 dark:border-red-900/50"><b>Duhet të paguash:</b>${crStrings}</div>`;
             }
             if (credits.length > 0) {
-                let drStrings = credits.map(c => `<div onclick="showBreakdown('${c.id}', 'credit')" class="font-extrabold text-green-700 bg-white px-3 py-2 rounded border border-green-200 mt-2 shadow-sm cursor-pointer hover:bg-green-50 hover:border-green-400 transition flex justify-between items-center group dark:bg-slate-800 dark:border-slate-600"><span><i class="fas fa-arrow-left text-[10px] mr-1 text-green-400 group-hover:text-green-600"></i> ${c.name}</span><span class="flex items-center gap-2">${c.amount.toFixed(2)} L <i class="fas fa-info-circle text-gray-300 group-hover:text-green-400 transition"></i></span></div>`).join('');
+                let drStrings = credits.map(c => `<div onclick="showBreakdown('${c.id}', 'credit')" class="font-extrabold text-green-700 bg-white px-3 py-2 rounded border border-green-200 mt-2 shadow-sm cursor-pointer hover:bg-green-50 hover:border-green-400 transition flex justify-between items-center group dark:bg-slate-800 dark:border-slate-600 dark:hover:border-green-500"><span><i class="fas fa-arrow-left text-[10px] mr-1 text-green-400 group-hover:text-green-600"></i> ${c.name}</span><span class="flex items-center gap-2">${c.amount.toFixed(2)} L <i class="fas fa-info-circle text-gray-300 group-hover:text-green-400 transition"></i></span></div>`).join('');
                 konkluzioniHtml += `<div class="p-3 bg-green-50 border-2 border-green-200 rounded-lg text-sm text-green-900 dark:bg-green-900/20 dark:text-green-300 dark:border-green-900/50"><b>Të detyrohen ty:</b>${drStrings}</div>`;
             }
             if (debts.length === 0 && credits.length === 0) {
@@ -824,7 +1147,7 @@
             return { debts, credits };
         };
 
-        // --- INFO MODAL EKZISTUES ---
+        // --- INFO MODAL ---
         window.showTxInfo = (txId) => {
             const tx = window.transactions.find(t => t.id === txId);
             if(!tx) return;
@@ -835,12 +1158,12 @@
             const involvedNames = tx.involvedUsers.map(uId => window.users.find(x => x.id === uId)?.name || 'I fshirë').join(", ");
             
             document.getElementById('info-tx-title').innerText = tx.description;
-            document.getElementById('info-tx-body').innerHTML = `<div class="mb-3 text-lg"><span class="bg-gray-100 px-2 py-1 rounded font-bold text-gray-800 dark:bg-slate-700 dark:text-white">${tx.totalAmount} Lekë</span></div><div class="grid grid-cols-1 gap-2 border-t pt-3"><div class="flex items-center gap-2"><i class="fas fa-calendar-alt text-gray-400 w-5"></i> <span><b>Data:</b> ${dateStr}</span></div><div class="flex items-center gap-2"><i class="fas fa-clock text-gray-400 w-5"></i> <span><b>Ora:</b> ${timeStr}</span></div><div class="flex items-center gap-2"><i class="fas fa-user-tag text-blue-400 w-5"></i> <span><b>Paguar nga:</b> ${payerName}</span></div><div class="flex items-start gap-2"><i class="fas fa-users text-gray-400 w-5 mt-1"></i> <span><b>Ndarë për:</b> ${involvedNames}</span></div></div>`;
+            document.getElementById('info-tx-body').innerHTML = `<div class="mb-3 text-lg"><span class="bg-gray-100 px-2 py-1 rounded font-bold text-gray-800 dark:bg-slate-700 dark:text-white">${tx.totalAmount} Lekë</span></div><div class="grid grid-cols-1 gap-2 border-t pt-3 dark:border-slate-600"><div class="flex items-center gap-2"><i class="fas fa-calendar-alt text-gray-400 w-5"></i> <span class="dark:text-gray-300"><b>Data:</b> ${dateStr}</span></div><div class="flex items-center gap-2"><i class="fas fa-clock text-gray-400 w-5"></i> <span class="dark:text-gray-300"><b>Ora:</b> ${timeStr}</span></div><div class="flex items-center gap-2"><i class="fas fa-user-tag text-blue-400 w-5"></i> <span class="dark:text-gray-300"><b>Paguar nga:</b> ${payerName}</span></div><div class="flex items-start gap-2"><i class="fas fa-users text-gray-400 w-5 mt-1"></i> <span class="dark:text-gray-300"><b>Ndarë për:</b> ${involvedNames}</span></div></div>`;
             document.getElementById('info-tx-modal').classList.remove('hidden');
         };
         window.closeTxInfo = () => document.getElementById('info-tx-modal').classList.add('hidden');
 
-        // --- BREAKDOWN MODAL EKZISTUES ---
+        // --- BREAKDOWN MODAL ---
         window.showBreakdown = (otherUserId, type) => {
             const me = window.users.find(u => u.id === window.selectedUserId);
             const other = window.users.find(u => u.id === otherUserId);
@@ -862,17 +1185,71 @@
                     } else if(tx.paidBy === otherUserId && tx.involvedUsers.includes(window.selectedUserId) && otherUserId !== window.selectedUserId) {
                         relationText = `<span class="text-red-500 font-semibold">Të ulet ty (I detyrohesh)</span>`; amountClass = 'text-red-500'; operator = '-'; totalZbritur += split;
                     }
-                    if(relationText !== '') htmlStr += `<li class="py-3 flex justify-between items-center hover:bg-gray-50 px-2 rounded transition dark:hover:bg-slate-800"><div><div class="font-medium text-gray-800">${tx.description}</div><div class="text-[10px] text-gray-500">${dateStr} &bull; ${relationText}</div></div><div class="font-bold ${amountClass}">${operator}${split.toFixed(2)} L</div></li>`;
+                    if(relationText !== '') htmlStr += `<li class="py-3 flex justify-between items-center hover:bg-gray-50 px-2 rounded transition dark:hover:bg-slate-800"><div><div class="font-medium text-gray-800 dark:text-gray-200">${tx.description}</div><div class="text-[10px] text-gray-500">${dateStr} &bull; ${relationText}</div></div><div class="font-bold ${amountClass}">${operator}${split.toFixed(2)} L</div></li>`;
                 });
             }
             htmlStr += `</ul>`;
             let net = totalShtuar - totalZbritur; let netClass = net > 0 ? 'text-green-600' : (net < 0 ? 'text-red-600' : 'text-gray-800 dark:text-gray-300');
-            htmlStr += `<div class="mt-4 pt-3 border-t-2 border-gray-200 bg-gray-50 p-3 rounded-lg dark:bg-slate-800 dark:border-slate-600"><div class="flex justify-between text-sm mb-1"><span>Ai të ka borxh ty për blerjet e tua:</span> <span class="font-semibold text-green-600">+${totalShtuar.toFixed(2)} L</span></div><div class="flex justify-between text-sm mb-2"><span>Ti i ke borxh atij për blerjet e tij:</span> <span class="font-semibold text-red-500">-${totalZbritur.toFixed(2)} L</span></div><div class="flex justify-between text-lg font-black mt-2 pt-2 border-t border-gray-300 dark:border-slate-600"><span>Balanca përfundimtare:</span><span class="${netClass}">${Math.abs(net).toFixed(2)} L ${net > 0 ? '(Në favorin tënd)' : (net < 0 ? '(Ti i detyrohesh)' : '')}</span></div></div>`;
+            htmlStr += `<div class="mt-4 pt-3 border-t-2 border-gray-200 bg-gray-50 p-3 rounded-lg dark:bg-slate-800 dark:border-slate-600"><div class="flex justify-between text-sm mb-1 dark:text-gray-300"><span>Ai të ka borxh ty për blerjet e tua:</span> <span class="font-semibold text-green-600">+${totalShtuar.toFixed(2)} L</span></div><div class="flex justify-between text-sm mb-2 dark:text-gray-300"><span>Ti i ke borxh atij për blerjet e tij:</span> <span class="font-semibold text-red-500">-${totalZbritur.toFixed(2)} L</span></div><div class="flex justify-between text-lg font-black mt-2 pt-2 border-t border-gray-300 dark:border-slate-600 dark:text-gray-200"><span>Balanca përfundimtare:</span><span class="${netClass}">${Math.abs(net).toFixed(2)} L ${net > 0 ? '(Në favorin tënd)' : (net < 0 ? '(Ti i detyrohesh)' : '')}</span></div></div>`;
             document.getElementById('breakdown-body').innerHTML = htmlStr; document.getElementById('breakdown-modal').classList.remove('hidden');
         };
         window.closeBreakdownModal = () => document.getElementById('breakdown-modal').classList.add('hidden');
 
-        // --- EXPORT FUNKSIONET ---
+        // --- PROFILE ANALYTICS ---
+        window.openProfileAnalytics = () => {
+            if(!window.selectedUserId) return window.showToast("Zgjidhni një profil fillimisht.", "warning");
+            const me = window.users.find(u => u.id === window.selectedUserId);
+            let txs = window.transactions.filter(t => t.involvedUsers.includes(me.id) || t.paidBy === me.id);
+            
+            let numPayments = txs.filter(t => t.paidBy === me.id).length;
+            let totalPaid = txs.filter(t => t.paidBy === me.id).reduce((sum, t) => sum + t.totalAmount, 0);
+            let totalConsumed = txs.filter(t => t.involvedUsers.includes(me.id)).reduce((sum, t) => sum + (t.totalAmount / t.involvedUsers.length), 0);
+            let averageSpend = txs.length > 0 ? (totalConsumed / txs.length) : 0;
+            
+            let { debts, credits } = window.calculatePairwise(me.id);
+            let biggestDebtor = credits.length > 0 ? credits.reduce((prev, curr) => (prev.amount > curr.amount) ? prev : curr) : null;
+            let biggestCreditor = debts.length > 0 ? debts.reduce((prev, curr) => (prev.amount > curr.amount) ? prev : curr) : null;
+            let netB = totalConsumed - totalPaid;
+
+            document.getElementById('analytics-body').innerHTML = `
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 dark:bg-slate-800 dark:border-slate-700">
+                    <div class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Numri Pagesave</div>
+                    <div class="text-lg font-black text-blue-600">${numPayments}</div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 dark:bg-slate-800 dark:border-slate-700">
+                    <div class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Transaksione</div>
+                    <div class="text-lg font-black text-purple-600">${txs.length}</div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 dark:bg-slate-800 dark:border-slate-700">
+                    <div class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Totali Paguar</div>
+                    <div class="text-lg font-black text-green-600">${totalPaid.toFixed(2)} L</div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 dark:bg-slate-800 dark:border-slate-700">
+                    <div class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Konsumi Total</div>
+                    <div class="text-lg font-black text-red-600">${totalConsumed.toFixed(2)} L</div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 dark:bg-slate-800 dark:border-slate-700 col-span-2">
+                    <div class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Balanca Aktuale</div>
+                    <div class="text-xl font-black ${netB > 0 ? 'text-red-600' : 'text-green-600'}">${Math.abs(netB).toFixed(2)} L ${netB>0?'(Borxh)':'(Plus)'}</div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 dark:bg-slate-800 dark:border-slate-700">
+                    <div class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Të detyrohet më shumë</div>
+                    <div class="text-sm font-black text-green-700">${biggestDebtor ? biggestDebtor.name + ' (' + biggestDebtor.amount.toFixed(0) + 'L)' : 'Asnjë'}</div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 dark:bg-slate-800 dark:border-slate-700">
+                    <div class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">I detyrohesh më shumë</div>
+                    <div class="text-sm font-black text-red-700">${biggestCreditor ? biggestCreditor.name + ' (' + biggestCreditor.amount.toFixed(0) + 'L)' : 'Asnjë'}</div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 dark:bg-slate-800 dark:border-slate-700 col-span-2">
+                    <div class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Mesatarja e Shpenzimeve</div>
+                    <div class="text-lg font-black text-orange-600">${averageSpend.toFixed(2)} L</div>
+                </div>
+            `;
+            document.getElementById('profile-analytics-modal').classList.remove('hidden');
+        };
+        window.closeProfileAnalytics = () => document.getElementById('profile-analytics-modal').classList.add('hidden');
+
+        // --- EXPORT/IMPORT ---
         window.exportJSON = () => {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ users: window.users, transactions: window.transactions }, null, 2));
             const a = document.createElement('a'); a.href = dataStr; a.download = `shpenzimet_${new Date().getTime()}.json`; a.click();
@@ -887,10 +1264,46 @@
                 csvContent += `${t.id},${t.date},${t.type},"${t.description}",${t.totalAmount},"${payer}","${inv}"\n`;
             });
             const a = document.createElement('a'); a.href = encodeURI(csvContent); a.download = `shpenzimet_${new Date().getTime()}.csv`; a.click();
-            window.showToast("Eksportimi CSV përfundoi.", "success");
+            window.showToast("Eksportimi Excel/CSV përfundoi.", "success");
         };
 
-        window.init();
+        window.exportPDF = () => {
+            window.showToast("Përgatitja e PDF (Print Mode)...", "info");
+            setTimeout(() => window.print(), 500);
+        };
+
+        window.handleImportJSON = (e) => {
+            if(!auth.currentUser) return;
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if(data.users && Array.isArray(data.users)) {
+                        for(let u of data.users) {
+                            if(!window.users.find(ex => ex.id === u.id)) {
+                                await setDoc(doc(db, 'users', u.id), { name: u.name, ownerUid: auth.currentUser.uid, createdAt: u.createdAt || serverTimestamp(), updatedAt: serverTimestamp() });
+                            }
+                        }
+                    }
+                    if(data.transactions && Array.isArray(data.transactions)) {
+                        for(let t of data.transactions) {
+                            if(!window.transactions.find(ex => ex.id === t.id)) {
+                                await setDoc(doc(db, 'transactions', t.id), { type: t.type, description: t.description, totalAmount: t.totalAmount, date: t.date, paidBy: t.paidBy, involvedUsers: t.involvedUsers, ownerUid: auth.currentUser.uid, createdAt: t.createdAt || serverTimestamp(), updatedAt: serverTimestamp() });
+                            }
+                        }
+                    }
+                    window.showToast("Importimi përfundoi me sukses!", "success");
+                    e.target.value = ''; 
+                } catch(err) {
+                    window.showToast("Skedar i pavlefshëm JSON.", "error");
+                    e.target.value = '';
+                }
+            };
+            reader.readAsText(file);
+        };
+
     </script>
 </body>
 </html>
