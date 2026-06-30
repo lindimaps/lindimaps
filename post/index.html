@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LindiMaps - Gjenerues i Postimeve Sociale</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2canvas për shkarkimin e fotos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617; /* Sfond edhe me i erret per panelin */
+            color: #f8fafc;
+        }
+
+        /* Gradienti zyrtar i LindiMaps */
+        .text-gradient {
+            background: linear-gradient(to right, #38bdf8, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Glassmorphism ultra-modern për kartën në postim */
+        .glassmorphism {
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), 
+                        inset 0 0 20px rgba(56, 189, 248, 0.05);
+        }
+
+        /* Scrollbar i personalizuar për panelin e kontrollit */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
+
+    <!-- PJESA E MAJTË: PANELI I KONTROLLIT -->
+    <aside class="w-full lg:w-1/3 bg-[#0f172a] border-r border-slate-800 p-8 flex flex-col gap-6 overflow-y-auto h-auto lg:h-screen z-10 shadow-2xl">
+        
+        <div class="mb-4">
+            <h1 class="text-2xl font-black tracking-tighter flex items-center gap-2">
+                <span class="text-white">LINDI</span><span class="text-gradient">MAPS</span>
+            </h1>
+            <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mt-1">Studio e Krijimit</p>
+        </div>
+
+        <!-- Forma e të dhënave -->
+        <div class="space-y-5 flex-1">
+            
+            <!-- Ngarkimi i Fotos -->
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">1. Ngarko Foton e Sfondit</label>
+                <div class="relative group">
+                    <input type="file" id="imageInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                    <div class="w-full bg-slate-900 border-2 border-dashed border-slate-700 rounded-xl p-4 flex items-center justify-center gap-3 text-slate-400 group-hover:border-blue-500 group-hover:text-blue-400 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <span class="font-medium text-sm" id="fileNameDisplay">Kliko për të ngarkuar...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Titulli kryesor -->
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">2. Titulli Kryesor (I bardhë)</label>
+                <input type="text" id="titleInput" value="Takimi me drejtuesit për" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors text-sm">
+            </div>
+
+            <!-- Teksti i Theksuar (Gradient) -->
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">3. Fjala e theksuar (Gradient)</label>
+                <input type="text" id="highlightInput" value="Inteligjencën Hapësinore" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500 transition-colors text-sm">
+            </div>
+
+            <!-- Përshkrimi -->
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">4. Përshkrimi i Njoftimit</label>
+                <textarea id="descInput" rows="4" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors text-sm resize-none"
+                >Diskutuam mbi forcimin e bashkëpunimit në përdorimin e teknologjisë GIS dhe Remote Sensing. LindiMaps ofron zgjidhje konkrete në analizën e të dhënave komplekse gjeohapësinore.</textarea>
+            </div>
+        </div>
+
+        <!-- Butoni i Shkarkimit -->
+        <button id="downloadBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest text-sm py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all transform hover:-translate-y-1 mt-6 flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Shkarko Fotografi
+        </button>
+
+    </aside>
+
+    <!-- PJESA E DJATHTË: PREVIEW (PAMJA PARAPRAKE) -->
+    <main class="w-full lg:w-2/3 bg-[#020617] flex items-center justify-center p-8 relative">
+        
+        <!-- Sfond vizual dekorativ për mjedisin e punës -->
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div class="absolute w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+
+        <!-- ========================================== -->
+        <!-- KJO ËSHTË ZONA QË DO TË EKSPORTOHET SI FOTO -->
+        <!-- ========================================== -->
+        <!-- Dimensionet 400x500. Gjatë eksportit zmadhohet automatikisht për rezolucion 4K -->
+        <div id="export-area" class="relative w-[400px] h-[500px] bg-slate-800 rounded-none overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transition-all">
+            
+            <!-- Foto e Sfondit -->
+            <img id="previewImage" src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80" alt="Sfondi" class="absolute inset-0 w-full h-full object-cover z-0">
+
+            <!-- Gradienti i poshtëm për të krijuar kontrast për kartën -->
+            <div class="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent z-10"></div>
+
+            <!-- Karta Glassmorphism -->
+            <div class="relative z-20 mt-auto p-5 w-full">
+                
+                <div class="glassmorphism rounded-3xl p-6 w-full relative">
+                    
+                    <!-- Elementi dekorativ LindiMaps (Opsional) -->
+                    <div class="absolute -top-3 left-6 bg-gradient-to-r from-blue-600 to-teal-500 text-white text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full shadow-lg border border-white/20">
+                        Njoftim
+                    </div>
+
+                    <!-- Titujt -->
+                    <h2 class="text-xl font-black text-white leading-[1.1] mb-3 tracking-tighter mt-1">
+                        <span id="previewTitle">Takimi me drejtuesit për</span><br>
+                        <span id="previewHighlight" class="text-gradient">Inteligjencën Hapësinore</span>
+                    </h2>
+
+                    <!-- Përshkrimi -->
+                    <p id="previewDesc" class="text-[12px] text-slate-300 font-medium leading-relaxed mb-5">
+                        Diskutuam mbi forcimin e bashkëpunimit në përdorimin e teknologjisë GIS dhe Remote Sensing. LindiMaps ofron zgjidhje konkrete në analizën e të dhënave komplekse gjeohapësinore.
+                    </p>
+
+                    <!-- Footer i Kartës -->
+                    <div class="flex items-center justify-between border-t border-white/10 pt-4">
+                        
+                        <!-- Logo (Ikonë statike për eksport perfekt) -->
+                        <div class="relative">
+                            <div class="h-9 w-9 flex items-center justify-center bg-slate-900 rounded-xl shadow-md border border-white/10">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.1"/>
+                                    <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                                    <circle cx="12" cy="11" r="2.5" fill="#38bdf8"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Domajni -->
+                        <div class="text-center">
+                            <span class="text-white text-[12px] font-bold tracking-widest uppercase opacity-80">lindimaps.com</span>
+                        </div>
+
+                        <!-- Shigjeta -->
+                        <div class="text-[#2dd4bf]">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ========================================== -->
+
+    </main>
+
+    <!-- SCRIPT PËR LOGJIKËN -->
+    <script>
+        // Referencat e elementeve DOM
+        const imageInput = document.getElementById('imageInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const previewImage = document.getElementById('previewImage');
+        
+        const titleInput = document.getElementById('titleInput');
+        const previewTitle = document.getElementById('previewTitle');
+        
+        const highlightInput = document.getElementById('highlightInput');
+        const previewHighlight = document.getElementById('previewHighlight');
+        
+        const descInput = document.getElementById('descInput');
+        const previewDesc = document.getElementById('previewDesc');
+        
+        const downloadBtn = document.getElementById('downloadBtn');
+        const exportArea = document.getElementById('export-area');
+
+        // 1. Ndryshimi i Fotos së Sfondit
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Shfaq emrin e file-it në UI
+                fileNameDisplay.textContent = file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name;
+                
+                // Lexo file-in dhe vendose në img src
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    previewImage.src = event.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 2. Përditësimi i teksteve në kohë reale (Real-time data binding)
+        titleInput.addEventListener('input', (e) => { previewTitle.innerHTML = e.target.value.replace(/\n/g, '<br>'); });
+        highlightInput.addEventListener('input', (e) => { previewHighlight.textContent = e.target.value; });
+        descInput.addEventListener('input', (e) => { previewDesc.textContent = e.target.value; });
+
+        // 3. Logjika e Shkarkimit (Eksporti i elementit si foto)
+        downloadBtn.addEventListener('click', () => {
+            
+            // Ndrysho butonin për t'i treguar përdoruesit se po ngarkohet
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Po Gjenerohet...`;
+            downloadBtn.disabled = true;
+
+            // Përdor html2canvas
+            html2canvas(exportArea, {
+                scale: 3, // Rrit rezolucionin e fotos finale 3 herë (nga 400x500 në 1200x1500)
+                useCORS: true, // Lejon fotot nga domajne të tjera
+                backgroundColor: null,
+            }).then(canvas => {
+                // Konverto në imazh PNG
+                const imgData = canvas.toDataURL('image/png');
+                
+                // Krijo një link fiktiv për shkarkim
+                const link = document.createElement('a');
+                link.download = `LindiMaps_Post_${new Date().getTime()}.png`;
+                link.href = imgData;
+                link.click();
+
+                // Rikthe butonin në gjendjen normale
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            }).catch(err => {
+                console.error("Gabim gjatë eksportimit:", err);
+                alert("Ndodhi një gabim gjatë gjenerimit të fotos.");
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
