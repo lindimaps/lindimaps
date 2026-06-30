@@ -25,15 +25,57 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Glassmorphism ultra-modern për kartën në postim */
-        .glassmorphism {
+        /* ========================================== */
+        /* TEMPLATET E REJA TE KARTES                 */
+        /* ========================================== */
+
+        /* 1. Klasike (Glassmorphism origjinal) */
+        .style-classic {
             background: rgba(15, 23, 42, 0.45);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), 
-                        inset 0 0 20px rgba(56, 189, 248, 0.05);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(56, 189, 248, 0.05);
+            border-radius: 1.5rem; /* 24px */
         }
+
+        /* 2. Mjergull (Frosted Glass e dendur) */
+        .style-frosted {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(40px) saturate(150%);
+            -webkit-backdrop-filter: blur(40px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border-radius: 2rem; /* 32px */
+        }
+
+        /* 3. Neon (Teknologjike / Cyber) */
+        .style-neon {
+            background: rgba(2, 6, 23, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid #38bdf8;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.25), inset 0 0 15px rgba(45, 212, 191, 0.1);
+            border-radius: 1rem;
+        }
+
+        /* 4. Minimaliste (Solide, moderne) */
+        .style-minimal {
+            background: #0f172a;
+            border-left: 4px solid #38bdf8;
+            box-shadow: 20px 20px 60px rgba(0,0,0,0.6);
+            border-radius: 0.5rem;
+        }
+
+        /* FALLBACKS PER EKSPORT (html2canvas nuk pranon filterat CSS) */
+        .export-mode .style-classic { background: rgba(15, 23, 42, 0.95) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+        .export-mode .style-frosted { background: rgba(30, 41, 59, 0.90) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+        .export-mode .style-neon    { background: rgba(2, 6, 23, 0.98) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+        .export-mode .style-minimal { background: #0f172a !important; }
+
+        /* ========================================== */
 
         /* Scrollbar i personalizuar për panelin e kontrollit */
         ::-webkit-scrollbar { width: 6px; }
@@ -44,7 +86,7 @@
         textarea {
             resize: none;
             overflow: hidden;
-            min-height: 104px; /* Default height */
+            min-height: 104px;
         }
     </style>
 </head>
@@ -63,7 +105,7 @@
         <!-- Forma e të dhënave -->
         <div class="space-y-6 flex-1">
             
-            <!-- Formati / Platforma -->
+            <!-- 1. Formati / Platforma -->
             <div>
                 <label class="block text-xs font-bold uppercase text-slate-400 mb-3">1. Formati i Postimit</label>
                 <div class="grid grid-cols-2 gap-3">
@@ -86,9 +128,28 @@
                 </div>
             </div>
 
-            <!-- Ngarkimi i Fotos -->
+            <!-- 2. Stili i Kartës (ZGJEDHJE E RE) -->
             <div>
-                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">2. Ngarko Foton e Sfondit</label>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-3">2. Stili i Kartës</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="style-btn border-2 border-blue-500 bg-blue-500/10 text-blue-400 rounded-xl py-2 flex items-center justify-center transition-all" data-style="style-classic">
+                        <span class="text-[10px] font-bold uppercase tracking-wide">Klasike</span>
+                    </button>
+                    <button class="style-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-xl py-2 flex items-center justify-center transition-all" data-style="style-frosted">
+                        <span class="text-[10px] font-bold uppercase tracking-wide">Mjergull</span>
+                    </button>
+                    <button class="style-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-xl py-2 flex items-center justify-center transition-all" data-style="style-neon">
+                        <span class="text-[10px] font-bold uppercase tracking-wide">Neon</span>
+                    </button>
+                    <button class="style-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-xl py-2 flex items-center justify-center transition-all" data-style="style-minimal">
+                        <span class="text-[10px] font-bold uppercase tracking-wide">Minimal</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. Ngarkimi i Fotos -->
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">3. Ngarko Foton e Sfondit</label>
                 <div class="relative group">
                     <input type="file" id="imageInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                     <div class="w-full bg-slate-900 border-2 border-dashed border-slate-700 rounded-xl p-4 flex items-center justify-center gap-3 text-slate-400 group-hover:border-blue-500 group-hover:text-blue-400 transition-colors">
@@ -98,23 +159,23 @@
                 </div>
             </div>
 
-            <!-- Titulli kryesor -->
+            <!-- 4. Titulli kryesor -->
             <div>
-                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">3. Titulli Kryesor (I bardhë)</label>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">4. Titulli Kryesor (I bardhë)</label>
                 <input type="text" id="titleInput" value="Takimi me drejtuesit për" 
                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors text-sm">
             </div>
 
-            <!-- Teksti i Theksuar (Gradient) -->
+            <!-- 5. Teksti i Theksuar (Gradient) -->
             <div>
-                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">4. Fjala e theksuar (Gradient)</label>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">5. Fjala e theksuar (Gradient)</label>
                 <input type="text" id="highlightInput" value="Inteligjencën Hapësinore" 
                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal-500 transition-colors text-sm">
             </div>
 
-            <!-- Përshkrimi (Zgjerohet automatikisht) -->
+            <!-- 6. Përshkrimi (Zgjerohet automatikisht) -->
             <div>
-                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">5. Përshkrimi i Njoftimit</label>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">6. Përshkrimi i Njoftimit</label>
                 <textarea id="descInput" 
                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors text-sm"
                 >Diskutuam mbi forcimin e bashkëpunimit në përdorimin e teknologjisë GIS dhe Remote Sensing. LindiMaps ofron zgjidhje konkrete në analizën e të dhënave komplekse gjeohapësinore.</textarea>
@@ -139,7 +200,6 @@
         <!-- ========================================== -->
         <!-- KJO ËSHTË ZONA QË DO TË EKSPORTOHET SI FOTO -->
         <!-- ========================================== -->
-        <!-- Përmasat kontrollohen përmes JavaScript në varësi të formatit të zgjedhur -->
         <div id="export-area" class="relative bg-slate-800 rounded-none overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transition-all duration-300 ease-in-out" style="width: 400px; height: 500px;">
             
             <!-- Foto e Sfondit -->
@@ -148,12 +208,12 @@
             <!-- Gradienti i poshtëm për të krijuar kontrast për kartën -->
             <div class="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent z-10"></div>
 
-            <!-- Karta Glassmorphism -->
+            <!-- Karta (Tani ndryshon klasën sipas stilit të zgjedhur) -->
             <div class="relative z-20 mt-auto p-5 w-full">
                 
-                <div id="glassCard" class="glassmorphism rounded-3xl p-6 w-full relative">
+                <div id="glassCard" class="style-classic p-6 w-full relative transition-all duration-500">
                     
-                    <!-- Elementi dekorativ LindiMaps (Opsional) -->
+                    <!-- Elementi dekorativ LindiMaps -->
                     <div class="absolute -top-3 left-6 bg-gradient-to-r from-blue-600 to-teal-500 text-white text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full shadow-lg border border-white/20">
                         Njoftim
                     </div>
@@ -172,7 +232,7 @@
                     <!-- Footer i Kartës -->
                     <div class="flex items-center justify-between border-t border-white/10 pt-4">
                         
-                        <!-- Logo (Ikonë statike për eksport perfekt) -->
+                        <!-- Logo -->
                         <div class="relative">
                             <div class="h-9 w-9 flex items-center justify-center bg-slate-900 rounded-xl shadow-md border border-white/10">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -226,30 +286,45 @@
 
         let currentScale = 2.7; // Shkalla bazë për gjenerim HD
 
-        // --- 0. Logjika e Formateve ---
+        // --- 1. Logjika e Formateve ---
         const formatBtns = document.querySelectorAll('.format-btn');
         formatBtns.forEach(btn => {
             btn.addEventListener('click', function() {
-                // Hiq klasat aktive nga të gjithë butonat
                 formatBtns.forEach(b => {
                     b.classList.remove('border-blue-500', 'bg-blue-500/10', 'text-blue-400');
                     b.classList.add('border-slate-700', 'text-slate-400');
                 });
-                
-                // Shto klasat aktive tek butoni i klikuar
                 this.classList.remove('border-slate-700', 'text-slate-400');
                 this.classList.add('border-blue-500', 'bg-blue-500/10', 'text-blue-400');
 
-                // Ndrysho madhësitë e panelit preview
                 exportArea.style.width = this.getAttribute('data-w') + 'px';
                 exportArea.style.height = this.getAttribute('data-h') + 'px';
-                
-                // Përditëso shkallën e eksportit për të ruajtur cilësinë 4K / HD
                 currentScale = parseFloat(this.getAttribute('data-scale'));
             });
         });
 
-        // --- 1. Ndryshimi i Fotos së Sfondit ---
+        // --- 2. Logjika e Stileve të Kartës ---
+        const styleBtns = document.querySelectorAll('.style-btn');
+        styleBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Përditëso UI-në e butonave
+                styleBtns.forEach(b => {
+                    b.classList.remove('border-blue-500', 'bg-blue-500/10', 'text-blue-400');
+                    b.classList.add('border-slate-700', 'text-slate-400');
+                });
+                this.classList.remove('border-slate-700', 'text-slate-400');
+                this.classList.add('border-blue-500', 'bg-blue-500/10', 'text-blue-400');
+
+                // Hiq të gjitha klasat e stileve ekzistuese nga karta
+                glassCard.classList.remove('style-classic', 'style-frosted', 'style-neon', 'style-minimal');
+                
+                // Shto stilin e ri të zgjedhur
+                const selectedStyle = this.getAttribute('data-style');
+                glassCard.classList.add(selectedStyle);
+            });
+        });
+
+        // --- 3. Ndryshimi i Fotos së Sfondit ---
         imageInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -262,20 +337,17 @@
             }
         });
 
-        // --- 2. Përditësimi i teksteve (Dhe zgjerimi automatik i Textarea) ---
+        // --- 4. Përditësimi i teksteve (Dhe zgjerimi automatik i Textarea) ---
         titleInput.addEventListener('input', (e) => { previewTitle.innerHTML = e.target.value.replace(/\n/g, '<br>'); });
         highlightInput.addEventListener('input', (e) => { previewHighlight.textContent = e.target.value; });
         
         descInput.addEventListener('input', function(e) {
-            // Zgjerimi automatik i lartësisë së inputit
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
-            
-            // Përditësimi i tekstit në kartë
             previewDesc.textContent = e.target.value;
         });
 
-        // --- 3. Logjika e Shkarkimit ---
+        // --- 5. Logjika e Shkarkimit ---
         downloadBtn.addEventListener('click', () => {
             const originalText = downloadBtn.innerHTML;
             downloadBtn.innerHTML = `
@@ -286,15 +358,17 @@
                 Po Gjenerohet...`;
             downloadBtn.disabled = true;
 
-            // Fsheh gradientet dhe blur (Rregullim për HTML2Canvas)
+            // Rregullim për HTML2Canvas:
+            // Gradienti i tekstit zëvendësohet me ngjyrë solide bojëqielli
             previewHighlight.classList.remove('text-gradient');
             previewHighlight.style.color = '#38bdf8'; 
-            glassCard.style.background = 'rgba(15, 23, 42, 0.95)';
-            glassCard.style.border = '1px solid rgba(255, 255, 255, 0.05)';
+            
+            // Shtojmë klasën 'export-mode' për të aktivizuar CSS Fallbacks (shih te <style> lart)
+            exportArea.classList.add('export-mode');
 
             setTimeout(() => {
                 html2canvas(exportArea, {
-                    scale: currentScale, // Përdor shkallën e formatit të zgjedhur
+                    scale: currentScale,
                     useCORS: true,
                     backgroundColor: null,
                 }).then(canvas => {
@@ -314,8 +388,8 @@
                     // Rikthe dizajnin vizual pas shkarkimit
                     previewHighlight.classList.add('text-gradient');
                     previewHighlight.style.color = '';
-                    glassCard.style.background = '';
-                    glassCard.style.border = '';
+                    exportArea.classList.remove('export-mode'); // Heqim Fallbacks
+                    
                     downloadBtn.innerHTML = originalText;
                     downloadBtn.disabled = false;
                 });
