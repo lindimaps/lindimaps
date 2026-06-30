@@ -121,7 +121,7 @@
             <!-- Karta Glassmorphism -->
             <div class="relative z-20 mt-auto p-5 w-full">
                 
-                <div class="glassmorphism rounded-3xl p-6 w-full relative">
+                <div id="glassCard" class="glassmorphism rounded-3xl p-6 w-full relative">
                     
                     <!-- Elementi dekorativ LindiMaps (Opsional) -->
                     <div class="absolute -top-3 left-6 bg-gradient-to-r from-blue-600 to-teal-500 text-white text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full shadow-lg border border-white/20">
@@ -190,6 +190,7 @@
         const descInput = document.getElementById('descInput');
         const previewDesc = document.getElementById('previewDesc');
         
+        const glassCard = document.getElementById('glassCard'); // E SHTUAR: Referenca për kartën
         const downloadBtn = document.getElementById('downloadBtn');
         const exportArea = document.getElementById('export-area');
 
@@ -227,30 +228,48 @@
                 Po Gjenerohet...`;
             downloadBtn.disabled = true;
 
-            // Përdor html2canvas
-            html2canvas(exportArea, {
-                scale: 3, // Rrit rezolucionin e fotos finale 3 herë (nga 400x500 në 1200x1500)
-                useCORS: true, // Lejon fotot nga domajne të tjera
-                backgroundColor: null,
-            }).then(canvas => {
-                // Konverto në imazh PNG
-                const imgData = canvas.toDataURL('image/png');
-                
-                // Krijo një link fiktiv për shkarkim
-                const link = document.createElement('a');
-                link.download = `LindiMaps_Post_${new Date().getTime()}.png`;
-                link.href = imgData;
-                link.click();
+            // PËRSHTATJE PËR HTML2CANVAS PËRPARA SHKARKIMIT
+            // 1. Heqim tekstin me gradient dhe vendosim ngjyrë solide (html2canvas nuk lexon gradientet në tekst)
+            previewHighlight.classList.remove('text-gradient');
+            previewHighlight.style.color = '#38bdf8'; 
 
-                // Rikthe butonin në gjendjen normale
-                downloadBtn.innerHTML = originalText;
-                downloadBtn.disabled = false;
-            }).catch(err => {
-                console.error("Gabim gjatë eksportimit:", err);
-                alert("Ndodhi një gabim gjatë gjenerimit të fotos.");
-                downloadBtn.innerHTML = originalText;
-                downloadBtn.disabled = false;
-            });
+            // 2. Heqim efektin blur dhe bëjmë kartën më të errët (html2canvas nuk lexon backdrop-filter)
+            glassCard.style.background = 'rgba(15, 23, 42, 0.95)';
+            glassCard.style.border = '1px solid rgba(255, 255, 255, 0.05)';
+
+            // Përdorim setTimeout që t'i japim kohë (100ms) shfletuesit të aplikojë CSS e reja përpara se të "shkrepë" foton
+            setTimeout(() => {
+                // Përdor html2canvas
+                html2canvas(exportArea, {
+                    scale: 3, // Rrit rezolucionin e fotos finale 3 herë
+                    useCORS: true, // Lejon fotot nga domajne të tjera
+                    backgroundColor: null,
+                }).then(canvas => {
+                    // Konverto në imazh PNG
+                    const imgData = canvas.toDataURL('image/png');
+                    
+                    // Krijo një link fiktiv për shkarkim
+                    const link = document.createElement('a');
+                    link.download = `LindiMaps_Post_${new Date().getTime()}.png`;
+                    link.href = imgData;
+                    link.click();
+
+                }).catch(err => {
+                    console.error("Gabim gjatë eksportimit:", err);
+                    alert("Ndodhi një gabim gjatë gjenerimit të fotos.");
+                }).finally(() => {
+                    // RIKTHEJMË DIZAJNIN ORIGJINAL TË EKRANIT PASI ËSHTË BËRË SHKARKIMI
+                    previewHighlight.classList.add('text-gradient');
+                    previewHighlight.style.color = '';
+                    
+                    glassCard.style.background = '';
+                    glassCard.style.border = '';
+
+                    // Rikthe butonin në gjendjen normale
+                    downloadBtn.innerHTML = originalText;
+                    downloadBtn.disabled = false;
+                });
+            }, 100);
         });
     </script>
 </body>
