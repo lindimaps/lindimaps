@@ -6,15 +6,15 @@
     <title>LindiMaps - Gjenerues i Postimeve Sociale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- html2canvas për shkarkimin e fotos -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Librari moderne për shkarkimin (mbështet Blur dhe Gradient) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #020617; /* Sfond edhe me i erret per panelin */
+            background-color: #020617;
             color: #f8fafc;
         }
 
@@ -23,10 +23,12 @@
             background: linear-gradient(to right, #38bdf8, #2dd4bf);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            /* Zgjidhje për suportin e shfletuesve të ndryshëm */
+            background-clip: text;
         }
 
         /* ========================================== */
-        /* TEMPLATET E REJA TE KARTES                 */
+        /* TEMPLATET E KARTES                         */
         /* ========================================== */
 
         /* 1. Klasike (Glassmorphism origjinal) */
@@ -36,7 +38,7 @@
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(56, 189, 248, 0.05);
-            border-radius: 1.5rem; /* 24px */
+            border-radius: 1.5rem;
         }
 
         /* 2. Mjergull (Frosted Glass e dendur) */
@@ -48,7 +50,7 @@
             border-top: 1px solid rgba(255, 255, 255, 0.3);
             border-left: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            border-radius: 2rem; /* 32px */
+            border-radius: 2rem;
         }
 
         /* 3. Neon (Teknologjike / Cyber) */
@@ -68,12 +70,6 @@
             box-shadow: 20px 20px 60px rgba(0,0,0,0.6);
             border-radius: 0.5rem;
         }
-
-        /* FALLBACKS PER EKSPORT (html2canvas nuk pranon filterat CSS) */
-        .export-mode .style-classic { background: rgba(15, 23, 42, 0.95) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-        .export-mode .style-frosted { background: rgba(30, 41, 59, 0.90) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-        .export-mode .style-neon    { background: rgba(2, 6, 23, 0.98) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-        .export-mode .style-minimal { background: #0f172a !important; }
 
         /* ========================================== */
 
@@ -128,7 +124,7 @@
                 </div>
             </div>
 
-            <!-- 2. Stili i Kartës (ZGJEDHJE E RE) -->
+            <!-- 2. Stili i Kartës -->
             <div>
                 <label class="block text-xs font-bold uppercase text-slate-400 mb-3">2. Stili i Kartës</label>
                 <div class="grid grid-cols-2 gap-3">
@@ -206,7 +202,7 @@
             <img id="previewImage" src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80" alt="Sfondi" class="absolute inset-0 w-full h-full object-cover z-0">
 
             <!-- Gradienti i poshtëm për të krijuar kontrast për kartën -->
-            <div class="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent z-10"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent z-10 pointer-events-none"></div>
 
             <!-- Karta (Tani ndryshon klasën sipas stilit të zgjedhur) -->
             <div class="relative z-20 mt-auto p-5 w-full">
@@ -221,7 +217,7 @@
                     <!-- Titujt -->
                     <h2 class="text-xl font-black text-white leading-[1.1] mb-3 tracking-tighter mt-1">
                         <span id="previewTitle">Takimi me drejtuesit për</span><br>
-                        <span id="previewHighlight" class="text-gradient">Inteligjencën Hapësinore</span>
+                        <span id="previewHighlight" class="text-gradient block">Inteligjencën Hapësinore</span>
                     </h2>
 
                     <!-- Përshkrimi -->
@@ -347,7 +343,7 @@
             previewDesc.textContent = e.target.value;
         });
 
-        // --- 5. Logjika e Shkarkimit ---
+        // --- 5. Logjika e Shkarkimit (E re dhe me e fuqishme me html-to-image) ---
         downloadBtn.addEventListener('click', () => {
             const originalText = downloadBtn.innerHTML;
             downloadBtn.innerHTML = `
@@ -358,42 +354,35 @@
                 Po Gjenerohet...`;
             downloadBtn.disabled = true;
 
-            // Rregullim për HTML2Canvas:
-            // Gradienti i tekstit zëvendësohet me ngjyrë solide bojëqielli
-            previewHighlight.classList.remove('text-gradient');
-            previewHighlight.style.color = '#38bdf8'; 
+            // Libraria e re (htmlToImage) nuk ka nevojë t'i heqë gradientin apo mjergullën (blur-in) 
+            // sepse ajo arrin ta interpretojë saktë dizajnin njëlloj si shfletuesi.
             
-            // Shtojmë klasën 'export-mode' për të aktivizuar CSS Fallbacks (shih te <style> lart)
-            exportArea.classList.add('export-mode');
-
-            setTimeout(() => {
-                html2canvas(exportArea, {
-                    scale: currentScale,
-                    useCORS: true,
-                    backgroundColor: null,
-                }).then(canvas => {
-                    const imgData = canvas.toDataURL('image/png');
-                    const link = document.createElement('a');
-                    
-                    // Emërtoje sipas formatit të platformës
-                    const platformName = document.querySelector('.format-btn.border-blue-500 span').textContent.replace(/[^a-zA-Z]/g, '');
-                    link.download = `LindiMaps_${platformName}_${new Date().getTime()}.png`;
-                    
-                    link.href = imgData;
-                    link.click();
-                }).catch(err => {
-                    console.error("Gabim gjatë eksportimit:", err);
-                    alert("Ndodhi një gabim gjatë gjenerimit të fotos.");
-                }).finally(() => {
-                    // Rikthe dizajnin vizual pas shkarkimit
-                    previewHighlight.classList.add('text-gradient');
-                    previewHighlight.style.color = '';
-                    exportArea.classList.remove('export-mode'); // Heqim Fallbacks
-                    
-                    downloadBtn.innerHTML = originalText;
-                    downloadBtn.disabled = false;
-                });
-            }, 150);
+            htmlToImage.toPng(exportArea, {
+                pixelRatio: currentScale,
+                style: {
+                    transform: 'scale(1)',
+                    transformOrigin: 'top left'
+                }
+            })
+            .then(function (dataUrl) {
+                const link = document.createElement('a');
+                
+                // Emërtoje sipas formatit të platformës
+                const platformName = document.querySelector('.format-btn.border-blue-500 span').textContent.replace(/[^a-zA-Z]/g, '');
+                link.download = `LindiMaps_${platformName}_${new Date().getTime()}.png`;
+                
+                link.href = dataUrl;
+                link.click();
+            })
+            .catch(function (error) {
+                console.error("Gabim gjatë eksportimit:", error);
+                alert("Ndodhi një gabim gjatë gjenerimit të fotos.");
+            })
+            .finally(function () {
+                // Rikthe butonin
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            });
         });
     </script>
 </body>
