@@ -6,7 +6,7 @@
     <title>LindiMaps - Gjenerues i Postimeve Sociale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Librari moderne për shkarkimin (mbështet Blur dhe Gradient) -->
+    <!-- Librari moderne për shkarkimin (mbështet Blur dhe Gradient perfekt) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
     
     <style>
@@ -23,67 +23,71 @@
             background: linear-gradient(to right, #38bdf8, #2dd4bf);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            /* Zgjidhje për suportin e shfletuesve të ndryshëm */
             background-clip: text;
         }
 
         /* ========================================== */
-        /* TEMPLATET E KARTES                         */
+        /* MOTORI I STILEVE DINAMIKE DHE STRUKTURAVE  */
         /* ========================================== */
 
-        /* 1. Klasike (Glassmorphism origjinal) */
-        .style-classic {
-            background: rgba(15, 23, 42, 0.45);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(56, 189, 248, 0.05);
-            border-radius: 1.5rem;
-        }
+        /* BAZA (Klasat e përbashkëta që manipulohen nga stili aktiv) */
+        .content-wrapper { display: flex; flex-direction: column; justify-content: flex-end; padding: 1.25rem; transition: all 0.4s ease; }
+        .card-inner { position: relative; width: 100%; transition: all 0.4s ease; }
+        .card-label { position: absolute; top: -0.75rem; left: 1.5rem; transition: all 0.4s ease; z-index: 30;}
+        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 1.25rem; padding-top: 1rem; transition: all 0.4s ease; }
+        .text-wrapper { transition: all 0.4s ease; }
 
-        /* 2. Mjergull (Frosted Glass e dendur) */
-        .style-frosted {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(40px) saturate(150%);
-            -webkit-backdrop-filter: blur(40px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            border-radius: 2rem;
-        }
+        /* ========================================== */
+        /* KATEGORIA 1: KARTA SOCIALE (PLUSKUESE)     */
+        /* ========================================== */
 
-        /* 3. Neon (Teknologjike / Cyber) */
-        .style-neon {
-            background: rgba(2, 6, 23, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid #38bdf8;
-            box-shadow: 0 0 25px rgba(56, 189, 248, 0.25), inset 0 0 15px rgba(45, 212, 191, 0.1);
-            border-radius: 1rem;
-        }
+        /* 1. Klasike */
+        [data-style="classic"] .card-inner { background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(56, 189, 248, 0.05); border-radius: 1.5rem; padding: 1.5rem; }
 
-        /* 4. Minimaliste (Solide, moderne) */
-        .style-minimal {
-            background: #0f172a;
-            border-left: 4px solid #38bdf8;
-            box-shadow: 20px 20px 60px rgba(0,0,0,0.6);
-            border-radius: 0.5rem;
-        }
+        /* 2. Mjergull */
+        [data-style="frosted"] .card-inner { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(40px) saturate(150%); border: 1px solid rgba(255, 255, 255, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.3); border-left: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); border-radius: 2rem; padding: 1.5rem; }
+
+        /* 3. Neon */
+        [data-style="neon"] .card-inner { background: rgba(2, 6, 23, 0.7); backdrop-filter: blur(12px); border: 1px solid #38bdf8; box-shadow: 0 0 25px rgba(56, 189, 248, 0.25), inset 0 0 15px rgba(45, 212, 191, 0.1); border-radius: 1rem; padding: 1.5rem; }
+
+        /* 4. Minimal */
+        [data-style="minimal"] .card-inner { background: #0f172a; border-left: 4px solid #38bdf8; box-shadow: 20px 20px 60px rgba(0,0,0,0.6); border-radius: 0.5rem; padding: 1.5rem; }
+
+        /* ========================================== */
+        /* KATEGORIA 2: BANDEROLA PROFESIONALE        */
+        /* ========================================== */
+
+        /* 5. Gradient Majtas (Korporatë - Hero Banner) */
+        [data-style="corp-left"] .overlay-gradient { display: none; }
+        [data-style="corp-left"] .content-wrapper { justify-content: center; padding: 0; }
+        [data-style="corp-left"] .card-inner { background: linear-gradient(to right, rgba(2,6,23, 1) 0%, rgba(2,6,23, 0.85) 45%, rgba(2,6,23, 0) 100%); height: 100%; border-radius: 0; display: flex; flex-direction: column; justify-content: center; padding: 2.5rem 30% 2.5rem 2.5rem; }
+        [data-style="corp-left"] .card-label { position: relative; top: 0; left: 0; align-self: flex-start; margin-bottom: 1.25rem; }
+        [data-style="corp-left"] .card-footer { position: absolute; bottom: 2rem; left: 2.5rem; right: 2rem; border-top: none; margin-top: 0; padding-top: 0; }
+        [data-style="corp-left"] .preview-title { font-size: 1.5rem; line-height: 1.1; margin-bottom: 0.5rem; }
+        [data-style="corp-left"] .preview-desc { font-size: 0.85rem; line-height: 1.6; color: #cbd5e1; }
+
+        /* 6. Bllok Poshtë (Lajm Zyrtar) */
+        [data-style="corp-bottom"] .overlay-gradient { background: linear-gradient(to top, rgba(2,6,23, 0.4) 0%, transparent 100%); }
+        [data-style="corp-bottom"] .content-wrapper { padding: 0; }
+        [data-style="corp-bottom"] .card-inner { background: #0f172a; border-top: 3px solid #38bdf8; border-radius: 0; padding: 2.5rem 2rem 1.5rem 2rem; }
+        [data-style="corp-bottom"] .card-label { position: absolute; top: -0.75rem; left: 2rem; }
+        [data-style="corp-bottom"] .card-footer { border-top-color: rgba(255,255,255,0.05); }
+
+        /* 7. Kinematografike (Shpallje Qendrore) */
+        [data-style="corp-center"] .overlay-gradient { background: rgba(2,6,23, 0.75); backdrop-filter: blur(4px); }
+        [data-style="corp-center"] .content-wrapper { justify-content: center; align-items: center; padding: 2rem; }
+        [data-style="corp-center"] .card-inner { background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        [data-style="corp-center"] .card-label { position: relative; top: 0; left: 0; margin-bottom: 1.5rem; }
+        [data-style="corp-center"] .text-wrapper h2, [data-style="corp-center"] .text-wrapper p { text-align: center; }
+        [data-style="corp-center"] .card-footer { position: absolute; bottom: 2rem; left: 2rem; right: 2rem; width: calc(100% - 4rem); }
 
         /* ========================================== */
 
-        /* Scrollbar i personalizuar për panelin e kontrollit */
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
-        
-        /* Auto-zgjerim per textarea */
-        textarea {
-            resize: none;
-            overflow: hidden;
-            min-height: 104px;
-        }
+        textarea { resize: none; overflow: hidden; min-height: 104px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
@@ -91,7 +95,7 @@
     <!-- PJESA E MAJTË: PANELI I KONTROLLIT -->
     <aside class="w-full lg:w-1/3 bg-[#0f172a] border-r border-slate-800 p-8 flex flex-col gap-6 overflow-y-auto h-auto lg:h-screen z-10 shadow-2xl">
         
-        <div class="mb-4">
+        <div class="mb-2">
             <h1 class="text-2xl font-black tracking-tighter flex items-center gap-2">
                 <span class="text-white">LINDI</span><span class="text-gradient">MAPS</span>
             </h1>
@@ -124,22 +128,46 @@
                 </div>
             </div>
 
-            <!-- 2. Stili i Kartës -->
-            <div>
-                <label class="block text-xs font-bold uppercase text-slate-400 mb-3">2. Stili i Kartës</label>
-                <div class="grid grid-cols-2 gap-3">
-                    <button class="style-btn border-2 border-blue-500 bg-blue-500/10 text-blue-400 rounded-xl py-2 flex items-center justify-center transition-all" data-style="style-classic">
-                        <span class="text-[10px] font-bold uppercase tracking-wide">Klasike</span>
-                    </button>
-                    <button class="style-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-xl py-2 flex items-center justify-center transition-all" data-style="style-frosted">
-                        <span class="text-[10px] font-bold uppercase tracking-wide">Mjergull</span>
-                    </button>
-                    <button class="style-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-xl py-2 flex items-center justify-center transition-all" data-style="style-neon">
-                        <span class="text-[10px] font-bold uppercase tracking-wide">Neon</span>
-                    </button>
-                    <button class="style-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-xl py-2 flex items-center justify-center transition-all" data-style="style-minimal">
-                        <span class="text-[10px] font-bold uppercase tracking-wide">Minimal</span>
-                    </button>
+            <!-- 2. Stili i Arkitekturës -->
+            <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-4">2. Zgjidh Stilin e Dizajnit</label>
+                
+                <!-- Grupi 1: Kartat -->
+                <div class="mb-3">
+                    <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 block mb-2">Karta Sociale (Pluskuese)</span>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="style-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-lg py-2 transition-all" data-style="classic">
+                            <span class="text-[10px] font-bold uppercase tracking-wide">Klasike</span>
+                        </button>
+                        <button class="style-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-lg py-2 transition-all" data-style="frosted">
+                            <span class="text-[10px] font-bold uppercase tracking-wide">Mjergull</span>
+                        </button>
+                        <button class="style-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-lg py-2 transition-all" data-style="neon">
+                            <span class="text-[10px] font-bold uppercase tracking-wide">Neon</span>
+                        </button>
+                        <button class="style-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-lg py-2 transition-all" data-style="minimal">
+                            <span class="text-[10px] font-bold uppercase tracking-wide">Minimal</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grupi 2: Banderolat -->
+                <div>
+                    <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 block mb-2">Banderola Profesionale</span>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button class="style-btn border-2 border-blue-500 bg-blue-500/10 text-blue-400 rounded-lg py-2 transition-all flex items-center justify-center gap-2" data-style="corp-left">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h8v16H4z" fill="currentColor" fill-opacity="0.3"></path></svg>
+                            <span class="text-[10px] font-bold uppercase tracking-wide">Kopertinë (Gradient Majtas)</span>
+                        </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button class="style-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-lg py-2 transition-all" data-style="corp-bottom">
+                                <span class="text-[10px] font-bold uppercase tracking-wide">Bllok Poshtë</span>
+                            </button>
+                            <button class="style-btn border-2 border-slate-700 hover:border-slate-500 text-slate-400 rounded-lg py-2 transition-all" data-style="corp-center">
+                                <span class="text-[10px] font-bold uppercase tracking-wide">Kinematografike</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -196,37 +224,41 @@
         <!-- ========================================== -->
         <!-- KJO ËSHTË ZONA QË DO TË EKSPORTOHET SI FOTO -->
         <!-- ========================================== -->
-        <div id="export-area" class="relative bg-slate-800 rounded-none overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transition-all duration-300 ease-in-out" style="width: 400px; height: 500px;">
+        
+        <!-- data-style kontrollon në thelb të gjithë arkitekturën vizuale përmes CSS që përcaktuam lart -->
+        <div id="export-area" data-style="corp-left" class="relative bg-slate-800 rounded-none overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transition-all duration-300 ease-in-out" style="width: 500px; height: 500px;">
             
             <!-- Foto e Sfondit -->
             <img id="previewImage" src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80" alt="Sfondi" class="absolute inset-0 w-full h-full object-cover z-0">
 
-            <!-- Gradienti i poshtëm për të krijuar kontrast për kartën -->
-            <div class="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent z-10 pointer-events-none"></div>
+            <!-- Gradienti mbrojtës (Përdoret në disa stile, fshihet në të tjera) -->
+            <div class="overlay-gradient absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent z-10 pointer-events-none transition-all duration-400"></div>
 
-            <!-- Karta (Tani ndryshon klasën sipas stilit të zgjedhur) -->
-            <div class="relative z-20 mt-auto p-5 w-full">
+            <!-- Struktura e Kontentit -->
+            <div class="content-wrapper relative z-20 w-full h-full">
                 
-                <div id="glassCard" class="style-classic p-6 w-full relative transition-all duration-500">
+                <!-- Trupi i Kartës/Banderolës -->
+                <div class="card-inner">
                     
-                    <!-- Elementi dekorativ LindiMaps -->
-                    <div class="absolute -top-3 left-6 bg-gradient-to-r from-blue-600 to-teal-500 text-white text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full shadow-lg border border-white/20">
+                    <!-- Elementi dekorativ i sipërm -->
+                    <div class="card-label bg-gradient-to-r from-blue-600 to-teal-500 text-white text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 shadow-lg border border-white/20 rounded-full">
                         Njoftim
                     </div>
 
-                    <!-- Titujt -->
-                    <h2 class="text-xl font-black text-white leading-[1.1] mb-3 tracking-tighter mt-1">
-                        <span id="previewTitle">Takimi me drejtuesit për</span><br>
-                        <span id="previewHighlight" class="text-gradient block">Inteligjencën Hapësinore</span>
-                    </h2>
+                    <!-- Teksti (Titulli dhe Përshkrimi) -->
+                    <div class="text-wrapper">
+                        <h2 class="preview-title text-xl font-black text-white leading-[1.1] mb-2 tracking-tighter">
+                            <span id="previewTitle">Takimi me drejtuesit për</span><br>
+                            <span id="previewHighlight" class="text-gradient block mt-1">Inteligjencën Hapësinore</span>
+                        </h2>
 
-                    <!-- Përshkrimi -->
-                    <p id="previewDesc" class="text-[12px] text-slate-300 font-medium leading-relaxed mb-5">
-                        Diskutuam mbi forcimin e bashkëpunimit në përdorimin e teknologjisë GIS dhe Remote Sensing. LindiMaps ofron zgjidhje konkrete në analizën e të dhënave komplekse gjeohapësinore.
-                    </p>
+                        <p id="previewDesc" class="preview-desc text-[12px] text-slate-300 font-medium leading-relaxed">
+                            Diskutuam mbi forcimin e bashkëpunimit në përdorimin e teknologjisë GIS dhe Remote Sensing. LindiMaps ofron zgjidhje konkrete në analizën e të dhënave komplekse gjeohapësinore.
+                        </p>
+                    </div>
 
-                    <!-- Footer i Kartës -->
-                    <div class="flex items-center justify-between border-t border-white/10 pt-4">
+                    <!-- Footer-i (Logo, Website, Shigjeta) -->
+                    <div class="card-footer">
                         
                         <!-- Logo -->
                         <div class="relative">
@@ -240,8 +272,8 @@
                         </div>
 
                         <!-- Domajni -->
-                        <div class="text-center">
-                            <span class="text-white text-[12px] font-bold tracking-widest uppercase opacity-80">lindimaps.com</span>
+                        <div class="text-center flex-1">
+                            <span class="text-white text-[12px] font-bold tracking-widest uppercase opacity-90">lindimaps.com</span>
                         </div>
 
                         <!-- Shigjeta -->
@@ -276,13 +308,12 @@
         const descInput = document.getElementById('descInput');
         const previewDesc = document.getElementById('previewDesc');
         
-        const glassCard = document.getElementById('glassCard');
         const downloadBtn = document.getElementById('downloadBtn');
         const exportArea = document.getElementById('export-area');
 
-        let currentScale = 2.7; // Shkalla bazë për gjenerim HD
+        let currentScale = 2.7; 
 
-        // --- 1. Logjika e Formateve ---
+        // --- 1. Logjika e Formateve (Platforma) ---
         const formatBtns = document.querySelectorAll('.format-btn');
         formatBtns.forEach(btn => {
             btn.addEventListener('click', function() {
@@ -293,17 +324,18 @@
                 this.classList.remove('border-slate-700', 'text-slate-400');
                 this.classList.add('border-blue-500', 'bg-blue-500/10', 'text-blue-400');
 
+                // Ndrysho madhësinë e kanavacës
                 exportArea.style.width = this.getAttribute('data-w') + 'px';
                 exportArea.style.height = this.getAttribute('data-h') + 'px';
                 currentScale = parseFloat(this.getAttribute('data-scale'));
             });
         });
 
-        // --- 2. Logjika e Stileve të Kartës ---
+        // --- 2. Logjika e Stileve (Arkitektura Vizuale) ---
         const styleBtns = document.querySelectorAll('.style-btn');
         styleBtns.forEach(btn => {
             btn.addEventListener('click', function() {
-                // Përditëso UI-në e butonave
+                // UI i butonave
                 styleBtns.forEach(b => {
                     b.classList.remove('border-blue-500', 'bg-blue-500/10', 'text-blue-400');
                     b.classList.add('border-slate-700', 'text-slate-400');
@@ -311,16 +343,14 @@
                 this.classList.remove('border-slate-700', 'text-slate-400');
                 this.classList.add('border-blue-500', 'bg-blue-500/10', 'text-blue-400');
 
-                // Hiq të gjitha klasat e stileve ekzistuese nga karta
-                glassCard.classList.remove('style-classic', 'style-frosted', 'style-neon', 'style-minimal');
-                
-                // Shto stilin e ri të zgjedhur
+                // Ndrysho stilin duke përditësuar vetëm një Atribut në Kontejnerin Kryesor!
+                // E gjithë magjia bëhet nga CSS
                 const selectedStyle = this.getAttribute('data-style');
-                glassCard.classList.add(selectedStyle);
+                exportArea.setAttribute('data-style', selectedStyle);
             });
         });
 
-        // --- 3. Ndryshimi i Fotos së Sfondit ---
+        // --- 3. Ngarkimi i Fotos së Sfondit ---
         imageInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -343,7 +373,7 @@
             previewDesc.textContent = e.target.value;
         });
 
-        // --- 5. Logjika e Shkarkimit (E re dhe me e fuqishme me html-to-image) ---
+        // --- 5. Logjika e Shkarkimit me html-to-image ---
         downloadBtn.addEventListener('click', () => {
             const originalText = downloadBtn.innerHTML;
             downloadBtn.innerHTML = `
@@ -354,9 +384,6 @@
                 Po Gjenerohet...`;
             downloadBtn.disabled = true;
 
-            // Libraria e re (htmlToImage) nuk ka nevojë t'i heqë gradientin apo mjergullën (blur-in) 
-            // sepse ajo arrin ta interpretojë saktë dizajnin njëlloj si shfletuesi.
-            
             htmlToImage.toPng(exportArea, {
                 pixelRatio: currentScale,
                 style: {
@@ -367,7 +394,7 @@
             .then(function (dataUrl) {
                 const link = document.createElement('a');
                 
-                // Emërtoje sipas formatit të platformës
+                // Emërtoje sipas formatit dhe stilit
                 const platformName = document.querySelector('.format-btn.border-blue-500 span').textContent.replace(/[^a-zA-Z]/g, '');
                 link.download = `LindiMaps_${platformName}_${new Date().getTime()}.png`;
                 
@@ -379,7 +406,6 @@
                 alert("Ndodhi një gabim gjatë gjenerimit të fotos.");
             })
             .finally(function () {
-                // Rikthe butonin
                 downloadBtn.innerHTML = originalText;
                 downloadBtn.disabled = false;
             });
