@@ -8,14 +8,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style id="base-styles">
-        /* SHTESË: Stilizimi i Faturës për Printim */
+        /* SHTESË: Stilizimi i Faturës për Printim (PERMIRESUAR PER MOBILE) */
         @media print {
-            body * { visibility: hidden; }
-            #print-invoice-area, #print-invoice-area * { visibility: visible; }
-            #print-invoice-area { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; background: white; }
-            
-            /* Fshih UI normal gjatë printimit */
+            body { background-color: white !important; margin: 0; padding: 0; }
+            /* Fshih UI normal gjatë printimit në mënyrë të sigurtë */
             .no-print, aside, #mobile-header, #form-section, #auth-screen, #toast-container, main { display: none !important; }
+            /* Shfaq vetëm fushën e faturës */
+            #print-invoice-area { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; background: white !important; }
+            #print-invoice-area * { visibility: visible !important; }
+            
+            @page { margin: 1cm; }
         }
         
         ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -279,7 +281,7 @@
                             <input type="file" id="import-json-input" class="hidden" accept=".json" onchange="handleImportJSON(event)">
                             <button onclick="document.getElementById('import-json-input').click()" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition text-sm font-bold shadow-sm"><i class="fas fa-file-import"></i> Import</button>
                             <button onclick="exportJSON()" class="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-200 transition text-sm font-bold shadow-sm"><i class="fas fa-file-code"></i> JSON</button>
-                            <!-- Ndryshuar butoni PDF/Print për të gjeneruar një faturë të pastër -->
+                            <!-- Këto butona gjenerojnë faturën profesionale PDF/Print -->
                             <button onclick="exportCSV()" class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 transition text-sm font-bold shadow-sm"><i class="fas fa-file-excel"></i> Excel/CSV</button>
                             <button onclick="prepareAndPrint()" class="bg-red-100 text-red-700 px-3 py-2 rounded-lg hover:bg-red-200 transition text-sm font-bold shadow-sm"><i class="fas fa-file-pdf"></i> PDF</button>
                             <button onclick="prepareAndPrint()" class="w-full md:w-auto bg-slate-800 text-white px-5 py-3 md:py-2 rounded-lg hover:bg-slate-700 transition shadow flex justify-center items-center gap-2 font-bold">
@@ -1295,6 +1297,7 @@
             if (!window.selectedUserId) return window.showToast("Zgjidhni një profil për të gjeneruar faturën.", "warning");
 
             const me = window.users.find(u => u.id === window.selectedUserId);
+            // Merr të gjitha transaksionet e këtij përdoruesi
             const txs = window.transactions.filter(t => t.involvedUsers.includes(me.id) || t.paidBy === me.id);
             
             // Llogaritjet
@@ -1314,16 +1317,18 @@
                 if (isInvolved) totShpenzimePersona += pjesa;
 
                 const payerName = window.users.find(u => u.id === t.paidBy)?.name || 'I fshirë';
+                const involvedNames = t.involvedUsers.map(uId => window.users.find(x => x.id === uId)?.name || 'I fshirë').join(", ");
                 const d = new Date(t.date);
                 const dateStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`;
 
                 invoiceRows += `
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <tr style="border-bottom: 1px solid #e2e8f0; page-break-inside: avoid;">
                         <td style="padding: 10px 5px; font-size: 13px;">${dateStr}</td>
+                        <td style="padding: 10px 5px; font-size: 13px; text-transform: uppercase;">${t.type}</td>
                         <td style="padding: 10px 5px; font-size: 13px;"><b>${t.description}</b><br><span style="color:#64748b; font-size:11px;">Paguar nga: ${payerName}</span></td>
-                        <td style="padding: 10px 5px; font-size: 13px; text-align: center; text-transform: uppercase;">${t.type}</td>
                         <td style="padding: 10px 5px; font-size: 13px; text-align: right;">${t.totalAmount.toFixed(2)} L</td>
-                        <td style="padding: 10px 5px; font-size: 13px; text-align: right; font-weight: bold;">${isInvolved ? pjesa.toFixed(2) : '0.00'} L</td>
+                        <td style="padding: 10px 5px; font-size: 13px; text-align: right; font-weight: bold;">${pjesa.toFixed(2)} L</td>
+                        <td style="padding: 10px 5px; font-size: 11px; color:#475569;">${involvedNames}</td>
                     </tr>
                 `;
             });
@@ -1376,14 +1381,15 @@
                         <thead>
                             <tr style="background-color: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
                                 <th style="text-align: left; padding: 12px 5px; font-size: 13px;">Data</th>
+                                <th style="text-align: left; padding: 12px 5px; font-size: 13px;">Tipi</th>
                                 <th style="text-align: left; padding: 12px 5px; font-size: 13px;">Përshkrimi</th>
-                                <th style="text-align: center; padding: 12px 5px; font-size: 13px;">Lloji</th>
-                                <th style="text-align: right; padding: 12px 5px; font-size: 13px;">Vlera Faturës</th>
-                                <th style="text-align: right; padding: 12px 5px; font-size: 13px;">Pjesa Jote</th>
+                                <th style="text-align: right; padding: 12px 5px; font-size: 13px;">Vlera Totale</th>
+                                <th style="text-align: right; padding: 12px 5px; font-size: 13px;">Vlera p/Person</th>
+                                <th style="text-align: left; padding: 12px 5px; font-size: 13px;">Ndarë me</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${invoiceRows || '<tr><td colspan="5" style="text-align:center; padding: 25px; color:#64748b;">Nuk ka asnjë transaksion të regjistruar.</td></tr>'}
+                            ${invoiceRows || '<tr><td colspan="6" style="text-align:center; padding: 25px; color:#64748b;">Nuk ka asnjë transaksion të regjistruar.</td></tr>'}
                         </tbody>
                     </table>
 
@@ -1402,10 +1408,10 @@
             document.getElementById('print-invoice-area').innerHTML = invoiceHTML;
             window.showToast("Përgatitja e faturës...", "info");
             
-            // Ekzekuto printimin. Ne shfletuesit mobile, kjo hap dritaren per ta ruajtur si PDF direkt!
+            // Shmang probleme me printimin në Mobile duke pritur vetëm 100 milisekonda
             setTimeout(() => {
                 window.print();
-            }, 500);
+            }, 100);
         };
 
         window.handleImportJSON = (e) => {
