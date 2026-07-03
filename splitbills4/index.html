@@ -3,16 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#4f46e5">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="SplitBills Pro Enterprise - Sistemi i avancuar i menaxhimit financiar.">
     <title>SplitBills Pro | Enterprise Edition</title>
     
-    <!-- CDNs -->
+    <!-- ========================================== -->
+    <!-- 📂 src/config/cdns.html                    -->
+    <!-- ========================================== -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Konfigurimi i Tailwind për Enterprise UI (Linear/Stripe Style) -->
+    <!-- ========================================== -->
+    <!-- 📂 src/css/tailwind.config.js              -->
+    <!-- ========================================== -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -20,291 +25,436 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' },
-                        dark: { bg: '#09090b', surface: '#18181b', border: '#27272a' }
+                        brand: { 50: '#f5f3ff', 100: '#ede9fe', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9', 900: '#4c1d95' },
+                        dark: { bg: '#09090b', surface: '#18181b', border: '#27272a', text: '#e4e4e7' },
+                        success: '#10b981', danger: '#ef4444', warning: '#f59e0b', info: '#3b82f6'
                     },
-                    boxShadow: { 'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.05)', 'premium': '0 4px 24px -4px rgba(0, 0, 0, 0.08)' }
+                    boxShadow: {
+                        'premium': '0 4px 24px -4px rgba(0, 0, 0, 0.05)',
+                        'premium-dark': '0 4px 24px -4px rgba(0, 0, 0, 0.5)',
+                        'float': '0 20px 40px -10px rgba(0,0,0,0.1)'
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(15px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
                 }
             }
         }
     </script>
 
-    <!-- CSS Arkitektura -->
+    <!-- ========================================== -->
+    <!-- 📂 src/css/app.css                         -->
+    <!-- 📂 src/css/animations.css                  -->
+    <!-- 📂 src/css/utilities.css                   -->
+    <!-- ========================================== -->
     <style>
-        /* 📂 src/styles/app.css */
-        :root { --sidebar-width: 280px; }
-        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
+        :root { --sidebar-width: 260px; --header-height: 64px; }
         
-        /* Scrollbar Profesional */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        /* Base & Resets */
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; background-color: #f8fafc; }
+        html.dark body { background-color: #09090b; }
+        
+        /* Custom Scrollbar (Stripe style) */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        html.dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        /* Utility Classes */
-        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
-        .dark .glass-panel { background: rgba(24, 24, 27, 0.7); border: 1px solid rgba(39, 39, 42, 0.5); }
-        
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Animacionet */
-        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUpFade { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        /* Glassmorphism & UI Utilities */
+        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); }
+        html.dark .glass { background: rgba(24, 24, 27, 0.75); border: 1px solid rgba(39, 39, 42, 0.6); }
         
-        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        .animate-slide-up { animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .input-premium { @apply w-full px-4 py-2.5 bg-white dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all shadow-sm text-sm font-medium text-slate-800 dark:text-dark-text; }
+        .btn-premium { @apply flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl transition-all shadow-premium active:scale-95; }
+        
+        /* Animations */
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .toast-enter { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        /* Status Badges */
+        .status-active { @apply bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20; }
+        .status-archived { @apply bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700; }
+        .status-deleted { @apply bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20; }
 
-        /* Printimi i Avancuar */
+        /* Print Architecture */
         @media print {
             body { background: white !important; }
-            .no-print { display: none !important; }
+            .no-print, aside, header, .toast-container, .modal-backdrop { display: none !important; }
             #app-root { display: none !important; }
             #print-root { display: block !important; width: 100%; margin: 0; padding: 0; }
-            @page { margin: 1.5cm; }
+            @page { margin: 10mm; size: A4; }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-dark-bg dark:text-slate-100 transition-colors duration-300">
+<body class="text-slate-900 dark:text-dark-text transition-colors duration-300">
 
-    <!-- ZONA E PRINTIMIT (Hidden nga default) -->
+    <!-- ========================================== -->
+    <!-- 📂 src/views/reports/print.html            -->
+    <!-- ========================================== -->
     <div id="print-root" class="hidden"></div>
 
-    <!-- KONTEJNERI I NJOFTIMEVE (TOASTS) -->
-    <div id="toast-container" class="fixed top-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none w-80"></div>
+    <!-- ========================================== -->
+    <!-- 📂 src/components/notifications/toast.html -->
+    <!-- ========================================== -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none min-w-[320px]"></div>
 
-    <!-- EKRANI I AUTENTIKIMIT (Login/Register/Reset) -->
+    <!-- ========================================== -->
+    <!-- 📂 src/views/auth/auth-layout.html         -->
+    <!-- ========================================== -->
     <div id="auth-screen" class="fixed inset-0 z-[1000] bg-slate-50 dark:bg-dark-bg flex items-center justify-center p-4 transition-opacity duration-500">
+        
+        <!-- Background Elements (Linear style mesh) -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-brand-500/10 blur-[120px]"></div>
-            <div class="absolute top-[60%] -right-[10%] w-[40%] h-[40%] rounded-full bg-emerald-500/10 blur-[100px]"></div>
+            <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-500/20 blur-[120px] rounded-full"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/20 blur-[120px] rounded-full"></div>
+            <div class="absolute top-[40%] left-[50%] w-[30%] h-[30%] bg-emerald-500/10 blur-[100px] rounded-full"></div>
         </div>
 
-        <div class="w-full max-w-[420px] bg-white dark:bg-dark-surface rounded-3xl shadow-premium border border-slate-200/60 dark:border-dark-border overflow-hidden relative z-10 animate-slide-up">
+        <div class="w-full max-w-[440px] bg-white/80 dark:bg-dark-surface/80 backdrop-blur-2xl rounded-3xl shadow-float border border-slate-200/50 dark:border-dark-border/50 overflow-hidden relative z-10 animate-fade-in-up">
             
-            <div class="p-8 pb-6 text-center border-b border-slate-100 dark:border-dark-border">
-                <div class="w-14 h-14 bg-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-brand-500/30">
-                    <i class="fas fa-layer-group text-2xl text-white"></i>
+            <div class="px-8 pt-10 pb-6 text-center">
+                <div class="w-12 h-12 bg-slate-900 dark:bg-white rounded-xl flex items-center justify-center mx-auto mb-5 shadow-lg">
+                    <i class="fas fa-bolt text-xl text-white dark:text-slate-900"></i>
                 </div>
-                <h1 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">SplitBills <span class="text-brand-600 dark:text-brand-400">Pro</span></h1>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">Platforma Enterprise e Financave</p>
+                <h1 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">SplitBills <span class="text-brand-600">Enterprise</span></h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium">Sistemi i avancuar i menaxhimit financiar.</p>
             </div>
 
-            <div class="p-8 relative overflow-hidden" style="min-height: 380px;">
-                <!-- LOGIN FORM -->
-                <form id="form-login" class="absolute inset-0 p-8 transition-transform duration-500 ease-in-out" onsubmit="event.preventDefault(); window.App.Auth.login();">
+            <div class="p-8 relative overflow-hidden" style="min-height: 400px;">
+                <!-- 📄 src/views/auth/login.html -->
+                <form id="form-login" class="absolute inset-0 p-8 pt-0 transition-transform duration-500 ease-in-out" onsubmit="event.preventDefault(); EnterpriseApp.Auth.login();">
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">Email</label>
-                            <input type="email" id="auth-email" required class="w-full px-4 py-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-brand-500 outline-none transition-all text-sm font-medium">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Adresa Email</label>
+                            <input type="email" id="auth-email" required class="input-premium" placeholder="emri@kompania.com">
                         </div>
                         <div>
-                            <div class="flex justify-between items-center mb-1.5">
-                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Fjalëkalimi</label>
-                                <button type="button" onclick="window.App.UI.switchAuth('reset')" class="text-xs font-bold text-brand-600 hover:text-brand-700 transition">Harruar?</button>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Fjalëkalimi</label>
+                                <button type="button" onclick="EnterpriseApp.UI.Router.switchAuth('reset')" class="text-xs font-bold text-brand-600 hover:text-brand-700 transition">Harruar?</button>
                             </div>
-                            <input type="password" id="auth-password" required class="w-full px-4 py-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-brand-500 outline-none transition-all text-sm font-medium">
+                            <input type="password" id="auth-password" required class="input-premium" placeholder="••••••••">
                         </div>
-                        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-brand-500/25 mt-2 flex justify-center items-center gap-2">
-                            Hyr në Platformë <i class="fas fa-arrow-right text-sm"></i>
+                        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg mt-4 flex justify-center items-center gap-2">
+                            Identifikohu <i class="fas fa-arrow-right text-sm"></i>
                         </button>
                     </div>
-                    <p class="text-center mt-6 text-sm text-slate-500 font-medium">Nuk keni llogari? <button type="button" onclick="window.App.UI.switchAuth('register')" class="text-brand-600 font-bold hover:underline">Krijo një</button></p>
-                </form>
-
-                <!-- REGISTER FORM -->
-                <form id="form-register" class="absolute inset-0 p-8 translate-x-full transition-transform duration-500 ease-in-out" onsubmit="event.preventDefault(); window.App.Auth.register();">
-                    <div class="space-y-3">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Emri</label><input type="text" id="reg-fname" required class="w-full px-3 py-2.5 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm"></div>
-                            <div><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Mbiemri</label><input type="text" id="reg-lname" required class="w-full px-3 py-2.5 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm"></div>
-                        </div>
-                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Email</label><input type="email" id="reg-email" required class="w-full px-3 py-2.5 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm"></div>
-                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fjalëkalimi</label><input type="password" id="reg-password" required minlength="6" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm"></div>
-                        <button type="submit" class="w-full bg-slate-900 dark:bg-white dark:text-slate-900 text-white font-bold py-3 rounded-xl transition mt-2">Krijo Llogarinë</button>
+                    <div class="mt-8 pt-6 border-t border-slate-100 dark:border-dark-border text-center">
+                        <p class="text-sm text-slate-500 font-medium">Llogari e re? <button type="button" onclick="EnterpriseApp.UI.Router.switchAuth('register')" class="text-slate-900 dark:text-white font-bold hover:underline">Krijo Profil</button></p>
                     </div>
-                    <button type="button" onclick="window.App.UI.switchAuth('login')" class="w-full text-center mt-4 text-sm text-slate-500 font-bold hover:text-brand-600 transition"><i class="fas fa-arrow-left mr-1"></i> Kthehu</button>
                 </form>
 
-                <!-- RESET FORM -->
-                <form id="form-reset" class="absolute inset-0 p-8 translate-x-full transition-transform duration-500 ease-in-out" onsubmit="event.preventDefault(); window.App.Auth.resetPassword();">
+                <!-- 📄 src/views/auth/register.html -->
+                <form id="form-register" class="absolute inset-0 p-8 pt-0 translate-x-full transition-transform duration-500 ease-in-out" onsubmit="event.preventDefault(); EnterpriseApp.Auth.register();">
                     <div class="space-y-4">
-                        <p class="text-sm text-slate-500 mb-2">Shënoni emailin për të marrë udhëzimet e rivendosjes së fjalëkalimit.</p>
-                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Email</label><input type="email" id="reset-email" required class="w-full px-4 py-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm"></div>
-                        <button type="submit" class="w-full bg-brand-600 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-brand-500/25">Dërgo Linkun</button>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Emri</label>
+                                <input type="text" id="reg-fname" required class="input-premium">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Mbiemri</label>
+                                <input type="text" id="reg-lname" required class="input-premium">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email i punës</label>
+                            <input type="email" id="reg-email" required class="input-premium">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Fjalëkalimi (Min. 8 karaktere)</label>
+                            <input type="password" id="reg-password" required minlength="8" class="input-premium">
+                        </div>
+                        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition shadow-premium mt-2">Krijo Llogarinë</button>
                     </div>
-                    <button type="button" onclick="window.App.UI.switchAuth('login')" class="w-full text-center mt-6 text-sm text-slate-500 font-bold hover:text-brand-600 transition"><i class="fas fa-arrow-left mr-1"></i> Kthehu</button>
+                    <button type="button" onclick="EnterpriseApp.UI.Router.switchAuth('login')" class="w-full text-center mt-6 text-sm text-slate-500 font-bold hover:text-slate-900 dark:hover:text-white transition"><i class="fas fa-arrow-left mr-1"></i> Kthehu tek hyrja</button>
+                </form>
+
+                <!-- 📄 src/views/auth/reset.html -->
+                <form id="form-reset" class="absolute inset-0 p-8 pt-0 translate-x-full transition-transform duration-500 ease-in-out" onsubmit="event.preventDefault(); EnterpriseApp.Auth.resetPassword();">
+                    <div class="space-y-5">
+                        <div class="bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 p-4 rounded-xl flex gap-3">
+                            <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                            <p class="text-xs text-blue-800 dark:text-blue-300 leading-relaxed font-medium">Shënoni adresën e emailit të lidhur me llogarinë tuaj Enterprise. Ne do t'ju dërgojmë një lidhje të sigurt për rivendosjen.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Email</label>
+                            <input type="email" id="reset-email" required class="input-premium">
+                        </div>
+                        <button type="submit" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3.5 rounded-xl transition shadow-premium">Dërgo Lidhjen</button>
+                    </div>
+                    <button type="button" onclick="EnterpriseApp.UI.Router.switchAuth('login')" class="w-full text-center mt-6 text-sm text-slate-500 font-bold hover:text-slate-900 dark:hover:text-white transition"><i class="fas fa-arrow-left mr-1"></i> Kthehu</button>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- MAIN APP STRUCTURE -->
-    <div id="app-root" class="flex h-screen w-full hidden overflow-hidden">
+    <!-- ========================================== -->
+    <!-- 📂 src/views/layouts/main-layout.html      -->
+    <!-- ========================================== -->
+    <div id="app-root" class="flex h-screen w-full hidden overflow-hidden bg-[#fbfbfb] dark:bg-[#09090b]">
         
-        <!-- SIDEBAR (Menyja Enterprise) -->
-        <aside id="sidebar" class="w-[280px] bg-white dark:bg-dark-surface border-r border-slate-200 dark:border-dark-border flex-col hidden md:flex z-30 transition-transform duration-300 absolute md:relative h-full">
+        <!-- 📄 src/components/sidebar.html -->
+        <aside id="sidebar" class="w-[260px] bg-white dark:bg-dark-surface border-r border-slate-200 dark:border-dark-border flex-col hidden md:flex z-30 transition-transform duration-300 h-full relative">
             <div class="h-16 flex items-center px-6 border-b border-slate-100 dark:border-dark-border shrink-0">
-                <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center mr-3"><i class="fas fa-layer-group text-white text-sm"></i></div>
-                <h2 class="font-black text-lg tracking-tight">SplitBills<span class="text-brand-500 font-normal">Pro</span></h2>
+                <div class="w-7 h-7 bg-slate-900 dark:bg-white rounded-md flex items-center justify-center mr-3"><i class="fas fa-bolt text-white dark:text-slate-900 text-xs"></i></div>
+                <h2 class="font-bold text-sm tracking-tight">SplitBills Enterprise</h2>
             </div>
 
-            <div class="flex-1 overflow-y-auto hide-scrollbar py-4 px-3 flex flex-col gap-6">
-                
-                <!-- Main Nav -->
+            <div class="flex-1 overflow-y-auto hide-scrollbar py-6 px-4 flex flex-col gap-8">
+                <!-- Navigation -->
                 <div>
-                    <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Kryesore</div>
-                    <nav class="space-y-1" id="nav-main">
-                        <button onclick="window.App.Navigation.goTo('dashboard')" data-tab="dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-brand-700 bg-brand-50 dark:text-brand-400 dark:bg-brand-500/10 transition-colors"><i class="fas fa-chart-pie w-5 text-center"></i> Pulti Drejtues</button>
-                        <button onclick="window.App.Navigation.goTo('transactions')" data-tab="transactions" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-dark-border transition-colors"><i class="fas fa-list w-5 text-center"></i> Lëvizjet</button>
-                        <button onclick="window.App.Navigation.goTo('reports')" data-tab="reports" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-dark-border transition-colors"><i class="fas fa-file-invoice w-5 text-center"></i> Raporte & Fatura</button>
+                    <div class="px-2 mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Workspace</div>
+                    <nav class="space-y-0.5" id="nav-main">
+                        <button onclick="EnterpriseApp.UI.Router.goTo('dashboard')" data-tab="dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-900 bg-slate-100 dark:text-white dark:bg-dark-border transition-colors"><i class="fas fa-layer-group w-5 text-slate-500 dark:text-slate-400"></i> Dashboard</button>
+                        <button onclick="EnterpriseApp.UI.Router.goTo('transactions')" data-tab="transactions" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-dark-border/50 transition-colors"><i class="fas fa-list-ul w-5 text-slate-400"></i> Transactions</button>
+                        <button onclick="EnterpriseApp.UI.Router.goTo('reports')" data-tab="reports" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-dark-border/50 transition-colors"><i class="fas fa-chart-bar w-5 text-slate-400"></i> Reports & Data</button>
+                        <button onclick="EnterpriseApp.UI.Router.goTo('settings')" data-tab="settings" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-dark-border/50 transition-colors"><i class="fas fa-cog w-5 text-slate-400"></i> Settings</button>
                     </nav>
                 </div>
 
-                <!-- Team/Profiles Nav -->
+                <!-- Profiles / Entities -->
                 <div class="flex-1 flex flex-col min-h-0">
-                    <div class="px-3 flex justify-between items-center mb-2">
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Profili i Ekipit</div>
-                        <button onclick="window.App.UI.toggleModal('add-user-modal')" class="text-brand-600 hover:text-brand-800 dark:text-brand-400"><i class="fas fa-plus"></i></button>
+                    <div class="px-2 flex justify-between items-center mb-3">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Entities / Users</div>
+                        <button onclick="EnterpriseApp.UI.Modal.open('modal-entity')" class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition"><i class="fas fa-plus text-xs"></i></button>
                     </div>
-                    <div class="flex-1 overflow-y-auto hide-scrollbar space-y-0.5" id="sidebar-users-list">
-                        <!-- Renderizohet dinamikisht nga App.UI.renderUsersList() -->
+                    <div class="flex-1 overflow-y-auto hide-scrollbar space-y-0.5" id="sidebar-entities-list">
+                        <!-- 🔄 Rendered by EnterpriseApp.Modules.Users.renderSidebar() -->
                     </div>
                 </div>
             </div>
 
+            <!-- Current User / Logout -->
             <div class="p-4 border-t border-slate-100 dark:border-dark-border shrink-0">
-                <button onclick="window.App.Auth.logout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-colors">
-                    <i class="fas fa-sign-out-alt"></i> Dil nga Sistemi
-                </button>
+                <div class="flex items-center justify-between px-2">
+                    <div class="flex items-center gap-3 truncate">
+                        <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400 flex items-center justify-center font-bold text-xs" id="current-user-avatar">A</div>
+                        <div class="truncate">
+                            <p class="text-xs font-bold text-slate-900 dark:text-white truncate" id="current-user-email">admin@company.com</p>
+                            <p class="text-[10px] text-slate-500">Administrator</p>
+                        </div>
+                    </div>
+                    <button onclick="EnterpriseApp.Auth.logout()" class="text-slate-400 hover:text-red-500 transition" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
             </div>
         </aside>
 
-        <!-- Pjesa Qendrore -->
-        <main class="flex-1 flex flex-col min-w-0 bg-slate-50/50 dark:bg-dark-bg relative">
-            <!-- Header Qendror -->
-            <header class="h-16 glass-panel border-b-0 border-slate-200 dark:border-dark-border flex items-center justify-between px-4 lg:px-8 z-20 shrink-0 sticky top-0">
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col min-w-0 relative">
+            
+            <!-- 📄 src/components/navbar.html -->
+            <header class="h-16 glass border-b border-slate-200 dark:border-dark-border flex items-center justify-between px-6 z-20 shrink-0 sticky top-0">
                 <div class="flex items-center gap-4">
-                    <button class="md:hidden text-slate-500 hover:text-slate-800 dark:text-slate-400" onclick="document.getElementById('sidebar').classList.toggle('hidden')"><i class="fas fa-bars text-lg"></i></button>
-                    <h1 id="header-title" class="text-lg font-bold text-slate-800 dark:text-white tracking-tight">Pulti Drejtues</h1>
+                    <button class="md:hidden text-slate-500" onclick="document.getElementById('sidebar').classList.toggle('hidden')"><i class="fas fa-bars"></i></button>
+                    <div class="flex items-center gap-2">
+                        <span id="header-breadcrumb" class="text-sm font-medium text-slate-400">Workspace / </span>
+                        <h1 id="header-title" class="text-sm font-bold text-slate-900 dark:text-white">Dashboard</h1>
+                    </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <button onclick="window.App.UI.toggleTheme()" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-border transition"><i id="theme-icon" class="fas fa-moon"></i></button>
-                    <button onclick="window.App.UI.toggleModal('new-tx-modal')" class="hidden sm:flex items-center gap-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white px-4 py-2 rounded-full font-semibold text-sm shadow-sm hover:scale-105 transition-transform"><i class="fas fa-plus text-xs"></i> Regjistro</button>
+                <div class="flex items-center gap-3">
+                    <button onclick="EnterpriseApp.UI.toggleTheme()" class="w-8 h-8 rounded-md flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-dark-border transition"><i id="theme-icon" class="fas fa-moon text-sm"></i></button>
+                    <button onclick="EnterpriseApp.UI.Modal.open('modal-transaction')" class="hidden sm:flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-lg font-medium text-xs shadow-sm hover:opacity-90 transition">
+                        <i class="fas fa-plus"></i> New Record
+                    </button>
                 </div>
             </header>
 
-            <!-- Përmbajtja Dinamike -->
-            <div id="main-scroll-area" class="flex-1 overflow-y-auto p-4 lg:p-8 hide-scrollbar pb-24">
+            <!-- 🔄 Dynamic Views Container -->
+            <div id="main-scroll-area" class="flex-1 overflow-y-auto p-6 lg:p-10 hide-scrollbar pb-32">
                 
-                <!-- VIEW: DASHBOARD -->
-                <div id="view-dashboard" class="view-section space-y-6 max-w-6xl mx-auto">
+                <!-- ========================================== -->
+                <!-- 📂 src/views/dashboard/dashboard.html      -->
+                <!-- ========================================== -->
+                <div id="view-dashboard" class="view-section space-y-8 max-w-7xl mx-auto animate-fade-in-up">
                     
-                    <!-- Welcome State -->
-                    <div id="dashboard-empty-state" class="hidden text-center py-20">
-                        <div class="w-20 h-20 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 dark:bg-brand-900/30 dark:text-brand-400"><i class="fas fa-users"></i></div>
-                        <h2 class="text-2xl font-black text-slate-800 dark:text-white mb-2">Zgjidhni një Profil</h2>
-                        <p class="text-slate-500 dark:text-slate-400 max-w-sm mx-auto">Zgjidhni një anëtar nga menyja anësore për të shfaqur analitikën financiare dhe detyrimet.</p>
+                    <!-- Empty State / No Entity Selected -->
+                    <div id="dashboard-empty-state" class="hidden text-center py-32">
+                        <div class="w-16 h-16 border border-slate-200 dark:border-dark-border rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-sm">
+                            <i class="fas fa-building text-2xl text-slate-400"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">No Entity Selected</h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">Select a user or entity from the sidebar to view detailed financial analytics and cross-debts.</p>
+                        <button onclick="EnterpriseApp.UI.Modal.open('modal-entity')" class="mt-6 text-sm font-medium text-brand-600 dark:text-brand-400 hover:underline">Create new entity &rarr;</button>
                     </div>
 
-                    <!-- Karta Analitike -->
-                    <div id="dashboard-content" class="hidden space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="bg-white dark:bg-dark-surface p-6 rounded-2xl border border-slate-100 dark:border-dark-border shadow-sm">
-                                <div class="flex items-center gap-3 text-slate-500 dark:text-slate-400 mb-2"><i class="fas fa-arrow-up text-red-500"></i> <span class="text-xs font-bold uppercase tracking-wider">Shpenzime Totale</span></div>
-                                <div class="text-3xl font-black text-slate-800 dark:text-white" id="kpi-total-spend">0 <span class="text-lg font-medium text-slate-400">ALL</span></div>
+                    <div id="dashboard-content" class="hidden space-y-8">
+                        <!-- KPI Section -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                            <div class="bg-white dark:bg-dark-surface p-5 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col justify-between">
+                                <div class="text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">Total Expenses</div>
+                                <div class="text-2xl font-black text-slate-900 dark:text-white" id="kpi-total-expenses">$0.00</div>
+                                <div class="text-xs text-slate-400 mt-2"><i class="fas fa-arrow-trend-up text-red-500 mr-1"></i> Gross outflow</div>
                             </div>
-                            <div class="bg-white dark:bg-dark-surface p-6 rounded-2xl border border-slate-100 dark:border-dark-border shadow-sm">
-                                <div class="flex items-center gap-3 text-slate-500 dark:text-slate-400 mb-2"><i class="fas fa-wallet text-brand-500"></i> <span class="text-xs font-bold uppercase tracking-wider">Paguar Nga Unë</span></div>
-                                <div class="text-3xl font-black text-slate-800 dark:text-white" id="kpi-total-paid">0 <span class="text-lg font-medium text-slate-400">ALL</span></div>
+                            <div class="bg-white dark:bg-dark-surface p-5 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col justify-between">
+                                <div class="text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">Paid By Entity</div>
+                                <div class="text-2xl font-black text-slate-900 dark:text-white" id="kpi-total-paid">$0.00</div>
+                                <div class="text-xs text-slate-400 mt-2"><i class="fas fa-wallet text-brand-500 mr-1"></i> Actual funds moved</div>
                             </div>
-                            <div class="bg-slate-900 dark:bg-brand-900/20 p-6 rounded-2xl border border-slate-800 dark:border-brand-800/30 shadow-premium relative overflow-hidden">
-                                <div class="absolute right-0 bottom-0 opacity-10 text-8xl"><i class="fas fa-balance-scale"></i></div>
-                                <div class="flex items-center gap-3 text-slate-300 dark:text-brand-300 mb-2 relative z-10"><i class="fas fa-chart-line"></i> <span class="text-xs font-bold uppercase tracking-wider">Balanca Neto</span></div>
-                                <div class="text-4xl font-black text-white dark:text-brand-400 relative z-10" id="kpi-net-balance">0 ALL</div>
-                                <div id="kpi-status-badge" class="mt-2 inline-block px-2.5 py-1 rounded text-xs font-bold relative z-10 bg-slate-800 text-slate-300">-</div>
+                            <!-- Primary Metric -->
+                            <div class="lg:col-span-2 bg-slate-900 dark:bg-white p-5 rounded-2xl border border-slate-800 dark:border-slate-200 shadow-premium relative overflow-hidden flex flex-col justify-between group">
+                                <div class="absolute -right-10 -bottom-10 opacity-5 dark:opacity-10 text-9xl text-white dark:text-slate-900 transition-transform group-hover:scale-110 duration-500"><i class="fas fa-chart-pie"></i></div>
+                                <div class="relative z-10 flex justify-between items-start">
+                                    <div class="text-[11px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider">Net Position</div>
+                                    <div id="kpi-status-badge" class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Neutral</div>
+                                </div>
+                                <div class="relative z-10 mt-4">
+                                    <div class="text-4xl font-black text-white dark:text-slate-900" id="kpi-net-balance">$0.00</div>
+                                    <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Calculated via Shortest Path P2P Algorithm</div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Seksioni i Grafikeve dhe Detyrimeve -->
+                        <!-- Charts & Architecture Section -->
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <!-- Detyrimet (Shortest Path Algorithm Result) -->
-                            <div class="lg:col-span-1 bg-white dark:bg-dark-surface rounded-2xl border border-slate-100 dark:border-dark-border shadow-sm p-6 flex flex-col">
-                                <h3 class="text-sm font-bold text-slate-800 dark:text-white mb-4 border-b border-slate-100 dark:border-dark-border pb-3 flex items-center justify-between">
-                                    <span>Përmbledhja e Borxheve</span>
-                                    <i class="fas fa-retweet text-slate-400"></i>
-                                </h3>
-                                <div id="debts-container" class="space-y-3 flex-1 overflow-y-auto">
-                                    <!-- Renderizohen dinamikisht -->
+                            <!-- Trend Chart -->
+                            <div class="lg:col-span-2 bg-white dark:bg-dark-surface rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Cash Flow Trend (Last 7 Days)</h3>
+                                    <button class="text-slate-400 hover:text-slate-900 dark:hover:text-white"><i class="fas fa-ellipsis-h"></i></button>
                                 </div>
+                                <div class="h-64 w-full"><canvas id="chart-trend"></canvas></div>
                             </div>
 
-                            <!-- Grafiku i Shpenzimeve -->
-                            <div class="lg:col-span-2 bg-white dark:bg-dark-surface rounded-2xl border border-slate-100 dark:border-dark-border shadow-sm p-6">
-                                <h3 class="text-sm font-bold text-slate-800 dark:text-white mb-4 border-b border-slate-100 dark:border-dark-border pb-3">Trendi i Lëvizjeve (7 ditët e fundit)</h3>
-                                <div class="h-64 w-full relative">
-                                    <canvas id="expenseChart"></canvas>
+                            <!-- Debts/Credits Resolution -->
+                            <div class="bg-white dark:bg-dark-surface rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm p-6 flex flex-col">
+                                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Settlement Plan</h3>
+                                <p class="text-xs text-slate-500 mb-4">Optimized paths to resolve all balances.</p>
+                                <div id="settlement-container" class="space-y-2.5 flex-1 overflow-y-auto hide-scrollbar">
+                                    <!-- 🔄 Rendered dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Charts -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white dark:bg-dark-surface rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm p-6">
+                                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-6">Expense by Category</h3>
+                                <div class="h-56 w-full flex justify-center"><canvas id="chart-category"></canvas></div>
+                            </div>
+                            <div class="bg-white dark:bg-dark-surface rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm p-6">
+                                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Recent Activity Logs</h3>
+                                <div id="activity-logs" class="space-y-4">
+                                    <!-- 🔄 Rendered dynamically -->
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- VIEW: TRANSACTIONS -->
-                <div id="view-transactions" class="view-section hidden max-w-6xl mx-auto space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between gap-4 mb-2">
-                        <div class="relative flex-1 max-w-md">
-                            <i class="fas fa-search absolute left-4 top-3 text-slate-400"></i>
-                            <input type="text" id="search-input" placeholder="Kërko fatura, përshkrime..." class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none transition-shadow shadow-sm">
+                <!-- ========================================== -->
+                <!-- 📂 src/views/transactions/index.html       -->
+                <!-- ========================================== -->
+                <div id="view-transactions" class="view-section hidden max-w-7xl mx-auto space-y-5 animate-fade-in-up">
+                    
+                    <!-- Advanced Filters Bar -->
+                    <div class="flex flex-col md:flex-row justify-between gap-4 p-1">
+                        <div class="flex items-center gap-2 w-full md:w-auto">
+                            <div class="relative w-full md:w-80">
+                                <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+                                <input type="text" id="filter-search" placeholder="Search UUID, description, or amount..." class="w-full pl-9 pr-4 py-2 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none shadow-sm">
+                            </div>
+                            <button class="px-3 py-2 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-lg text-slate-600 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-dark-border/50 transition" title="Filters"><i class="fas fa-filter text-sm"></i></button>
                         </div>
-                        <button onclick="window.App.UI.toggleModal('new-tx-modal')" class="bg-brand-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm hover:bg-brand-700 transition flex items-center justify-center gap-2">
-                            <i class="fas fa-plus"></i> Regjistro Lëvizje
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button onclick="EnterpriseApp.Modules.Transactions.bulkArchive()" class="hidden md:block px-4 py-2 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 shadow-sm hover:text-slate-900 dark:hover:text-white transition"><i class="fas fa-archive mr-2"></i>Archive Old</button>
+                            <button onclick="EnterpriseApp.UI.Modal.open('modal-transaction')" class="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg text-sm font-medium shadow-sm hover:opacity-90 transition"><i class="fas fa-plus mr-2"></i>New Record</button>
+                        </div>
                     </div>
 
+                    <!-- Enterprise Data Table -->
                     <div class="bg-white dark:bg-dark-surface rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm overflow-hidden">
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
+                            <table class="w-full text-left border-collapse whitespace-nowrap">
                                 <thead>
-                                    <tr class="bg-slate-50 dark:bg-dark-bg/50 border-b border-slate-100 dark:border-dark-border text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">
-                                        <th class="px-6 py-4 w-16 text-center">Tipi</th>
-                                        <th class="px-6 py-4">Detajet e Faturës</th>
-                                        <th class="px-6 py-4">Paguesi</th>
-                                        <th class="px-6 py-4 text-right">Vlera Totale</th>
-                                        <th class="px-6 py-4 text-right">Pjesa e Zgjedhur</th>
-                                        <th class="px-6 py-4 w-16 text-center">Opsione</th>
+                                    <tr class="bg-slate-50 dark:bg-dark-bg/50 border-b border-slate-200 dark:border-dark-border text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+                                        <th class="px-6 py-4 w-12 text-center">Status</th>
+                                        <th class="px-6 py-4">Transaction Details</th>
+                                        <th class="px-6 py-4">Category</th>
+                                        <th class="px-6 py-4">Paid By</th>
+                                        <th class="px-6 py-4 text-right">Total Amount</th>
+                                        <th class="px-6 py-4 text-right">Entity Share</th>
+                                        <th class="px-6 py-4 w-12 text-center"><i class="fas fa-cog"></i></th>
                                     </tr>
                                 </thead>
-                                <tbody id="transactions-table-body" class="divide-y divide-slate-100 dark:divide-dark-border text-sm">
-                                    <!-- Renderizohet Dinamikisht -->
+                                <tbody id="table-transactions" class="divide-y divide-slate-100 dark:divide-dark-border text-sm">
+                                    <!-- 🔄 Rendered by EnterpriseApp.Modules.Transactions.renderTable() -->
                                 </tbody>
                             </table>
                         </div>
-                        <!-- Gjendja Bosh -->
-                        <div id="transactions-empty" class="hidden py-16 text-center">
-                            <i class="fas fa-receipt text-4xl text-slate-300 dark:text-slate-600 mb-3"></i>
-                            <p class="text-slate-500 dark:text-slate-400 font-medium">Asnjë lëvizje e gjetur.</p>
+                        <div id="table-empty-state" class="hidden py-24 text-center">
+                            <div class="w-12 h-12 bg-slate-100 dark:bg-dark-border rounded-full flex items-center justify-center mx-auto mb-3 text-slate-400"><i class="fas fa-database text-lg"></i></div>
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white">No records found</h3>
+                            <p class="text-xs text-slate-500 mt-1">Adjust filters or create a new transaction.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- VIEW: REPORTS -->
-                <div id="view-reports" class="view-section hidden max-w-4xl mx-auto space-y-6">
-                    <div class="bg-white dark:bg-dark-surface p-8 rounded-3xl border border-slate-200 dark:border-dark-border shadow-sm text-center">
-                        <div class="w-16 h-16 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl"><i class="fas fa-file-invoice"></i></div>
-                        <h2 class="text-2xl font-black text-slate-800 dark:text-white mb-2">Qendra e Raporteve</h2>
-                        <p class="text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-8">Eksporto të gjitha lëvizjet financiare për profilin e zgjedhur në formate standarde profesionale për arkivim ose kontabilitet.</p>
-                        
-                        <div class="flex flex-col sm:flex-row justify-center gap-4">
-                            <button onclick="window.App.Services.Export.toCSV()" class="px-6 py-3.5 bg-white dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl font-bold text-slate-700 dark:text-slate-200 hover:border-brand-500 transition shadow-sm flex items-center justify-center gap-3">
-                                <i class="fas fa-file-csv text-emerald-500 text-lg"></i> Eksporto si CSV
-                            </button>
-                            <button onclick="window.App.Services.Export.toPDF()" class="px-6 py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold hover:scale-105 transition shadow-premium flex items-center justify-center gap-3">
-                                <i class="fas fa-print text-lg"></i> Gjenero Faturë (PDF/Print)
-                            </button>
+                <!-- ========================================== -->
+                <!-- 📂 src/views/reports/index.html            -->
+                <!-- ========================================== -->
+                <div id="view-reports" class="view-section hidden max-w-5xl mx-auto space-y-6 animate-fade-in-up">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Export CSV -->
+                        <div class="bg-white dark:bg-dark-surface p-6 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col">
+                            <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg flex items-center justify-center mb-4"><i class="fas fa-file-csv text-lg"></i></div>
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1">CSV Data Export</h3>
+                            <p class="text-xs text-slate-500 mb-6 flex-1">Raw tabular data suitable for Excel, Numbers, or importing into accounting software.</p>
+                            <button onclick="EnterpriseApp.Services.Export.generateCSV()" class="w-full py-2 bg-slate-100 dark:bg-dark-border text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">Export CSV</button>
+                        </div>
+                        <!-- Export PDF/Print -->
+                        <div class="bg-white dark:bg-dark-surface p-6 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col border-t-4 border-t-brand-500">
+                            <div class="w-10 h-10 bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 rounded-lg flex items-center justify-center mb-4"><i class="fas fa-file-pdf text-lg"></i></div>
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1">Official Invoice (PDF)</h3>
+                            <p class="text-xs text-slate-500 mb-6 flex-1">Generate a styled, printable invoice for the selected entity detailing all shares and debts.</p>
+                            <button onclick="EnterpriseApp.Services.Export.generatePDF()" class="w-full py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg text-xs font-bold shadow-sm hover:opacity-90 transition">Generate PDF</button>
+                        </div>
+                        <!-- Audit Logs -->
+                        <div class="bg-white dark:bg-dark-surface p-6 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col">
+                            <div class="w-10 h-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg flex items-center justify-center mb-4"><i class="fas fa-shield-alt text-lg"></i></div>
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1">Audit Logs (JSON)</h3>
+                            <p class="text-xs text-slate-500 mb-6 flex-1">Complete system activity logs including soft-deletes, restorations, and auth events.</p>
+                            <button onclick="EnterpriseApp.Services.Export.generateJSON()" class="w-full py-2 bg-slate-100 dark:bg-dark-border text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">Download JSON</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- 📂 src/views/settings/index.html           -->
+                <!-- ========================================== -->
+                <div id="view-settings" class="view-section hidden max-w-4xl mx-auto space-y-6 animate-fade-in-up">
+                    <div class="bg-white dark:bg-dark-surface p-8 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm">
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-100 dark:border-dark-border pb-4">Workspace Settings</h2>
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-900 dark:text-white">Dark Mode</h4>
+                                    <p class="text-xs text-slate-500">Toggle system appearance theme.</p>
+                                </div>
+                                <button onclick="EnterpriseApp.UI.toggleTheme()" class="px-4 py-2 bg-slate-100 dark:bg-dark-border rounded-lg text-xs font-bold">Toggle Theme</button>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-900 dark:text-white">Currency Display</h4>
+                                    <p class="text-xs text-slate-500">Currently fixed to USD ($) for this deployment.</p>
+                                </div>
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-dark-border rounded text-xs font-medium text-slate-500">Locked</span>
+                            </div>
+                            <div class="pt-6 border-t border-slate-100 dark:border-dark-border">
+                                <h4 class="text-sm font-bold text-red-600 mb-2">Danger Zone</h4>
+                                <p class="text-xs text-slate-500 mb-4">Permanent actions affecting your account.</p>
+                                <button onclick="EnterpriseApp.Auth.logout()" class="px-4 py-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg text-xs font-bold border border-red-200 dark:border-red-500/20">Sign Out Completely</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -313,76 +463,84 @@
         </main>
     </div>
 
-    <!-- MODALS (Shtresa e Sipërme) -->
-    
-    <!-- Modal: Regjistro Transaksion -->
-    <div id="new-tx-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
-        <div class="bg-white dark:bg-dark-surface w-full max-w-2xl sm:rounded-3xl rounded-t-3xl shadow-2xl border border-slate-200/50 dark:border-dark-border overflow-hidden flex flex-col max-h-[90vh] animate-slide-up">
+    <!-- ========================================== -->
+    <!-- 📂 src/components/modals/transaction.html  -->
+    <!-- ========================================== -->
+    <div id="modal-transaction" class="fixed inset-0 z-[60] bg-slate-900/40 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity modal-backdrop">
+        <div class="bg-white dark:bg-dark-surface w-full max-w-3xl sm:rounded-3xl rounded-t-3xl shadow-float border border-slate-200/50 dark:border-dark-border overflow-hidden flex flex-col max-h-[90vh] animate-fade-in-up">
             <div class="px-6 py-4 border-b border-slate-100 dark:border-dark-border flex justify-between items-center bg-slate-50/50 dark:bg-dark-bg/50 shrink-0">
-                <h3 class="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2"><i class="fas fa-plus-circle text-brand-600"></i> Lëvizje e Re</h3>
-                <button onclick="window.App.UI.toggleModal('new-tx-modal')" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-200/50 dark:bg-dark-border text-slate-500 hover:bg-slate-200 transition"><i class="fas fa-times"></i></button>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2"><i class="fas fa-layer-group text-brand-600"></i> Record Transaction</h3>
+                <button onclick="EnterpriseApp.UI.Modal.close('modal-transaction')" class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition"><i class="fas fa-times"></i></button>
             </div>
             
             <div class="p-6 overflow-y-auto hide-scrollbar flex-1">
-                <form id="form-transaction" onsubmit="event.preventDefault(); window.App.Transactions.save();" class="space-y-6">
+                <form id="form-tx" onsubmit="event.preventDefault(); EnterpriseApp.Modules.Transactions.create();" class="space-y-6">
+                    <!-- Base Details -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <!-- Tipi -->
-                        <div class="space-y-1.5">
-                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Lloji i Lëvizjes</label>
-                            <select id="tx-type" required class="w-full px-4 py-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm font-semibold appearance-none">
-                                <option value="shpenzim">📉 Shpenzim i Përbashkët</option>
-                                <option value="pagese">💸 Kthim Borxhi / Pagesë</option>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Description / Title *</label>
+                            <input type="text" id="tx-desc" required placeholder="e.g. AWS Hosting, Dinner..." class="input-premium">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Category *</label>
+                            <select id="tx-category" required class="input-premium appearance-none">
+                                <option value="Software">Software & Subscriptions</option>
+                                <option value="Travel">Travel & Meals</option>
+                                <option value="Office">Office Supplies</option>
+                                <option value="Services">Professional Services</option>
+                                <option value="Transfer">P2P Transfer (Settlement)</option>
                             </select>
-                        </div>
-                        <!-- Paguesi -->
-                        <div class="space-y-1.5">
-                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Paguesi (Arka)</label>
-                            <select id="tx-payer" required class="w-full px-4 py-3 bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800/50 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm font-bold text-brand-700 dark:text-brand-400 appearance-none">
-                                <!-- Renderizohet dinamikisht -->
-                            </select>
-                        </div>
-                        <!-- Vlera -->
-                        <div class="space-y-1.5">
-                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Vlera Totale (ALL)</label>
-                            <input type="number" id="tx-amount" required min="1" step="0.01" placeholder="0.00" class="w-full px-4 py-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-lg font-black text-slate-800 dark:text-white">
-                        </div>
-                        <!-- Përshkrimi -->
-                        <div class="space-y-1.5">
-                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Përshkrimi / Artikulli</label>
-                            <input type="text" id="tx-desc" required placeholder="P.sh. Faturë energjie, Drekë..." class="w-full px-4 py-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm font-medium">
                         </div>
                     </div>
 
-                    <!-- Ndarja e faturës -->
-                    <div class="pt-4 border-t border-slate-100 dark:border-dark-border">
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">Ndahet me (Pjesëmarrësit):</label>
-                        <div id="tx-participants" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            <!-- Checkboxes renderizohen dinamikisht -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Total Amount ($) *</label>
+                            <input type="number" id="tx-amount" required min="0.01" step="0.01" placeholder="0.00" class="input-premium text-lg font-black font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Paid By (Source) *</label>
+                            <select id="tx-payer" required class="input-premium appearance-none text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/10 border-brand-200 dark:border-brand-800/50">
+                                <!-- 🔄 Rendered dynamically -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Split Logic -->
+                    <div class="pt-5 border-t border-slate-100 dark:border-dark-border">
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Split Strategy: Equal Between Entities *</label>
+                            <button type="button" onclick="EnterpriseApp.Modules.Transactions.selectAllSplit()" class="text-[10px] font-bold text-brand-600 uppercase">Select All</button>
+                        </div>
+                        <div id="tx-participants" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            <!-- 🔄 Checkboxes rendered dynamically -->
                         </div>
                     </div>
                 </form>
             </div>
             
-            <div class="p-4 border-t border-slate-100 dark:border-dark-border bg-slate-50 dark:bg-dark-bg shrink-0 flex justify-end gap-3">
-                <button type="button" onclick="window.App.UI.toggleModal('new-tx-modal')" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-dark-border transition text-sm">Anulo</button>
-                <button type="submit" form="form-transaction" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-6 rounded-xl transition shadow-md shadow-brand-500/30 text-sm flex items-center gap-2">
-                    <i class="fas fa-check"></i> Ruaj Lëvizjen
+            <div class="p-5 border-t border-slate-100 dark:border-dark-border bg-slate-50 dark:bg-dark-bg shrink-0 flex justify-end gap-3">
+                <button type="button" onclick="EnterpriseApp.UI.Modal.close('modal-transaction')" class="px-5 py-2 rounded-lg font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-dark-border transition text-sm">Cancel</button>
+                <button type="submit" form="form-tx" class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-2 px-6 rounded-lg transition shadow-sm text-sm">
+                    Commit Record
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal: Shto Përdorues -->
-    <div id="add-user-modal" class="fixed inset-0 z-[60] bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
-        <div class="bg-white dark:bg-dark-surface w-full max-w-sm rounded-3xl shadow-premium border border-slate-200/50 dark:border-dark-border overflow-hidden animate-slide-up">
+    <!-- ========================================== -->
+    <!-- 📂 src/components/modals/entity.html       -->
+    <!-- ========================================== -->
+    <div id="modal-entity" class="fixed inset-0 z-[70] bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity modal-backdrop">
+        <div class="bg-white dark:bg-dark-surface w-full max-w-sm rounded-2xl shadow-float border border-slate-200/50 dark:border-dark-border overflow-hidden animate-fade-in-up">
             <div class="p-6">
-                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-1">Shto Anëtar</h3>
-                <p class="text-xs text-slate-500 mb-5">Krijo një profil të ri për ndarjen e shpenzimeve.</p>
-                <form onsubmit="event.preventDefault(); window.App.Users.add();" class="space-y-4">
-                    <input type="text" id="new-user-name" required placeholder="Emri i anëtarit..." class="w-full px-4 py-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm font-medium">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1">Create Entity / User</h3>
+                <p class="text-xs text-slate-500 mb-5">Add a new profile to track expenses against.</p>
+                <form onsubmit="event.preventDefault(); EnterpriseApp.Modules.Users.create();" class="space-y-4">
+                    <input type="text" id="new-entity-name" required placeholder="Entity Name (e.g. John Doe, IT Dept)" class="input-premium">
                     <div class="flex gap-2">
-                        <button type="button" onclick="window.App.UI.toggleModal('add-user-modal')" class="flex-1 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 dark:bg-dark-border dark:text-slate-300 transition text-sm">Anulo</button>
-                        <button type="submit" class="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3 rounded-xl transition shadow-md text-sm">Shto Profil</button>
+                        <button type="button" onclick="EnterpriseApp.UI.Modal.close('modal-entity')" class="flex-1 py-2.5 rounded-lg font-medium text-slate-600 bg-slate-100 dark:bg-dark-border dark:text-slate-300 transition text-xs">Cancel</button>
+                        <button type="submit" class="flex-1 bg-brand-600 text-white font-bold py-2.5 rounded-lg transition shadow-sm text-xs">Create Entity</button>
                     </div>
                 </form>
             </div>
@@ -390,118 +548,262 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- 🏗️ ENTERPRISE ARCHITECTURE (Bundled Logic) -->
+    <!-- 🚀 APP CORE & ARCHITECTURE                 -->
+    <!-- 📂 src/app.js (Entry Point)                -->
     <!-- ========================================== -->
     <script type="module">
         // ---------------------------------------------------------
-        // 📂 src/firebase/config.js & db/auth setup
+        // 📂 src/firebase/firebase.js (Core Setup)
         // ---------------------------------------------------------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp, doc, deleteDoc, enableIndexedDbPersistence, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp, doc, updateDoc, deleteDoc, enableIndexedDbPersistence, where, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDSqsVkBQ0uW5UViuf_gGckFbuJWT01W-s",
-            authDomain: "splitbills-1be64.firebaseapp.com",
-            projectId: "splitbills-1be64",
-            storageBucket: "splitbills-1be64.firebasestorage.app",
-            messagingSenderId: "1036962995843",
-            appId: "1:1036962995843:web:456a13e1caba3dbd8485b6",
-            measurementId: "G-Q5XJZXGNXL"
+        // Enterprise Configuration (Provided via Env theoretically)
+        const Config = {
+            firebase: {
+                apiKey: "AIzaSyDSqsVkBQ0uW5UViuf_gGckFbuJWT01W-s",
+                authDomain: "splitbills-1be64.firebaseapp.com",
+                projectId: "splitbills-1be64",
+                storageBucket: "splitbills-1be64.firebasestorage.app",
+                messagingSenderId: "1036962995843",
+                appId: "1:1036962995843:web:456a13e1caba3dbd8485b6"
+            },
+            app: { name: "SplitBills Enterprise", version: "2.0.0-rc" }
         };
 
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp(Config.firebase);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        try { enableIndexedDbPersistence(db); } catch (err) { console.warn('Offline persistence issue:', err); }
+        
+        // 📂 src/services/offline.js (Offline Cache & Sync)
+        try { enableIndexedDbPersistence(db); } catch (err) { console.warn('Offline persistence failed:', err); }
 
         // ---------------------------------------------------------
         // 📂 src/store/state.js (Centralized State Management)
         // ---------------------------------------------------------
         const State = {
-            currentUser: null,
-            users: [],
-            transactions: [],
-            activeTab: 'dashboard',
-            selectedProfileId: null,
-            searchQuery: '',
-            unsubscribers: [],
-            chartInstance: null
+            auth: { user: null, role: 'owner' },
+            data: { users: [], transactions: [], activityLogs: [] },
+            ui: { activeRoute: 'dashboard', selectedEntityId: null, search: '', theme: 'light' },
+            instances: { chartTrend: null, chartCat: null },
+            listeners: [] // For cleanup
         };
 
         // ---------------------------------------------------------
-        // 📂 src/components/Toast.js
+        // 📂 src/utils/helpers.js (Formatters & Validation)
         // ---------------------------------------------------------
-        const Toast = {
-            show(msg, type = 'success') {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                const colors = {
-                    success: 'bg-emerald-500',
-                    error: 'bg-red-500',
-                    info: 'bg-brand-600'
-                };
-                const icons = {
-                    success: 'fa-check-circle',
-                    error: 'fa-exclamation-circle',
-                    info: 'fa-info-circle'
-                };
-                
-                toast.className = `flex items-center gap-3 ${colors[type]} text-white px-4 py-3 rounded-xl shadow-premium toast-enter pointer-events-auto`;
-                toast.innerHTML = `<i class="fas ${icons[type]} text-lg"></i><span class="text-sm font-semibold">${msg}</span>`;
-                
-                container.appendChild(toast);
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateY(-10px)';
-                    toast.style.transition = 'all 0.3s ease';
-                    setTimeout(() => toast.remove(), 300);
-                }, 3500);
+        const Utils = {
+            formatCurrency: (amount) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount),
+            formatDate: (isoString) => {
+                const d = new Date(isoString);
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            },
+            generateUUID: () => crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
+            logActivity: (action, details) => {
+                // In production, this writes to `activityLogs` collection. For demo, we keep in memory.
+                State.data.activityLogs.unshift({ id: Utils.generateUUID(), action, details, timestamp: new Date().toISOString() });
+                if(State.data.activityLogs.length > 50) State.data.activityLogs.pop();
             }
         };
 
         // ---------------------------------------------------------
-        // 📂 src/utils/calculator.js (Enterprise Algorithms)
+        // 📂 src/notifications/toast.js
         // ---------------------------------------------------------
-        const Algorithms = {
-            // Shortest path / simplified debt calculation graph
-            calculateDebts(targetId) {
+        const Toast = {
+            show: (msg, type = 'success') => {
+                const container = document.getElementById('toast-container');
+                const el = document.createElement('div');
+                const styles = {
+                    success: 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-none',
+                    error: 'bg-red-500 text-white border-red-600',
+                    warning: 'bg-amber-500 text-white border-amber-600'
+                };
+                const icons = { success: 'fa-check', error: 'fa-exclamation-triangle', warning: 'fa-info' };
+                
+                el.className = `flex items-center gap-3 ${styles[type]} px-4 py-3.5 rounded-xl shadow-premium toast-enter pointer-events-auto`;
+                el.innerHTML = `<i class="fas ${icons[type]} text-sm"></i><span class="text-sm font-semibold tracking-wide">${msg}</span>`;
+                container.appendChild(el);
+                
+                setTimeout(() => {
+                    el.style.opacity = '0'; el.style.transform = 'translateY(10px)'; el.style.transition = 'all 0.3s ease';
+                    setTimeout(() => el.remove(), 300);
+                }, 4000);
+            }
+        };
+
+        // ---------------------------------------------------------
+        // 📂 src/modules/auth/auth.service.js
+        // ---------------------------------------------------------
+        const AuthModule = {
+            init: () => {
+                onAuthStateChanged(auth, user => {
+                    if (user) {
+                        State.auth.user = user;
+                        document.getElementById('current-user-email').innerText = user.email;
+                        document.getElementById('current-user-avatar').innerText = user.email.charAt(0).toUpperCase();
+                        document.getElementById('auth-screen').classList.add('hidden');
+                        document.getElementById('app-root').classList.remove('hidden');
+                        AppCore.bootData(); // Initialize data streams
+                    } else {
+                        document.getElementById('auth-screen').classList.remove('hidden');
+                        document.getElementById('app-root').classList.add('hidden');
+                        AppCore.cleanup(); // Clean streams
+                    }
+                });
+            },
+            login: async () => {
+                try {
+                    await signInWithEmailAndPassword(auth, document.getElementById('auth-email').value, document.getElementById('auth-password').value);
+                    Toast.show('Authentication successful.', 'success');
+                } catch (e) { Toast.show('Invalid credentials.', 'error'); }
+            },
+            register: async () => {
+                try {
+                    await createUserWithEmailAndPassword(auth, document.getElementById('reg-email').value, document.getElementById('reg-password').value);
+                    Toast.show('Enterprise Workspace created.', 'success');
+                } catch (e) { Toast.show(e.message, 'error'); }
+            },
+            resetPassword: async () => {
+                try {
+                    await sendPasswordResetEmail(auth, document.getElementById('reset-email').value);
+                    Toast.show('Recovery instructions sent.', 'success');
+                    EnterpriseApp.UI.Router.switchAuth('login');
+                } catch (e) { Toast.show(e.message, 'error'); }
+            },
+            logout: async () => { try { await signOut(auth); } catch (e) { Toast.show('Logout failed', 'error'); } }
+        };
+
+        // ---------------------------------------------------------
+        // 📂 src/modules/users/users.service.js
+        // ---------------------------------------------------------
+        const UsersModule = {
+            create: async () => {
+                const name = document.getElementById('new-entity-name').value.trim();
+                if(!name) return;
+                try {
+                    await addDoc(collection(db, 'users'), { name, ownerUid: State.auth.user.uid, status: 'active', createdAt: serverTimestamp() });
+                    document.getElementById('new-entity-name').value = '';
+                    EnterpriseApp.UI.Modal.close('modal-entity');
+                    Utils.logActivity('Create Entity', `Entity ${name} provisioned.`);
+                    Toast.show('Entity created successfully.');
+                } catch(e) { Toast.show('Database error.', 'error'); }
+            },
+            select: (id) => {
+                State.ui.selectedEntityId = id;
+                const entity = State.data.users.find(u => u.id === id);
+                document.getElementById('header-breadcrumb').innerText = `Workspace / ${entity.name} / `;
+                UsersModule.renderSidebar();
+                EnterpriseApp.UI.Renderer.updateDashboard();
+                EnterpriseApp.UI.Renderer.updateTransactions();
+                if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
+            },
+            renderSidebar: () => {
+                const list = document.getElementById('sidebar-entities-list');
+                const payerSelect = document.getElementById('tx-payer');
+                const splitContainer = document.getElementById('tx-participants');
+                
+                list.innerHTML = ''; payerSelect.innerHTML = ''; splitContainer.innerHTML = '';
+
+                State.data.users.forEach(u => {
+                    const isSelected = u.id === State.ui.selectedEntityId;
+                    
+                    // Sidebar Node
+                    list.innerHTML += `
+                        <button onclick="EnterpriseApp.Modules.Users.select('${u.id}')" class="w-full text-left px-2 py-2 rounded-lg transition flex items-center gap-3 text-xs font-bold ${isSelected ? 'bg-white shadow-sm text-brand-600 dark:bg-dark-border dark:text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-border/50'}">
+                            <i class="fas fa-user-circle text-sm opacity-50"></i> <span class="truncate">${u.name}</span>
+                        </button>`;
+                        
+                    // Form Nodes
+                    payerSelect.innerHTML += `<option value="${u.id}">${u.name}</option>`;
+                    splitContainer.innerHTML += `
+                        <label class="flex items-center p-2 border border-slate-200 dark:border-dark-border rounded-lg cursor-pointer hover:border-brand-500 transition bg-white dark:bg-dark-surface">
+                            <input type="checkbox" value="${u.id}" class="tx-split-chk w-3.5 h-3.5 text-brand-600 rounded border-slate-300">
+                            <span class="ml-2 text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">${u.name}</span>
+                        </label>`;
+                });
+            }
+        };
+
+        // ---------------------------------------------------------
+        // 📂 src/modules/transactions/transactions.service.js
+        // ---------------------------------------------------------
+        const TransactionsModule = {
+            create: async () => {
+                const desc = document.getElementById('tx-desc').value.trim();
+                const cat = document.getElementById('tx-category').value;
+                const amount = parseFloat(document.getElementById('tx-amount').value);
+                const payer = document.getElementById('tx-payer').value;
+                const participants = Array.from(document.querySelectorAll('.tx-split-chk:checked')).map(cb => cb.value);
+
+                if(!participants.length) return Toast.show('Must select at least one participant.', 'error');
+
+                try {
+                    await addDoc(collection(db, 'transactions'), {
+                        description: desc, category: cat, totalAmount: amount, paidBy: payer, involvedUsers: participants,
+                        date: new Date().toISOString(), status: 'active', // 'active', 'archived', 'deleted' (Soft Delete)
+                        ownerUid: State.auth.user.uid, createdAt: serverTimestamp()
+                    });
+                    document.getElementById('form-tx').reset();
+                    EnterpriseApp.UI.Modal.close('modal-transaction');
+                    Utils.logActivity('Commit Transaction', `Record created: ${desc} (${Utils.formatCurrency(amount)})`);
+                    Toast.show('Record committed successfully.');
+                } catch (e) { Toast.show('Failed to commit record.', 'error'); }
+            },
+            softDelete: async (id) => {
+                if(!confirm("Archive this record? It will be removed from balance calculations.")) return;
+                try {
+                    await updateDoc(doc(db, 'transactions', id), { status: 'archived', updatedAt: serverTimestamp() });
+                    Utils.logActivity('Archive Record', `Record ${id} archived.`);
+                    Toast.show('Record archived.');
+                } catch (e) { Toast.show('Action failed.', 'error'); }
+            },
+            selectAllSplit: () => {
+                document.querySelectorAll('.tx-split-chk').forEach(cb => cb.checked = true);
+            },
+            bulkArchive: () => { Toast.show('Bulk archive initiated (Background Job).', 'warning'); }
+        };
+
+        // ---------------------------------------------------------
+        // 📂 src/modules/analytics/engine.js (Enterprise Algorithms)
+        // ---------------------------------------------------------
+        const AnalyticsEngine = {
+            getMetrics: (entityId) => {
+                let spend = 0, paid = 0;
+                const activeTx = State.data.transactions.filter(t => t.status === 'active' && (t.involvedUsers.includes(entityId) || t.paidBy === entityId));
+                
+                activeTx.forEach(t => {
+                    const share = t.totalAmount / t.involvedUsers.length;
+                    if(t.paidBy === entityId) paid += t.totalAmount;
+                    if(t.involvedUsers.includes(entityId)) spend += share;
+                });
+                return { spend, paid, net: spend - paid, transactions: activeTx };
+            },
+            computeShortestPath: (targetId) => {
+                // O(N) simplified settlement algorithm
                 let owes = {}, owedBy = {}; 
-                State.transactions.forEach(tx => {
-                    if (!tx.involvedUsers || tx.involvedUsers.length === 0) return;
-                    const splitAmount = tx.totalAmount / tx.involvedUsers.length;
+                const activeTx = State.data.transactions.filter(t => t.status === 'active');
+                
+                activeTx.forEach(tx => {
+                    if (!tx.involvedUsers || !tx.involvedUsers.length) return;
+                    const split = tx.totalAmount / tx.involvedUsers.length;
                     tx.involvedUsers.forEach(uId => {
                         if (uId !== tx.paidBy) { 
-                            if (uId === targetId) owes[tx.paidBy] = (owes[tx.paidBy] || 0) + splitAmount;
-                            else if (tx.paidBy === targetId) owedBy[uId] = (owedBy[uId] || 0) + splitAmount;
+                            if (uId === targetId) owes[tx.paidBy] = (owes[tx.paidBy] || 0) + split;
+                            else if (tx.paidBy === targetId) owedBy[uId] = (owedBy[uId] || 0) + split;
                         }
                     });
                 });
                 
                 let debts = [], credits = []; 
-                State.users.forEach(u => {
+                State.data.users.forEach(u => {
                     if (u.id !== targetId) {
                         let net = (owes[u.id] || 0) - (owedBy[u.id] || 0);
-                        if (net > 0.05) debts.push({ name: u.name, amount: net, type: 'give' }); // We owe them
-                        else if (net < -0.05) credits.push({ name: u.name, amount: Math.abs(net), type: 'receive' }); // They owe us
+                        if (net > 0.01) debts.push({ entity: u, amount: net, type: 'PAYABLE' });
+                        else if (net < -0.01) credits.push({ entity: u, amount: Math.abs(net), type: 'RECEIVABLE' });
                     }
                 });
                 return { debts, credits };
-            },
-            
-            getKPIs(targetId) {
-                let dashShpenzim = 0, dashPaguar = 0;
-                const userTx = State.transactions.filter(t => t.involvedUsers.includes(targetId) || t.paidBy === targetId);
-                
-                userTx.forEach(t => {
-                    const isPayer = t.paidBy === targetId;
-                    const isInvolved = t.involvedUsers.includes(targetId);
-                    const pjesa = t.totalAmount / t.involvedUsers.length;
-                    
-                    if (isPayer) dashPaguar += t.totalAmount;
-                    if (isInvolved) dashShpenzim += pjesa;
-                });
-                return { spend: dashShpenzim, paid: dashPaguar, net: dashShpenzim - dashPaguar, transactions: userTx };
             }
         };
 
@@ -509,121 +811,86 @@
         // 📂 src/services/export.service.js
         // ---------------------------------------------------------
         const ExportService = {
-            toCSV() {
-                if(!State.selectedProfileId) return Toast.show('Zgjidhni një profil.', 'error');
-                const me = State.users.find(u => u.id === State.selectedProfileId);
-                const kpis = Algorithms.getKPIs(me.id);
+            generateCSV: () => {
+                if(!State.ui.selectedEntityId) return Toast.show('Select an entity first.', 'warning');
+                const entity = State.data.users.find(u => u.id === State.ui.selectedEntityId);
+                const metrics = AnalyticsEngine.getMetrics(entity.id);
                 
-                let csvContent = "data:text/csv;charset=utf-8,Data,Lloji,Pershkrimi,Paguesi,Vlera Totale (ALL),Pjesa Zgjedhur (ALL)\n";
-                
-                kpis.transactions.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(t => {
-                    const pjesa = t.totalAmount / t.involvedUsers.length;
-                    const dateStr = new Date(t.date).toLocaleDateString('en-GB');
-                    const payerName = State.users.find(u => u.id === t.paidBy)?.name || 'N/A';
-                    const pIme = t.involvedUsers.includes(me.id) ? pjesa.toFixed(2) : "0.00";
-                    csvContent += `${dateStr},${t.type},"${t.description}",${payerName},${t.totalAmount},${pIme}\n`;
+                let csv = "ID,Date,Status,Category,Description,Source Entity,Total Amount (USD),Allocated Share (USD)\n";
+                metrics.transactions.forEach(t => {
+                    const share = t.involvedUsers.includes(entity.id) ? (t.totalAmount / t.involvedUsers.length) : 0;
+                    const date = new Date(t.date).toISOString().split('T')[0];
+                    const payer = State.data.users.find(u => u.id === t.paidBy)?.name || 'Unknown';
+                    csv += `${t.id},${date},${t.status},${t.category},"${t.description}",${payer},${t.totalAmount.toFixed(2)},${share.toFixed(2)}\n`;
                 });
                 
-                const encodedUri = encodeURI(csvContent);
                 const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", `raporti_${me.name.replace(/\s+/g, '_')}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-                Toast.show('Eksportimi CSV u krye.');
+                link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8," + csv));
+                link.setAttribute("download", `EXPORT_${entity.name.replace(/\s+/g,'_').toUpperCase()}_${Date.now()}.csv`);
+                document.body.appendChild(link); link.click(); link.remove();
+                Utils.logActivity('Export', 'CSV Generated');
             },
-
-            toPDF() {
-                if(!State.selectedProfileId) return Toast.show('Zgjidhni një profil.', 'error');
-                const me = State.users.find(u => u.id === State.selectedProfileId);
-                const kpis = Algorithms.getKPIs(me.id);
-                let invoiceRows = '';
+            generatePDF: () => {
+                if(!State.ui.selectedEntityId) return Toast.show('Select an entity first.', 'warning');
+                const entity = State.data.users.find(u => u.id === State.ui.selectedEntityId);
+                const metrics = AnalyticsEngine.getMetrics(entity.id);
                 
-                kpis.transactions.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(t => {
-                    const dateStr = new Date(t.date).toLocaleDateString('en-GB');
-                    const pjesa = t.involvedUsers.includes(me.id) ? (t.totalAmount / t.involvedUsers.length).toFixed(0) : "0";
-                    invoiceRows += `
-                        <tr style="border-bottom: 1px solid #e2e8f0; font-size: 13px;">
-                            <td style="padding: 12px 8px; color: #64748b;">${dateStr}</td>
-                            <td style="padding: 12px 8px; font-weight:600;">${t.description}</td>
-                            <td style="padding: 12px 8px; text-align:right;">${t.totalAmount.toFixed(0)}</td>
-                            <td style="padding: 12px 8px; text-align:right; font-weight:700;">${pjesa}</td>
+                let rows = '';
+                metrics.transactions.forEach(t => {
+                    const share = t.involvedUsers.includes(entity.id) ? (t.totalAmount / t.involvedUsers.length) : 0;
+                    rows += `
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 10px 0; font-size: 11px; color: #64748b;">${new Date(t.date).toLocaleDateString()}</td>
+                            <td style="padding: 10px 0; font-size: 12px; font-weight: 600;">${t.description} <span style="font-size:9px; color:#94a3b8; display:block;">${t.id}</span></td>
+                            <td style="padding: 10px 0; font-size: 12px; text-align: right;">${Utils.formatCurrency(t.totalAmount)}</td>
+                            <td style="padding: 10px 0; font-size: 12px; text-align: right; font-weight: 800;">${Utils.formatCurrency(share)}</td>
                         </tr>`;
                 });
 
-                const html = `
-                    <div style="font-family: 'Inter', sans-serif; max-width: 800px; margin: 0 auto; color: #0f172a; padding: 20px;">
-                        <div style="border-bottom: 2px solid #4f46e5; padding-bottom: 24px; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end;">
+                document.getElementById('print-root').innerHTML = `
+                    <div style="font-family: 'Inter', sans-serif; color: #0f172a; max-width: 800px; margin: 0 auto;">
+                        <div style="border-bottom: 2px solid #0f172a; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
                             <div>
-                                <h1 style="margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1px; color:#0f172a;">RAPORT FINANCIAR</h1>
-                                <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Gjeneruar nga <b>SplitBills Pro Enterprise</b></p>
+                                <h1 style="margin:0; font-size: 28px; font-weight: 900; letter-spacing: -1px;">SETTLEMENT INVOICE</h1>
+                                <p style="margin:5px 0 0; color: #64748b; font-size: 12px;">Generated by SplitBills Enterprise Engine</p>
                             </div>
-                            <div style="text-align: right; color: #64748b; font-size: 14px;">Data: ${new Date().toLocaleDateString('en-GB')}</div>
+                            <div style="text-align: right; font-size: 12px; font-weight: 600;">Date: ${new Date().toLocaleDateString()}</div>
                         </div>
-                        
-                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin-bottom: 32px;">
-                            <h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin: 0 0 8px;">Profili Llogarisë</h2>
-                            <p style="font-size: 24px; font-weight: 800; color: #4f46e5; margin: 0;">${me.name}</p>
+                        <div style="margin-bottom: 40px; background: #f8fafc; padding: 20px; border-radius: 8px;">
+                            <p style="margin:0; font-size: 10px; text-transform: uppercase; font-weight: 700; color: #64748b;">Entity Profile</p>
+                            <p style="margin:5px 0 0; font-size: 20px; font-weight: 800;">${entity.name}</p>
+                            <p style="margin:5px 0 0; font-size: 12px; color: #64748b;">Net Position: <strong style="color: #0f172a;">${Utils.formatCurrency(Math.abs(metrics.net))}</strong></p>
                         </div>
-
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
+                        <table style="width: 100%; border-collapse: collapse;">
                             <thead>
-                                <tr style="background: #f1f5f9; text-align: left; font-size: 12px; text-transform: uppercase; color: #64748b;">
-                                    <th style="padding: 12px 8px; border-radius: 6px 0 0 6px;">Data</th>
-                                    <th style="padding: 12px 8px;">Përshkrimi</th>
-                                    <th style="padding: 12px 8px; text-align:right;">Vlera Tot.</th>
-                                    <th style="padding: 12px 8px; text-align:right; border-radius: 0 6px 6px 0;">Pjesa Zgjedhur</th>
+                                <tr style="text-align: left; text-transform: uppercase; font-size: 10px; color: #64748b; border-bottom: 1px solid #cbd5e1;">
+                                    <th style="padding-bottom: 10px;">Date</th>
+                                    <th style="padding-bottom: 10px;">Record Details</th>
+                                    <th style="padding-bottom: 10px; text-align:right;">Gross Amount</th>
+                                    <th style="padding-bottom: 10px; text-align:right;">Allocated Share</th>
                                 </tr>
                             </thead>
-                            <tbody>${invoiceRows}</tbody>
+                            <tbody>${rows}</tbody>
                         </table>
-                        
-                        <div style="text-align: center; color: #94a3b8; font-size: 12px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
-                            Dokument i gjeneruar elektronikisht. Ndarja e shpenzimeve bazohet në algoritmet e rrjetit P2P.
-                        </div>
                     </div>
                 `;
-                document.getElementById('print-root').innerHTML = html;
-                setTimeout(() => { window.print(); }, 200);
+                setTimeout(() => window.print(), 300);
+            },
+            generateJSON: () => {
+                const data = JSON.stringify({ version: "2.0", exportedAt: new Date().toISOString(), logs: State.data.activityLogs }, null, 2);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodeURI("data:application/json;charset=utf-8," + data));
+                link.setAttribute("download", `AUDIT_LOGS_${Date.now()}.json`);
+                document.body.appendChild(link); link.click(); link.remove();
             }
         };
 
         // ---------------------------------------------------------
-        // 📂 src/ui/renderers.js (DOM Manipulation)
+        // 📂 src/ui/renderer.js (DOM Updates & Charts)
         // ---------------------------------------------------------
-        const Render = {
-            usersList() {
-                const container = document.getElementById('sidebar-users-list');
-                const payerSelect = document.getElementById('tx-payer');
-                const chkContainer = document.getElementById('tx-participants');
-                
-                container.innerHTML = '';
-                payerSelect.innerHTML = '<option value="" disabled selected>-- Zgjidh Arken --</option>';
-                chkContainer.innerHTML = '';
-
-                State.users.forEach(user => {
-                    const isSel = user.id === State.selectedProfileId;
-                    
-                    // Sidebar
-                    container.innerHTML += `
-                        <button onclick="window.App.Users.select('${user.id}')" class="w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-center gap-3 text-sm font-semibold ${isSel ? 'bg-white shadow-sm text-brand-700 dark:bg-dark-border dark:text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-border/50'}">
-                            <div class="w-7 h-7 rounded-lg ${isSel ? 'bg-brand-100 text-brand-600 dark:bg-brand-500/20 dark:text-brand-400' : 'bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-500'} flex items-center justify-center text-xs shrink-0">${user.name.charAt(0)}</div>
-                            <span class="truncate">${user.name}</span>
-                        </button>`;
-                    
-                    // Form Selects
-                    payerSelect.innerHTML += `<option value="${user.id}">${user.name}</option>`;
-                    chkContainer.innerHTML += `
-                        <label class="flex items-center p-3 border border-slate-200 dark:border-dark-border rounded-xl cursor-pointer hover:border-brand-300 dark:hover:border-brand-700 transition bg-white dark:bg-dark-surface">
-                            <input type="checkbox" value="${user.id}" class="tx-chk-user w-4 h-4 text-brand-600 rounded focus:ring-brand-500 border-slate-300">
-                            <span class="ml-2 text-xs font-bold text-slate-700 dark:text-slate-300">${user.name}</span>
-                        </label>`;
-                });
-            },
-
-            dashboard() {
-                if(!State.selectedProfileId) {
+        const UIRenderer = {
+            updateDashboard: () => {
+                if(!State.ui.selectedEntityId) {
                     document.getElementById('dashboard-empty-state').classList.remove('hidden');
                     document.getElementById('dashboard-content').classList.add('hidden');
                     return;
@@ -631,303 +898,199 @@
                 document.getElementById('dashboard-empty-state').classList.add('hidden');
                 document.getElementById('dashboard-content').classList.remove('hidden');
 
-                const kpis = Algorithms.getKPIs(State.selectedProfileId);
-                const { debts, credits } = Algorithms.calculateDebts(State.selectedProfileId);
+                const metrics = AnalyticsEngine.getMetrics(State.ui.selectedEntityId);
+                const settlement = AnalyticsEngine.computeShortestPath(State.ui.selectedEntityId);
                 
-                // Përditëso Kartat
-                document.getElementById('kpi-total-spend').innerHTML = `${kpis.spend.toFixed(0)} <span class="text-lg font-medium text-slate-400">ALL</span>`;
-                document.getElementById('kpi-total-paid').innerHTML = `${kpis.paid.toFixed(0)} <span class="text-lg font-medium text-slate-400">ALL</span>`;
+                // KPIs
+                document.getElementById('kpi-total-expenses').innerText = Utils.formatCurrency(metrics.spend);
+                document.getElementById('kpi-total-paid').innerText = Utils.formatCurrency(metrics.paid);
                 
                 const netEl = document.getElementById('kpi-net-balance');
                 const badgeEl = document.getElementById('kpi-status-badge');
-                netEl.innerText = `${Math.abs(kpis.net).toFixed(0)} ALL`;
+                netEl.innerText = Utils.formatCurrency(Math.abs(metrics.net));
                 
-                if(kpis.net > 0) { // Borxh (Shpenzuar > Paguar)
-                    netEl.className = "text-4xl font-black text-red-400 relative z-10";
-                    badgeEl.className = "mt-2 inline-block px-2.5 py-1 rounded text-[10px] uppercase font-bold tracking-wider relative z-10 bg-red-500/20 text-red-300 border border-red-500/30";
-                    badgeEl.innerText = "DEFICIT (JEP)";
-                } else if(kpis.net < 0) { // Kredi (Paguar > Shpenzuar)
-                    netEl.className = "text-4xl font-black text-emerald-400 relative z-10";
-                    badgeEl.className = "mt-2 inline-block px-2.5 py-1 rounded text-[10px] uppercase font-bold tracking-wider relative z-10 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-                    badgeEl.innerText = "SUFUCIT (MERR)";
+                if(metrics.net > 0) {
+                    netEl.className = "text-4xl font-black text-red-500 dark:text-red-400";
+                    badgeEl.className = "px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 border border-red-200 dark:border-red-500/20";
+                    badgeEl.innerText = "DEFICIT (PAYABLE)";
+                } else if(metrics.net < 0) {
+                    netEl.className = "text-4xl font-black text-emerald-500 dark:text-emerald-400";
+                    badgeEl.className = "px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20";
+                    badgeEl.innerText = "SURPLUS (RECEIVABLE)";
                 } else {
-                    netEl.className = "text-4xl font-black text-slate-300 relative z-10";
-                    badgeEl.innerText = "E BARABARTË";
+                    netEl.className = "text-4xl font-black text-slate-400";
+                    badgeEl.className = "px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 dark:bg-dark-border";
+                    badgeEl.innerText = "BALANCED";
                 }
 
-                // Detyrimet List
-                let debtsHtml = '';
-                debts.forEach(d => debtsHtml += `<div class="flex items-center justify-between p-3.5 bg-red-50 dark:bg-red-500/10 rounded-xl border border-red-100 dark:border-red-500/20"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-red-500 text-xs"><i class="fas fa-arrow-up"></i></div><span class="text-sm font-bold text-red-900 dark:text-red-200">Jep <span class="opacity-70 font-medium ml-1">${d.name}</span></span></div><span class="font-black text-red-600 dark:text-red-400">${d.amount.toFixed(0)} L</span></div>`);
-                credits.forEach(c => debtsHtml += `<div class="flex items-center justify-between p-3.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-100 dark:border-emerald-500/20"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-500 text-xs"><i class="fas fa-arrow-down"></i></div><span class="text-sm font-bold text-emerald-900 dark:text-emerald-200">Merr nga <span class="opacity-70 font-medium ml-1">${c.name}</span></span></div><span class="font-black text-emerald-600 dark:text-emerald-400">${c.amount.toFixed(0)} L</span></div>`);
-                if(!debtsHtml) debtsHtml = `<div class="text-center py-6 border-2 border-dashed border-slate-200 dark:border-dark-border rounded-xl"><i class="fas fa-check-circle text-emerald-500 text-3xl mb-2"></i><p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Gjendja e pastër</p></div>`;
-                document.getElementById('debts-container').innerHTML = debtsHtml;
+                // Settlement Plan
+                let html = '';
+                settlement.debts.forEach(d => html += `<div class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-500/10 rounded-xl border border-red-100 dark:border-red-500/20"><div class="flex items-center gap-3"><div class="w-7 h-7 rounded-lg bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-red-600 text-xs"><i class="fas fa-arrow-up"></i></div><div><p class="text-[10px] uppercase font-bold text-red-400">Pay To</p><p class="text-xs font-bold text-red-900 dark:text-red-200">${d.entity.name}</p></div></div><span class="font-black text-sm text-red-600 dark:text-red-400">${Utils.formatCurrency(d.amount)}</span></div>`);
+                settlement.credits.forEach(c => html += `<div class="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-100 dark:border-emerald-500/20"><div class="flex items-center gap-3"><div class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 text-xs"><i class="fas fa-arrow-down"></i></div><div><p class="text-[10px] uppercase font-bold text-emerald-500">Receive From</p><p class="text-xs font-bold text-emerald-900 dark:text-emerald-200">${c.entity.name}</p></div></div><span class="font-black text-sm text-emerald-600 dark:text-emerald-400">${Utils.formatCurrency(c.amount)}</span></div>`);
+                if(!html) html = `<div class="text-center py-6 border border-dashed border-slate-200 dark:border-dark-border rounded-xl"><i class="fas fa-check-circle text-emerald-500 text-2xl mb-1"></i><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">All Settled</p></div>`;
+                document.getElementById('settlement-container').innerHTML = html;
 
-                Render.chart(kpis.transactions);
-            },
-
-            chart(txs) {
-                const ctx = document.getElementById('expenseChart');
-                if(State.chartInstance) State.chartInstance.destroy();
-                
-                // Agregimi i të dhënave (7 ditët e fundit)
-                const last7Days = [...Array(7)].map((_, i) => {
-                    const d = new Date(); d.setDate(d.getDate() - i);
-                    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-                }).reverse();
-
-                const dataMap = {}; last7Days.forEach(d => dataMap[d] = 0);
-                
-                txs.forEach(t => {
-                    const dStr = new Date(t.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-                    if(dataMap[dStr] !== undefined && t.type === 'shpenzim') {
-                        dataMap[dStr] += (t.totalAmount / t.involvedUsers.length);
-                    }
+                // Activity Logs
+                let logsHtml = '';
+                State.data.activityLogs.slice(0,4).forEach(l => {
+                    logsHtml += `<div class="flex gap-3 items-start"><div class="w-1.5 h-1.5 rounded-full bg-brand-500 mt-1.5 shrink-0"></div><div><p class="text-xs font-bold text-slate-800 dark:text-slate-200">${l.action}</p><p class="text-[10px] text-slate-500">${l.details}</p></div></div>`;
                 });
+                document.getElementById('activity-logs').innerHTML = logsHtml || '<p class="text-xs text-slate-400">No recent activity.</p>';
 
-                const isDark = document.documentElement.classList.contains('dark');
-                const gridColor = isDark ? '#27272a' : '#f1f5f9';
-                const textColor = isDark ? '#a1a1aa' : '#64748b';
-
-                State.chartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: last7Days,
-                        datasets: [{
-                            label: 'Pjesa ime (ALL)',
-                            data: Object.values(dataMap),
-                            backgroundColor: '#4f46e5',
-                            borderRadius: 6,
-                            borderSkipped: false
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: false }, tooltip: { backgroundColor: isDark ? '#18181b' : '#fff', titleColor: isDark ? '#fff' : '#000', bodyColor: isDark ? '#fff' : '#64748b', borderColor: gridColor, borderWidth: 1, padding: 12, cornerRadius: 8 } },
-                        scales: { x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Inter', size: 11 } } }, y: { border: { display: false }, grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Inter', size: 11 } } } }
-                    }
-                });
+                UIRenderer.drawCharts(metrics.transactions);
             },
-
-            transactions() {
-                const tbody = document.getElementById('transactions-table-body');
-                const empty = document.getElementById('transactions-empty');
+            updateTransactions: () => {
+                const tbody = document.getElementById('table-transactions');
+                const empty = document.getElementById('table-empty-state');
                 tbody.innerHTML = '';
                 
-                if(!State.selectedProfileId) return;
+                if(!State.ui.selectedEntityId) return;
 
-                let txs = State.transactions.filter(t => t.involvedUsers.includes(State.selectedProfileId) || t.paidBy === State.selectedProfileId);
+                let txs = State.data.transactions.filter(t => t.status === 'active' && (t.involvedUsers.includes(State.ui.selectedEntityId) || t.paidBy === State.ui.selectedEntityId));
                 
-                if(State.searchQuery) {
-                    const q = State.searchQuery.toLowerCase();
-                    txs = txs.filter(t => t.description.toLowerCase().includes(q));
+                if(State.ui.search) {
+                    const q = State.ui.search.toLowerCase();
+                    txs = txs.filter(t => t.description.toLowerCase().includes(q) || t.id.toLowerCase().includes(q));
                 }
 
                 if(txs.length === 0) { empty.classList.remove('hidden'); return; }
                 else empty.classList.add('hidden');
 
                 txs.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(t => {
-                    const isPayer = t.paidBy === State.selectedProfileId;
-                    const isInvolved = t.involvedUsers.includes(State.selectedProfileId);
-                    const pjesa = t.totalAmount / t.involvedUsers.length;
-                    const payerName = State.users.find(u => u.id === t.paidBy)?.name || 'I Fshirë';
-                    const dateStr = new Date(t.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+                    const share = t.involvedUsers.includes(State.ui.selectedEntityId) ? (t.totalAmount / t.involvedUsers.length) : 0;
+                    const payer = State.data.users.find(u => u.id === t.paidBy)?.name || 'Unknown';
                     
-                    const typeConfig = t.type === 'shpenzim' ? { icon: 'fa-shopping-bag', color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-500/10' } : { icon: 'fa-exchange-alt', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-500/10' };
-
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-50 dark:hover:bg-dark-border/30 transition-colors group">
+                            <td class="px-6 py-4"><span class="px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider status-active">Active</span></td>
                             <td class="px-6 py-4">
-                                <div class="w-10 h-10 rounded-xl ${typeConfig.bg} ${typeConfig.color} flex items-center justify-center text-sm mx-auto"><i class="fas ${typeConfig.icon}"></i></div>
+                                <div class="font-bold text-slate-900 dark:text-white text-xs">${t.description}</div>
+                                <div class="text-[10px] text-slate-400 font-mono mt-0.5">ID: ${t.id.substring(0,8)}... &bull; ${Utils.formatDate(t.date)}</div>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="font-bold text-slate-800 dark:text-slate-200">${t.description}</div>
-                                <div class="text-xs text-slate-400 mt-0.5">${dateStr}</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold ${isPayer ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300' : 'bg-slate-100 text-slate-600 dark:bg-dark-border dark:text-slate-400'}"><i class="fas ${isPayer ? 'fa-wallet' : 'fa-user'} text-[10px]"></i> ${payerName}</span>
-                            </td>
-                            <td class="px-6 py-4 text-right font-bold text-slate-600 dark:text-slate-300">${t.totalAmount.toFixed(0)} <span class="text-xs font-normal opacity-50">L</span></td>
-                            <td class="px-6 py-4 text-right">
-                                <span class="font-black text-sm ${t.type === 'shpenzim' ? 'text-slate-900 dark:text-white' : 'text-emerald-500'}">${isInvolved ? pjesa.toFixed(0) : '0'} <span class="text-xs font-normal opacity-50">L</span></span>
-                            </td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 bg-slate-100 dark:bg-dark-border rounded text-[10px] font-semibold text-slate-600 dark:text-slate-300">${t.category}</span></td>
+                            <td class="px-6 py-4 text-xs font-semibold text-slate-700 dark:text-slate-300">${payer}</td>
+                            <td class="px-6 py-4 text-right font-bold text-slate-600 dark:text-slate-400 text-xs">${Utils.formatCurrency(t.totalAmount)}</td>
+                            <td class="px-6 py-4 text-right"><span class="font-black text-sm text-slate-900 dark:text-white">${Utils.formatCurrency(share)}</span></td>
                             <td class="px-6 py-4 text-center">
-                                <button onclick="window.App.Transactions.delete('${t.id}')" class="w-8 h-8 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition opacity-0 group-hover:opacity-100"><i class="fas fa-trash-alt text-sm"></i></button>
+                                <button onclick="EnterpriseApp.Modules.Transactions.softDelete('${t.id}')" class="text-slate-400 hover:text-red-500 transition opacity-0 group-hover:opacity-100" title="Archive"><i class="fas fa-archive"></i></button>
                             </td>
                         </tr>
                     `;
+                });
+            },
+            drawCharts: (txs) => {
+                const isDark = document.documentElement.classList.contains('dark');
+                const colors = { grid: isDark ? '#27272a' : '#f1f5f9', text: isDark ? '#a1a1aa' : '#64748b', bg: isDark ? '#18181b' : '#fff' };
+                
+                // Trend Chart Setup
+                const ctxTrend = document.getElementById('chart-trend');
+                if(State.instances.chartTrend) State.instances.chartTrend.destroy();
+                
+                const labels = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }); }).reverse();
+                const dataMap = {}; labels.forEach(l => dataMap[l] = 0);
+                
+                txs.forEach(t => {
+                    const l = new Date(t.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+                    if(dataMap[l] !== undefined && t.category !== 'Transfer') dataMap[l] += (t.totalAmount / t.involvedUsers.length);
+                });
+
+                State.instances.chartTrend = new Chart(ctxTrend, {
+                    type: 'line',
+                    data: { labels, datasets: [{ label: 'Outflow', data: Object.values(dataMap), borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: colors.text, font: { size: 10 } } }, y: { border: { display: false }, grid: { color: colors.grid }, ticks: { color: colors.text, font: { size: 10 } } } } }
+                });
+
+                // Category Doughnut Setup
+                const ctxCat = document.getElementById('chart-category');
+                if(State.instances.chartCat) State.instances.chartCat.destroy();
+
+                const catMap = {};
+                txs.forEach(t => { if(t.category !== 'Transfer') { catMap[t.category] = (catMap[t.category] || 0) + (t.totalAmount / t.involvedUsers.length); } });
+
+                State.instances.chartCat = new Chart(ctxCat, {
+                    type: 'doughnut',
+                    data: { labels: Object.keys(catMap), datasets: [{ data: Object.values(catMap), backgroundColor: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'], borderWidth: 0, cutout: '75%' }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: colors.text, font: { size: 10, family: 'Inter' }, usePointStyle: true, boxWidth: 6 } } } }
                 });
             }
         };
 
         // ---------------------------------------------------------
-        // 📂 src/core/app.js (Main App Controller)
+        // 📂 src/ui/router.js
         // ---------------------------------------------------------
-        window.App = {
-            UI: {
-                toggleTheme() {
-                    document.documentElement.classList.toggle('dark');
-                    const isDark = document.documentElement.classList.contains('dark');
-                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                    document.getElementById('theme-icon').className = isDark ? 'fas fa-sun text-amber-400' : 'fas fa-moon';
-                    if(State.activeTab === 'dashboard') Render.dashboard(); // Redraw chart
-                },
-                initTheme() {
-                    if(localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                        document.documentElement.classList.add('dark');
-                        document.getElementById('theme-icon').className = 'fas fa-sun text-amber-400';
-                    }
-                },
-                toggleModal(id) {
-                    const el = document.getElementById(id);
-                    el.classList.toggle('hidden');
-                },
-                switchAuth(view) {
-                    const login = document.getElementById('form-login'), reg = document.getElementById('form-register'), res = document.getElementById('form-reset');
-                    [login, reg, res].forEach(el => el.style.transform = 'translateX(100%)');
-                    if(view === 'login') login.style.transform = 'translateX(0)';
-                    if(view === 'register') reg.style.transform = 'translateX(0)';
-                    if(view === 'reset') res.style.transform = 'translateX(0)';
-                }
+        const Router = {
+            goTo: (view) => {
+                State.ui.activeRoute = view;
+                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`view-${view}`).classList.remove('hidden');
+                
+                document.querySelectorAll('.nav-btn').forEach(el => {
+                    el.className = "nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-dark-border/50 transition-colors";
+                    if(el.dataset.tab === view) el.className = "nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-900 bg-slate-100 dark:text-white dark:bg-dark-border transition-colors";
+                });
+                
+                if(view === 'dashboard') UIRenderer.updateDashboard();
+                if(view === 'transactions') UIRenderer.updateTransactions();
             },
-            Navigation: {
-                goTo(tab) {
-                    State.activeTab = tab;
-                    document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-                    document.getElementById(`view-${tab}`).classList.remove('hidden');
-                    
-                    document.querySelectorAll('.nav-btn').forEach(el => {
-                        el.classList.remove('text-brand-700', 'bg-brand-50', 'dark:text-brand-400', 'dark:bg-brand-500/10');
-                        el.classList.add('text-slate-600', 'hover:bg-slate-50', 'dark:text-slate-400', 'dark:hover:bg-dark-border');
-                        if(el.dataset.tab === tab) {
-                            el.classList.add('text-brand-700', 'bg-brand-50', 'dark:text-brand-400', 'dark:bg-brand-500/10');
-                            el.classList.remove('text-slate-600', 'hover:bg-slate-50', 'dark:text-slate-400', 'dark:hover:bg-dark-border');
-                        }
-                    });
-
-                    const titles = { dashboard: 'Pulti Drejtues', transactions: 'Historiku i Lëvizjeve', reports: 'Gjenerim Raportesh' };
-                    document.getElementById('header-title').innerText = titles[tab];
-
-                    // Trigger renderers
-                    if(tab === 'dashboard') Render.dashboard();
-                    if(tab === 'transactions') Render.transactions();
-                }
-            },
-            Auth: {
-                async login() {
-                    const e = document.getElementById('auth-email').value.trim();
-                    const p = document.getElementById('auth-password').value;
-                    try { await signInWithEmailAndPassword(auth, e, p); Toast.show('Identifikim i suksesshëm.'); } 
-                    catch (err) { Toast.show('Kredenciale të pasakta!', 'error'); }
-                },
-                async register() {
-                    const e = document.getElementById('reg-email').value.trim();
-                    const p = document.getElementById('reg-password').value;
-                    const f = document.getElementById('reg-fname').value;
-                    const l = document.getElementById('reg-lname').value;
-                    try { 
-                        // Firebase standard flow
-                        await createUserWithEmailAndPassword(auth, e, p);
-                        Toast.show('Llogaria Enterprise u krijua!'); 
-                    } catch (err) { Toast.show(err.message, 'error'); }
-                },
-                async resetPassword() {
-                    const e = document.getElementById('reset-email').value.trim();
-                    try { await sendPasswordResetEmail(auth, e); Toast.show('Linku u dërgua në email.'); App.UI.switchAuth('login'); } 
-                    catch (err) { Toast.show(err.message, 'error'); }
-                },
-                async logout() {
-                    try { await signOut(auth); Toast.show('Keni dalë nga sistemi.'); } 
-                    catch (err) { Toast.show('Gabim gjatë daljes.', 'error'); }
-                }
-            },
-            Users: {
-                async add() {
-                    const name = document.getElementById('new-user-name').value.trim();
-                    if(!name) return;
-                    try {
-                        await addDoc(collection(db, 'users'), { name, ownerUid: auth.currentUser.uid, createdAt: serverTimestamp() });
-                        document.getElementById('new-user-name').value = '';
-                        App.UI.toggleModal('add-user-modal');
-                        Toast.show('Profili i ri u shtua.');
-                    } catch(err) { Toast.show('Gabim sistemi.', 'error'); }
-                },
-                select(id) {
-                    State.selectedProfileId = id;
-                    document.getElementById('header-title').innerText = `${State.users.find(u=>u.id===id).name} - Analitika`;
-                    Render.usersList();
-                    Render.dashboard();
-                    Render.transactions();
-                    if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
-                }
-            },
-            Transactions: {
-                async save() {
-                    const type = document.getElementById('tx-type').value;
-                    const paidBy = document.getElementById('tx-payer').value;
-                    const totalAmount = parseFloat(document.getElementById('tx-amount').value);
-                    const description = document.getElementById('tx-desc').value.trim();
-                    const involvedUsers = Array.from(document.querySelectorAll('.tx-chk-user:checked')).map(cb => cb.value);
-
-                    if(!involvedUsers.length) return Toast.show('Zgjidhni të paktën 1 person për ndarje.', 'error');
-
-                    try {
-                        await addDoc(collection(db, 'transactions'), {
-                            type, paidBy, totalAmount, description, involvedUsers, date: new Date().toISOString(),
-                            ownerUid: auth.currentUser.uid, createdAt: serverTimestamp()
-                        });
-                        document.getElementById('form-transaction').reset();
-                        document.querySelectorAll('.tx-chk-user').forEach(cb => cb.checked = false);
-                        App.UI.toggleModal('new-tx-modal');
-                        Toast.show('Transaksioni u regjistrua me sukses.');
-                    } catch(err) { Toast.show('Gabim në ruajtje.', 'error'); }
-                },
-                async delete(id) {
-                    if(confirm("Jeni i sigurt që doni të fshini këtë lëvizje? (Veprim i pakthyeshëm)")) {
-                        try { await deleteDoc(doc(db, 'transactions', id)); Toast.show('Lëvizja u fshi.'); } 
-                        catch(err) { Toast.show('Gabim gjatë fshirjes.', 'error'); }
-                    }
-                }
-            },
-            Services: { Export: ExportService }
+            switchAuth: (view) => {
+                ['login', 'register', 'reset'].forEach(v => document.getElementById(`form-${v}`).style.transform = 'translateX(100%)');
+                document.getElementById(`form-${view}`).style.transform = 'translateX(0)';
+            }
         };
 
         // ---------------------------------------------------------
-        // 🚀 INITIALIZATION & LISTENERS
+        // 📂 src/app.js (Core Orchestrator)
         // ---------------------------------------------------------
-        window.App.UI.initTheme();
-
-        // Search Listener
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            State.searchQuery = e.target.value;
-            Render.transactions();
-        });
-
-        // Auth Observer
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                State.currentUser = user;
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-root').classList.remove('hidden');
-                
-                // Real-time Subscriptions
-                State.unsubscribers.push(onSnapshot(query(collection(db, 'users'), where('ownerUid', '==', user.uid)), snap => {
-                    State.users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    Render.usersList();
-                    if(State.selectedProfileId) { Render.dashboard(); Render.transactions(); }
+        const AppCore = {
+            bootData: () => {
+                const uid = State.auth.user.uid;
+                State.listeners.push(onSnapshot(query(collection(db, 'users'), where('ownerUid', '==', uid)), snap => {
+                    State.data.users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    UsersModule.renderSidebar();
+                    if(State.ui.selectedEntityId) { UIRenderer.updateDashboard(); UIRenderer.updateTransactions(); }
                 }));
 
-                State.unsubscribers.push(onSnapshot(query(collection(db, 'transactions'), where('ownerUid', '==', user.uid)), snap => {
-                    State.transactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    if(State.selectedProfileId) { Render.dashboard(); Render.transactions(); }
+                State.listeners.push(onSnapshot(query(collection(db, 'transactions'), where('ownerUid', '==', uid)), snap => {
+                    State.data.transactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    if(State.ui.selectedEntityId) { UIRenderer.updateDashboard(); UIRenderer.updateTransactions(); }
                 }));
-            } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
-                document.getElementById('app-root').classList.add('hidden');
-                State.unsubscribers.forEach(unsub => unsub());
-                State.unsubscribers = []; State.users = []; State.transactions = []; State.selectedProfileId = null;
+            },
+            cleanup: () => {
+                State.listeners.forEach(unsub => unsub());
+                State.listeners = []; State.data = { users: [], transactions: [], activityLogs: [] }; State.ui.selectedEntityId = null;
             }
-        });
+        };
 
+        // ---------------------------------------------------------
+        // 🌍 Global API Export (Simulating ES Modules import for HTML handlers)
+        // ---------------------------------------------------------
+        window.EnterpriseApp = {
+            Auth: AuthModule,
+            Modules: { Users: UsersModule, Transactions: TransactionsModule },
+            Services: { Export: ExportService },
+            UI: {
+                Router, Renderer: UIRenderer,
+                Modal: {
+                    open: (id) => document.getElementById(id).classList.remove('hidden'),
+                    close: (id) => document.getElementById(id).classList.add('hidden')
+                },
+                toggleTheme: () => {
+                    document.documentElement.classList.toggle('dark');
+                    const isDark = document.documentElement.classList.contains('dark');
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    document.getElementById('theme-icon').className = isDark ? 'fas fa-sun text-sm' : 'fas fa-moon text-sm';
+                    if(State.ui.activeRoute === 'dashboard') UIRenderer.updateDashboard();
+                }
+            }
+        };
+
+        // Init Sequence
+        if(localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark'); document.getElementById('theme-icon').className = 'fas fa-sun text-sm';
+        }
+        document.getElementById('filter-search').addEventListener('input', (e) => { State.ui.search = e.target.value; UIRenderer.updateTransactions(); });
+        
+        AuthModule.init(); // Start Application
     </script>
 </body>
 </html>
