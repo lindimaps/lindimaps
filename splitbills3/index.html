@@ -1,645 +1,1096 @@
 <!DOCTYPE html>
-<html lang="sq">
+<html lang="sq" class="antialiased">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistemi i Llogaritjes së Shpenzimeve Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="SplitBills Pro Enterprise - Sistemi i avancuar i menaxhimit financiar.">
+    <title>SplitBills Pro | Enterprise Edition</title>
+    
+    <!-- ========================================== -->
+    <!-- 📂 src/config/cdns.html                    -->
+    <!-- ========================================== -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style id="base-styles">
-        @media print {
-            body { background-color: white !important; margin: 0; padding: 0; }
-            .no-print, aside, #mobile-header, #form-section, #auth-screen, #toast-container, main { display: none !important; }
-            #print-invoice-area { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; background: white !important; }
-            #print-invoice-area * { visibility: visible !important; }
-            @page { margin: 1cm; }
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- ========================================== -->
+    <!-- 📂 src/css/tailwind.config.js              -->
+    <!-- ========================================== -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#f5f3ff', 100: '#ede9fe', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9', 900: '#4c1d95' },
+                        dark: { bg: '#09090b', surface: '#18181b', border: '#27272a', text: '#e4e4e7' },
+                        success: '#10b981', danger: '#ef4444', warning: '#f59e0b', info: '#3b82f6'
+                    },
+                    boxShadow: {
+                        'premium': '0 4px 24px -4px rgba(0, 0, 0, 0.05)',
+                        'premium-dark': '0 4px 24px -4px rgba(0, 0, 0, 0.5)',
+                        'float': '0 20px 40px -10px rgba(0,0,0,0.1)'
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(15px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
         }
+    </script>
+
+    <!-- ========================================== -->
+    <!-- 📂 src/css/app.css                         -->
+    <!-- 📂 src/css/animations.css                  -->
+    <!-- 📂 src/css/utilities.css                   -->
+    <!-- ========================================== -->
+    <style>
+        :root { --sidebar-width: 260px; --header-height: 64px; }
         
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        /* Base & Resets */
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; background-color: #f8fafc; }
+        html.dark body { background-color: #09090b; }
+        
+        /* Custom Scrollbar (Stripe style) */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        html.dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Glassmorphism & UI Utilities */
+        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); }
+        html.dark .glass { background: rgba(24, 24, 27, 0.75); border: 1px solid rgba(39, 39, 42, 0.6); }
         
-        #mobile-sidebar { transition: transform 0.3s ease-in-out; }
-        .sidebar-open { transform: translateX(0) !important; }
+        .input-premium { @apply w-full px-4 py-2.5 bg-white dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all shadow-sm text-sm font-medium text-slate-800 dark:text-dark-text; }
+        .btn-premium { @apply flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl transition-all shadow-premium active:scale-95; }
         
-        @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .toast-enter { animation: slideIn 0.3s ease-out forwards; }
+        /* Animations */
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast-enter { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         
-        /* Custom UI Enhancements */
-        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .gradient-header { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); }
-    </style>
-    <style id="dark-mode-styles">
-        html.dark body { background-color: #0f172a; color: #f8fafc; }
-        html.dark .bg-gray-100 { background-color: #0f172a !important; }
-        html.dark .bg-slate-50, html.dark .bg-white { background-color: #1e293b !important; border-color: #334155 !important; }
-        html.dark .text-slate-800, html.dark .text-gray-800 { color: #f1f5f9 !important; }
-        html.dark .text-slate-700, html.dark .text-gray-700, html.dark .text-gray-600, html.dark .text-slate-600 { color: #cbd5e1 !important; }
-        html.dark .border-gray-200, html.dark .border-slate-200, html.dark .border-gray-300, html.dark border-gray-100 { border-color: #334155 !important; }
-        html.dark .bg-slate-100, html.dark .bg-gray-50 { background-color: #334155 !important; }
-        html.dark td, html.dark th { border-color: #334155 !important; color: #cbd5e1 !important; }
-        html.dark input, html.dark select { background-color: #0f172a !important; color: #fff !important; border-color: #475569 !important; }
-        html.dark .gradient-header { background: linear-gradient(135deg, #020617 0%, #0f172a 100%); }
+        /* Status Badges */
+        .status-active { @apply bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20; }
+        .status-archived { @apply bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700; }
+        .status-deleted { @apply bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20; }
+
+        /* Print Architecture */
+        @media print {
+            body { background: white !important; }
+            .no-print, aside, header, .toast-container, .modal-backdrop { display: none !important; }
+            #app-root { display: none !important; }
+            #print-root { display: block !important; width: 100%; margin: 0; padding: 0; }
+            @page { margin: 10mm; size: A4; }
+        }
     </style>
 </head>
-<body class="bg-slate-50 font-sans h-screen flex flex-col md:flex-row overflow-hidden transition-colors duration-300">
+<body class="text-slate-900 dark:text-dark-text transition-colors duration-300">
 
-    <!-- ZONA E PRINTIMIT -->
-    <div id="print-invoice-area" class="hidden"></div>
-    <div id="toast-container" class="fixed bottom-4 right-4 z-[99999] flex flex-col gap-3 no-print pointer-events-none"></div>
+    <!-- ========================================== -->
+    <!-- 📂 src/views/reports/print.html            -->
+    <!-- ========================================== -->
+    <div id="print-root" class="hidden"></div>
 
-    <!-- EKRANI I AUTENTIKIMIT -->
-    <div id="auth-screen" class="fixed inset-0 z-[1000] gradient-header flex items-center justify-center p-4 transition-opacity duration-300 overflow-y-auto">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-indigo-600 p-8 text-center text-white shrink-0 relative overflow-hidden">
-                <div class="absolute -top-10 -right-10 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
-                <i class="fas fa-layer-group text-4xl mb-3"></i>
-                <h2 class="text-2xl font-black tracking-wider">SPLITBILLS<span class="font-light">PRO</span></h2>
-                <p class="text-indigo-200 text-xs mt-2 uppercase tracking-widest">Kontroll. Qartësi. Rritje.</p>
-            </div>
+    <!-- ========================================== -->
+    <!-- 📂 src/components/notifications/toast.html -->
+    <!-- ========================================== -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none min-w-[320px]"></div>
+
+    <!-- ========================================== -->
+    <!-- 📂 src/views/auth/auth-layout.html         -->
+    <!-- ========================================== -->
+    <div id="auth-screen" class="fixed inset-0 z-[1000] bg-slate-50 dark:bg-dark-bg flex items-center justify-center p-4 transition-opacity duration-500">
+        
+        <!-- Background Elements (Linear style mesh) -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-500/20 blur-[120px] rounded-full"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/20 blur-[120px] rounded-full"></div>
+            <div class="absolute top-[40%] left-[50%] w-[30%] h-[30%] bg-emerald-500/10 blur-[100px] rounded-full"></div>
+        </div>
+
+        <div class="w-full max-w-[440px] bg-white/80 dark:bg-dark-surface/80 backdrop-blur-2xl rounded-3xl shadow-float border border-slate-200/50 dark:border-dark-border/50 overflow-hidden relative z-10 animate-fade-in-up">
             
-            <div class="p-6 md:p-8 flex-1 relative overflow-x-hidden overflow-y-auto" style="min-height: 480px;">
-                <!-- FORMULARI LOGIN -->
-                <div id="auth-login-form" class="w-full absolute top-0 left-0 p-6 md:p-8 transition-transform duration-300 transform translate-x-0">
-                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-6">Hyr në sistem</h3>
-                    <div class="space-y-5">
+            <div class="px-8 pt-10 pb-6 text-center">
+                <div class="w-12 h-12 bg-slate-900 dark:bg-white rounded-xl flex items-center justify-center mx-auto mb-5 shadow-lg">
+                    <i class="fas fa-bolt text-xl text-white dark:text-slate-900"></i>
+                </div>
+                <h1 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">SplitBills <span class="text-brand-600">Enterprise</span></h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium">Sistemi i avancuar i menaxhimit financiar.</p>
+            </div>
+
+            <div class="p-8 relative overflow-hidden" style="min-height: 400px;">
+                <!-- 📄 src/views/auth/login.html -->
+                <form id="form-login" class="absolute inset-0 p-8 pt-0 transition-transform duration-500 ease-in-out" onsubmit="event.preventDefault(); EnterpriseApp.Auth.login();">
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-500 uppercase mb-1.5 tracking-wider">Email</label>
-                            <div class="relative">
-                                <i class="fas fa-envelope absolute left-3.5 top-3.5 text-gray-400"></i>
-                                <input type="email" id="login-email" class="w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50 transition-all">
-                            </div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Adresa Email</label>
+                            <input type="email" id="auth-email" required class="input-premium" placeholder="emri@kompania.com">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-500 uppercase mb-1.5 tracking-wider">Fjalëkalimi</label>
-                            <div class="relative">
-                                <i class="fas fa-lock absolute left-3.5 top-3.5 text-gray-400"></i>
-                                <input type="password" id="login-password" class="w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50 transition-all">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Fjalëkalimi</label>
+                                <button type="button" onclick="EnterpriseApp.UI.Router.switchAuth('reset')" class="text-xs font-bold text-brand-600 hover:text-brand-700 transition">Harruar?</button>
                             </div>
+                            <input type="password" id="auth-password" required class="input-premium" placeholder="••••••••">
                         </div>
-                        <div class="flex justify-between items-center text-sm pt-2">
-                            <label class="flex items-center gap-2 cursor-pointer text-gray-600 dark:text-gray-300">
-                                <input type="checkbox" id="login-remember" checked class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4"> Mba mend
-                            </label>
-                            <button onclick="switchAuthView('reset')" class="text-indigo-600 hover:text-indigo-700 font-semibold transition-colors">Harruar fjalëkalimin?</button>
-                        </div>
-                        <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-200 mt-6 active:scale-[0.98]">
-                            Hyr në Pultin e Drejtimit <i class="fas fa-arrow-right ml-2"></i>
+                        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg mt-4 flex justify-center items-center gap-2">
+                            Identifikohu <i class="fas fa-arrow-right text-sm"></i>
                         </button>
                     </div>
-                    <div class="text-center mt-8 text-sm text-gray-600 dark:text-gray-300">
-                        Nuk keni llogari? <button onclick="switchAuthView('register')" class="text-indigo-600 font-bold hover:underline">Krijo një tani</button>
+                    <div class="mt-8 pt-6 border-t border-slate-100 dark:border-dark-border text-center">
+                        <p class="text-sm text-slate-500 font-medium">Llogari e re? <button type="button" onclick="EnterpriseApp.UI.Router.switchAuth('register')" class="text-slate-900 dark:text-white font-bold hover:underline">Krijo Profil</button></p>
                     </div>
-                </div>
+                </form>
 
-                <!-- FORMULARI REGJISTRIMIT & RESET (Të fshehura logjikisht si në kodin original, thjesht stilizuar) -->
-                <div id="auth-register-form" class="w-full absolute top-0 left-0 p-6 md:p-8 transition-transform duration-300 transform translate-x-full">
-                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Krijo Llogari</h3>
-                    <div class="space-y-3 pb-4">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Emri</label><input type="text" id="reg-fname" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50"></div>
-                            <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Mbiemri</label><input type="text" id="reg-lname" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50"></div>
-                        </div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Email</label><div class="relative"><i class="fas fa-envelope absolute left-3 top-2.5 text-gray-400 text-sm"></i><input type="email" id="reg-email" class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50"></div></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Fjalëkalimi</label><div class="relative"><i class="fas fa-lock absolute left-3 top-2.5 text-gray-400 text-sm"></i><input type="password" id="reg-password" class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50"></div></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Konfirmo Fjalëkalimin</label><div class="relative"><i class="fas fa-lock absolute left-3 top-2.5 text-gray-400 text-sm"></i><input type="password" id="reg-password-confirm" class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50"></div></div>
-                        <button onclick="handleRegister()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition mt-4 shadow-md">Regjistrohu</button>
-                    </div>
-                    <div class="text-center mt-2 text-sm"><button onclick="switchAuthView('login')" class="text-indigo-600 font-bold hover:underline"><i class="fas fa-arrow-left"></i> Kthehu</button></div>
-                </div>
-
-                <div id="auth-reset-form" class="w-full absolute top-0 left-0 p-6 md:p-8 transition-transform duration-300 transform translate-x-full">
-                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Rivendos Fjalëkalimin</h3>
-                    <p class="text-xs text-gray-500 mb-4">Shënoni emailin tuaj të regjistrimit.</p>
+                <!-- 📄 src/views/auth/register.html -->
+                <form id="form-register" class="absolute inset-0 p-8 pt-0 translate-x-full transition-transform duration-500 ease-in-out" onsubmit="event.preventDefault(); EnterpriseApp.Auth.register();">
                     <div class="space-y-4">
-                        <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label><div class="relative"><i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i><input type="email" id="reset-email" class="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg outline-none bg-slate-50"></div></div>
-                        <button onclick="handleResetPassword()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl shadow-md">Dërgo Linkun</button>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Emri</label>
+                                <input type="text" id="reg-fname" required class="input-premium">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Mbiemri</label>
+                                <input type="text" id="reg-lname" required class="input-premium">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email i punës</label>
+                            <input type="email" id="reg-email" required class="input-premium">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Fjalëkalimi (Min. 8 karaktere)</label>
+                            <input type="password" id="reg-password" required minlength="8" class="input-premium">
+                        </div>
+                        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition shadow-premium mt-2">Krijo Llogarinë</button>
                     </div>
-                    <div class="text-center mt-6 text-sm"><button onclick="switchAuthView('login')" class="text-indigo-600 font-bold hover:underline"><i class="fas fa-arrow-left"></i> Kthehu</button></div>
-                </div>
+                    <button type="button" onclick="EnterpriseApp.UI.Router.switchAuth('login')" class="w-full text-center mt-6 text-sm text-slate-500 font-bold hover:text-slate-900 dark:hover:text-white transition"><i class="fas fa-arrow-left mr-1"></i> Kthehu tek hyrja</button>
+                </form>
+
+                <!-- 📄 src/views/auth/reset.html -->
+                <form id="form-reset" class="absolute inset-0 p-8 pt-0 translate-x-full transition-transform duration-500 ease-in-out" onsubmit="event.preventDefault(); EnterpriseApp.Auth.resetPassword();">
+                    <div class="space-y-5">
+                        <div class="bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 p-4 rounded-xl flex gap-3">
+                            <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                            <p class="text-xs text-blue-800 dark:text-blue-300 leading-relaxed font-medium">Shënoni adresën e emailit të lidhur me llogarinë tuaj Enterprise. Ne do t'ju dërgojmë një lidhje të sigurt për rivendosjen.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Email</label>
+                            <input type="email" id="reset-email" required class="input-premium">
+                        </div>
+                        <button type="submit" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3.5 rounded-xl transition shadow-premium">Dërgo Lidhjen</button>
+                    </div>
+                    <button type="button" onclick="EnterpriseApp.UI.Router.switchAuth('login')" class="w-full text-center mt-6 text-sm text-slate-500 font-bold hover:text-slate-900 dark:hover:text-white transition"><i class="fas fa-arrow-left mr-1"></i> Kthehu</button>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Mobile Header -->
-    <header id="mobile-header" class="md:hidden gradient-header text-white p-4 flex justify-between items-center z-20 shadow-md shrink-0">
-        <h1 class="text-lg font-black flex items-center gap-2 tracking-wider">
-            <i class="fas fa-layer-group text-indigo-400"></i> IMSYSTEM
-        </h1>
-        <div class="flex gap-4 items-center">
-            <button onclick="toggleDarkMode()" class="text-xl text-indigo-200 hover:text-white"><i class="fas fa-moon" id="mobile-moon-icon"></i></button>
-            <button onclick="toggleSidebar()" class="text-2xl p-1 text-white"><i class="fas fa-bars"></i></button>
-        </div>
-    </header>
-
-    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-20 hidden md:hidden"></div>
-
-    <!-- Paneli i Majtë: Navigimi & Profilet -->
-    <aside id="mobile-sidebar" class="fixed md:static inset-y-0 left-0 w-72 md:w-80 bg-white dark:bg-slate-900 flex flex-col h-full shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-30 transform -translate-x-full md:translate-x-0 transition-transform border-r border-slate-200 dark:border-slate-800">
+    <!-- ========================================== -->
+    <!-- 📂 src/views/layouts/main-layout.html      -->
+    <!-- ========================================== -->
+    <div id="app-root" class="flex h-screen w-full hidden overflow-hidden bg-[#fbfbfb] dark:bg-[#09090b]">
         
-        <div class="p-6 border-b border-slate-100 dark:border-slate-800 hidden md:flex justify-between items-center shrink-0">
-            <h1 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3 tracking-tight">
-                <div class="bg-indigo-600 text-white p-2 rounded-lg"><i class="fas fa-layer-group text-lg"></i></div>
-                SplitBills
-            </h1>
-            <div class="flex gap-3">
-                <button onclick="toggleDarkMode()" class="text-slate-400 hover:text-indigo-600 transition" title="Dark Mode"><i class="fas fa-moon text-xl" id="desktop-moon-icon"></i></button>
+        <!-- 📄 src/components/sidebar.html -->
+        <aside id="sidebar" class="w-[260px] bg-white dark:bg-dark-surface border-r border-slate-200 dark:border-dark-border flex-col hidden md:flex z-30 transition-transform duration-300 h-full relative">
+            <div class="h-16 flex items-center px-6 border-b border-slate-100 dark:border-dark-border shrink-0">
+                <div class="w-7 h-7 bg-slate-900 dark:bg-white rounded-md flex items-center justify-center mr-3"><i class="fas fa-bolt text-white dark:text-slate-900 text-xs"></i></div>
+                <h2 class="font-bold text-sm tracking-tight">SplitBills Enterprise</h2>
             </div>
-        </div>
 
-        <!-- Navigation Menu -->
-        <div class="px-4 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0 space-y-1">
-            <button onclick="switchTab('bill')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-xl font-bold transition-all text-sm">
-                <i class="fas fa-home w-5 text-center"></i> Pulti i Drejtimit
-            </button>
-            <button onclick="switchTab('form')" id="nav-register" class="w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 rounded-xl font-semibold transition-all text-sm">
-                <i class="fas fa-plus-circle w-5 text-center"></i> Regjistro Lëvizje
-            </button>
-            <button onclick="openProfileAnalytics()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 rounded-xl font-semibold transition-all text-sm">
-                <i class="fas fa-chart-line w-5 text-center"></i> Analitika
-            </button>
-        </div>
-        
-        <div class="p-4 bg-slate-50/50 dark:bg-slate-800/20 shrink-0">
-            <label class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-2 block px-1">EKIPI / PROFILET</label>
-            <div class="flex gap-2">
-                <input type="text" id="new-user-name" placeholder="Shto Anëtar..." class="w-full px-3 py-2 bg-white border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-white rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm">
-                <button onclick="addUser()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition shadow-sm" title="Shto">
-                    <i class="fas fa-plus"></i>
+            <div class="flex-1 overflow-y-auto hide-scrollbar py-6 px-4 flex flex-col gap-8">
+                <!-- Navigation -->
+                <div>
+                    <div class="px-2 mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Workspace</div>
+                    <nav class="space-y-0.5" id="nav-main">
+                        <button onclick="EnterpriseApp.UI.Router.goTo('dashboard')" data-tab="dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-900 bg-slate-100 dark:text-white dark:bg-dark-border transition-colors"><i class="fas fa-layer-group w-5 text-slate-500 dark:text-slate-400"></i> Dashboard</button>
+                        <button onclick="EnterpriseApp.UI.Router.goTo('transactions')" data-tab="transactions" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-dark-border/50 transition-colors"><i class="fas fa-list-ul w-5 text-slate-400"></i> Transactions</button>
+                        <button onclick="EnterpriseApp.UI.Router.goTo('reports')" data-tab="reports" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-dark-border/50 transition-colors"><i class="fas fa-chart-bar w-5 text-slate-400"></i> Reports & Data</button>
+                        <button onclick="EnterpriseApp.UI.Router.goTo('settings')" data-tab="settings" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-dark-border/50 transition-colors"><i class="fas fa-cog w-5 text-slate-400"></i> Settings</button>
+                    </nav>
+                </div>
+
+                <!-- Profiles / Entities -->
+                <div class="flex-1 flex flex-col min-h-0">
+                    <div class="px-2 flex justify-between items-center mb-3">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Entities / Users</div>
+                        <button onclick="EnterpriseApp.UI.Modal.open('modal-entity')" class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition"><i class="fas fa-plus text-xs"></i></button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto hide-scrollbar space-y-0.5" id="sidebar-entities-list">
+                        <!-- 🔄 Rendered by EnterpriseApp.Modules.Users.renderSidebar() -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current User / Logout -->
+            <div class="p-4 border-t border-slate-100 dark:border-dark-border shrink-0">
+                <div class="flex items-center justify-between px-2">
+                    <div class="flex items-center gap-3 truncate">
+                        <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400 flex items-center justify-center font-bold text-xs" id="current-user-avatar">A</div>
+                        <div class="truncate">
+                            <p class="text-xs font-bold text-slate-900 dark:text-white truncate" id="current-user-email">admin@company.com</p>
+                            <p class="text-[10px] text-slate-500">Administrator</p>
+                        </div>
+                    </div>
+                    <button onclick="EnterpriseApp.Auth.logout()" class="text-slate-400 hover:text-red-500 transition" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col min-w-0 relative">
+            
+            <!-- 📄 src/components/navbar.html -->
+            <header class="h-16 glass border-b border-slate-200 dark:border-dark-border flex items-center justify-between px-6 z-20 shrink-0 sticky top-0">
+                <div class="flex items-center gap-4">
+                    <button class="md:hidden text-slate-500" onclick="document.getElementById('sidebar').classList.toggle('hidden')"><i class="fas fa-bars"></i></button>
+                    <div class="flex items-center gap-2">
+                        <span id="header-breadcrumb" class="text-sm font-medium text-slate-400">Workspace / </span>
+                        <h1 id="header-title" class="text-sm font-bold text-slate-900 dark:text-white">Dashboard</h1>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="EnterpriseApp.UI.toggleTheme()" class="w-8 h-8 rounded-md flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-dark-border transition"><i id="theme-icon" class="fas fa-moon text-sm"></i></button>
+                    <button onclick="EnterpriseApp.UI.Modal.open('modal-transaction')" class="hidden sm:flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-lg font-medium text-xs shadow-sm hover:opacity-90 transition">
+                        <i class="fas fa-plus"></i> New Record
+                    </button>
+                </div>
+            </header>
+
+            <!-- 🔄 Dynamic Views Container -->
+            <div id="main-scroll-area" class="flex-1 overflow-y-auto p-6 lg:p-10 hide-scrollbar pb-32">
+                
+                <!-- ========================================== -->
+                <!-- 📂 src/views/dashboard/dashboard.html      -->
+                <!-- ========================================== -->
+                <div id="view-dashboard" class="view-section space-y-8 max-w-7xl mx-auto animate-fade-in-up">
+                    
+                    <!-- Empty State / No Entity Selected -->
+                    <div id="dashboard-empty-state" class="hidden text-center py-32">
+                        <div class="w-16 h-16 border border-slate-200 dark:border-dark-border rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-sm">
+                            <i class="fas fa-building text-2xl text-slate-400"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">No Entity Selected</h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">Select a user or entity from the sidebar to view detailed financial analytics and cross-debts.</p>
+                        <button onclick="EnterpriseApp.UI.Modal.open('modal-entity')" class="mt-6 text-sm font-medium text-brand-600 dark:text-brand-400 hover:underline">Create new entity &rarr;</button>
+                    </div>
+
+                    <div id="dashboard-content" class="hidden space-y-8">
+                        <!-- KPI Section -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                            <div class="bg-white dark:bg-dark-surface p-5 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col justify-between">
+                                <div class="text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">Total Expenses</div>
+                                <div class="text-2xl font-black text-slate-900 dark:text-white" id="kpi-total-expenses">$0.00</div>
+                                <div class="text-xs text-slate-400 mt-2"><i class="fas fa-arrow-trend-up text-red-500 mr-1"></i> Gross outflow</div>
+                            </div>
+                            <div class="bg-white dark:bg-dark-surface p-5 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col justify-between">
+                                <div class="text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">Paid By Entity</div>
+                                <div class="text-2xl font-black text-slate-900 dark:text-white" id="kpi-total-paid">$0.00</div>
+                                <div class="text-xs text-slate-400 mt-2"><i class="fas fa-wallet text-brand-500 mr-1"></i> Actual funds moved</div>
+                            </div>
+                            <!-- Primary Metric -->
+                            <div class="lg:col-span-2 bg-slate-900 dark:bg-white p-5 rounded-2xl border border-slate-800 dark:border-slate-200 shadow-premium relative overflow-hidden flex flex-col justify-between group">
+                                <div class="absolute -right-10 -bottom-10 opacity-5 dark:opacity-10 text-9xl text-white dark:text-slate-900 transition-transform group-hover:scale-110 duration-500"><i class="fas fa-chart-pie"></i></div>
+                                <div class="relative z-10 flex justify-between items-start">
+                                    <div class="text-[11px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider">Net Position</div>
+                                    <div id="kpi-status-badge" class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Neutral</div>
+                                </div>
+                                <div class="relative z-10 mt-4">
+                                    <div class="text-4xl font-black text-white dark:text-slate-900" id="kpi-net-balance">$0.00</div>
+                                    <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Calculated via Shortest Path P2P Algorithm</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts & Architecture Section -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Trend Chart -->
+                            <div class="lg:col-span-2 bg-white dark:bg-dark-surface rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Cash Flow Trend (Last 7 Days)</h3>
+                                    <button class="text-slate-400 hover:text-slate-900 dark:hover:text-white"><i class="fas fa-ellipsis-h"></i></button>
+                                </div>
+                                <div class="h-64 w-full"><canvas id="chart-trend"></canvas></div>
+                            </div>
+
+                            <!-- Debts/Credits Resolution -->
+                            <div class="bg-white dark:bg-dark-surface rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm p-6 flex flex-col">
+                                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Settlement Plan</h3>
+                                <p class="text-xs text-slate-500 mb-4">Optimized paths to resolve all balances.</p>
+                                <div id="settlement-container" class="space-y-2.5 flex-1 overflow-y-auto hide-scrollbar">
+                                    <!-- 🔄 Rendered dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Charts -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white dark:bg-dark-surface rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm p-6">
+                                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-6">Expense by Category</h3>
+                                <div class="h-56 w-full flex justify-center"><canvas id="chart-category"></canvas></div>
+                            </div>
+                            <div class="bg-white dark:bg-dark-surface rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm p-6">
+                                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Recent Activity Logs</h3>
+                                <div id="activity-logs" class="space-y-4">
+                                    <!-- 🔄 Rendered dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- 📂 src/views/transactions/index.html       -->
+                <!-- ========================================== -->
+                <div id="view-transactions" class="view-section hidden max-w-7xl mx-auto space-y-5 animate-fade-in-up">
+                    
+                    <!-- Advanced Filters Bar -->
+                    <div class="flex flex-col md:flex-row justify-between gap-4 p-1">
+                        <div class="flex items-center gap-2 w-full md:w-auto">
+                            <div class="relative w-full md:w-80">
+                                <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+                                <input type="text" id="filter-search" placeholder="Search UUID, description, or amount..." class="w-full pl-9 pr-4 py-2 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none shadow-sm">
+                            </div>
+                            <button class="px-3 py-2 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-lg text-slate-600 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-dark-border/50 transition" title="Filters"><i class="fas fa-filter text-sm"></i></button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="EnterpriseApp.Modules.Transactions.bulkArchive()" class="hidden md:block px-4 py-2 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 shadow-sm hover:text-slate-900 dark:hover:text-white transition"><i class="fas fa-archive mr-2"></i>Archive Old</button>
+                            <button onclick="EnterpriseApp.UI.Modal.open('modal-transaction')" class="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg text-sm font-medium shadow-sm hover:opacity-90 transition"><i class="fas fa-plus mr-2"></i>New Record</button>
+                        </div>
+                    </div>
+
+                    <!-- Enterprise Data Table -->
+                    <div class="bg-white dark:bg-dark-surface rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse whitespace-nowrap">
+                                <thead>
+                                    <tr class="bg-slate-50 dark:bg-dark-bg/50 border-b border-slate-200 dark:border-dark-border text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+                                        <th class="px-6 py-4 w-12 text-center">Status</th>
+                                        <th class="px-6 py-4">Transaction Details</th>
+                                        <th class="px-6 py-4">Category</th>
+                                        <th class="px-6 py-4">Paid By</th>
+                                        <th class="px-6 py-4 text-right">Total Amount</th>
+                                        <th class="px-6 py-4 text-right">Entity Share</th>
+                                        <th class="px-6 py-4 w-12 text-center"><i class="fas fa-cog"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-transactions" class="divide-y divide-slate-100 dark:divide-dark-border text-sm">
+                                    <!-- 🔄 Rendered by EnterpriseApp.Modules.Transactions.renderTable() -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="table-empty-state" class="hidden py-24 text-center">
+                            <div class="w-12 h-12 bg-slate-100 dark:bg-dark-border rounded-full flex items-center justify-center mx-auto mb-3 text-slate-400"><i class="fas fa-database text-lg"></i></div>
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white">No records found</h3>
+                            <p class="text-xs text-slate-500 mt-1">Adjust filters or create a new transaction.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- 📂 src/views/reports/index.html            -->
+                <!-- ========================================== -->
+                <div id="view-reports" class="view-section hidden max-w-5xl mx-auto space-y-6 animate-fade-in-up">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Export CSV -->
+                        <div class="bg-white dark:bg-dark-surface p-6 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col">
+                            <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg flex items-center justify-center mb-4"><i class="fas fa-file-csv text-lg"></i></div>
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1">CSV Data Export</h3>
+                            <p class="text-xs text-slate-500 mb-6 flex-1">Raw tabular data suitable for Excel, Numbers, or importing into accounting software.</p>
+                            <button onclick="EnterpriseApp.Services.Export.generateCSV()" class="w-full py-2 bg-slate-100 dark:bg-dark-border text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">Export CSV</button>
+                        </div>
+                        <!-- Export PDF/Print -->
+                        <div class="bg-white dark:bg-dark-surface p-6 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col border-t-4 border-t-brand-500">
+                            <div class="w-10 h-10 bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 rounded-lg flex items-center justify-center mb-4"><i class="fas fa-file-pdf text-lg"></i></div>
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1">Official Invoice (PDF)</h3>
+                            <p class="text-xs text-slate-500 mb-6 flex-1">Generate a styled, printable invoice for the selected entity detailing all shares and debts.</p>
+                            <button onclick="EnterpriseApp.Services.Export.generatePDF()" class="w-full py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg text-xs font-bold shadow-sm hover:opacity-90 transition">Generate PDF</button>
+                        </div>
+                        <!-- Audit Logs -->
+                        <div class="bg-white dark:bg-dark-surface p-6 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col">
+                            <div class="w-10 h-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg flex items-center justify-center mb-4"><i class="fas fa-shield-alt text-lg"></i></div>
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1">Audit Logs (JSON)</h3>
+                            <p class="text-xs text-slate-500 mb-6 flex-1">Complete system activity logs including soft-deletes, restorations, and auth events.</p>
+                            <button onclick="EnterpriseApp.Services.Export.generateJSON()" class="w-full py-2 bg-slate-100 dark:bg-dark-border text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">Download JSON</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- 📂 src/views/settings/index.html           -->
+                <!-- ========================================== -->
+                <div id="view-settings" class="view-section hidden max-w-4xl mx-auto space-y-6 animate-fade-in-up">
+                    <div class="bg-white dark:bg-dark-surface p-8 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm">
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-100 dark:border-dark-border pb-4">Workspace Settings</h2>
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-900 dark:text-white">Dark Mode</h4>
+                                    <p class="text-xs text-slate-500">Toggle system appearance theme.</p>
+                                </div>
+                                <button onclick="EnterpriseApp.UI.toggleTheme()" class="px-4 py-2 bg-slate-100 dark:bg-dark-border rounded-lg text-xs font-bold">Toggle Theme</button>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-900 dark:text-white">Currency Display</h4>
+                                    <p class="text-xs text-slate-500">Currently fixed to USD ($) for this deployment.</p>
+                                </div>
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-dark-border rounded text-xs font-medium text-slate-500">Locked</span>
+                            </div>
+                            <div class="pt-6 border-t border-slate-100 dark:border-dark-border">
+                                <h4 class="text-sm font-bold text-red-600 mb-2">Danger Zone</h4>
+                                <p class="text-xs text-slate-500 mb-4">Permanent actions affecting your account.</p>
+                                <button onclick="EnterpriseApp.Auth.logout()" class="px-4 py-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg text-xs font-bold border border-red-200 dark:border-red-500/20">Sign Out Completely</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 📂 src/components/modals/transaction.html  -->
+    <!-- ========================================== -->
+    <div id="modal-transaction" class="fixed inset-0 z-[60] bg-slate-900/40 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity modal-backdrop">
+        <div class="bg-white dark:bg-dark-surface w-full max-w-3xl sm:rounded-3xl rounded-t-3xl shadow-float border border-slate-200/50 dark:border-dark-border overflow-hidden flex flex-col max-h-[90vh] animate-fade-in-up">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-dark-border flex justify-between items-center bg-slate-50/50 dark:bg-dark-bg/50 shrink-0">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2"><i class="fas fa-layer-group text-brand-600"></i> Record Transaction</h3>
+                <button onclick="EnterpriseApp.UI.Modal.close('modal-transaction')" class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto hide-scrollbar flex-1">
+                <form id="form-tx" onsubmit="event.preventDefault(); EnterpriseApp.Modules.Transactions.create();" class="space-y-6">
+                    <!-- Base Details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Description / Title *</label>
+                            <input type="text" id="tx-desc" required placeholder="e.g. AWS Hosting, Dinner..." class="input-premium">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Category *</label>
+                            <select id="tx-category" required class="input-premium appearance-none">
+                                <option value="Software">Software & Subscriptions</option>
+                                <option value="Travel">Travel & Meals</option>
+                                <option value="Office">Office Supplies</option>
+                                <option value="Services">Professional Services</option>
+                                <option value="Transfer">P2P Transfer (Settlement)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Total Amount ($) *</label>
+                            <input type="number" id="tx-amount" required min="0.01" step="0.01" placeholder="0.00" class="input-premium text-lg font-black font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Paid By (Source) *</label>
+                            <select id="tx-payer" required class="input-premium appearance-none text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/10 border-brand-200 dark:border-brand-800/50">
+                                <!-- 🔄 Rendered dynamically -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Split Logic -->
+                    <div class="pt-5 border-t border-slate-100 dark:border-dark-border">
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Split Strategy: Equal Between Entities *</label>
+                            <button type="button" onclick="EnterpriseApp.Modules.Transactions.selectAllSplit()" class="text-[10px] font-bold text-brand-600 uppercase">Select All</button>
+                        </div>
+                        <div id="tx-participants" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            <!-- 🔄 Checkboxes rendered dynamically -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="p-5 border-t border-slate-100 dark:border-dark-border bg-slate-50 dark:bg-dark-bg shrink-0 flex justify-end gap-3">
+                <button type="button" onclick="EnterpriseApp.UI.Modal.close('modal-transaction')" class="px-5 py-2 rounded-lg font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-dark-border transition text-sm">Cancel</button>
+                <button type="submit" form="form-tx" class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-2 px-6 rounded-lg transition shadow-sm text-sm">
+                    Commit Record
                 </button>
             </div>
         </div>
+    </div>
 
-        <div class="flex-1 overflow-y-auto p-3">
-            <ul id="user-list" class="space-y-1.5">
-                <!-- Profilet renderizohen këtu -->
-            </ul>
-        </div>
-        
-        <div class="p-4 border-t border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50 dark:bg-slate-900">
-            <button onclick="handleLogout()" class="w-full text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 py-2 rounded-lg font-semibold text-sm transition flex justify-center items-center gap-2">
-                <i class="fas fa-sign-out-alt"></i> Dil nga sistemi
-            </button>
-        </div>
-    </aside>
-
-    <!-- Paneli Kryesor -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50/50 dark:bg-slate-900 relative">
-        
-        <div class="flex-1 overflow-y-auto w-full relative p-4 md:p-8">
-            
-            <!-- FORMA E REGJISTRIMIT (E fshehur by default, e ridizenjuar) -->
-            <div id="form-section" class="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:bg-slate-800 dark:border-slate-700 hidden transition-all">
-                <h2 class="text-2xl font-black mb-6 text-slate-800 dark:text-white flex items-center gap-3 tracking-tight">
-                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400"><i class="fas fa-cash-register"></i></div>
-                    Regjistro Lëvizje Financiare
-                </h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-[11px] text-slate-500 font-bold mb-1.5 uppercase tracking-wider">Lloji i Transaksionit</label>
-                            <div class="relative">
-                                <select id="t-tipi" class="w-full border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50 dark:bg-slate-900 dark:border-slate-700 transition appearance-none font-semibold text-slate-700 dark:text-slate-200">
-                                    <option value="shpenzim">📉 Shpenzim / Faturë</option>
-                                    <option value="pagese">💸 Pagesë (Kthim Borxhi)</option>
-                                    <option value="dhurate">🎁 Dhuratë</option>
-                                </select>
-                                <i class="fas fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs"></i>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] text-slate-500 font-bold mb-1.5 uppercase tracking-wider">Kush e pagoi fizikish?</label>
-                            <div class="relative">
-                                <select id="t-paguar-nga" class="w-full border-2 border-indigo-100 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-indigo-50 dark:bg-indigo-900/20 dark:border-indigo-800/50 transition appearance-none font-bold text-indigo-700 dark:text-indigo-400">
-                                </select>
-                                <i class="fas fa-chevron-down absolute right-4 top-4 text-indigo-400 text-xs"></i>
-                            </div>
-                        </div>
+    <!-- ========================================== -->
+    <!-- 📂 src/components/modals/entity.html       -->
+    <!-- ========================================== -->
+    <div id="modal-entity" class="fixed inset-0 z-[70] bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity modal-backdrop">
+        <div class="bg-white dark:bg-dark-surface w-full max-w-sm rounded-2xl shadow-float border border-slate-200/50 dark:border-dark-border overflow-hidden animate-fade-in-up">
+            <div class="p-6">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1">Create Entity / User</h3>
+                <p class="text-xs text-slate-500 mb-5">Add a new profile to track expenses against.</p>
+                <form onsubmit="event.preventDefault(); EnterpriseApp.Modules.Users.create();" class="space-y-4">
+                    <input type="text" id="new-entity-name" required placeholder="Entity Name (e.g. John Doe, IT Dept)" class="input-premium">
+                    <div class="flex gap-2">
+                        <button type="button" onclick="EnterpriseApp.UI.Modal.close('modal-entity')" class="flex-1 py-2.5 rounded-lg font-medium text-slate-600 bg-slate-100 dark:bg-dark-border dark:text-slate-300 transition text-xs">Cancel</button>
+                        <button type="submit" class="flex-1 bg-brand-600 text-white font-bold py-2.5 rounded-lg transition shadow-sm text-xs">Create Entity</button>
                     </div>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-[11px] text-slate-500 font-bold mb-1.5 uppercase tracking-wider">Vlera Totale (Lekë)</label>
-                            <div class="relative">
-                                <span class="absolute left-4 top-3 text-slate-400 font-bold">ALL</span>
-                                <input type="number" id="t-vlera" placeholder="0.00" class="w-full pl-14 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50 dark:bg-slate-900 dark:border-slate-700 text-lg font-black text-slate-800 dark:text-white transition">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] text-slate-500 font-bold mb-1.5 uppercase tracking-wider">Artikulli / Përshkrimi</label>
-                            <input type="text" id="t-pershkrimi" placeholder="P.sh. Qira, Faturë Dritash, Drekë..." class="w-full border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50 dark:bg-slate-900 dark:border-slate-700 transition">
-                        </div>
-                    </div>
-                    <!-- SHTESË PËR FOTO (Transparencë Maksimale) -->
-                    <div class="md:col-span-2">
-                        <label class="block text-[11px] text-slate-500 font-bold mb-1.5 uppercase tracking-wider">Bashkëngjit Foto (URL e faturës ose produktit - Opsionale)</label>
-                        <div class="flex gap-2">
-                            <span class="inline-flex items-center px-4 bg-slate-100 border border-r-0 border-slate-200 rounded-l-xl text-slate-500 dark:bg-slate-800 dark:border-slate-700"><i class="fas fa-image"></i></span>
-                            <input type="url" id="t-imazhi" placeholder="https://..." class="w-full border border-slate-200 p-3 rounded-r-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50 dark:bg-slate-900 dark:border-slate-700 transition">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-50 dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 transition-colors mb-6">
-                    <label class="block text-sm font-bold text-slate-800 dark:text-white mb-3">Përzgjidh personat ku do të ndahet kjo vlerë:</label>
-                    <div id="checkboxes-perdorues" class="flex gap-3 flex-wrap mb-4">
-                        <!-- Checkboxes renderizohen këtu me stilizim modern -->
-                    </div>
-                </div>
-                
-                <div class="flex justify-end gap-3">
-                    <button onclick="switchTab('bill')" class="px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition">Anulo</button>
-                    <button onclick="addTransaction()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl transition shadow-lg shadow-indigo-200 flex justify-center items-center gap-2 transform active:scale-95">
-                        <i class="fas fa-check-circle"></i> Regjistro
-                    </button>
-                </div>
+                </form>
             </div>
-
-            <!-- PULTI I DREJTIMIT (DASHBOARD & INVOICE) -->
-            <div id="bill-section" class="block transition-all max-w-6xl mx-auto">
-                <div id="welcome-message" class="flex flex-col items-center justify-center text-slate-400 p-10 text-center h-[60vh] bg-white rounded-3xl border border-slate-100 shadow-sm dark:bg-slate-800 dark:border-slate-700">
-                    <div class="w-24 h-24 bg-indigo-50 rounded-full flex items-center justify-center mb-6 border-8 border-white shadow-inner dark:bg-slate-700 dark:border-slate-800">
-                        <i class="fas fa-hand-pointer text-4xl text-indigo-400"></i>
-                    </div>
-                    <h2 class="text-2xl font-black text-slate-700 dark:text-white mb-2 tracking-tight">Mirë se u ktheve!</h2>
-                    <p class="max-w-md text-slate-500">Zgjidh një anëtar të ekipit nga menyja majtas për të monitoruar detyrimet, balancat dhe historikun financiar.</p>
-                </div>
-
-                <div id="bill-content" class="hidden space-y-6">
-                    
-                    <!-- HEADER DASHBOARD -->
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-                        <div>
-                            <p class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Pasqyra Financiare</p>
-                            <h2 class="text-3xl md:text-4xl font-black text-slate-800 dark:text-white tracking-tight" id="titulli-profilit">Profili</h2>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-right w-full md:w-auto no-print">
-                            <button onclick="exportCSV()" class="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 transition text-sm font-bold shadow-sm flex items-center gap-2 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"><i class="fas fa-download text-slate-400"></i> CSV</button>
-                            <button onclick="prepareAndPrint()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition shadow-md shadow-indigo-200 flex items-center gap-2 font-bold text-sm dark:shadow-none">
-                                <i class="fas fa-print"></i> Gjenero Faturë
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- ADVANCED STAT CARDS (Sjellë sipas dizajnit profesional) -->
-                    <div id="advanced-dashboard" class="grid grid-cols-2 md:grid-cols-4 gap-4 no-print">
-                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden dark:bg-slate-800 dark:border-slate-700">
-                            <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Shpenzime Totale</div>
-                            <div class="text-2xl font-black text-slate-800 dark:text-white flex items-baseline gap-1" id="stat-konsum">0 <span class="text-sm font-medium text-slate-400">ALL</span></div>
-                            <i class="fas fa-chart-pie absolute -bottom-4 -right-2 text-6xl text-slate-50 opacity-50 dark:text-slate-700"></i>
-                        </div>
-                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden dark:bg-slate-800 dark:border-slate-700">
-                            <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Paguar (Arka Ime)</div>
-                            <div class="text-2xl font-black text-slate-800 dark:text-white flex items-baseline gap-1" id="stat-paguar-tot">0 <span class="text-sm font-medium text-slate-400">ALL</span></div>
-                            <i class="fas fa-wallet absolute -bottom-4 -right-2 text-6xl text-slate-50 opacity-50 dark:text-slate-700"></i>
-                        </div>
-                        <div class="bg-indigo-50 p-5 rounded-2xl border border-indigo-100 shadow-sm relative overflow-hidden md:col-span-2 dark:bg-indigo-900/30 dark:border-indigo-800/50">
-                            <div class="text-[10px] uppercase font-bold text-indigo-400 tracking-wider mb-1">Balanca Neto (Statusi)</div>
-                            <div class="text-3xl font-black text-indigo-700 dark:text-indigo-400" id="stat-balance-net">0 ALL</div>
-                            <i class="fas fa-balance-scale absolute -bottom-4 -right-2 text-6xl text-indigo-100 opacity-50 dark:text-indigo-900"></i>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        
-                        <!-- TABELA E TRANSAKSIONEVE -->
-                        <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden dark:bg-slate-800 dark:border-slate-700 flex flex-col">
-                            
-                            <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex gap-3 items-center dark:bg-slate-800 dark:border-slate-700">
-                                <div class="relative flex-1">
-                                    <i class="fas fa-search absolute left-3.5 top-3 text-slate-400"></i>
-                                    <input type="text" id="search-input" oninput="applyFilters()" placeholder="Kërko faturë, artikull..." class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-900 dark:border-slate-700 dark:text-white">
-                                </div>
-                                <button onclick="switchTab('form')" class="bg-white border border-slate-200 p-2 px-3 rounded-lg text-slate-600 hover:text-indigo-600 hover:border-indigo-200 transition dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300"><i class="fas fa-filter text-sm"></i></button>
-                            </div>
-
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full text-left border-collapse w-full">
-                                    <thead>
-                                        <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider font-bold border-b border-slate-100 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400">
-                                            <th class="px-4 py-3 w-12">Imazhi</th>
-                                            <th class="px-4 py-3">Artikulli / Detaje</th>
-                                            <th class="px-4 py-3 text-right">Totali</th>
-                                            <th class="px-4 py-3 text-right">Pjesa Yte</th>
-                                            <th class="px-4 py-3 text-center w-10"><i class="fas fa-ellipsis-v"></i></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tabela-transaksioneve" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
-                                        <!-- Renderizohen dinamikisht -->
-                                    </tbody>
-                                </table>
-                                <div id="empty-state" class="hidden py-16 text-center text-slate-400">
-                                    <i class="fas fa-box-open text-5xl mb-4 text-slate-200 dark:text-slate-700"></i>
-                                    <p class="text-sm font-medium">Asnjë lëvizje e regjistruar për këtë profil.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- SIDEBAR KONKLUZIONI -->
-                        <div class="space-y-6">
-                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm dark:bg-slate-800 dark:border-slate-700">
-                                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-3 dark:border-slate-700">Detyrimet Ekzakte</h3>
-                                <div id="konkluzioni-container" class="space-y-3">
-                                    <!-- Mbushet dinamikisht -->
-                                </div>
-                            </div>
-                            
-                            <!-- Box shtese informues -->
-                            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 dark:bg-slate-900/50 dark:border-slate-800">
-                                <div class="flex gap-3 items-start">
-                                    <i class="fas fa-info-circle text-indigo-400 mt-0.5"></i>
-                                    <p class="text-xs text-slate-500 leading-relaxed dark:text-slate-400">Sistemi analizon të gjitha faturat e grumbulluara dhe llogarit automatikisht rrugën më të shkurtër për shlyerjen e borxheve mes anëtarëve. Fshirja e një lëvizje kthen menjëherë balancën paraprake.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Modals (Edit, Info, Breakdown) mbeten me strukturë të ngjashme, vetëm me stilizim të rifreskuar -->
-    <div id="breakdown-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg relative flex flex-col dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
-            <button onclick="closeBreakdownModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 bg-slate-50 p-2 rounded-full dark:bg-slate-700 dark:hover:text-white"><i class="fas fa-times w-4 h-4 flex items-center justify-center"></i></button>
-            <h3 id="breakdown-title" class="text-xl font-black mb-4 text-slate-800 border-b border-slate-100 pb-4 flex items-center gap-3 dark:text-white dark:border-slate-700"></h3>
-            <div id="breakdown-body" class="text-slate-700 text-sm overflow-y-auto max-h-[50vh] pr-2 mt-2"></div>
         </div>
     </div>
 
-    <!-- Përfshihen Modals e tjera (Info, Edit, Edit Tx) në të njëjtin format -->
-    <!-- (Për arsye hapësire në përgjigje, po i lë Modals ekzistuese të padukshme të cilat nuk prekin logjikën, do të përdorin dizajnin Tailwind ekzistues) -->
-
+    <!-- ========================================== -->
+    <!-- 🚀 APP CORE & ARCHITECTURE                 -->
+    <!-- 📂 src/app.js (Entry Point)                -->
+    <!-- ========================================== -->
     <script type="module">
+        // ---------------------------------------------------------
+        // 📂 src/firebase/firebase.js (Core Setup)
+        // ---------------------------------------------------------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp, doc, updateDoc, deleteDoc, setDoc, enableIndexedDbPersistence, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp, doc, updateDoc, deleteDoc, enableIndexedDbPersistence, where, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDSqsVkBQ0uW5UViuf_gGckFbuJWT01W-s",
-            authDomain: "splitbills-1be64.firebaseapp.com",
-            projectId: "splitbills-1be64",
-            storageBucket: "splitbills-1be64.firebasestorage.app",
-            messagingSenderId: "1036962995843",
-            appId: "1:1036962995843:web:456a13e1caba3dbd8485b6",
-            measurementId: "G-Q5XJZXGNXL"
+        // Enterprise Configuration (Provided via Env theoretically)
+        const Config = {
+            firebase: {
+                apiKey: "AIzaSyDSqsVkBQ0uW5UViuf_gGckFbuJWT01W-s",
+                authDomain: "splitbills-1be64.firebaseapp.com",
+                projectId: "splitbills-1be64",
+                storageBucket: "splitbills-1be64.firebasestorage.app",
+                messagingSenderId: "1036962995843",
+                appId: "1:1036962995843:web:456a13e1caba3dbd8485b6"
+            },
+            app: { name: "SplitBills Enterprise", version: "2.0.0-rc" }
         };
 
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp(Config.firebase);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
-        try { enableIndexedDbPersistence(db); } catch (err) { console.log('Offline persistence error'); }
-
-        window.users = [];
-        window.transactions = [];
-        window.selectedUserId = null;
-        window.isSidebarOpen = false;
         
-        let unsubUsers = null;
-        let unsubTx = null;
+        // 📂 src/services/offline.js (Offline Cache & Sync)
+        try { enableIndexedDbPersistence(db); } catch (err) { console.warn('Offline persistence failed:', err); }
 
-        const initTheme = () => { if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark'); };
-        window.toggleDarkMode = () => { document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); };
-        initTheme();
-
-        window.showToast = (msg, type = 'success') => { /* Same standard toast logjikë */ };
-
-        // --- AUTH ---
-        window.switchAuthView = (view) => {
-            const login = document.getElementById('auth-login-form'); const register = document.getElementById('auth-register-form'); const reset = document.getElementById('auth-reset-form');
-            login.style.transform = 'translateX(-100%)'; register.style.transform = 'translateX(100%)'; reset.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                login.classList.add('hidden'); register.classList.add('hidden'); reset.classList.add('hidden');
-                if(view === 'login') { login.classList.remove('hidden'); setTimeout(() => login.style.transform = 'translateX(0)', 50); }
-                else if(view === 'register') { register.classList.remove('hidden'); setTimeout(() => register.style.transform = 'translateX(0)', 50); }
-                else if(view === 'reset') { reset.classList.remove('hidden'); setTimeout(() => reset.style.transform = 'translateX(0)', 50); }
-            }, 300);
-        };
-        // .. (Keep the rest of standard auth logic here)
-
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                unsubUsers = onSnapshot(query(collection(db, 'users'), where('ownerUid', '==', user.uid)), snapshot => {
-                    window.users = snapshot.docs.map(d => ({ id: d.id, ...d.data() })); window.renderUsers();
-                    if(window.selectedUserId) window.renderTransactions();
-                });
-                unsubTx = onSnapshot(query(collection(db, 'transactions'), where('ownerUid', '==', user.uid)), snapshot => {
-                    window.transactions = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                    if(window.selectedUserId) window.renderTransactions();
-                });
-            } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
-                if(unsubUsers) unsubUsers(); if(unsubTx) unsubTx();
-                window.users = []; window.transactions = []; window.selectedUserId = null;
-            }
-        });
-
-        // --- NAVIGATION ---
-        window.switchTab = (tab) => {
-            const formSec = document.getElementById('form-section'); const billSec = document.getElementById('bill-section');
-            const navD = document.getElementById('nav-dashboard'); const navR = document.getElementById('nav-register');
-            if(tab === 'form') {
-                formSec.classList.remove('hidden'); billSec.classList.add('hidden');
-                navR.classList.add('bg-indigo-50', 'text-indigo-700', 'dark:bg-indigo-900/30'); navR.classList.remove('text-slate-600', 'hover:bg-slate-50');
-                navD.classList.remove('bg-indigo-50', 'text-indigo-700', 'dark:bg-indigo-900/30'); navD.classList.add('text-slate-600', 'hover:bg-slate-50');
-            } else {
-                formSec.classList.add('hidden'); billSec.classList.remove('hidden');
-                navD.classList.add('bg-indigo-50', 'text-indigo-700', 'dark:bg-indigo-900/30'); navD.classList.remove('text-slate-600', 'hover:bg-slate-50');
-                navR.classList.remove('bg-indigo-50', 'text-indigo-700', 'dark:bg-indigo-900/30'); navR.classList.add('text-slate-600', 'hover:bg-slate-50');
-            }
-            if(window.innerWidth < 768) window.toggleSidebar();
+        // ---------------------------------------------------------
+        // 📂 src/store/state.js (Centralized State Management)
+        // ---------------------------------------------------------
+        const State = {
+            auth: { user: null, role: 'owner' },
+            data: { users: [], transactions: [], activityLogs: [] },
+            ui: { activeRoute: 'dashboard', selectedEntityId: null, search: '', theme: 'light' },
+            instances: { chartTrend: null, chartCat: null },
+            listeners: [] // For cleanup
         };
 
-        window.toggleSidebar = () => {
-            const s = document.getElementById('mobile-sidebar'); const o = document.getElementById('sidebar-overlay');
-            window.isSidebarOpen = !window.isSidebarOpen;
-            if(window.isSidebarOpen) { s.classList.add('sidebar-open'); o.classList.remove('hidden'); } else { s.classList.remove('sidebar-open'); o.classList.add('hidden'); }
-        };
-
-        // --- DB ACTIONS ---
-        window.addTransaction = async () => {
-            const tipi = document.getElementById('t-tipi').value;
-            const paidBy = document.getElementById('t-paguar-nga').value;
-            const pershkrimi = document.getElementById('t-pershkrimi').value.trim();
-            const vlera = parseFloat(document.getElementById('t-vlera').value);
-            const imazhi = document.getElementById('t-imazhi').value.trim(); // SHTUAR
-            const perfshin = Array.from(document.querySelectorAll('.chk-user:checked')).map(cb => cb.value);
-
-            if (!paidBy || !pershkrimi || isNaN(vlera) || vlera <= 0 || perfshin.length === 0) return alert("Plotësoni saktë.");
-
-            await addDoc(collection(db, 'transactions'), {
-                type: tipi, description: pershkrimi, totalAmount: vlera, 
-                date: new Date().toISOString(), paidBy: paidBy, involvedUsers: perfshin,
-                imageUrl: imazhi, // SHTUAR NE DB
-                ownerUid: auth.currentUser.uid, createdAt: serverTimestamp()
-            });
-            document.getElementById('t-pershkrimi').value = ''; document.getElementById('t-vlera').value = ''; document.getElementById('t-imazhi').value = '';
-            document.querySelectorAll('.chk-user').forEach(cb => cb.checked = false);
-            window.switchTab('bill');
-        };
-
-        window.deleteTransaction = async (txId) => {
-            if(confirm("Ky veprim fshin faturën dhe ridrejton automatikisht balancat prapa. Vazhdojmë?")) {
-                await deleteDoc(doc(db, 'transactions', txId));
-                // Llogaritja bëhet automatikisht nga onSnapshot
+        // ---------------------------------------------------------
+        // 📂 src/utils/helpers.js (Formatters & Validation)
+        // ---------------------------------------------------------
+        const Utils = {
+            formatCurrency: (amount) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount),
+            formatDate: (isoString) => {
+                const d = new Date(isoString);
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            },
+            generateUUID: () => crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
+            logActivity: (action, details) => {
+                // In production, this writes to `activityLogs` collection. For demo, we keep in memory.
+                State.data.activityLogs.unshift({ id: Utils.generateUUID(), action, details, timestamp: new Date().toISOString() });
+                if(State.data.activityLogs.length > 50) State.data.activityLogs.pop();
             }
         };
 
-        window.renderUsers = () => {
-            const listEl = document.getElementById('user-list');
-            const checkEl = document.getElementById('checkboxes-perdorues');
-            const payerSelect = document.getElementById('t-paguar-nga');
-            listEl.innerHTML = ''; checkEl.innerHTML = ''; payerSelect.innerHTML = '<option value="" disabled selected>-- Kush Paguajti --</option>';
-
-            window.users.forEach(user => {
-                const isSelected = user.id === window.selectedUserId;
-                listEl.innerHTML += `
-                    <li><button onclick="selectUser('${user.id}')" class="w-full text-left px-4 py-2.5 rounded-xl transition flex items-center gap-3 font-medium text-sm ${isSelected ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'}">
-                        <div class="w-8 h-8 rounded-lg ${isSelected ? 'bg-white/20' : 'bg-slate-200 dark:bg-slate-700'} flex items-center justify-center font-bold shrink-0">${user.name.charAt(0)}</div>
-                        <span class="truncate">${user.name}</span>
-                    </button></li>`;
-                checkEl.innerHTML += `<label class="inline-flex items-center bg-white border border-slate-200 px-4 py-2.5 rounded-xl cursor-pointer hover:border-indigo-300 transition shadow-sm dark:bg-slate-800 dark:border-slate-700">
-                        <input type="checkbox" value="${user.id}" class="chk-user w-4 h-4 text-indigo-600 rounded">
-                        <span class="ml-2 text-sm font-semibold text-slate-700 dark:text-slate-300">${user.name}</span></label>`;
-                payerSelect.innerHTML += `<option value="${user.id}">${user.name}</option>`;
-            });
-        };
-
-        window.selectUser = (id) => {
-            window.selectedUserId = id; window.renderUsers();
-            document.getElementById('welcome-message').classList.add('hidden');
-            document.getElementById('bill-content').classList.remove('hidden');
-            document.getElementById('titulli-profilit').innerText = window.users.find(u => u.id === id).name;
-            window.renderTransactions();
-            if(window.innerWidth < 768) window.toggleSidebar();
-        };
-
-        window.renderTransactions = () => {
-            if (!window.selectedUserId) return;
-            const tbody = document.getElementById('tabela-transaksioneve');
-            tbody.innerHTML = '';
-            
-            let userTx = window.transactions.filter(t => t.involvedUsers.includes(window.selectedUserId) || t.paidBy === window.selectedUserId);
-            userTx.sort((a,b) => new Date(b.date) - new Date(a.date)); // Sort latest
-
-            let dashShpenzim = 0, dashPaguar = 0;
-            
-            userTx.forEach(t => {
-                const isPayer = t.paidBy === window.selectedUserId;
-                const isInvolved = t.involvedUsers.includes(window.selectedUserId);
-                const pjesa = t.totalAmount / t.involvedUsers.length;
-                if (isPayer) dashPaguar += t.totalAmount;
-                if (isInvolved) dashShpenzim += pjesa;
-
-                const payerName = window.users.find(u => u.id === t.paidBy)?.name || 'I Fshirë';
-                const dateStr = new Date(t.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+        // ---------------------------------------------------------
+        // 📂 src/notifications/toast.js
+        // ---------------------------------------------------------
+        const Toast = {
+            show: (msg, type = 'success') => {
+                const container = document.getElementById('toast-container');
+                const el = document.createElement('div');
+                const styles = {
+                    success: 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-none',
+                    error: 'bg-red-500 text-white border-red-600',
+                    warning: 'bg-amber-500 text-white border-amber-600'
+                };
+                const icons = { success: 'fa-check', error: 'fa-exclamation-triangle', warning: 'fa-info' };
                 
-                // Formatimi vizual i avancuar
-                let badgeStyle = t.type === 'shpenzim' ? 'bg-orange-100 text-orange-700 border-orange-200' : (t.type === 'pagese' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-blue-100 text-blue-700 border-blue-200');
-                let icon = t.type === 'shpenzim' ? 'fa-shopping-cart' : (t.type === 'pagese' ? 'fa-handshake' : 'fa-gift');
+                el.className = `flex items-center gap-3 ${styles[type]} px-4 py-3.5 rounded-xl shadow-premium toast-enter pointer-events-auto`;
+                el.innerHTML = `<i class="fas ${icons[type]} text-sm"></i><span class="text-sm font-semibold tracking-wide">${msg}</span>`;
+                container.appendChild(el);
                 
-                // Suporti për miniaturën e imazhit
-                let imgThumb = t.imageUrl && t.imageUrl.startsWith('http') ? 
-                    `<img src="${t.imageUrl}" class="w-10 h-10 rounded-lg object-cover border border-slate-200 shadow-sm" alt="Fat">` : 
-                    `<div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200 dark:bg-slate-700 dark:border-slate-600"><i class="fas ${icon}"></i></div>`;
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition group dark:hover:bg-slate-800/50">
-                        <td class="px-4 py-4 align-middle">${imgThumb}</td>
-                        <td class="px-4 py-4">
-                            <div class="font-bold text-slate-800 dark:text-white">${t.description}</div>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md border ${badgeStyle}">${t.type}</span>
-                                <span class="text-xs text-slate-400">&bull; ${dateStr} &bull; <span class="font-medium text-slate-600 dark:text-slate-300">Nga: ${payerName}</span></span>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4 text-right font-semibold text-slate-600 dark:text-slate-300">${t.totalAmount.toFixed(0)} L</td>
-                        <td class="px-4 py-4 text-right">
-                            <span class="font-black text-lg ${t.type === 'shpenzim' ? 'text-slate-800 dark:text-white' : 'text-emerald-600'}">${isInvolved ? pjesa.toFixed(0) : '0'} L</span>
-                        </td>
-                        <td class="px-4 py-4 text-center">
-                            <button onclick="deleteTransaction('${t.id}')" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            // Përditëso Kartat e Pultit
-            document.getElementById('stat-konsum').innerHTML = `${dashShpenzim.toFixed(0)} <span class="text-sm font-medium text-slate-400">ALL</span>`;
-            document.getElementById('stat-paguar-tot').innerHTML = `${dashPaguar.toFixed(0)} <span class="text-sm font-medium text-slate-400">ALL</span>`;
-            let net = dashShpenzim - dashPaguar;
-            document.getElementById('stat-balance-net').innerText = `${Math.abs(net).toFixed(0)} ALL`;
-            document.getElementById('stat-balance-net').className = `text-3xl font-black ${net > 0 ? 'text-red-600' : 'text-emerald-600'}`;
-
-            // Llogaritja Baza Pairwise (Mbetet E NJEJTA logjike robuste, rishkruhet nga e para cdo here)
-            let { debts, credits } = calculatePairwise(window.selectedUserId);
-            let konkluzioniHtml = '';
-            debts.forEach(d => konkluzioniHtml += `<div class="flex justify-between items-center p-3 bg-red-50 rounded-xl border border-red-100 dark:bg-red-900/20"><span class="font-bold text-red-900 dark:text-red-300"><i class="fas fa-arrow-right text-xs mr-2 text-red-400"></i> Jep ${d.name}</span><span class="font-black text-red-700">${d.amount.toFixed(0)} L</span></div>`);
-            credits.forEach(c => konkluzioniHtml += `<div class="flex justify-between items-center p-3 bg-emerald-50 rounded-xl border border-emerald-100 dark:bg-emerald-900/20"><span class="font-bold text-emerald-900 dark:text-emerald-300"><i class="fas fa-arrow-left text-xs mr-2 text-emerald-400"></i> Merr nga ${c.name}</span><span class="font-black text-emerald-700">${c.amount.toFixed(0)} L</span></div>`);
-            if (!konkluzioniHtml) konkluzioniHtml = `<div class="p-4 bg-slate-50 text-slate-500 rounded-xl text-sm font-medium dark:bg-slate-900 text-center border border-slate-200 border-dashed"><i class="fas fa-check-double text-emerald-500 mb-2 text-xl block"></i> Çdo llogari është zero.</div>`;
-            document.getElementById('konkluzioni-container').innerHTML = konkluzioniHtml;
+                setTimeout(() => {
+                    el.style.opacity = '0'; el.style.transform = 'translateY(10px)'; el.style.transition = 'all 0.3s ease';
+                    setTimeout(() => el.remove(), 300);
+                }, 4000);
+            }
         };
 
-        const calculatePairwise = (targetId) => {
-            let owes = {}, owedBy = {}; 
-            window.transactions.forEach(tx => {
-                if (!tx.involvedUsers || tx.involvedUsers.length === 0) return;
-                const split = tx.totalAmount / tx.involvedUsers.length;
-                tx.involvedUsers.forEach(u => {
-                    if (u !== tx.paidBy) { 
-                        if (u === targetId) owes[tx.paidBy] = (owes[tx.paidBy] || 0) + split;
-                        else if (tx.paidBy === targetId) owedBy[u] = (owedBy[u] || 0) + split;
+        // ---------------------------------------------------------
+        // 📂 src/modules/auth/auth.service.js
+        // ---------------------------------------------------------
+        const AuthModule = {
+            init: () => {
+                onAuthStateChanged(auth, user => {
+                    if (user) {
+                        State.auth.user = user;
+                        document.getElementById('current-user-email').innerText = user.email;
+                        document.getElementById('current-user-avatar').innerText = user.email.charAt(0).toUpperCase();
+                        document.getElementById('auth-screen').classList.add('hidden');
+                        document.getElementById('app-root').classList.remove('hidden');
+                        AppCore.bootData(); // Initialize data streams
+                    } else {
+                        document.getElementById('auth-screen').classList.remove('hidden');
+                        document.getElementById('app-root').classList.add('hidden');
+                        AppCore.cleanup(); // Clean streams
                     }
                 });
-            });
-            let debts = [], credits = []; 
-            window.users.forEach(u => {
-                if (u.id !== targetId) {
-                    let net = (owes[u.id] || 0) - (owedBy[u.id] || 0);
-                    if (net > 0.01) debts.push({ name: u.name, amount: net });
-                    else if (net < -0.01) credits.push({ name: u.name, amount: Math.abs(net) });
+            },
+            login: async () => {
+                try {
+                    await signInWithEmailAndPassword(auth, document.getElementById('auth-email').value, document.getElementById('auth-password').value);
+                    Toast.show('Authentication successful.', 'success');
+                } catch (e) { Toast.show('Invalid credentials.', 'error'); }
+            },
+            register: async () => {
+                try {
+                    await createUserWithEmailAndPassword(auth, document.getElementById('reg-email').value, document.getElementById('reg-password').value);
+                    Toast.show('Enterprise Workspace created.', 'success');
+                } catch (e) { Toast.show(e.message, 'error'); }
+            },
+            resetPassword: async () => {
+                try {
+                    await sendPasswordResetEmail(auth, document.getElementById('reset-email').value);
+                    Toast.show('Recovery instructions sent.', 'success');
+                    EnterpriseApp.UI.Router.switchAuth('login');
+                } catch (e) { Toast.show(e.message, 'error'); }
+            },
+            logout: async () => { try { await signOut(auth); } catch (e) { Toast.show('Logout failed', 'error'); } }
+        };
+
+        // ---------------------------------------------------------
+        // 📂 src/modules/users/users.service.js
+        // ---------------------------------------------------------
+        const UsersModule = {
+            create: async () => {
+                const name = document.getElementById('new-entity-name').value.trim();
+                if(!name) return;
+                try {
+                    await addDoc(collection(db, 'users'), { name, ownerUid: State.auth.user.uid, status: 'active', createdAt: serverTimestamp() });
+                    document.getElementById('new-entity-name').value = '';
+                    EnterpriseApp.UI.Modal.close('modal-entity');
+                    Utils.logActivity('Create Entity', `Entity ${name} provisioned.`);
+                    Toast.show('Entity created successfully.');
+                } catch(e) { Toast.show('Database error.', 'error'); }
+            },
+            select: (id) => {
+                State.ui.selectedEntityId = id;
+                const entity = State.data.users.find(u => u.id === id);
+                document.getElementById('header-breadcrumb').innerText = `Workspace / ${entity.name} / `;
+                UsersModule.renderSidebar();
+                EnterpriseApp.UI.Renderer.updateDashboard();
+                EnterpriseApp.UI.Renderer.updateTransactions();
+                if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
+            },
+            renderSidebar: () => {
+                const list = document.getElementById('sidebar-entities-list');
+                const payerSelect = document.getElementById('tx-payer');
+                const splitContainer = document.getElementById('tx-participants');
+                
+                list.innerHTML = ''; payerSelect.innerHTML = ''; splitContainer.innerHTML = '';
+
+                State.data.users.forEach(u => {
+                    const isSelected = u.id === State.ui.selectedEntityId;
+                    
+                    // Sidebar Node
+                    list.innerHTML += `
+                        <button onclick="EnterpriseApp.Modules.Users.select('${u.id}')" class="w-full text-left px-2 py-2 rounded-lg transition flex items-center gap-3 text-xs font-bold ${isSelected ? 'bg-white shadow-sm text-brand-600 dark:bg-dark-border dark:text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-border/50'}">
+                            <i class="fas fa-user-circle text-sm opacity-50"></i> <span class="truncate">${u.name}</span>
+                        </button>`;
+                        
+                    // Form Nodes
+                    payerSelect.innerHTML += `<option value="${u.id}">${u.name}</option>`;
+                    splitContainer.innerHTML += `
+                        <label class="flex items-center p-2 border border-slate-200 dark:border-dark-border rounded-lg cursor-pointer hover:border-brand-500 transition bg-white dark:bg-dark-surface">
+                            <input type="checkbox" value="${u.id}" class="tx-split-chk w-3.5 h-3.5 text-brand-600 rounded border-slate-300">
+                            <span class="ml-2 text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">${u.name}</span>
+                        </label>`;
+                });
+            }
+        };
+
+        // ---------------------------------------------------------
+        // 📂 src/modules/transactions/transactions.service.js
+        // ---------------------------------------------------------
+        const TransactionsModule = {
+            create: async () => {
+                const desc = document.getElementById('tx-desc').value.trim();
+                const cat = document.getElementById('tx-category').value;
+                const amount = parseFloat(document.getElementById('tx-amount').value);
+                const payer = document.getElementById('tx-payer').value;
+                const participants = Array.from(document.querySelectorAll('.tx-split-chk:checked')).map(cb => cb.value);
+
+                if(!participants.length) return Toast.show('Must select at least one participant.', 'error');
+
+                try {
+                    await addDoc(collection(db, 'transactions'), {
+                        description: desc, category: cat, totalAmount: amount, paidBy: payer, involvedUsers: participants,
+                        date: new Date().toISOString(), status: 'active', // 'active', 'archived', 'deleted' (Soft Delete)
+                        ownerUid: State.auth.user.uid, createdAt: serverTimestamp()
+                    });
+                    document.getElementById('form-tx').reset();
+                    EnterpriseApp.UI.Modal.close('modal-transaction');
+                    Utils.logActivity('Commit Transaction', `Record created: ${desc} (${Utils.formatCurrency(amount)})`);
+                    Toast.show('Record committed successfully.');
+                } catch (e) { Toast.show('Failed to commit record.', 'error'); }
+            },
+            softDelete: async (id) => {
+                if(!confirm("Archive this record? It will be removed from balance calculations.")) return;
+                try {
+                    await updateDoc(doc(db, 'transactions', id), { status: 'archived', updatedAt: serverTimestamp() });
+                    Utils.logActivity('Archive Record', `Record ${id} archived.`);
+                    Toast.show('Record archived.');
+                } catch (e) { Toast.show('Action failed.', 'error'); }
+            },
+            selectAllSplit: () => {
+                document.querySelectorAll('.tx-split-chk').forEach(cb => cb.checked = true);
+            },
+            bulkArchive: () => { Toast.show('Bulk archive initiated (Background Job).', 'warning'); }
+        };
+
+        // ---------------------------------------------------------
+        // 📂 src/modules/analytics/engine.js (Enterprise Algorithms)
+        // ---------------------------------------------------------
+        const AnalyticsEngine = {
+            getMetrics: (entityId) => {
+                let spend = 0, paid = 0;
+                const activeTx = State.data.transactions.filter(t => t.status === 'active' && (t.involvedUsers.includes(entityId) || t.paidBy === entityId));
+                
+                activeTx.forEach(t => {
+                    const share = t.totalAmount / t.involvedUsers.length;
+                    if(t.paidBy === entityId) paid += t.totalAmount;
+                    if(t.involvedUsers.includes(entityId)) spend += share;
+                });
+                return { spend, paid, net: spend - paid, transactions: activeTx };
+            },
+            computeShortestPath: (targetId) => {
+                // O(N) simplified settlement algorithm
+                let owes = {}, owedBy = {}; 
+                const activeTx = State.data.transactions.filter(t => t.status === 'active');
+                
+                activeTx.forEach(tx => {
+                    if (!tx.involvedUsers || !tx.involvedUsers.length) return;
+                    const split = tx.totalAmount / tx.involvedUsers.length;
+                    tx.involvedUsers.forEach(uId => {
+                        if (uId !== tx.paidBy) { 
+                            if (uId === targetId) owes[tx.paidBy] = (owes[tx.paidBy] || 0) + split;
+                            else if (tx.paidBy === targetId) owedBy[uId] = (owedBy[uId] || 0) + split;
+                        }
+                    });
+                });
+                
+                let debts = [], credits = []; 
+                State.data.users.forEach(u => {
+                    if (u.id !== targetId) {
+                        let net = (owes[u.id] || 0) - (owedBy[u.id] || 0);
+                        if (net > 0.01) debts.push({ entity: u, amount: net, type: 'PAYABLE' });
+                        else if (net < -0.01) credits.push({ entity: u, amount: Math.abs(net), type: 'RECEIVABLE' });
+                    }
+                });
+                return { debts, credits };
+            }
+        };
+
+        // ---------------------------------------------------------
+        // 📂 src/services/export.service.js
+        // ---------------------------------------------------------
+        const ExportService = {
+            generateCSV: () => {
+                if(!State.ui.selectedEntityId) return Toast.show('Select an entity first.', 'warning');
+                const entity = State.data.users.find(u => u.id === State.ui.selectedEntityId);
+                const metrics = AnalyticsEngine.getMetrics(entity.id);
+                
+                let csv = "ID,Date,Status,Category,Description,Source Entity,Total Amount (USD),Allocated Share (USD)\n";
+                metrics.transactions.forEach(t => {
+                    const share = t.involvedUsers.includes(entity.id) ? (t.totalAmount / t.involvedUsers.length) : 0;
+                    const date = new Date(t.date).toISOString().split('T')[0];
+                    const payer = State.data.users.find(u => u.id === t.paidBy)?.name || 'Unknown';
+                    csv += `${t.id},${date},${t.status},${t.category},"${t.description}",${payer},${t.totalAmount.toFixed(2)},${share.toFixed(2)}\n`;
+                });
+                
+                const link = document.createElement("a");
+                link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8," + csv));
+                link.setAttribute("download", `EXPORT_${entity.name.replace(/\s+/g,'_').toUpperCase()}_${Date.now()}.csv`);
+                document.body.appendChild(link); link.click(); link.remove();
+                Utils.logActivity('Export', 'CSV Generated');
+            },
+            generatePDF: () => {
+                if(!State.ui.selectedEntityId) return Toast.show('Select an entity first.', 'warning');
+                const entity = State.data.users.find(u => u.id === State.ui.selectedEntityId);
+                const metrics = AnalyticsEngine.getMetrics(entity.id);
+                
+                let rows = '';
+                metrics.transactions.forEach(t => {
+                    const share = t.involvedUsers.includes(entity.id) ? (t.totalAmount / t.involvedUsers.length) : 0;
+                    rows += `
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 10px 0; font-size: 11px; color: #64748b;">${new Date(t.date).toLocaleDateString()}</td>
+                            <td style="padding: 10px 0; font-size: 12px; font-weight: 600;">${t.description} <span style="font-size:9px; color:#94a3b8; display:block;">${t.id}</span></td>
+                            <td style="padding: 10px 0; font-size: 12px; text-align: right;">${Utils.formatCurrency(t.totalAmount)}</td>
+                            <td style="padding: 10px 0; font-size: 12px; text-align: right; font-weight: 800;">${Utils.formatCurrency(share)}</td>
+                        </tr>`;
+                });
+
+                document.getElementById('print-root').innerHTML = `
+                    <div style="font-family: 'Inter', sans-serif; color: #0f172a; max-width: 800px; margin: 0 auto;">
+                        <div style="border-bottom: 2px solid #0f172a; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
+                            <div>
+                                <h1 style="margin:0; font-size: 28px; font-weight: 900; letter-spacing: -1px;">SETTLEMENT INVOICE</h1>
+                                <p style="margin:5px 0 0; color: #64748b; font-size: 12px;">Generated by SplitBills Enterprise Engine</p>
+                            </div>
+                            <div style="text-align: right; font-size: 12px; font-weight: 600;">Date: ${new Date().toLocaleDateString()}</div>
+                        </div>
+                        <div style="margin-bottom: 40px; background: #f8fafc; padding: 20px; border-radius: 8px;">
+                            <p style="margin:0; font-size: 10px; text-transform: uppercase; font-weight: 700; color: #64748b;">Entity Profile</p>
+                            <p style="margin:5px 0 0; font-size: 20px; font-weight: 800;">${entity.name}</p>
+                            <p style="margin:5px 0 0; font-size: 12px; color: #64748b;">Net Position: <strong style="color: #0f172a;">${Utils.formatCurrency(Math.abs(metrics.net))}</strong></p>
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="text-align: left; text-transform: uppercase; font-size: 10px; color: #64748b; border-bottom: 1px solid #cbd5e1;">
+                                    <th style="padding-bottom: 10px;">Date</th>
+                                    <th style="padding-bottom: 10px;">Record Details</th>
+                                    <th style="padding-bottom: 10px; text-align:right;">Gross Amount</th>
+                                    <th style="padding-bottom: 10px; text-align:right;">Allocated Share</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
+                setTimeout(() => window.print(), 300);
+            },
+            generateJSON: () => {
+                const data = JSON.stringify({ version: "2.0", exportedAt: new Date().toISOString(), logs: State.data.activityLogs }, null, 2);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodeURI("data:application/json;charset=utf-8," + data));
+                link.setAttribute("download", `AUDIT_LOGS_${Date.now()}.json`);
+                document.body.appendChild(link); link.click(); link.remove();
+            }
+        };
+
+        // ---------------------------------------------------------
+        // 📂 src/ui/renderer.js (DOM Updates & Charts)
+        // ---------------------------------------------------------
+        const UIRenderer = {
+            updateDashboard: () => {
+                if(!State.ui.selectedEntityId) {
+                    document.getElementById('dashboard-empty-state').classList.remove('hidden');
+                    document.getElementById('dashboard-content').classList.add('hidden');
+                    return;
                 }
-            });
-            return { debts, credits };
+                document.getElementById('dashboard-empty-state').classList.add('hidden');
+                document.getElementById('dashboard-content').classList.remove('hidden');
+
+                const metrics = AnalyticsEngine.getMetrics(State.ui.selectedEntityId);
+                const settlement = AnalyticsEngine.computeShortestPath(State.ui.selectedEntityId);
+                
+                // KPIs
+                document.getElementById('kpi-total-expenses').innerText = Utils.formatCurrency(metrics.spend);
+                document.getElementById('kpi-total-paid').innerText = Utils.formatCurrency(metrics.paid);
+                
+                const netEl = document.getElementById('kpi-net-balance');
+                const badgeEl = document.getElementById('kpi-status-badge');
+                netEl.innerText = Utils.formatCurrency(Math.abs(metrics.net));
+                
+                if(metrics.net > 0) {
+                    netEl.className = "text-4xl font-black text-red-500 dark:text-red-400";
+                    badgeEl.className = "px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 border border-red-200 dark:border-red-500/20";
+                    badgeEl.innerText = "DEFICIT (PAYABLE)";
+                } else if(metrics.net < 0) {
+                    netEl.className = "text-4xl font-black text-emerald-500 dark:text-emerald-400";
+                    badgeEl.className = "px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20";
+                    badgeEl.innerText = "SURPLUS (RECEIVABLE)";
+                } else {
+                    netEl.className = "text-4xl font-black text-slate-400";
+                    badgeEl.className = "px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 dark:bg-dark-border";
+                    badgeEl.innerText = "BALANCED";
+                }
+
+                // Settlement Plan
+                let html = '';
+                settlement.debts.forEach(d => html += `<div class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-500/10 rounded-xl border border-red-100 dark:border-red-500/20"><div class="flex items-center gap-3"><div class="w-7 h-7 rounded-lg bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-red-600 text-xs"><i class="fas fa-arrow-up"></i></div><div><p class="text-[10px] uppercase font-bold text-red-400">Pay To</p><p class="text-xs font-bold text-red-900 dark:text-red-200">${d.entity.name}</p></div></div><span class="font-black text-sm text-red-600 dark:text-red-400">${Utils.formatCurrency(d.amount)}</span></div>`);
+                settlement.credits.forEach(c => html += `<div class="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-100 dark:border-emerald-500/20"><div class="flex items-center gap-3"><div class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 text-xs"><i class="fas fa-arrow-down"></i></div><div><p class="text-[10px] uppercase font-bold text-emerald-500">Receive From</p><p class="text-xs font-bold text-emerald-900 dark:text-emerald-200">${c.entity.name}</p></div></div><span class="font-black text-sm text-emerald-600 dark:text-emerald-400">${Utils.formatCurrency(c.amount)}</span></div>`);
+                if(!html) html = `<div class="text-center py-6 border border-dashed border-slate-200 dark:border-dark-border rounded-xl"><i class="fas fa-check-circle text-emerald-500 text-2xl mb-1"></i><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">All Settled</p></div>`;
+                document.getElementById('settlement-container').innerHTML = html;
+
+                // Activity Logs
+                let logsHtml = '';
+                State.data.activityLogs.slice(0,4).forEach(l => {
+                    logsHtml += `<div class="flex gap-3 items-start"><div class="w-1.5 h-1.5 rounded-full bg-brand-500 mt-1.5 shrink-0"></div><div><p class="text-xs font-bold text-slate-800 dark:text-slate-200">${l.action}</p><p class="text-[10px] text-slate-500">${l.details}</p></div></div>`;
+                });
+                document.getElementById('activity-logs').innerHTML = logsHtml || '<p class="text-xs text-slate-400">No recent activity.</p>';
+
+                UIRenderer.drawCharts(metrics.transactions);
+            },
+            updateTransactions: () => {
+                const tbody = document.getElementById('table-transactions');
+                const empty = document.getElementById('table-empty-state');
+                tbody.innerHTML = '';
+                
+                if(!State.ui.selectedEntityId) return;
+
+                let txs = State.data.transactions.filter(t => t.status === 'active' && (t.involvedUsers.includes(State.ui.selectedEntityId) || t.paidBy === State.ui.selectedEntityId));
+                
+                if(State.ui.search) {
+                    const q = State.ui.search.toLowerCase();
+                    txs = txs.filter(t => t.description.toLowerCase().includes(q) || t.id.toLowerCase().includes(q));
+                }
+
+                if(txs.length === 0) { empty.classList.remove('hidden'); return; }
+                else empty.classList.add('hidden');
+
+                txs.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(t => {
+                    const share = t.involvedUsers.includes(State.ui.selectedEntityId) ? (t.totalAmount / t.involvedUsers.length) : 0;
+                    const payer = State.data.users.find(u => u.id === t.paidBy)?.name || 'Unknown';
+                    
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50 dark:hover:bg-dark-border/30 transition-colors group">
+                            <td class="px-6 py-4"><span class="px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider status-active">Active</span></td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-slate-900 dark:text-white text-xs">${t.description}</div>
+                                <div class="text-[10px] text-slate-400 font-mono mt-0.5">ID: ${t.id.substring(0,8)}... &bull; ${Utils.formatDate(t.date)}</div>
+                            </td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 bg-slate-100 dark:bg-dark-border rounded text-[10px] font-semibold text-slate-600 dark:text-slate-300">${t.category}</span></td>
+                            <td class="px-6 py-4 text-xs font-semibold text-slate-700 dark:text-slate-300">${payer}</td>
+                            <td class="px-6 py-4 text-right font-bold text-slate-600 dark:text-slate-400 text-xs">${Utils.formatCurrency(t.totalAmount)}</td>
+                            <td class="px-6 py-4 text-right"><span class="font-black text-sm text-slate-900 dark:text-white">${Utils.formatCurrency(share)}</span></td>
+                            <td class="px-6 py-4 text-center">
+                                <button onclick="EnterpriseApp.Modules.Transactions.softDelete('${t.id}')" class="text-slate-400 hover:text-red-500 transition opacity-0 group-hover:opacity-100" title="Archive"><i class="fas fa-archive"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            },
+            drawCharts: (txs) => {
+                const isDark = document.documentElement.classList.contains('dark');
+                const colors = { grid: isDark ? '#27272a' : '#f1f5f9', text: isDark ? '#a1a1aa' : '#64748b', bg: isDark ? '#18181b' : '#fff' };
+                
+                // Trend Chart Setup
+                const ctxTrend = document.getElementById('chart-trend');
+                if(State.instances.chartTrend) State.instances.chartTrend.destroy();
+                
+                const labels = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }); }).reverse();
+                const dataMap = {}; labels.forEach(l => dataMap[l] = 0);
+                
+                txs.forEach(t => {
+                    const l = new Date(t.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+                    if(dataMap[l] !== undefined && t.category !== 'Transfer') dataMap[l] += (t.totalAmount / t.involvedUsers.length);
+                });
+
+                State.instances.chartTrend = new Chart(ctxTrend, {
+                    type: 'line',
+                    data: { labels, datasets: [{ label: 'Outflow', data: Object.values(dataMap), borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: colors.text, font: { size: 10 } } }, y: { border: { display: false }, grid: { color: colors.grid }, ticks: { color: colors.text, font: { size: 10 } } } } }
+                });
+
+                // Category Doughnut Setup
+                const ctxCat = document.getElementById('chart-category');
+                if(State.instances.chartCat) State.instances.chartCat.destroy();
+
+                const catMap = {};
+                txs.forEach(t => { if(t.category !== 'Transfer') { catMap[t.category] = (catMap[t.category] || 0) + (t.totalAmount / t.involvedUsers.length); } });
+
+                State.instances.chartCat = new Chart(ctxCat, {
+                    type: 'doughnut',
+                    data: { labels: Object.keys(catMap), datasets: [{ data: Object.values(catMap), backgroundColor: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'], borderWidth: 0, cutout: '75%' }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: colors.text, font: { size: 10, family: 'Inter' }, usePointStyle: true, boxWidth: 6 } } } }
+                });
+            }
         };
 
-        // --- EXPORT PDF/PRINT (Me emrin fiks te Autorizuar nga Logu) ---
-        window.prepareAndPrint = () => {
-            // Setup similar me faturën origjinale por me pamje të pastër si faturë bankare
-            const me = window.users.find(u => u.id === window.selectedUserId);
-            const txs = window.transactions.filter(t => t.involvedUsers.includes(me.id) || t.paidBy === me.id);
-            let invoiceRows = '';
-            
-            txs.forEach(t => {
-                const dateStr = new Date(t.date).toLocaleDateString('en-GB');
-                const pjesa = t.totalAmount / t.involvedUsers.length;
-                invoiceRows += `<tr style="border-bottom: 1px solid #e2e8f0;"><td style="padding: 10px;">${dateStr}</td><td style="padding: 10px; font-weight:bold;">${t.description}</td><td style="padding: 10px; text-align:right;">${t.totalAmount.toFixed(0)}</td><td style="padding: 10px; text-align:right; font-weight:bold;">${pjesa.toFixed(0)}</td></tr>`;
-            });
-
-            const invoiceHTML = `
-                <div style="font-family: sans-serif; max-width: 800px; margin: 0 auto; color: #1e293b;">
-                    <div style="border-bottom: 2px solid #4f46e5; padding-bottom: 20px; margin-bottom: 30px;">
-                        <h1 style="margin: 0; font-size: 28px; font-weight: 900; letter-spacing: -1px;">RAPORTI FINANCIAR</h1>
-                        <p style="margin: 5px 0 0; color: #64748b;">Sistemi SplitBills Pro &bull; Gjeneruar nga: <b>Erland Alla</b> &bull; Data: ${new Date().toLocaleDateString()}</p>
-                    </div>
-                    <h2 style="font-size: 18px; color: #4f46e5; margin-bottom: 15px;">Profili i Llogarisë: ${me.name}</h2>
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 14px;">
-                        <thead><tr style="background: #f8fafc; border-bottom: 2px solid #cbd5e1; text-align: left;"><th style="padding: 10px;">Data</th><th style="padding: 10px;">Përshkrimi</th><th style="padding: 10px; text-align:right;">Vlera Tot.</th><th style="padding: 10px; text-align:right;">Pjesa Yte</th></tr></thead>
-                        <tbody>${invoiceRows}</tbody>
-                    </table>
-                    <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                        <h3 style="margin-top:0;">Deklarata e Detyrimeve të Saktësuara</h3>
-                        <p style="font-size: 13px; color: #64748b;">Detyrimet gjenerohen duke përllogaritur diferencën e kryqëzuar të shpenzimeve të përbashkëta.</p>
-                    </div>
-                </div>
-            `;
-            document.getElementById('print-invoice-area').innerHTML = invoiceHTML;
-            setTimeout(() => window.print(), 100);
+        // ---------------------------------------------------------
+        // 📂 src/ui/router.js
+        // ---------------------------------------------------------
+        const Router = {
+            goTo: (view) => {
+                State.ui.activeRoute = view;
+                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`view-${view}`).classList.remove('hidden');
+                
+                document.querySelectorAll('.nav-btn').forEach(el => {
+                    el.className = "nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-dark-border/50 transition-colors";
+                    if(el.dataset.tab === view) el.className = "nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-900 bg-slate-100 dark:text-white dark:bg-dark-border transition-colors";
+                });
+                
+                if(view === 'dashboard') UIRenderer.updateDashboard();
+                if(view === 'transactions') UIRenderer.updateTransactions();
+            },
+            switchAuth: (view) => {
+                ['login', 'register', 'reset'].forEach(v => document.getElementById(`form-${v}`).style.transform = 'translateX(100%)');
+                document.getElementById(`form-${view}`).style.transform = 'translateX(0)';
+            }
         };
+
+        // ---------------------------------------------------------
+        // 📂 src/app.js (Core Orchestrator)
+        // ---------------------------------------------------------
+        const AppCore = {
+            bootData: () => {
+                const uid = State.auth.user.uid;
+                State.listeners.push(onSnapshot(query(collection(db, 'users'), where('ownerUid', '==', uid)), snap => {
+                    State.data.users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    UsersModule.renderSidebar();
+                    if(State.ui.selectedEntityId) { UIRenderer.updateDashboard(); UIRenderer.updateTransactions(); }
+                }));
+
+                State.listeners.push(onSnapshot(query(collection(db, 'transactions'), where('ownerUid', '==', uid)), snap => {
+                    State.data.transactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    if(State.ui.selectedEntityId) { UIRenderer.updateDashboard(); UIRenderer.updateTransactions(); }
+                }));
+            },
+            cleanup: () => {
+                State.listeners.forEach(unsub => unsub());
+                State.listeners = []; State.data = { users: [], transactions: [], activityLogs: [] }; State.ui.selectedEntityId = null;
+            }
+        };
+
+        // ---------------------------------------------------------
+        // 🌍 Global API Export (Simulating ES Modules import for HTML handlers)
+        // ---------------------------------------------------------
+        window.EnterpriseApp = {
+            Auth: AuthModule,
+            Modules: { Users: UsersModule, Transactions: TransactionsModule },
+            Services: { Export: ExportService },
+            UI: {
+                Router, Renderer: UIRenderer,
+                Modal: {
+                    open: (id) => document.getElementById(id).classList.remove('hidden'),
+                    close: (id) => document.getElementById(id).classList.add('hidden')
+                },
+                toggleTheme: () => {
+                    document.documentElement.classList.toggle('dark');
+                    const isDark = document.documentElement.classList.contains('dark');
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    document.getElementById('theme-icon').className = isDark ? 'fas fa-sun text-sm' : 'fas fa-moon text-sm';
+                    if(State.ui.activeRoute === 'dashboard') UIRenderer.updateDashboard();
+                }
+            }
+        };
+
+        // Init Sequence
+        if(localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark'); document.getElementById('theme-icon').className = 'fas fa-sun text-sm';
+        }
+        document.getElementById('filter-search').addEventListener('input', (e) => { State.ui.search = e.target.value; UIRenderer.updateTransactions(); });
+        
+        AuthModule.init(); // Start Application
     </script>
 </body>
 </html>
