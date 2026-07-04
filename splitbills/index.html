@@ -780,6 +780,38 @@
             return { transactions: exportTxs, selectedUsers };
         };
 
+        window.getExportConclusions = (txList) => {
+            let owes = {}; 
+            txList.forEach(tx => {
+                if (!tx.involvedUsers || tx.involvedUsers.length === 0) return;
+                const split = tx.totalAmount / tx.involvedUsers.length;
+                const payer = tx.paidBy;
+                tx.involvedUsers.forEach(user => {
+                    if (user !== payer) {
+                        if (!owes[user]) owes[user] = {};
+                        owes[user][payer] = (owes[user][payer] || 0) + split;
+                    }
+                });
+            });
+
+            let conclusions = [];
+            let processedPairs = new Set();
+            Object.keys(owes).forEach(debtor => {
+                Object.keys(owes[debtor]).forEach(creditor => {
+                    const pair = [debtor, creditor].sort().join('-');
+                    if(!processedPairs.has(pair)) {
+                        processedPairs.add(pair);
+                        const dOwesC = owes[debtor][creditor] || 0;
+                        const cOwesD = (owes[creditor] && owes[creditor][debtor]) ? owes[creditor][debtor] : 0;
+                        const net = dOwesC - cOwesD;
+                        if(net > 0.01) conclusions.push({ debtor, creditor, amount: net });
+                        else if(net < -0.01) conclusions.push({ debtor: creditor, creditor: debtor, amount: Math.abs(net) });
+                    }
+                });
+            });
+            return conclusions;
+        };
+
         // EXPORT TO EXCEL I SISTEMUAR (Kerkese 1 dhe 2)
         window.executeExcelExport = () => {
             const data = window.getFilteredExportData();
@@ -831,6 +863,19 @@
                 const sheetName = (`Paguar nga ${payerName}`).substring(0, 31).replace(/[\[\]\*\\\/\?\:]/g, "");
                 XLSX.utils.book_append_sheet(wb, wsPayer, sheetName);
             });
+
+            // SKELETI 3: Konkluzioni i Detyrimeve
+            const conclusions = window.getExportConclusions(txs);
+            const concHeaders = ["Borxhliu (Duhet të paguajë)", "Kreditori (I detyrohet)", "Shuma (Lekë)"];
+            const concRows = conclusions.map(c => {
+                const dName = window.users.find(u => u.id === c.debtor)?.name || 'I fshirë';
+                const cName = window.users.find(u => u.id === c.creditor)?.name || 'I fshirë';
+                return [dName, cName, parseFloat(c.amount.toFixed(2))];
+            });
+            if(concRows.length === 0) concRows.push(["Të gjitha llogaritë janë të lara", "-", 0]);
+            
+            const wsConc = XLSX.utils.aoa_to_sheet([concHeaders, ...concRows]);
+            XLSX.utils.book_append_sheet(wb, wsConc, "Konkluzioni i Detyrimeve");
 
             // Gjenero fajllin pa errore njoftimi fallco
             XLSX.writeFile(wb, `Raport_Shpenzimesh_${new Date().getTime()}.xlsx`);
@@ -914,6 +959,32 @@
                     headStyles: { fillColor: [51, 65, 85] },
                     footStyles: { fillColor: [241, 245, 249], textColor: [15, 23, 42], fontStyle: 'bold' }
                 });
+            });
+
+            // Përmbledhja e Aksioneve & Konkluzioni i Detyrimeve
+            let finalYConc = doc.lastAutoTable.finalY + 15;
+            if(finalYConc > 260) { doc.addPage(); finalYConc = 20; }
+            
+            doc.setFontSize(13);
+            doc.setTextColor(0);
+            doc.text("Përmbledhja e Aksioneve / Konkluzioni i Detyrimeve", 14, finalYConc);
+            
+            const conclusions = window.getExportConclusions(txs);
+            const concBody = conclusions.map(c => {
+                const dName = window.users.find(u => u.id === c.debtor)?.name || 'I fshirë';
+                const cName = window.users.find(u => u.id === c.creditor)?.name || 'I fshirë';
+                return [`${dName} duhet t'i paguajë ${cName}`, `${c.amount.toFixed(2)} L`];
+            });
+            
+            if(concBody.length === 0) concBody.push(["Të gjitha llogaritë midis këtyre personave janë të lara", "0.00 L"]);
+
+            doc.autoTable({
+                startY: finalYConc + 4,
+                head: [["Përshkrimi i Detyrimit", "Shuma"]],
+                body: concBody,
+                styles: { fontSize: 10, cellPadding: 4 },
+                headStyles: { fillColor: [220, 38, 38] },
+                alternateRowStyles: { fillColor: [254, 242, 242] }
             });
 
             doc.save(`Raport_Shpenzimesh_${new Date().getTime()}.pdf`);
