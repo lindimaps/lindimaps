@@ -762,10 +762,20 @@
             // Filtri i Përdoruesve (Zgjidh midis personave)
             const selectedUsers = Array.from(document.querySelectorAll('.export-chk-user:checked')).map(cb => cb.value);
             if (selectedUsers.length > 0) {
-                // Filtrojmë nëse së paku 1 nga personat e zgjedhur është pagues ose i përfshirë në transaksion
                 exportTxs = exportTxs.filter(t => {
                     const allInvolved = [t.paidBy, ...t.involvedUsers];
-                    return selectedUsers.some(uid => allInvolved.includes(uid));
+                    
+                    // KUSHTI RIGOROZ DHE PRIMAR: Transaksioni duhet të jetë EKSKLUZIVISHT midis personave të zgjedhur.
+                    // Kjo zhduk të gjithë personat e pa-filtruar (asnjë outsider nuk lejohet në këtë transaksion).
+                    const isStrictlyBetweenSelected = allInvolved.every(uid => selectedUsers.includes(uid));
+                    
+                    // KUSHTI "Përmendur Bashkë": Nëse zgjedhim 2 ose më shumë persona, 
+                    // kërkojmë që transaksioni të përfshijë të paktën 2 persona të ndryshëm nga ai grup i filtruar.
+                    // (Përjashton shpenzimet personale të 1 individi të vetëm kur po kërkojmë raport ndarjeje).
+                    const uniqueInvolved = [...new Set(allInvolved)];
+                    const isMentionedTogether = selectedUsers.length >= 2 ? uniqueInvolved.length >= 2 : true;
+
+                    return isStrictlyBetweenSelected && isMentionedTogether;
                 });
             }
 
