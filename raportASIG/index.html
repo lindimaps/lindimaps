@@ -2003,7 +2003,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Raporti_${specialisti.replace(/\s+/g, '_')}_${dateRange.replace(/\s+/g, '')}.xls`;
+            a.download = `${specialisti.replace(/\s+/g, '.')}.${dateRange.replace(/\s+/g, '')}.xls`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -2012,7 +2012,7 @@
         window.exportToPDF = () => {
             const dateRange = document.getElementById('rep-periudha').value;
             const specialisti = document.getElementById('rep-specialisti').value || 'Raporti';
-            const filename = `Raporti_${specialisti.replace(/\s+/g, '_')}_${dateRange.replace(/\s+/g, '')}.pdf`;
+            const filename = `${specialisti.replace(/\s+/g, '.')}.${dateRange.replace(/\s+/g, '')}.pdf`;
             
             showLoading();
             
