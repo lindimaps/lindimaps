@@ -185,7 +185,7 @@
             </div>
         </div>
         
-        <!-- SEKSIONI I PROFILEVE (Mbushet vetëm kur zgjidhet grupi) -->
+        <!-- SEKSIONI I PROFILEVE -->
         <div class="p-4 border-b border-slate-700 bg-slate-800/50 shrink-0 select-group-dependent hidden">
             <label class="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-2 block">Shto Profil në këtë Grup</label>
             <div class="flex gap-2">
@@ -612,29 +612,38 @@
                 setTimeout(() => document.getElementById('auth-screen').classList.add('hidden'), 300);
                 document.getElementById('login-password').value = ''; document.getElementById('reg-password').value = '';
                 
-                // 1. Shkarko Grupet
+                // 1. Shkarko Grupet në kohë reale me Error Handlers
                 const qGroups = query(collection(db, 'groups'), where('ownerUid', '==', user.uid));
                 unsubGroups = onSnapshot(qGroups, snapshot => {
                     window.groups = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                     renderGroupsDropdown();
+                }, error => {
+                    console.error("Groups real-time sync error:", error);
                 });
 
-                // 2. Shkarko Profilet
+                // 2. Shkarko Profilet në kohë reale me Error Handlers
                 const qUsers = query(collection(db, 'users'), where('ownerUid', '==', user.uid));
                 unsubUsers = onSnapshot(qUsers, snapshot => {
                     window.users = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                     if (window.selectedGroupId) {
                         window.renderUsers();
+                        if (window.selectedUserId) {
+                            window.renderTransactions();
+                        }
                     }
+                }, error => {
+                    console.error("Users real-time sync error:", error);
                 });
 
-                // 3. Shkarko Transaksionet
+                // 3. Shkarko Transaksionet në kohë reale me Error Handlers
                 const qTx = query(collection(db, 'transactions'), where('ownerUid', '==', user.uid));
                 unsubTx = onSnapshot(qTx, snapshot => {
                     window.transactions = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                     if (window.selectedGroupId && window.selectedUserId) {
                         window.renderTransactions();
                     }
+                }, error => {
+                    console.error("Transactions real-time sync error:", error);
                 });
 
                 if (window.innerWidth < 768) window.switchTab('form');
@@ -656,7 +665,13 @@
         window.addGroup = async () => {
             const name = document.getElementById('new-group-name').value.trim();
             if (name === '') return window.showToast('Emri i grupit nuk mund të jetë bosh.', 'error');
-            if (window.groups.some(g => g.name.toLowerCase() === name.toLowerCase())) return window.showToast('Ky grup ekziston!', 'error');
+            
+            // Kontrollojmë nëse ekziston grupi (pa pasur parasysh shkronjat e mëdha/vogla dhe hapësirat)
+            const groupExists = window.groups.some(g => g.name.trim().toLowerCase() === name.toLowerCase());
+            if (groupExists) {
+                return window.showToast('Ky grup ekziston!', 'error');
+            }
+
             try {
                 const docRef = await addDoc(collection(db, 'groups'), { name: name, ownerUid: auth.currentUser.uid, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
                 document.getElementById('new-group-name').value = '';
@@ -678,6 +693,14 @@
                 if (group.id === window.selectedGroupId) opt.selected = true;
                 dropdown.appendChild(opt);
             });
+
+            // Sinkronizimi i vlerës së zgjedhur në selektor
+            if (window.selectedGroupId) {
+                dropdown.value = window.selectedGroupId;
+                document.querySelectorAll('.select-group-dependent').forEach(el => el.classList.remove('hidden'));
+                document.getElementById('no-group-warning').classList.add('hidden');
+                document.getElementById('main-group-content').classList.remove('hidden');
+            }
         };
 
         window.selectGroup = (groupId) => {
@@ -702,7 +725,7 @@
             
             // Filtro profilet vetëm brenda këtij grupi
             const groupUsers = window.users.filter(u => u.groupId === window.selectedGroupId);
-            if (groupUsers.some(u => u.name.toLowerCase() === name.toLowerCase())) return window.showToast('Ky profil ekziston në këtë grup!', 'error'); 
+            if (groupUsers.some(u => u.name.trim().toLowerCase() === name.toLowerCase())) return window.showToast('Ky profil ekziston në këtë grup!', 'error'); 
             
             try { 
                 await addDoc(collection(db, 'users'), { 
@@ -738,7 +761,7 @@
 
         window.openEditModal = (id, currentName, e) => { e.stopPropagation(); document.getElementById('edit-user-id').value = id; document.getElementById('edit-user-name').value = currentName; document.getElementById('edit-modal').classList.remove('hidden'); };
         window.closeEditModal = () => document.getElementById('edit-modal').classList.add('hidden');
-        window.saveUserEdit = async () => { const id = document.getElementById('edit-user-id').value; const newName = document.getElementById('edit-user-name').value.trim(); if(newName === "") return; try { await updateDoc(doc(db, 'users', id), { name: newName, updatedAt: serverTimestamp() }); if(window.selectedUserId === id) document.getElementById('titulli-profilit').innerText = `Fatura: ${newName}`; window.closeEditModal(); window.showToast('U përditësua.', 'success'); } catch(e) { window.showToast('Gabim.', 'error'); } };
+        window.saveUserEdit = async () => { const id = document.getElementById('edit-user-id').value; const newName = document.getElementById('edit-user-name').value.trim(); if(newName === "") return; try { await updateDoc(doc(db, 'users', id), { name: newName, updatedAt: serverTimestamp() }); if(window.selectedUserId === id) document.getElementById('titulli-profilit').innerText = `Pasqyra: ${newName}`; window.closeEditModal(); window.showToast('U përditësua.', 'success'); } catch(e) { window.showToast('Gabim.', 'error'); } };
 
         window.renderUsers = () => {
             const listEl = document.getElementById('user-list'); const checkEl = document.getElementById('checkboxes-perdorues'); const payerSelect = document.getElementById('t-paguar-nga');
@@ -955,7 +978,7 @@
             if (debts.length === 0 && credits.length === 0) konkluzioniHtml = `<div class="p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-600"><i class="fas fa-thumbs-up text-blue-500"></i> <b>Konkluzioni:</b> Llogaria jote është plotësisht e shlyer (0.00 L).</div>`;
             document.getElementById('konkluzioni-container').innerHTML = konkluzioniHtml;
 
-            // --- RENDER SPREADSHEET MATRIX (Ashtu si në foto) ---
+            // --- RENDER SPREADSHEET MATRIX ---
             const ssHeader = document.getElementById('spreadsheet-header');
             const ssBody = document.getElementById('spreadsheet-body');
             if (ssHeader && ssBody) {
@@ -1055,7 +1078,7 @@
         window.closeProfileAnalytics = () => document.getElementById('profile-analytics-modal').classList.add('hidden');
 
         // ==========================================
-        // EKSPORTIMI SAKTIKUES NË EXCEL MATRICË (SI FOTO)
+        // EKSPORTIMI NË EXCEL MATRICË (SI FOTO)
         // ==========================================
         window.exportExcelMatrix = () => {
             if (!window.selectedGroupId) return window.showToast("Zgjidhni një grup më parë.", "error");
@@ -1070,7 +1093,6 @@
 
             const wb = XLSX.utils.book_new();
 
-            // Krijojmë headerat saktësisht si në foto
             const headers = ["Date", "Description", "Category", "Cost", "Currency"];
             activeGroupUsers.forEach(u => headers.push(u.name));
 
@@ -1078,7 +1100,6 @@
             let userSpreadsheetTotals = {};
             activeGroupUsers.forEach(u => { userSpreadsheetTotals[u.id] = 0; });
 
-            // Plotësojmë çdo rresht transaksioni
             currentGroupTransactions.forEach(t => {
                 const d = new Date(t.date);
                 const dateFormatted = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
@@ -1110,7 +1131,6 @@
                 rows.push(row);
             });
 
-            // Shtojmë rreshtin "Total balance" në fund saktësisht si në foto
             const totalRow = ["Total balance", "", "", "", "ALL"];
             activeGroupUsers.forEach(u => {
                 totalRow.push(parseFloat(userSpreadsheetTotals[u.id].toFixed(2)));
@@ -1125,7 +1145,7 @@
         };
 
         // ==========================================
-        // EKSPORTIMI SAKTIKUES NË PDF MATRICË (SI FOTO)
+        // EKSPORTIMI NË PDF MATRICË (SI FOTO)
         // ==========================================
         window.exportPDFMatrix = () => {
             if (!window.selectedGroupId) return window.showToast("Zgjidhni një grup më parë.", "error");
@@ -1138,7 +1158,7 @@
                 return window.showToast("Nuk ka transaksione në këtë grup për t'u eksportuar.", "warning");
             }
 
-            const doc = new window.jspdf.jsPDF('landscape'); // Landscape përshtatet më mirë për formatin e gjerë matricë
+            const doc = new window.jspdf.jsPDF('landscape'); 
             
             doc.setFontSize(14);
             const activeGroup = window.groups.find(g => g.id === window.selectedGroupId);
@@ -1184,7 +1204,6 @@
                 rows.push(row);
             });
 
-            // Shto rreshtin Total balance në fund
             const totalRow = ["Total balance", "", "", "", "ALL"];
             activeGroupUsers.forEach(u => {
                 totalRow.push(userSpreadsheetTotals[u.id].toFixed(2));
@@ -1197,12 +1216,7 @@
                 body: rows,
                 styles: { fontSize: 8, cellPadding: 2 },
                 headStyles: { fillColor: [51, 65, 85] },
-                rowStyles: {
-                    // Vendos ngjyrë të veçantë për rreshtin e fundit të totalit
-                    fontStyle: 'bold'
-                },
                 didParseCell: function (data) {
-                    // Nëse jemi te rreshti i fundit (Total balance), e bëjmë bold dhe me sfond gri të hapur
                     if (data.row.index === rows.length - 1) {
                         data.cell.styles.fontStyle = 'bold';
                         data.cell.styles.fillColor = [241, 245, 249];
