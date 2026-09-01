@@ -2343,7 +2343,10 @@ window.changeVacationMonth = (offset) => { currentVacationDate = new Date(curren
 
 window.toggleVacationDay = async (dStr) => {
 const user = auth.currentUser; if(!user) return;
-const isWkd = [0, 6].includes(new Date(dStr).getDay()); const hols = getHolidaysForYear(); if (hols[dStr] || isWkd) return;
+
+// Kemi hequr bllokimin e klikimit per fundjavat dhe festat
+// const isWkd = [0, 6].includes(new Date(dStr).getDay()); const hols = getHolidaysForYear(); if (hols[dStr] || isWkd) return;
+
 const isVacation = vacationYearData.selected.includes(dStr); const isMedical = vacationYearData.medical?.includes(dStr);
 if (isVacation || isMedical) {
 const type = isVacation ? 'selected' : 'medical'; const label = isVacation ? 'lejen' : 'raportin mjekësor';
@@ -2371,7 +2374,13 @@ for (let d = 1; d <= dInM; d++) {
 const dStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 const isHol = hols[dStr]; const isSel = vacationYearData.selected.includes(dStr); const isMed = vacationYearData.medical?.includes(dStr); const isWkd = [0, 6].includes(new Date(dStr).getDay());
 let cellClass = "bg-white border-slate-100 text-slate-600 shadow-sm"; let labelText = "";
-if (isHol) { cellClass = "bg-red-50 text-red-500 font-bold border-red-100"; labelText = `<span class="text-[5px] uppercase truncate w-full px-1 text-center font-bold">${isHol}</span>`; } else if (isWkd) { cellClass = "bg-slate-50 text-slate-200 border-transparent cursor-default"; } else if (isSel) { cellClass = "bg-blue-600 text-white shadow-lg border-blue-600"; labelText = `<span class="text-[5px] uppercase font-bold">Leje</span>`; } else if (isMed) { cellClass = "bg-orange-500 text-white shadow-lg border-orange-500"; labelText = `<span class="text-[5px] uppercase font-bold">Raport</span>`; }
+
+// Ndryshimi: IsSel (Leja) dhe isMed (Raporti) kane prioritet ngjyre mbi isHol dhe isWkd
+if (isSel) { cellClass = "bg-blue-600 text-white shadow-lg border-blue-600"; labelText = `<span class="text-[5px] uppercase font-bold">Leje</span>`; } 
+else if (isMed) { cellClass = "bg-orange-500 text-white shadow-lg border-orange-500"; labelText = `<span class="text-[5px] uppercase font-bold">Raport</span>`; }
+else if (isHol) { cellClass = "bg-red-50 text-red-500 font-bold border-red-100"; labelText = `<span class="text-[5px] uppercase truncate w-full px-1 text-center font-bold">${isHol}</span>`; } 
+else if (isWkd) { cellClass = "bg-slate-50 text-slate-400 border-transparent cursor-pointer"; } 
+
 html += `<div onclick="toggleVacationDay('${dStr}')" class="h-12 md:h-16 rounded-2xl border flex flex-col items-center justify-center cursor-pointer transition-all ${cellClass}"><span class="text-sm font-black">${d}</span>${labelText}</div>`;
 }
 document.getElementById('v-calendar-grid').innerHTML = html;
