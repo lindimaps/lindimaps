@@ -221,11 +221,26 @@ rawData.forEach(d => {
 });
 
 require([
-    "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", 
-    "esri/layers/TileLayer", "esri/layers/WebTileLayer", "esri/Basemap",
-    "esri/widgets/LayerList", "esri/widgets/Compass", "esri/widgets/ScaleBar",
-    "esri/geometry/geometryEngine"
-], (Map, MapView, FeatureLayer, TileLayer, WebTileLayer, Basemap, LayerList, Compass, ScaleBar, geometryEngine) => {
+    "esri/Map",
+    "esri/views/MapView",
+    "esri/layers/FeatureLayer",
+    "esri/layers/TileLayer",
+    "esri/layers/WebTileLayer",
+    "esri/Basemap",
+    "esri/widgets/LayerList",
+    "esri/widgets/Compass",
+    "esri/widgets/ScaleBar"
+], function (
+    Map,
+    MapView,
+    FeatureLayer,
+    TileLayer,
+    WebTileLayer,
+    Basemap,
+    LayerList,
+    Compass,
+    ScaleBar
+) {
 
     const asigBasemaps = {
         "2025": new Basemap({ baseLayers: [new TileLayer({ url: "https://di-albania-satellite1.img.arcgis.com/arcgis/rest/services/rgb/Albania_2025_L3/MapServer" })], title: "Ortofoto 2025" }),
