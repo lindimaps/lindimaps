@@ -245,19 +245,7 @@ require([
     const asigBasemaps = {
         "2025": new Basemap({ baseLayers: [new TileLayer({ url: "https://di-albania-satellite1.img.arcgis.com/arcgis/rest/services/rgb/Albania_2025_L3/MapServer" })], title: "Ortofoto 2025" }),
         "2024": new Basemap({ baseLayers: [new TileLayer({ url: "https://di-albania-satellite1.img.arcgis.com/arcgis/rest/services/rgb/Albania_2024L3/MapServer" })], title: "Ortofoto 2024" }),
-       "2023": new Basemap({
-    baseLayers: [
-        new WMTSLayer({
-            url: "https://di-albania-satellite1.img.arcgis.com/arcgis/rest/services/rgb/Albania2023RGBwgs84/MapServer/WMTS",
-            serviceMode: "KVP",
-            activeLayer: {
-                id: "rgb_Albania2023RGBwgs84",
-                tileMatrixSetId: "GoogleMapsCompatible"
-            }
-        })
-    ],
-    title: "Ortofoto 2023"
-}),
+       "2023": new Basemap({ baseLayers: [new TileLayer({ url: "https://di-albania-satellite1.img.arcgis.com/arcgis/rest/services/rgb/Albania2023RGBwgs84/MapServer" })], title: "Ortofoto 2023" }),
 
     const pyjeUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Pyjet_n%C3%AB_Zonat_e_Mbrojtura/FeatureServer/0";
     const bashkiUrl = "https://services-eu1.arcgis.com/omB9pKT6MaKdkhUH/arcgis/rest/services/Kufi_Bashkie/FeatureServer/0";
