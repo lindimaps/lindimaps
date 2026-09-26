@@ -1,0 +1,269 @@
+{
+  "home": {
+    "_id": "lindimaps-home",
+    "_type": "homePage",
+    "heroTitleSq": "E ardhmja përmes GIS",
+    "heroTextSq": "Konsulencë dhe zgjidhje profesionale për hartat dhe analizat tuaja hapësinore.",
+    "primaryCtaSq": "Eksploro Shërbimet",
+    "secondaryCtaSq": "Na Kontaktoni",
+    "heroTitleEn": "The future through GIS",
+    "heroTextEn": "Professional consulting and solutions for your spatial maps and analysis.",
+    "primaryCtaEn": "Explore Services",
+    "secondaryCtaEn": "Contact Us"
+  },
+  "settings": {
+    "_id": "lindimaps-settings",
+    "_type": "siteSettings",
+    "siteName": "LindiMaps",
+    "email": "contact.lindimaps@gmail.com",
+    "locationSq": "Tiranë, Shqipëri",
+    "locationEn": "Tirana, Albania",
+    "useStarterContent": false,
+    "linkedin": "https://www.linkedin.com/in/erland-alla/",
+    "researchGate": "https://www.researchgate.net/profile/Erland-Alla"
+  },
+  "services": [
+    {
+      "_id": "lindimaps-service-1",
+      "_type": "service",
+      "order": 1,
+      "titleSq": "Sistemet GIS",
+      "descriptionSq": "Implementimi i bazave të të dhënave gjeografike, analizave hapësinore dhe hartografisë tematike për sektorin publik dhe privat.",
+      "imageUrl": "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&q=80&w=800",
+      "titleEn": "GIS Systems",
+      "descriptionEn": "Implementation of geographic databases, spatial analysis, and thematic cartography for the public and private sectors."
+    },
+    {
+      "_id": "lindimaps-service-2",
+      "_type": "service",
+      "order": 2,
+      "titleSq": "Fotogrametri",
+      "descriptionSq": "Përpunimi i imazheve nga dronët për gjenerimin e modeleve 3D, ortofotove me rezolucion të lartë dhe modeleve të lartësisë (DSM/DTM).",
+      "imageUrl": "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&q=80&w=800",
+      "titleEn": "Photogrammetry",
+      "descriptionEn": "Processing drone imagery for the generation of 3D models, high-resolution orthophotos, and elevation models (DSM/DTM)."
+    },
+    {
+      "_id": "lindimaps-service-3",
+      "_type": "service",
+      "order": 3,
+      "titleSq": "Analizë Territori",
+      "descriptionSq": "Studime mbi përdorimin e tokës, monitorimin e zonave urbane dhe vlerësimin e rreziqeve natyrore përmes metodave gjeo-hapësinore.",
+      "imageUrl": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
+      "titleEn": "Territory Analysis",
+      "descriptionEn": "Studies on land use, urban area monitoring, and natural risk assessment through geospatial methods."
+    },
+    {
+      "_id": "lindimaps-service-4",
+      "_type": "service",
+      "order": 4,
+      "titleSq": "Kadastra Dixhitale",
+      "descriptionSq": "Dixhitalizimi i parcelave dhe objekteve, përditësimi i të dhënave kadastrale dhe integrimi në platformat GIS.",
+      "imageUrl": "https://www.magnasoft.com/wp-content/uploads/2023/09/Envisioning-the-Future-The-Digital-Transformation-of-Land-Administration-and-Cadastral-Mapping-scaled.jpg",
+      "titleEn": "Digital Cadastre",
+      "descriptionEn": "Digitization of parcels and objects, updating cadastral data, and integration into GIS platforms."
+    },
+    {
+      "_id": "lindimaps-service-5",
+      "_type": "service",
+      "order": 5,
+      "titleSq": "Konsulencë Teknike",
+      "descriptionSq": "Asistencë profesionale në zgjedhjen e teknologjive hapësinore dhe menaxhimin e projekteve të infrastrukturës.",
+      "imageUrl": "https://cdn.prod.website-files.com/65818ff33a5087c1f3bbb728/66a78c4f7819b56edf3f56d4_20240729T1230-f7afc7e9-34ae-486d-9c7e-b356f8259dc2.jpeg",
+      "titleEn": "Technical Consulting",
+      "descriptionEn": "Professional assistance in selecting spatial technologies and managing infrastructure projects."
+    },
+    {
+      "_id": "lindimaps-service-6",
+      "_type": "service",
+      "order": 6,
+      "titleSq": "Web GIS Developer",
+      "descriptionSq": "Krijimi i hartave dhe aplikacioneve Web GIS.",
+      "imageUrl": "https://www.openware.com.kw/content/dam/esrisites/en-us/arcgis/products/web-appbuilder/images/banner-screens-web-app-builder.jpg",
+      "titleEn": "Web GIS Developer",
+      "descriptionEn": "Creation of interactive maps and Web GIS applications."
+    }
+  ],
+  "projects": [
+    {
+      "_id": "lindimaps-project-1",
+      "_type": "project",
+      "slug": {
+        "_type": "slug",
+        "current": "webgis-lubonje"
+      },
+      "order": 1,
+      "category": "webgis",
+      "year": 2024,
+      "featured": true,
+      "titleSq": "Ndërtimi WEB GIS Lubonjë",
+      "summarySq": "Platformë interaktive për dokumentimin e zonave të trashëgimisë kulturore. Mundëson akses në të dhënat hapësinore përmes teknologjisë cloud.",
+      "imageUrl": "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1200",
+      "liveUrl": "https://storymaps.arcgis.com/stories/43523107564d461fbb8ea118df18efd3",
+      "titleEn": "Building WEB GIS Lubonjë",
+      "summaryEn": "Interactive platform for documenting cultural heritage areas. Enables access to spatial data through cloud technology."
+    },
+    {
+      "_id": "lindimaps-project-2",
+      "_type": "project",
+      "slug": {
+        "_type": "slug",
+        "current": "monitorimi-pyjeve"
+      },
+      "order": 2,
+      "category": "remote-sensing",
+      "year": 2024,
+      "featured": true,
+      "titleSq": "Monitorimi i Pyjeve",
+      "summarySq": "Analizë gjeohapësinore e mbulesës tokës duke përdorur Inteligjencën Artificiale për identifikimin e ndryshimeve në biomasë.",
+      "imageUrl": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200",
+      "titleEn": "Forest Monitoring",
+      "summaryEn": "Geospatial analysis of land cover using Artificial Intelligence to identify changes in biomass."
+    },
+    {
+      "_id": "lindimaps-project-3",
+      "_type": "project",
+      "slug": {
+        "_type": "slug",
+        "current": "kalaja-lezhe-3d"
+      },
+      "order": 3,
+      "category": "3d",
+      "year": 2025,
+      "featured": true,
+      "titleSq": "Kalaja Lezhë 3D",
+      "summarySq": "Gjenerimi i modeleve 3D të kalasë së Lezhës duke përdorur fotogrametrinë për ruajtjen dixhitale të monumentit.",
+      "imageUrl": "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1200",
+      "liveUrl": "https://storymaps.arcgis.com/stories/136af9b1b3be4e889d61f2b25a7f64a4",
+      "titleEn": "Lezhë Castle 3D",
+      "summaryEn": "Generation of 3D models of Lezhë Castle using photogrammetry for the digital preservation of the monument."
+    }
+  ],
+  "profile": {
+    "_id": "lindimaps-profile",
+    "_type": "profile",
+    "name": "Erland Alla",
+    "headlineSq": "Ekspert në Gjeoinformatikë",
+    "bioSq": [
+      {
+        "_key": "p0",
+        "_type": "block",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_key": "s0",
+            "_type": "span",
+            "text": "Inxhinier gjeoinformatikë me përvojë të gjerë në analizën gjeohapësinore, përpunimin e të dhënave satelitore dhe implementimin e teknologjive GIS në projekte kombëtare dhe ndërkombëtare.",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_key": "p1",
+        "_type": "block",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_key": "s1",
+            "_type": "span",
+            "text": "Fokusi im kryesor qëndron në zhvillimin e produkteve të avancuara gjeohapësinore që mbështesin vendimmarrjen e bazuar në të dhëna dhe bashkëpunimin ndërdisiplinor.",
+            "marks": []
+          }
+        ]
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/erland-alla/",
+    "researchGate": "https://www.researchgate.net/profile/Erland-Alla",
+    "scholar": "https://scholar.google.com/citations?user=8HofjlEAAAAJ&hl=en",
+    "orcid": "https://orcid.org/0009-0008-5121-7564",
+    "headlineEn": "Expert in Geoinformatics",
+    "bioEn": [
+      {
+        "_key": "p0",
+        "_type": "block",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_key": "s0",
+            "_type": "span",
+            "text": "Geoinformatics engineer with extensive experience in geospatial analysis, satellite data processing, and the implementation of GIS technologies in national and international projects.",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_key": "p1",
+        "_type": "block",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_key": "s1",
+            "_type": "span",
+            "text": "My main focus lies in developing advanced geospatial products that support data-driven decision making and interdisciplinary collaboration.",
+            "marks": []
+          }
+        ]
+      }
+    ]
+  },
+  "about": {
+    "_id": "lindimaps-about",
+    "_type": "aboutPage",
+    "history": [
+      {
+        "_key": "history-0",
+        "_type": "aboutItem",
+        "titleSq": "Fillimet",
+        "descriptionSq": "Fillimi i konceptit të një platforme që pasqyron pasionin dhe përvojën time në fushën e Gjeoinformacionit (GIS)",
+        "titleEn": "The Beginnings",
+        "descriptionEn": "The inception of a platform concept reflecting my passion and experience in the field of Geoinformation (GIS)."
+      },
+      {
+        "_key": "history-1",
+        "_type": "aboutItem",
+        "titleSq": "Zgjerimi",
+        "descriptionSq": "Integrimi i teknologjive GIS dhe Remote Sensing në bashkëpunimet e para me sektorin publik.",
+        "titleEn": "Expansion",
+        "descriptionEn": "Integration of GIS and Remote Sensing technologies in the initial collaborations with the public sector."
+      },
+      {
+        "_key": "history-2",
+        "_type": "aboutItem",
+        "titleSq": "Risi në GIS",
+        "descriptionSq": "Një pikë referimi për zgjidhje dhe planifikime të ndryshme gjeohapësinore.",
+        "titleEn": "Innovation in GIS",
+        "descriptionEn": "A reference point for various geospatial solutions and planning."
+      }
+    ],
+    "values": [
+      {
+        "_key": "values-0",
+        "_type": "aboutItem",
+        "titleSq": "Inovacioni",
+        "descriptionSq": "Përdorimi i teknologjive më të fundit satelitore dhe GIS për zgjidhje territoriale.",
+        "titleEn": "Innovation",
+        "descriptionEn": "Use of the latest satellite and GIS technologies for territorial solutions."
+      },
+      {
+        "_key": "values-1",
+        "_type": "aboutItem",
+        "titleSq": "Saktësia",
+        "descriptionSq": "Integriteti i të dhënave gjeohapësinore si prioritet absolut në çdo projekt.",
+        "titleEn": "Accuracy",
+        "descriptionEn": "Integrity of geospatial data as an absolute priority in every project."
+      },
+      {
+        "_key": "values-2",
+        "_type": "aboutItem",
+        "titleSq": "Integriteti",
+        "descriptionSq": "Transparencë dhe profesionalizëm në trajtimin e projekteve.",
+        "titleEn": "Integrity",
+        "descriptionEn": "Transparency and professionalism in handling projects."
+      }
+    ]
+  }
+}

@@ -1,3 +1,6 @@
+import { SiteHeader, SiteFooter } from "./site-shell";
+import { Catalogue } from "./catalogue";
+import { routes } from "@/lib/routes";
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -67,62 +70,12 @@ export default async function Home({ lang }: { lang: Language }) {
   const { home, settings, projects, services } = await getSiteContent();
   const t = copy[lang];
   const email = settings?.email?.trim() || "contact.lindimaps@gmail.com";
-  const name = settings?.siteName || "LindiMaps";
   const heroImage =
     safeUrl(home?.image) ||
     "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1920&q=80";
   return (
     <>
-      <a className="skip" href="#main">
-        {t.skip}
-      </a>
-      <header className="site-header" id="top">
-        <div className="container nav-row">
-          <Link className="brand" href={lang === "sq" ? "/" : "/en"}>
-            {safeUrl(settings?.logo) ? (
-              <img
-                src={safeUrl(settings?.logo)}
-                alt={name}
-                width="150"
-                height="48"
-              />
-            ) : (
-              <>
-                <span className="brand-mark" aria-hidden="true">
-                  L<span>·</span>
-                </span>
-                {name}
-              </>
-            )}
-          </Link>
-          <nav
-            aria-label={lang === "sq" ? "Navigimi kryesor" : "Main navigation"}
-          >
-            <a href="#services">{t.services}</a>
-            <a href="#projects">{t.projects}</a>
-            <a href="#contact">{t.contact}</a>
-          </nav>
-          <div
-            className="languages"
-            aria-label={lang === "sq" ? "Gjuha" : "Language"}
-          >
-            <Link
-              href="/"
-              hrefLang="sq"
-              aria-current={lang === "sq" ? "page" : undefined}
-            >
-              SQ
-            </Link>
-            <Link
-              href="/en"
-              hrefLang="en"
-              aria-current={lang === "en" ? "page" : undefined}
-            >
-              EN
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SiteHeader lang={lang} page="home" settings={settings} />
       <main id="main">
         <section className="hero">
           <img
@@ -138,14 +91,14 @@ export default async function Home({ lang }: { lang: Language }) {
               {localized(home, "heroText", lang, t.text)}
             </p>
             <div className="actions">
-              <a className="button" href="#services">
+              <Link className="button" href={routes.services[lang]}>
                 {localized(home, "primaryCta", lang, t.explore)}
                 <Arrow />
-              </a>
-              <a className="button secondary" href="#contact">
+              </Link>
+              <Link className="button secondary" href={routes.contact[lang]}>
                 {localized(home, "secondaryCta", lang, t.contactCta)}
                 <Arrow />
-              </a>
+              </Link>
             </div>
           </div>
         </section>
@@ -158,92 +111,13 @@ export default async function Home({ lang }: { lang: Language }) {
           <div className="container">
             <p className="eyebrow">01 / {t.services}</p>
             <h2>{t.services}</h2>
-            <div className="grid">
-              {services.length ? (
-                services.map((item) => (
-                  <article className="card" key={item._id}>
-                    {safeUrl(item.image) && (
-                      <img
-                        className="service-icon"
-                        src={safeUrl(item.image)}
-                        alt=""
-                        width="56"
-                        height="56"
-                        loading="lazy"
-                      />
-                    )}
-                    <h3>
-                      {localized(
-                        item,
-                        "title",
-                        lang,
-                        lang === "en" ? "Service" : "Shërbim",
-                      )}
-                    </h3>
-                    <p>{localized(item, "description", lang)}</p>
-                  </article>
-                ))
-              ) : (
-                <p className="empty">{t.emptyServices}</p>
-              )}
-            </div>
+            <Catalogue items={services} lang={lang} kind="services" />
           </div>
         </section>
         <section className="section container" id="projects">
           <p className="eyebrow">02 / {t.projects}</p>
           <h2>{t.projects}</h2>
-          <div className="grid">
-            {projects.length ? (
-              projects.map((item) => (
-                <article className="card project" key={item._id}>
-                  {safeUrl(item.image) && (
-                    <img
-                      className="project-image"
-                      src={safeUrl(item.image)}
-                      alt={localized(item, "title", lang)}
-                      width="640"
-                      height="400"
-                      loading="lazy"
-                    />
-                  )}
-                  <div className="project-body">
-                    <p className="eyebrow">
-                      {[item.category, item.year].filter(Boolean).join(" / ")}
-                    </p>
-                    <h3>
-                      {localized(
-                        item,
-                        "title",
-                        lang,
-                        lang === "en" ? "Project" : "Projekt",
-                      )}
-                    </h3>
-                    <p>{localized(item, "summary", lang)}</p>
-                    {item.technologies?.length ? (
-                      <ul className="tags">
-                        {item.technologies.map((technology, index) => (
-                          <li key={`${technology}-${index}`}>{technology}</li>
-                        ))}
-                      </ul>
-                    ) : null}
-                    {safeUrl(item.liveUrl) && (
-                      <a
-                        className="text-link"
-                        href={safeUrl(item.liveUrl)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {t.open}
-                        <Arrow />
-                      </a>
-                    )}
-                  </div>
-                </article>
-              ))
-            ) : (
-              <p className="empty">{t.emptyProjects}</p>
-            )}
-          </div>
+          <Catalogue items={projects} lang={lang} kind="projects" />
         </section>
         <section className="contact" id="contact">
           <div className="container">
@@ -280,14 +154,7 @@ export default async function Home({ lang }: { lang: Language }) {
           </div>
         </section>
       </main>
-      <footer>
-        <div className="container footer-row">
-          <p>
-            © {new Date().getFullYear()} {name}. {t.rights}
-          </p>
-          <a href="#top">{t.back} ↑</a>
-        </div>
-      </footer>
+      <SiteFooter lang={lang} settings={settings} />
     </>
   );
 }

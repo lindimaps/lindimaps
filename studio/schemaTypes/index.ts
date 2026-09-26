@@ -1,3 +1,4 @@
+import {aboutPageType} from './aboutPage'
 import {projectType} from './project'
 import {publicationType} from './publication'
 import {activityType} from './activity'
@@ -9,6 +10,7 @@ import {homePageType} from './homePage'
 import {siteSettingsType} from './siteSettings'
 
 export const schemaTypes = [
+  aboutPageType,
   projectType,
   publicationType,
   activityType,
