@@ -1,36 +1,19 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LindiMaps — Next.js
 
-## Getting Started
+Run `npm ci` and `npm run dev` in `web/`. The Albanian homepage is `/`; English is `/en`.
 
-First, run the development server:
+## Sanity
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Server-side queries read published `homePage`, `siteSettings`, `service`, and `project` documents from project `oyagunrg`, dataset `production`. Public identifiers have defaults; optional overrides are in `.env.example`. No write token is needed for the public dataset. Queries use the published perspective and revalidate every 60 seconds; a subsequent request triggers cache refresh. Publishing in Studio does not require a new deployment.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Create and **Publish** Home and Site settings, then Services and Projects in Studio. Fill both SQ and EN fields. Empty fields use the homepage defaults; empty collections show an honest empty state. Projects link to their Live URL when provided. If multiple Home/settings documents exist, the most recently updated published document is used. Fetch failures are logged on the server and fall back to base content.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Validation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`npm run lint` and `npm run build`.
 
-## Learn More
+## Vercel
 
-To learn more about Next.js, take a look at the following resources:
+Import this repository using Next.js and set **Root Directory** to `web`. The standard build is `npm run build`; no custom output directory is required. First verify a preview deployment. The existing static site and GitHub Pages configuration remain at the repository root.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This is the first CMS-connected homepage. Other existing static pages, interactive maps, academy, publications, and internal tools have not yet been ported. Do not move the production domain until their migration and URL handling have been verified.
