@@ -10,9 +10,10 @@ export async function contentMetadata(lang:Language,page:PageKey):Promise<Metada
 function Biography({blocks}:{blocks?:TextBlock[]}){return <div className="prose">{blocks?.filter(b=>b._type==="block").map(b=><p key={b._key}>{b.children?.map(s=>s.text).join("")}</p>)}</div>}
 export default async function ContentPage({lang,page,projectCategory}:{lang:Language;page:Exclude<PageKey,"home">;projectCategory?:string}){
  const data=await getSiteContent();const {profile,settings,about}=data;const sq=lang==="sq";
- const projectFilters=[["gis","GIS"],["webgis","WebGIS"],["remote-sensing","Remote Sensing"],["3d","3D"]] as const;
+ const fallbackProjectFilters=[["gis","GIS"],["webgis","WebGIS"],["remote-sensing","Remote Sensing"],["3d","3D"]] as const;
+ const projectFilters=data.projectCategories.length?data.projectCategories.map(category=>[category.slug,localized(category,"title",lang,category.titleSq||category.slug)] as const):fallbackProjectFilters;
  const activeProjectCategory=projectFilters.some(([value])=>value===projectCategory)?projectCategory:undefined;
- const visibleProjects=activeProjectCategory?data.projects.filter(item=>item.category===activeProjectCategory):data.projects;
+ const visibleProjects=activeProjectCategory?data.projects.filter(item=>item.categories?.some(category=>category.slug===activeProjectCategory)||item.category===activeProjectCategory):data.projects;
  return <><SiteHeader lang={lang} page={page} settings={settings}/><main id="main" tabIndex={-1}>
   <section className="page-heading container"><p className="eyebrow">LindiMaps / {labels[lang][page]}</p><h1>{labels[lang][page]}</h1></section>
   {page==="services"&&<section className="container content-section services-editorial"><div className="section-signature"><span>01</span><i></i><small>GIS CAPABILITIES</small></div><div className="editorial-intro"><p className="eyebrow">{sq?"GIS · Remote Sensing · WebGIS":"GIS · Remote Sensing · WebGIS"}</p><h2>{sq?"Zgjidhje gjeohapësinore nga analiza te aplikacioni.":"Geospatial solutions from analysis to application."}</h2></div><Catalogue items={data.services} lang={lang} kind="services"/></section>}

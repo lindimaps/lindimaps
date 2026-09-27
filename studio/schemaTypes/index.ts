@@ -9,6 +9,7 @@ import {profileType} from './profile'
 import {homePageType} from './homePage'
 import {siteSettingsType} from './siteSettings'
 import {teamMemberType} from './teamMember'
+import {projectCategoryType} from './projectCategory'
 
 export const schemaTypes = [
   aboutPageType,
@@ -22,4 +23,5 @@ export const schemaTypes = [
   homePageType,
   siteSettingsType,
   teamMemberType,
+  projectCategoryType,
 ]
