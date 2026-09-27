@@ -7,7 +7,7 @@ export type Activity={_id:string;titleSq?:string;titleEn?:string;kind?:string;da
 export type GalleryItem={_id:string;titleSq?:string;titleEn?:string;captionSq?:string;captionEn?:string;image?:string;tags?:string[]};
 export type TeamMember={_id:string;name:string;roleSq?:string;roleEn?:string;bioSq?:string;bioEn?:string;image?:string;email?:string;linkedin?:string;order?:number;featured?:boolean};
 export type Partner={_id:string;name:string;roleSq?:string;roleEn?:string;logo?:string;url?:string};
-export type Publication = {_id:string;title:string;titleEn?:string;publicationType?:string;authors?:string[];year?:number;publisher?:string;doi?:string;url?:string;pdfUrl?:string;citation?:string;keywords?:string[];abstractSq?:string;abstractEn?:string;image?:string;featured?:boolean};
+export type Publication = {_id:string;title:string;titleEn?:string;publicationType?:string;authors?:string[];year?:number;publisher?:string;doi?:string;url?:string;pdfUrl?:string;citation?:string;citationEn?:string;keywords?:string[];abstractSq?:string;abstractEn?:string;image?:string;featured?:boolean};
 export type TextBlock={_key:string;_type:string;children?:{_key:string;text:string}[]};
 export type SiteContent={
  home:(Localized&{image?:string})|null;
@@ -27,7 +27,7 @@ const query=`{
  "profile": *[_type=="profile"]|order(_updatedAt desc)[0]{...,"image":photo.asset->url},
  "about": *[_type=="aboutPage"]|order(_updatedAt desc)[0]{history,values},
  "services": *[_type=="service"]|order(order asc,_createdAt asc){_id,titleSq,titleEn,descriptionSq,descriptionEn,"image":coalesce(icon.asset->url,imageUrl)},
- "publications": *[_type=="publication"]|order(featured desc,year desc,_createdAt desc){_id,title,titleEn,publicationType,authors,year,publisher,doi,url,citation,keywords,abstractSq,abstractEn,featured,"image":coverImage.asset->url,"pdfUrl":pdf.asset->url},
+ "publications": *[_type=="publication"]|order(featured desc,year desc,_createdAt desc){_id,title,titleEn,publicationType,authors,year,publisher,doi,url,citation,citationEn,keywords,abstractSq,abstractEn,featured,"image":coverImage.asset->url,"pdfUrl":pdf.asset->url},
  "activities": *[_type=="activity"]|order(date desc,_createdAt desc){_id,titleSq,titleEn,kind,date,location,descriptionSq,descriptionEn,url,"image":image.asset->url},
  "gallery": *[_type=="galleryItem"]|order(_createdAt desc){_id,titleSq,titleEn,captionSq,captionEn,tags,"image":image.asset->url},
  "partners": *[_type=="partner"]|order(order asc,name asc){_id,name,roleSq,roleEn,url,"logo":coalesce(logo.asset->url,logoUrl)},
