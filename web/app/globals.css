@@ -485,20 +485,12 @@ body:has(.home-map-hero) main{padding-top:0}
 @media(max-width:900px){.site-header.home-site-header{background:linear-gradient(180deg,rgba(3,15,25,.88),rgba(3,15,25,.35) 75%,transparent)!important}body:has(.site-header.home-site-header) main:not(:has(.home-map-hero)){padding-top:76px}}
 
 
-/* Home Projects: reuse the approved Projects portfolio card standard inside the dark showcase */
-.projects-showcase .project-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:30px}
-.projects-showcase .catalogue-card{border-radius:12px;overflow:hidden;background:#fff;color:#0f172a;border:1px solid rgba(255,255,255,.14);box-shadow:none}
-.projects-showcase .catalogue-card:first-child{grid-column:1/-1;display:grid;grid-template-columns:1.15fr .85fr}
-.projects-showcase .catalogue-card:first-child .card-media,.projects-showcase .catalogue-card:first-child .project-image{height:100%;min-height:430px}
-.projects-showcase .catalogue-card:not(:first-child) .project-image,.projects-showcase .catalogue-card:not(:first-child) .card-placeholder{height:290px}
-.projects-showcase .project-body{padding:32px}
-.projects-showcase .catalogue-card:first-child .project-body{padding:48px;display:flex;flex-direction:column;justify-content:center}
-.projects-showcase .catalogue-card:first-child h3{font-size:clamp(2rem,3.5vw,3.5rem)}
-.projects-showcase .catalogue-card p,.projects-showcase .catalogue-card small{color:#64748b}
+/* Home Projects: use the same approved project-card system as the Projects page */
+.projects-showcase .project-grid{grid-template-columns:1fr!important;gap:42px!important}
+.projects-showcase .catalogue-card.projects{color:#0f172a!important}
+.projects-showcase .catalogue-card.projects p,.projects-showcase .catalogue-card.projects small{color:#64748b}
 .projects-showcase .project-meta span{border-color:#dce4eb;color:#526277}
 .projects-showcase .project-tech li{background:#f3f6f9;color:#526277}
-.projects-showcase .catalogue-card:hover{border-color:#c8d6e2;background:#fff;transform:translateY(-4px)}
-@media(max-width:900px){.projects-showcase .project-grid{grid-template-columns:1fr}.projects-showcase .catalogue-card:first-child{grid-column:auto;display:block}.projects-showcase .catalogue-card:first-child .card-media,.projects-showcase .catalogue-card:first-child .project-image{min-height:0;height:270px}.projects-showcase .catalogue-card:first-child .project-body{padding:30px}.projects-showcase .catalogue-card:first-child h3{font-size:2rem}}
 
 
 /* Final accessibility/performance safeguards */
