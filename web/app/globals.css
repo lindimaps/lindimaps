@@ -434,3 +434,11 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
  .service-grid .catalogue-card.services .card-media,.service-grid .catalogue-card.services .project-image{min-height:0!important;height:auto!important;aspect-ratio:auto!important;object-fit:contain!important}
  .service-grid .catalogue-card.services .project-body{padding:24px!important}
 }
+
+/* Mobile Workspace: keep approved product marks, only add collapse/expand behavior */
+.mobile-workspace-toggle>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;padding:0}
+.mobile-workspace-toggle>summary::-webkit-details-marker{display:none}
+.mobile-workspace-toggle>summary small{padding:5px 0 9px}
+.mobile-workspace-toggle>summary svg{width:12px;height:8px;fill:none;stroke:currentColor;stroke-width:1.5;transition:transform .2s ease}
+.mobile-workspace-toggle[open]>summary svg{transform:rotate(180deg)}
+.mobile-workspace-products>a{display:block;padding:9px 0}
