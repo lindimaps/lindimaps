@@ -82,6 +82,15 @@
       "imageUrl": "https://www.openware.com.kw/content/dam/esrisites/en-us/arcgis/products/web-appbuilder/images/banner-screens-web-app-builder.jpg",
       "titleEn": "Web GIS Developer",
       "descriptionEn": "Creation of interactive maps and Web GIS applications."
+    },
+    {
+      "_id": "lindimaps-service-7",
+      "_type": "service",
+      "order": 7,
+      "titleSq": "Zhvillim Web & Platforma Digjitale",
+      "descriptionSq": "Projektim dhe zhvillim i faqeve web dhe platformave digjitale moderne me arkitekturë të plotë: Next.js, CMS, databaza dhe API, autentikim, integrime cloud, deploy, domain/DNS, SEO, siguri, performancë dhe mirëmbajtje. Nga prezenca profesionale online deri te portalet dhe aplikacionet web të personalizuara.",
+      "titleEn": "Web Development & Digital Platforms",
+      "descriptionEn": "Design and development of modern websites and digital platforms with complete architecture: Next.js, CMS, databases and APIs, authentication, cloud integrations, deployment, domain/DNS, SEO, security, performance, and maintenance. From professional online presence to custom portals and web applications."
     }
   ],
   "projects": [
