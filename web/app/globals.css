@@ -308,3 +308,45 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .modern-contact .socials svg{width:14px;height:14px}
 .modern-contact+*{margin-top:0}
 @media(max-width:760px){.modern-contact{padding:82px 0 88px}.modern-contact .contact-layout{grid-template-columns:1fr;gap:58px}.modern-contact h2{font-size:clamp(3rem,14.5vw,4.9rem)}.modern-contact .contact-copy{margin-top:28px}.modern-contact .contact-side{border-left:0;border-top:1px solid #d6dfe7;padding:30px 0 0}.modern-contact .socials{margin-top:28px}}
+
+/* Home final responsive QA */
+.home-map-hero{min-height:100svh}
+.home-map-hero .map-hero-center{width:min(1120px,calc(100% - 48px))}
+.map-hero-brand strong,.map-hero-tagline,.map-hero-copy{max-width:100%}
+.map-hero-actions{flex-wrap:wrap}
+.map-hero-actions a{min-height:48px}
+.services-showcase .catalogue-grid,.projects-showcase .catalogue-grid{align-items:stretch}
+.services-showcase .catalogue-card,.projects-showcase .catalogue-card{height:100%}
+@media(max-width:900px){
+.home-site-header .nav-row{min-height:76px}
+.home-site-header .languages{border-color:rgba(255,255,255,.24)}
+.home-site-header .mobile-menu>summary{border-color:rgba(255,255,255,.24);background:rgba(7,20,38,.22)}
+.home-site-header .mobile-menu>summary>span{background:#fff}
+.home-site-header .mobile-menu-panel{max-height:calc(100svh - 76px);overflow-y:auto;overscroll-behavior:contain}
+}
+@media(max-width:600px){
+.home-map-hero .map-hero-center{width:calc(100% - 32px);padding-top:108px;padding-bottom:96px}
+.map-hero-brand strong{font-size:clamp(2.5rem,13vw,4.2rem)}
+.home-map-hero h1{font-size:clamp(2.45rem,12.5vw,4rem);line-height:.9}
+.map-hero-tagline{font-size:clamp(.82rem,4vw,1.05rem);letter-spacing:.18em}
+.map-hero-copy{font-size:.96rem;line-height:1.58}
+.map-hero-actions{width:100%;display:grid;grid-template-columns:1fr}
+.map-hero-actions a{width:100%;justify-content:space-between}
+.map-coordinate{display:none}
+.spatial-intro-index{gap:10px}.spatial-intro-index i{min-width:28px}
+.spatial-intro-layout{gap:36px}
+.spatial-capabilities{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.spatial-capabilities span{min-width:0}
+.services-showcase .catalogue-grid,.projects-showcase .catalogue-grid{grid-template-columns:1fr}
+.modern-contact .contact-email{font-size:.92rem}
+}
+@media(max-width:380px){
+.home-site-header .lm-word small{display:none}
+.home-site-header .lm-logo{gap:8px}
+.home-site-header .lm-icon{width:36px;height:36px}
+.home-site-header .languages{font-size:.62rem}
+.home-site-header .languages span{display:none}
+.home-site-header .languages a{padding:4px 6px}
+.map-hero-brand strong{font-size:2.35rem}
+.spatial-capabilities{grid-template-columns:1fr}
+}
