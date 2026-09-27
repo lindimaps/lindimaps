@@ -46,6 +46,6 @@ export function SiteHeader({lang,page,settings}:{lang:Language;page:PageKey;sett
 export function SiteFooter({lang,settings}:{lang:Language;settings:SiteContent["settings"]}) {
   return <footer>
     <div className="container footer-main"><Link className="footer-brand" href={routes.home[lang]}><Logo/></Link><div className="footer-links">{(Object.keys(routes) as PageKey[]).map(key=><Link key={key} href={routes[key][lang]}>{labels[lang][key]}</Link>)}</div></div>
-    <div className="container footer-row"><p>© {new Date().getFullYear()} {settings?.siteName || "LindiMaps"}. {lang==="sq"?"Të gjitha të drejtat e rezervuara.":"All rights reserved."}</p><a className="back-link" href="#top">{lang==="sq"?"Kthehu lart":"Back to top"} ↑</a></div>
+    <div className="container footer-row"><p>© {new Date().getFullYear()} {settings?.siteName || "LindiMaps"}. {lang==="sq"?"Të gjitha të drejtat e rezervuara.":"All rights reserved."}</p><a className="back-top-float" href="#top" aria-label={lang==="sq"?"Kthehu lart":"Back to top"} title={lang==="sq"?"Kthehu lart":"Back to top"}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></a></div>
   </footer>
 }
