@@ -22,6 +22,7 @@ export const siteSettingsType = defineType({
     defineField({name: 'locationSq', title: 'Vendndodhja', type: 'string'}),
     defineField({name: 'locationEn', title: 'Location (EN)', type: 'string'}),
     defineField({name: 'linkedin', title: 'LinkedIn', type: 'url'}),
+    defineField({name: 'instagram', title: 'Instagram', type: 'url'}),
     defineField({name: 'github', title: 'GitHub', type: 'url'}),
     defineField({name: 'researchGate', title: 'ResearchGate', type: 'url'}),
     defineField({name: 'seoTitle', title: 'SEO title', type: 'string'}),

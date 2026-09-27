@@ -7,7 +7,7 @@ export type Publication = {_id:string;title:string;titleEn?:string;publicationTy
 export type TextBlock={_key:string;_type:string;children?:{_key:string;text:string}[]};
 export type SiteContent={
  home:(Localized&{image?:string})|null;
- settings:(Localized&{useStarterContent?:boolean;siteName?:string;email?:string;logo?:string;seoTitle?:string;linkedin?:string;github?:string;researchGate?:string})|null;
+ settings:(Localized&{useStarterContent?:boolean;siteName?:string;email?:string;logo?:string;seoTitle?:string;linkedin?:string;instagram?:string;github?:string;researchGate?:string})|null;
  profile:(Localized&{name:string;image?:string;bioSq?:TextBlock[];bioEn?:TextBlock[];cvUrl?:string;linkedin?:string;researchGate?:string;scholar?:string;orcid?:string})|null;
  about:{history:(Localized&{_key:string})[];values:(Localized&{_key:string})[]}|null;
  projects:ContentItem[];services:ContentItem[];publications:Publication[];
