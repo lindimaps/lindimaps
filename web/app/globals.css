@@ -252,3 +252,9 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .home-site-header .brand .lm-word strong span,
 .home-site-header .brand .lm-word small{color:inherit!important}
 .home-site-header .brand .lm-icon{background:initial;border-color:initial}
+
+/* Brand correction: preserve the standard site logo; only lift LINDI to white on dark Home header */
+.home-site-header .brand .lm-word strong{color:#fff!important}
+.home-site-header .brand .lm-word strong>span{color:#3b82f6!important}
+.home-site-header .brand .lm-word small{color:rgba(255,255,255,.78)!important}
+.home-site-header .brand .lm-icon{background:initial!important;border-color:initial!important}
