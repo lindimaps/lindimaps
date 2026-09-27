@@ -513,3 +513,25 @@ body:has(.home-map-hero) main{padding-top:0}
 
 /* About: editorial portrait treatment + CMS-managed team */
 .about-profile .profile-photo{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:24px 4px 24px 4px;box-shadow:0 28px 70px rgba(7,20,38,.16);transform:rotate(-.7deg);transition:transform .45s ease,box-shadow .45s ease}.about-profile .profile-grid:hover .profile-photo{transform:rotate(0) translateY(-4px);box-shadow:0 34px 80px rgba(7,20,38,.2)}.about-team-section{padding:clamp(70px,9vw,125px) 0;background:#071426;color:#fff}.team-heading{display:grid;grid-template-columns:.55fr 1.45fr;gap:5vw;align-items:end;margin-bottom:48px}.team-heading h2{font-size:clamp(2.6rem,5vw,5rem);font-weight:450;letter-spacing:-.055em}.team-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.team-card{background:#0b1c31;border:1px solid rgba(255,255,255,.09);overflow:hidden}.team-photo-wrap{position:relative;aspect-ratio:4/5;overflow:hidden;background:#10243a;display:grid;place-items:center;font-size:3rem}.team-photo-wrap:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 58%,rgba(3,15,25,.38))}.team-photo-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease,filter .6s ease}.team-card:hover .team-photo-wrap img{transform:scale(1.035);filter:saturate(1.05)}.team-card-body{padding:24px}.team-card-body small{color:#67dbe6;font-size:.62rem;font-weight:850;letter-spacing:.12em;text-transform:uppercase}.team-card-body h3{color:#fff;margin-top:8px;font-size:1.7rem}.team-card-body p{color:#94a7bb;margin-top:14px;font-size:.9rem;line-height:1.7}.team-card-body>div{display:flex;gap:16px;margin-top:20px}.team-card-body a{color:#dbe8f5;font-size:.72rem;font-weight:800}.team-card-featured{grid-column:span 2;display:grid;grid-template-columns:1.05fr .95fr}.team-card-featured .team-photo-wrap{aspect-ratio:auto;min-height:520px}@media(max-width:900px){.team-grid{grid-template-columns:1fr 1fr}.team-card-featured{grid-column:1/-1}}@media(max-width:600px){.about-profile .profile-photo{border-radius:18px 3px 18px 3px;transform:none}.team-heading{grid-template-columns:1fr;gap:12px}.team-grid{grid-template-columns:1fr}.team-card-featured{display:block;grid-column:auto}.team-card-featured .team-photo-wrap{aspect-ratio:4/5;min-height:0}}
+
+
+/* Publications: stable cards on desktop and comfortable mobile gutters */
+.publications-section .publication-list{gap:22px}
+.publications-section .publication-card{padding:30px;gap:34px;overflow:hidden;transition:border-color .25s ease,box-shadow .25s ease}
+.publications-section .publication-card:hover{padding-left:30px;transform:none;border-color:#cbd8e5;box-shadow:0 14px 36px rgba(15,23,42,.055)}
+.publications-section .pub-content{min-width:0;padding:4px 0}
+.publications-section .publication-card h2,.publications-section .pub-authors,.publications-section .pub-publisher,.publications-section .pub-abstract,.publications-section .pub-citation{overflow-wrap:anywhere}
+@media(max-width:760px){
+ .publications-section{width:calc(100% - 28px)}
+ .publications-section .publication-list{gap:18px}
+ .publications-section .publication-card{grid-template-columns:1fr;gap:22px;padding:16px 16px 22px;border-radius:16px}
+ .publications-section .publication-card:hover{padding-left:16px;transform:none}
+ .publications-section .pub-visual{width:100%}
+ .publications-section .pub-visual img,.publications-section .pub-placeholder{width:100%;height:auto;aspect-ratio:16/10;min-height:0}
+ .publications-section .pub-content{padding:0 2px}
+ .publications-section .publication-card h2{font-size:clamp(1.35rem,7vw,1.85rem);line-height:1.12}
+ .publications-section .pub-authors{font-size:.88rem;line-height:1.55}
+ .publications-section .pub-publisher,.publications-section .pub-abstract,.publications-section .pub-citation{font-size:.86rem;line-height:1.65}
+ .publications-section .pub-actions{gap:12px;margin-top:20px}
+ .publications-section .pub-link{padding:9px 0}
+}
