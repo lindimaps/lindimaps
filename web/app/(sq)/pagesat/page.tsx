@@ -1,0 +1,1 @@
+export const metadata={title:"Pagesat | LindiMaps Systems"};export default function Page(){return <main className="legacy-system-bridge"><section><small>LINDIMAPS SYSTEMS</small><h1>Pagesat</h1><p>Sistemi ekzistues i punëtorëve, orëve, shënimeve dhe raporteve ruhet në Firebase gjatë migrimit.</p><a href="/pagesat-legacy.html">Hap sistemin aktual ↗</a></section></main>}
