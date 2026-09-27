@@ -7,6 +7,7 @@ export const activityType=defineType({
   defineField({name:'kind',title:'Lloji',type:'string',options:{list:['Conference','Training','Workshop','Presentation','Fieldwork','Other']}}),
   defineField({name:'date',title:'Data',type:'date',validation:r=>r.required()}),
   defineField({name:'location',title:'Vendndodhja',type:'string'}),
+  defineField({name:'locationEn',title:'Location (EN)',type:'string'}),
   defineField({name:'descriptionSq',title:'Përshkrimi',type:'text',rows:4}),
   defineField({name:'descriptionEn',title:'Description (EN)',type:'text',rows:4}),
   defineField({name:'image',title:'Foto',type:'image',options:{hotspot:true}}),
