@@ -1,0 +1,1 @@
+import LegalPage from "@/components/legal-page";export const metadata={title:"Terms of Use | LindiMaps"};export default function Page(){return <LegalPage lang="en" type="terms"/>}

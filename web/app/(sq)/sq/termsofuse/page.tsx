@@ -1,0 +1,1 @@
+import LegalPage from "@/components/legal-page";export const metadata={title:"Kushtet e Përdorimit | LindiMaps"};export default function Page(){return <LegalPage lang="sq" type="terms"/>}
