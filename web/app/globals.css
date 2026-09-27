@@ -586,3 +586,4 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 
 /* Project cards: year as plain text only */
 .project-grid .catalogue-card.projects .project-meta span:last-child{border:0!important;background:transparent!important;border-radius:0!important;padding:0!important}
+
