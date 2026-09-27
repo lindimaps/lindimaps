@@ -426,7 +426,8 @@
       "roleSq": "Institucion partner",
       "roleEn": "Partner institution",
       "url": "https://nasri.gov.al",
-      "order": 1
+      "order": 1,
+      "logoUrl": "https://nasri.gov.al/wp-content/uploads/2022/05/logo_new-removebg-preview.png"
     },
     {
       "_id": "lindimaps-partner-fgjm",
@@ -435,7 +436,8 @@
       "roleSq": "Institucion partner",
       "roleEn": "Partner institution",
       "url": "https://fgjm.edu.al",
-      "order": 2
+      "order": 2,
+      "logoUrl": "https://fgjm.edu.al/wp-content/uploads/2021/04/logoo.png"
     },
     {
       "_id": "lindimaps-partner-ashsh",
@@ -444,7 +446,8 @@
       "roleSq": "Institucion partner",
       "roleEn": "Partner institution",
       "url": "https://akad.gov.al/",
-      "order": 3
+      "order": 3,
+      "logoUrl": "https://akad.gov.al/wp-content/uploads/2024/03/testttt.png"
     },
     {
       "_id": "lindimaps-partner-unitir",
@@ -453,7 +456,8 @@
       "roleSq": "Institucion partner",
       "roleEn": "Partner institution",
       "url": "https://unitir.edu.al/",
-      "order": 4
+      "order": 4,
+      "logoUrl": "https://unitir.edu.al/wp-content/uploads/2019/08/logo.png"
     },
     {
       "_id": "lindimaps-partner-fhf",
@@ -462,7 +466,8 @@
       "roleSq": "Institucion partner",
       "roleEn": "Partner institution",
       "url": "https://fhf.edu.al/",
-      "order": 5
+      "order": 5,
+      "logoUrl": "https://fhf.edu.al/wp-content/themes/fhf-theme/resources/images/svg/logo.svg"
     },
     {
       "_id": "lindimaps-partner-drtk-korce",
@@ -471,7 +476,8 @@
       "roleSq": "Institucion partner",
       "roleEn": "Partner institution",
       "url": "https://drtkkorce.com/",
-      "order": 6
+      "order": 6,
+      "logoUrl": "https://drtkkorce.com/wp-content/uploads/2024/06/DRTK-1.png"
     },
     {
       "_id": "lindimaps-partner-bashkia-korce",
@@ -480,7 +486,8 @@
       "roleSq": "Institucion partner",
       "roleEn": "Partner institution",
       "url": "https://bashkiakorce.gov.al",
-      "order": 7
+      "order": 7,
+      "logoUrl": "https://bashkiakorce.gov.al/wp-content/uploads/2024/08/korca_logo.png"
     },
     {
       "_id": "lindimaps-partner-bashkia-lezhe",
@@ -489,7 +496,8 @@
       "roleSq": "Institucion partner",
       "roleEn": "Partner institution",
       "url": "https://lezha.gov.al/",
-      "order": 8
+      "order": 8,
+      "logoUrl": "https://lezha.gov.al/wp-content/uploads/2022/07/PNG-NEW-no-lissus_013700960_11036.png"
     },
     {
       "_id": "lindimaps-partner-upt",
@@ -498,7 +506,8 @@
       "roleSq": "Institucion partner",
       "roleEn": "Partner institution",
       "url": "https://upt.edu.al/",
-      "order": 9
+      "order": 9,
+      "logoUrl": "https://autex.org/sites/default/files/portfolio-images/Members_Tirana_logo_900_675.png"
     }
   ]
 }
