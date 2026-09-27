@@ -11,7 +11,7 @@ export type TextBlock={_key:string;_type:string;children?:{_key:string;text:stri
 export type SiteContent={
  home:(Localized&{image?:string})|null;
  settings:(Localized&{useStarterContent?:boolean;siteName?:string;email?:string;logo?:string;ogImage?:string;seoTitle?:string;linkedin?:string;instagram?:string;github?:string;researchGate?:string})|null;
- profile:(Localized&{name:string;image?:string;bioSq?:TextBlock[];bioEn?:TextBlock[];cvUrl?:string;linkedin?:string;researchGate?:string;scholar?:string;orcid?:string})|null;
+ profile:(Localized&{name:string;image?:string;bioSq?:TextBlock[];bioEn?:TextBlock[];cvUrl?:string;email?:string;linkedin?:string;researchGate?:string;github?:string;scholar?:string;orcid?:string;skills?:string[]})|null;
  about:{history:(Localized&{_key:string})[];values:(Localized&{_key:string})[]}|null;
  projects:ContentItem[];services:ContentItem[];publications:Publication[];activities:Activity[];gallery:GalleryItem[];partners:Partner[];
 };
