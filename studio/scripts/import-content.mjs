@@ -14,6 +14,7 @@ const documents = [
   ...(data.partners || []),
 ].filter(Boolean)
 const dryRun = process.argv.includes('--dry-run')
+const syncExisting = process.argv.includes('--sync-existing')
 const client = getCliClient({apiVersion: '2025-02-19'}).withConfig({
   useCdn: false,
   perspective: 'raw',
@@ -47,7 +48,18 @@ async function main() {
     console.log(
       `${dryRun ? 'PREVIEW' : 'CREATE'} ${doc._type}: ${doc.titleSq || doc.title || doc.name || doc._id}`,
     )
-  if (dryRun || !pending.length) return
+  if (dryRun) return
+  if (syncExisting) {
+    const byId = new Map(existing.map((item) => [item._id.replace(/^drafts\./, ''), item]))
+    for (const doc of documents) {
+      const old = byId.get(doc._id)
+      if (!old) continue
+      const {_id, _type, ...fields} = doc
+      await client.patch(old._id).set(fields).commit()
+      console.log(`UPDATE ${doc._type}: ${doc.titleSq || doc.title || doc.name || doc._id}`)
+    }
+  }
+  if (!pending.length) return
   let transaction = client.transaction()
   for (const doc of pending) transaction = transaction.createIfNotExists(doc)
   await transaction.commit()
