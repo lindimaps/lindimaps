@@ -500,3 +500,8 @@ body:has(.home-map-hero) main{padding-top:0}
 .projects-showcase .project-tech li{background:#f3f6f9;color:#526277}
 .projects-showcase .catalogue-card:hover{border-color:#c8d6e2;background:#fff;transform:translateY(-4px)}
 @media(max-width:900px){.projects-showcase .project-grid{grid-template-columns:1fr}.projects-showcase .catalogue-card:first-child{grid-column:auto;display:block}.projects-showcase .catalogue-card:first-child .card-media,.projects-showcase .catalogue-card:first-child .project-image{min-height:0;height:270px}.projects-showcase .catalogue-card:first-child .project-body{padding:30px}.projects-showcase .catalogue-card:first-child h3{font-size:2rem}}
+
+
+/* Final accessibility/performance safeguards */
+:where(a,button,summary,input,textarea,select):focus-visible{outline:2px solid #3b82f6;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
