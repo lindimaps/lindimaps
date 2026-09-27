@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {SiteFooter} from "./site-shell";
 import {LegalHeader} from "./legal-header";
 import {getSiteContent} from "@/lib/sanity";

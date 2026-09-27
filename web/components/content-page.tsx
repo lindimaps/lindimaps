@@ -5,7 +5,7 @@ import {routes,labels,type PageKey} from "@/lib/routes";
 import {SiteHeader,SiteFooter} from "./site-shell";
 import {Catalogue} from "./catalogue";
 import ContactForm from "./contact-form";
-export function contentMetadata(lang:Language,page:PageKey):Metadata{return {title:`${labels[lang][page]} | LindiMaps`,alternates:{canonical:routes[page][lang],languages:{sq:routes[page].sq,en:routes[page].en}}}}
+export function contentMetadata(lang:Language,page:PageKey):Metadata{return {title:labels[lang][page],alternates:{canonical:routes[page][lang],languages:{"sq-AL":routes[page].sq,"en":routes[page].en,"x-default":routes[page].sq}},openGraph:{title:`${labels[lang][page]} | LindiMaps`,url:routes[page][lang],locale:lang==="sq"?"sq_AL":"en_US"},robots:{index:true,follow:true}}}
 function Biography({blocks}:{blocks?:TextBlock[]}){return <div className="prose">{blocks?.filter(b=>b._type==="block").map(b=><p key={b._key}>{b.children?.map(s=>s.text).join("")}</p>)}</div>}
 export default async function ContentPage({lang,page}:{lang:Language;page:Exclude<PageKey,"home">}){
  const data=await getSiteContent();const {profile,settings,about}=data;const sq=lang==="sq";
