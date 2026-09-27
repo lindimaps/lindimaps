@@ -272,6 +272,35 @@
           "style": "normal"
         }
       ]
+    },
+    {
+      "_id": "lindimaps-project-lezha-turistike",
+      "_type": "project",
+      "slug": {
+        "_type": "slug",
+        "current": "lezha-turistike"
+      },
+      "order": 4,
+      "category": "webgis",
+      "year": 2026,
+      "featured": true,
+      "titleSq": "Lezha Turistike",
+      "titleEn": "Lezha Turistike — Digital Tourism Platform",
+      "summarySq": "Platformë turistike digjitale dygjuhëshe për eksplorimin e Lezhës, me destinacione, trashëgimi historike e arkeologjike, kulinari, galeri, përmbajtje shkencore, Web GIS 2D/3D dhe guidë interaktive për planifikimin e vizitës.",
+      "summaryEn": "A bilingual digital tourism platform for exploring Lezhë, combining destinations, historical and archaeological heritage, gastronomy, gallery and scientific content with 2D/3D Web GIS and an interactive visit-planning guide.",
+      "liveUrl": "https://www.lezhaturistike.com",
+      "technologies": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Sanity CMS",
+        "Vercel",
+        "Web GIS",
+        "ArcGIS Online"
+      ],
+      "roleSq": "Konceptim, arkitekturë, zhvillim web, CMS dhe integrim Web GIS",
+      "roleEn": "Concept, architecture, web development, CMS and Web GIS integration",
+      "client": "Lezha Turistike"
     }
   ],
   "profile": {
