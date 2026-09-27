@@ -246,3 +246,9 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .mobile-workspace-subnav{border:0!important;margin:0 0 8px!important;padding:0 0 0 14px!important}
 .mobile-workspace-subnav>a{border:0!important;box-shadow:none!important;background:transparent!important;padding-left:8px!important}
 }
+
+/* Brand lock: header and footer use the same official LindiMaps logo treatment */
+.home-site-header .brand .lm-word strong,
+.home-site-header .brand .lm-word strong span,
+.home-site-header .brand .lm-word small{color:inherit!important}
+.home-site-header .brand .lm-icon{background:initial;border-color:initial}
