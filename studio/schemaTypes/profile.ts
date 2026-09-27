@@ -20,7 +20,7 @@ export const profileType = defineType({
       options: {layout: 'tags'},
     }),
     defineField({name: 'cvUrl', title: 'CV URL', type: 'url'}),
-    defineField({name: 'email', title: 'Email', type: 'string'}),
+    defineField({name: 'email', title: 'Email', type: 'string', validation: (r) => r.email()}),
     defineField({name: 'linkedin', title: 'LinkedIn', type: 'url'}),
     defineField({name: 'researchGate', title: 'ResearchGate', type: 'url'}),
     defineField({name: 'github', title: 'GitHub', type: 'url'}),
