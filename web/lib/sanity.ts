@@ -30,7 +30,7 @@ const query=`{
  "publications": *[_type=="publication"]|order(featured desc,year desc,_createdAt desc){_id,title,titleEn,publicationType,authors,year,publisher,doi,url,citation,keywords,abstractSq,abstractEn,featured,"image":coverImage.asset->url,"pdfUrl":pdf.asset->url},
  "activities": *[_type=="activity"]|order(date desc,_createdAt desc){_id,titleSq,titleEn,kind,date,location,descriptionSq,descriptionEn,url,"image":image.asset->url},
  "gallery": *[_type=="galleryItem"]|order(_createdAt desc){_id,titleSq,titleEn,captionSq,captionEn,tags,"image":image.asset->url},
- "partners": *[_type=="partner"]|order(order asc,name asc){_id,name,roleSq,roleEn,url,"logo":logo.asset->url},
+ "partners": *[_type=="partner"]|order(order asc,name asc){_id,name,roleSq,roleEn,url,"logo":coalesce(logo.asset->url,logoUrl)},
  "team": *[_type=="teamMember"]|order(featured desc,order asc,name asc){_id,name,roleSq,roleEn,bioSq,bioEn,email,linkedin,order,featured,"image":photo.asset->url}
 }`;
 export const getSiteContent=cache(async():Promise<SiteContent>=>{
