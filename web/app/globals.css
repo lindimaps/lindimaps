@@ -605,3 +605,5 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 @media(max-width:700px){.service-detail-hero{padding-top:72px}.service-detail-hero h1{font-size:clamp(2.8rem,14vw,4.8rem)}.service-detail-intro{grid-template-columns:1fr;gap:18px}.service-detail-columns{grid-template-columns:1fr;gap:54px}}
 
 /* service pages production deployment trigger */
+
+/* production redeploy trigger 2026-09-28 */
