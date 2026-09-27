@@ -5,16 +5,26 @@ export const publicationType = defineType({
   fields:[
     defineField({name:'title',title:'Titulli',type:'string',validation:r=>r.required()}),
     defineField({name:'titleEn',title:'Title (EN)',type:'string'}),
-    defineField({name:'publicationType',title:'Lloji',type:'string',options:{list:['Journal article','Book chapter','Conference paper','Report','Other']}}),
+    defineField({name:'publicationType',title:'Lloji',type:'string',options:{list:[
+      {title:'Artikull shkencor',value:'Journal article'},
+      {title:'Kapitull libri',value:'Book chapter'},
+      {title:'Punim konference',value:'Conference paper'},
+      {title:'Raport',value:'Report'},
+      {title:'Poster / Prezantim',value:'Presentation'},
+      {title:'Tjetër',value:'Other'}
+    ]}}),
     defineField({name:'authors',title:'Autorët',type:'array',of:[{type:'string'}]}),
-    defineField({name:'year',title:'Viti',type:'number'}),
+    defineField({name:'year',title:'Viti',type:'number',validation:r=>r.min(1900).max(2100)}),
     defineField({name:'publisher',title:'Revista / Botuesi / Konferenca',type:'string'}),
     defineField({name:'doi',title:'DOI',type:'string'}),
     defineField({name:'url',title:'URL',type:'url'}),
+    defineField({name:'pdf',title:'PDF / Dokument',type:'file',options:{accept:'.pdf'}}),
+    defineField({name:'citation',title:'Referenca bibliografike',type:'text',rows:3}),
+    defineField({name:'keywords',title:'Fjalë kyçe / Keywords',type:'array',of:[{type:'string'}],options:{layout:'tags'}}),
     defineField({name:'abstractSq',title:'Përmbledhje',type:'text',rows:5}),
     defineField({name:'abstractEn',title:'Abstract (EN)',type:'text',rows:5}),
     defineField({name:'coverImage',title:'Imazhi',type:'image',options:{hotspot:true}}),
     defineField({name:'featured',title:'Publikim i veçuar',type:'boolean',initialValue:false})
   ],
-  preview:{select:{title:'title',subtitle:'publisher',media:'coverImage'}}
+  preview:{select:{title:'title',publisher:'publisher',year:'year',media:'coverImage'},prepare({title,publisher,year,media}){return {title,subtitle:[publisher,year].filter(Boolean).join(' · '),media}}}
 })
