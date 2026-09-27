@@ -75,7 +75,7 @@ export const projectType = defineType({
     defineField({name: 'roleSq', title: 'Roli', type: 'string'}),
     defineField({name: 'roleEn', title: 'Role (EN)', type: 'string'}),
     defineField({name: 'client', title: 'Institucioni / Klienti', type: 'string'}),
-    defineField({name: 'year', title: 'Viti', type: 'number'}),
+    defineField({name: 'year', title: 'Viti', type: 'number', validation: (r) => r.integer().min(1900).max(2100)}),
     defineField({name: 'liveUrl', title: 'WebGIS / Live URL', type: 'url'}),
     defineField({name: 'githubUrl', title: 'GitHub URL', type: 'url'}),
     defineField({name: 'location', title: 'Vendndodhja', type: 'geopoint'}),
@@ -85,7 +85,7 @@ export const projectType = defineType({
       type: 'boolean',
       initialValue: false,
     }),
-    defineField({name: 'order', title: 'Renditja', type: 'number'}),
+    defineField({name: 'order', title: 'Renditja', type: 'number', validation: (r) => r.integer().min(0)}),
   ],
   preview: {select: {title: 'titleSq', subtitle: 'category', media: 'coverImage'}},
 })

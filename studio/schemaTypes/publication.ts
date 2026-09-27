@@ -14,9 +14,9 @@ export const publicationType = defineType({
       {title:'Tjetër',value:'Other'}
     ]}}),
     defineField({name:'authors',title:'Autorët',type:'array',of:[{type:'string'}]}),
-    defineField({name:'year',title:'Viti',type:'number',validation:r=>r.min(1900).max(2100)}),
+    defineField({name:'year',title:'Viti',type:'number',validation:r=>r.integer().min(1900).max(2100)}),
     defineField({name:'publisher',title:'Revista / Botuesi / Konferenca',type:'string'}),
-    defineField({name:'doi',title:'DOI',type:'string'}),
+    defineField({name:'doi',title:'DOI',type:'string',validation:r=>r.regex(/^10\.\d{4,9}\/\S+$/,{name:'DOI',invert:false}).warning('Përdorni formatin DOI, p.sh. 10.xxxx/xxxxx')}),
     defineField({name:'url',title:'URL',type:'url'}),
     defineField({name:'pdf',title:'PDF / Dokument',type:'file',options:{accept:'.pdf'}}),
     defineField({name:'citation',title:'Referenca bibliografike',type:'text',rows:3}),

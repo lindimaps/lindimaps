@@ -2,7 +2,7 @@ import {defineField, defineType} from 'sanity'
 export const galleryItemType=defineType({
  name:'galleryItem',title:'Galeri',type:'document',
  fields:[
-  defineField({name:'titleSq',title:'Titulli',type:'string'}),
+  defineField({name:'titleSq',title:'Titulli',type:'string',validation:r=>r.required()}),
   defineField({name:'titleEn',title:'Title (EN)',type:'string'}),
   defineField({name:'image',title:'Foto',type:'image',options:{hotspot:true},validation:r=>r.required()}),
   defineField({name:'captionSq',title:'Përshkrimi',type:'text',rows:2}),
