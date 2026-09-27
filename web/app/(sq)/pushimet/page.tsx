@@ -1,1 +1,1 @@
-import type {Metadata} from "next";import PushimetApp from "@/components/pushimet-app";export const metadata:Metadata={title:"Pushimet | LindiMaps Systems",robots:{index:false,follow:false}};export default function Page(){return <PushimetApp/>}
+import type {Metadata} from "next";import PushimetApp from "@/components/pushimet-app";export const metadata:Metadata={title:"Pushimet | Systems",robots:{index:false,follow:false,nocache:true}};export default function Page(){return <PushimetApp/>}
