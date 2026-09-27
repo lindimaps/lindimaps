@@ -595,3 +595,13 @@ body:has(.home-map-hero) main{padding-top:0}
 .service-grid .catalogue-card.services .project-image{width:100%!important;height:100%!important;min-height:360px!important;object-fit:cover!important;object-position:center!important}
 .service-grid .catalogue-card.services .project-body{padding:40px!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
 @media(max-width:700px){.service-grid .catalogue-card.services{grid-template-columns:1fr!important}.service-grid .catalogue-card.services .card-media,.service-grid .catalogue-card.services .project-image{min-height:0!important;height:auto!important;aspect-ratio:auto!important;object-fit:contain!important}.service-grid .catalogue-card.services .project-body{padding:24px!important}}
+
+
+/* Projects: match the approved full-width Service card visual while preserving project functionality */
+.projects-portfolio .project-grid{grid-template-columns:1fr!important;gap:42px!important}
+.projects-portfolio .project-grid .catalogue-card.projects{width:100%!important;display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)!important;align-items:stretch!important;padding:0!important;border:1px solid #e2e8f0!important;border-radius:16px!important;overflow:hidden!important;background:#fff!important}
+.projects-portfolio .project-grid .catalogue-card.projects .card-media{width:100%!important;height:100%!important;min-height:360px!important;background:#f7f9fb!important}
+.projects-portfolio .project-grid .catalogue-card.projects .project-image{width:100%!important;height:100%!important;min-height:360px!important;object-fit:cover!important;object-position:center!important}
+.projects-portfolio .project-grid .catalogue-card.projects .project-body{padding:40px!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
+.projects-portfolio .project-grid .catalogue-card.projects h3{font-size:1.35rem}
+@media(max-width:700px){.projects-portfolio .project-grid .catalogue-card.projects{grid-template-columns:1fr!important}.projects-portfolio .project-grid .catalogue-card.projects .card-media,.projects-portfolio .project-grid .catalogue-card.projects .project-image{min-height:0!important;height:auto!important;aspect-ratio:auto!important;object-fit:contain!important}.projects-portfolio .project-grid .catalogue-card.projects .project-body{padding:24px!important}}
