@@ -10,7 +10,7 @@ export type Publication = {_id:string;title:string;titleEn?:string;publicationTy
 export type TextBlock={_key:string;_type:string;children?:{_key:string;text:string}[]};
 export type SiteContent={
  home:(Localized&{image?:string})|null;
- settings:(Localized&{useStarterContent?:boolean;siteName?:string;email?:string;logo?:string;seoTitle?:string;linkedin?:string;instagram?:string;github?:string;researchGate?:string})|null;
+ settings:(Localized&{useStarterContent?:boolean;siteName?:string;email?:string;logo?:string;ogImage?:string;seoTitle?:string;linkedin?:string;instagram?:string;github?:string;researchGate?:string})|null;
  profile:(Localized&{name:string;image?:string;bioSq?:TextBlock[];bioEn?:TextBlock[];cvUrl?:string;linkedin?:string;researchGate?:string;scholar?:string;orcid?:string})|null;
  about:{history:(Localized&{_key:string})[];values:(Localized&{_key:string})[]}|null;
  projects:ContentItem[];services:ContentItem[];publications:Publication[];activities:Activity[];gallery:GalleryItem[];partners:Partner[];
@@ -21,7 +21,7 @@ const projectId=process.env.SANITY_PROJECT_ID||"oyagunrg";
 const dataset=process.env.SANITY_DATASET||"production";
 const query=`{
  "home": *[_type=="homePage"]|order(_updatedAt desc)[0]{...,"image":heroImage.asset->url},
- "settings": *[_type=="siteSettings"]|order(_updatedAt desc)[0]{...,"logo":logo.asset->url},
+ "settings": *[_type=="siteSettings"]|order(_updatedAt desc)[0]{...,"logo":logo.asset->url,"ogImage":ogImage.asset->url},
  "projects": *[_type=="project"]|order(order asc,year desc,_createdAt desc){_id,titleSq,titleEn,summarySq,summaryEn,category,year,liveUrl,technologies,"image":coalesce(coverImage.asset->url,imageUrl)},
  "profile": *[_type=="profile"]|order(_updatedAt desc)[0]{...,"image":photo.asset->url},
  "about": *[_type=="aboutPage"]|order(_updatedAt desc)[0]{history,values},
