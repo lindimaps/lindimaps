@@ -76,6 +76,7 @@ export const projectType = defineType({
     defineField({name: 'roleSq', title: 'Roli', type: 'string'}),
     defineField({name: 'roleEn', title: 'Role (EN)', type: 'string'}),
     defineField({name: 'client', title: 'Institucioni / Klienti', type: 'string'}),
+    defineField({name: 'clientEn', title: 'Institution / Client (EN)', type: 'string'}),
     defineField({name: 'year', title: 'Viti', type: 'number', validation: (r) => r.integer().min(1900).max(2100)}),
     defineField({name: 'liveUrl', title: 'WebGIS / Live URL', type: 'url'}),
     defineField({name: 'githubUrl', title: 'GitHub URL', type: 'url'}),
