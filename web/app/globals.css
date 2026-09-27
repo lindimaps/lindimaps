@@ -471,3 +471,22 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .workspace-card b{margin-top:auto;font-size:.82rem;color:#0f172a}
 @media(max-width:900px){.workspace-intro{grid-template-columns:1fr;gap:20px}.workspace-card-grid{grid-template-columns:1fr}.workspace-card{min-height:230px}}
 @media(max-width:600px){.workspace-editorial{padding-top:18px!important;padding-bottom:72px!important}.workspace-intro{margin:26px 0 34px;padding-bottom:30px}.workspace-intro h2{font-size:clamp(2.25rem,12vw,3.6rem)}.workspace-card{padding:24px;min-height:220px}}
+
+/* Recovery pass: restore approved Projects filters, Publications mobile safety, Partners names, and header/hero overlap */
+.project-filters{display:flex!important;align-items:center!important;gap:10px!important;flex-wrap:wrap!important;margin:30px 0 42px!important}
+.project-filters a{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:38px!important;padding:8px 14px!important;border:1px solid #dce4eb!important;border-radius:999px!important;background:#fff!important;color:#526277!important;font-size:.74rem!important;font-weight:800!important;line-height:1.2!important;white-space:nowrap!important;transition:background .2s ease,color .2s ease,border-color .2s ease!important}
+.project-filters a:hover{border-color:#bfdbfe!important;color:#2563eb!important;background:#f8fbff!important}
+.project-filters a.active{background:#0f172a!important;border-color:#0f172a!important;color:#fff!important}
+.partner-card strong{display:block!important;margin-top:12px!important;color:#0f172a!important;font-size:.86rem!important;line-height:1.3!important;text-align:center!important}
+.partner-card small{display:block!important;margin-top:5px!important;color:#64748b!important;font-size:.66rem!important;line-height:1.35!important;text-align:center!important}
+@media(max-width:760px){
+ .publication-card,.pub-content,.publication-card h2,.pub-authors,.pub-publisher,.pub-abstract{min-width:0!important;max-width:100%!important}
+ .publication-card h2,.pub-authors,.pub-publisher,.pub-abstract{overflow-wrap:anywhere!important;word-break:normal!important}
+ .publication-card h2{font-size:clamp(1.35rem,7.2vw,2rem)!important;line-height:1.12!important}
+ .pub-actions{max-width:100%!important}
+ .pub-link{max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+ .project-filters{gap:8px!important;margin:24px 0 32px!important}
+ .project-filters a{font-size:.7rem!important;padding:8px 12px!important}
+}
+/* Sticky header without pushing the approved page/hero composition downward */
+.home-site-header{position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:1000!important}
