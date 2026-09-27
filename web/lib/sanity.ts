@@ -3,6 +3,9 @@ import starterData from "@/data/starter.json";
 export type Language = "sq" | "en";
 type Localized = Partial<Record<`${"title"|"description"|"summary"|"heroTitle"|"heroText"|"primaryCta"|"secondaryCta"|"introTitle"|"intro"|"location"|"seoDescription"|"headline"}${"Sq"|"En"}`,string>>;
 export type ContentItem = Localized & {_id:string;category?:string;year?:number;image?:string;liveUrl?:string;technologies?:string[]};
+export type Activity={_id:string;titleSq?:string;titleEn?:string;kind?:string;date?:string;location?:string;descriptionSq?:string;descriptionEn?:string;image?:string;url?:string};
+export type GalleryItem={_id:string;titleSq?:string;titleEn?:string;captionSq?:string;captionEn?:string;image?:string;tags?:string[]};
+export type Partner={_id:string;name:string;roleSq?:string;roleEn?:string;logo?:string;url?:string};
 export type Publication = {_id:string;title:string;titleEn?:string;publicationType?:string;authors?:string[];year?:number;publisher?:string;doi?:string;url?:string;pdfUrl?:string;citation?:string;keywords?:string[];abstractSq?:string;abstractEn?:string;image?:string;featured?:boolean};
 export type TextBlock={_key:string;_type:string;children?:{_key:string;text:string}[]};
 export type SiteContent={
@@ -10,7 +13,7 @@ export type SiteContent={
  settings:(Localized&{useStarterContent?:boolean;siteName?:string;email?:string;logo?:string;seoTitle?:string;linkedin?:string;instagram?:string;github?:string;researchGate?:string})|null;
  profile:(Localized&{name:string;image?:string;bioSq?:TextBlock[];bioEn?:TextBlock[];cvUrl?:string;linkedin?:string;researchGate?:string;scholar?:string;orcid?:string})|null;
  about:{history:(Localized&{_key:string})[];values:(Localized&{_key:string})[]}|null;
- projects:ContentItem[];services:ContentItem[];publications:Publication[];
+ projects:ContentItem[];services:ContentItem[];publications:Publication[];activities:Activity[];gallery:GalleryItem[];partners:Partner[];
 };
 export function localized(value:Localized|null|undefined,field:string,lang:Language,fallback=""){const key=`${field}${lang==="sq"?"Sq":"En"}` as keyof Localized;return value?.[key]?.trim()||fallback}
 export function safeUrl(value?:string){if(!value)return undefined;try{const url=new URL(value);return ["https:","http:"].includes(url.protocol)?url.href:undefined}catch{return undefined}}
@@ -23,10 +26,13 @@ const query=`{
  "profile": *[_type=="profile"]|order(_updatedAt desc)[0]{...,"image":photo.asset->url},
  "about": *[_type=="aboutPage"]|order(_updatedAt desc)[0]{history,values},
  "services": *[_type=="service"]|order(order asc,_createdAt asc){_id,titleSq,titleEn,descriptionSq,descriptionEn,"image":coalesce(icon.asset->url,imageUrl)},
- "publications": *[_type=="publication"]|order(featured desc,year desc,_createdAt desc){_id,title,titleEn,publicationType,authors,year,publisher,doi,url,citation,keywords,abstractSq,abstractEn,featured,"image":coverImage.asset->url,"pdfUrl":pdf.asset->url}
+ "publications": *[_type=="publication"]|order(featured desc,year desc,_createdAt desc){_id,title,titleEn,publicationType,authors,year,publisher,doi,url,citation,keywords,abstractSq,abstractEn,featured,"image":coverImage.asset->url,"pdfUrl":pdf.asset->url},
+ "activities": *[_type=="activity"]|order(date desc,_createdAt desc){_id,titleSq,titleEn,kind,date,location,descriptionSq,descriptionEn,url,"image":image.asset->url},
+ "gallery": *[_type=="galleryItem"]|order(_createdAt desc){_id,titleSq,titleEn,captionSq,captionEn,tags,"image":image.asset->url},
+ "partners": *[_type=="partner"]|order(order asc,name asc){_id,name,roleSq,roleEn,url,"logo":logo.asset->url}
 }`;
 export const getSiteContent=cache(async():Promise<SiteContent>=>{
- const empty:SiteContent={profile:null,about:null,home:null,settings:null,projects:[],services:[],publications:[]};
+ const empty:SiteContent={profile:null,about:null,home:null,settings:null,projects:[],services:[],publications:[],activities:[],gallery:[],partners:[]};
  try{
   if(!/^[a-z0-9]+$/.test(projectId)||!/^[a-z0-9_-]+$/.test(dataset))throw new Error("Invalid Sanity configuration");
   const url=new URL(`https://${projectId}.api.sanity.io/v2025-02-19/data/query/${dataset}`);url.searchParams.set("query",query);url.searchParams.set("perspective","published");
