@@ -11,6 +11,7 @@ const documents = [
   ...data.services,
   ...data.projects,
   ...(data.publications || []),
+  ...(data.partners || []),
 ].filter(Boolean)
 const dryRun = process.argv.includes('--dry-run')
 const client = getCliClient({apiVersion: '2025-02-19'}).withConfig({
