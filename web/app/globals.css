@@ -207,7 +207,7 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 }
 
 /* Home shell integration — header floats over the cinematic map */
-.home-site-header{position:absolute;top:0;left:0;right:0;z-index:50;background:linear-gradient(180deg,rgba(3,15,25,.78),rgba(3,15,25,.28) 72%,transparent);border-bottom:1px solid rgba(255,255,255,.1);box-shadow:none;backdrop-filter:none}
+.home-site-header{position:sticky;top:0;left:0;right:0;z-index:1000;background:linear-gradient(180deg,rgba(3,15,25,.78),rgba(3,15,25,.28) 72%,transparent);border-bottom:1px solid rgba(255,255,255,.1);box-shadow:none;backdrop-filter:none}
 .home-site-header .nav-row{min-height:84px}
 .home-site-header .desktop-nav>a,.home-site-header .workspace-menu>summary,.home-site-header .languages,.home-site-header .languages a{color:rgba(238,247,251,.86)}
 .home-site-header .desktop-nav>a:hover,.home-site-header .desktop-nav>a[aria-current="page"],.home-site-header .languages a:hover,.home-site-header .languages a[aria-current="page"]{color:#fff}
