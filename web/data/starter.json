@@ -106,22 +106,54 @@
       "year": 2024,
       "featured": true,
       "titleSq": "Ndërtimi WEB GIS Lubonjë",
-      "summarySq": "Platformë WebGIS për dokumentimin, organizimin dhe prezantimin digjital të trashëgimisë kulturore dhe natyrore të Lubonjës, Korçë. Projekti lidh të dhënat gjeohapësinore me dokumentimin nga dronët, LiDAR dhe skanimi lazer, duke i bërë rezultatet të aksesueshme përmes një eksperience interaktive online.",
+      "summarySq": "Platformë WebGIS interaktive për dokumentimin, organizimin dhe komunikimin e trashëgimisë kulturore dhe natyrore të Lubonjës, Korçë. Projekti bashkon të dhëna GIS me dokumentim nga dronët, LiDAR dhe skanimi lazer, duke i kthyer rezultatet e kërkimit në një eksperiencë hartografike të aksesueshme në web.",
       "imageUrl": "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1200",
       "liveUrl": "https://storymaps.arcgis.com/stories/43523107564d461fbb8ea118df18efd3",
       "titleEn": "Building WEB GIS Lubonjë",
-      "summaryEn": "A WebGIS platform for the digital documentation, organization and presentation of Lubonja’s cultural and natural heritage in Korçë. The project connects geospatial data with drone, LiDAR and laser-scanning documentation, making the results accessible through an interactive online experience.",
+      "summaryEn": "An interactive WebGIS platform for documenting, organizing and communicating the cultural and natural heritage of Lubonja, Korçë. The project combines GIS data with drone, LiDAR and laser-scanning documentation, turning research outputs into an accessible web-mapping experience.",
       "technologies": [
         "ArcGIS Online",
-        "StoryMaps",
+        "WebGIS",
         "GIS",
         "Drone",
         "LiDAR",
         "Laser Scanning"
       ],
-      "roleSq": "WebGIS · integrim dhe vizualizim i të dhënave gjeohapësinore",
-      "roleEn": "WebGIS · geospatial data integration and visualization",
-      "client": "Projekt kërkimor Lubonja · AKKSHI"
+      "roleSq": "Zhvillim WebGIS dhe integrim i të dhënave gjeohapësinore",
+      "roleEn": "WebGIS development and geospatial data integration",
+      "client": "Projekt kërkimor Lubonja",
+      "descriptionSq": [
+        {
+          "_key": "p1",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "s1",
+              "_type": "span",
+              "marks": [],
+              "text": "Platforma WebGIS e Lubonjës është ndërtuar për të lidhur dokumentimin e trashëgimisë me analizën dhe publikimin gjeohapësinor. Të dhënat e mbledhura me GIS, dronë, LiDAR dhe skanim lazer organizohen në një mjedis digjital ku informacioni hapësinor mund të eksplorohet dhe komunikohet në mënyrë interaktive."
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        }
+      ],
+      "descriptionEn": [
+        {
+          "_key": "p1",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "s1",
+              "_type": "span",
+              "marks": [],
+              "text": "The Lubonja WebGIS platform connects heritage documentation with geospatial analysis and publishing. Data collected through GIS, drones, LiDAR and laser scanning are organized in a digital environment where spatial information can be explored and communicated interactively."
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        }
+      ]
     },
     {
       "_id": "lindimaps-project-2",
@@ -135,19 +167,51 @@
       "year": 2024,
       "featured": true,
       "titleSq": "Monitorimi i Pyjeve",
-      "summarySq": "Monitorim dhe analizë e mbulesës pyjore përmes të dhënave satelitore dhe metodave GIS/Remote Sensing. Qasja synon identifikimin e ndryshimeve territoriale dhe të biomasës, krahasimin shumëkohor të sipërfaqeve dhe prodhimin e informacionit hartografik për vlerësim dhe monitorim.",
+      "summarySq": "Projekt i analizës së mbulesës pyjore dhe ndryshimeve të biomasës përmes Remote Sensing dhe analizës GIS. Qasja kombinon imazhe satelitore, klasifikim të mbulesës së tokës dhe përpunim gjeohapësinor për të evidentuar ndryshimet territoriale dhe për të mbështetur monitorimin mjedisor.",
       "imageUrl": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200",
       "titleEn": "Forest Monitoring",
-      "summaryEn": "Forest-cover monitoring and analysis using satellite data and GIS/Remote Sensing methods. The workflow focuses on identifying territorial and biomass changes, multi-temporal comparison of land surfaces, and producing cartographic information for assessment and monitoring.",
+      "summaryEn": "A forest-cover and biomass-change analysis project based on Remote Sensing and GIS. The workflow combines satellite imagery, land-cover classification and geospatial processing to identify territorial change and support environmental monitoring.",
       "technologies": [
         "Remote Sensing",
         "Satellite Imagery",
         "GIS",
-        "Spatial Analysis",
-        "Land Cover"
+        "Land Cover",
+        "Spatial Analysis"
       ],
-      "roleSq": "Përpunim imazhesh satelitore · analizë gjeohapësinore",
-      "roleEn": "Satellite imagery processing · geospatial analysis"
+      "roleSq": "Analizë Remote Sensing dhe përpunim gjeohapësinor",
+      "roleEn": "Remote Sensing analysis and geospatial processing",
+      "descriptionSq": [
+        {
+          "_key": "p1",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "s1",
+              "_type": "span",
+              "marks": [],
+              "text": "Monitorimi i Pyjeve përdor të dhëna të vrojtimit të Tokës për të analizuar strukturën dhe ndryshimet e mbulesës pyjore. Përpunimi satelitor dhe analiza GIS mundësojnë krahasimin hapësinor të sipërfaqeve dhe krijimin e produkteve të interpretuara për monitorim dhe vendimmarrje."
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        }
+      ],
+      "descriptionEn": [
+        {
+          "_key": "p1",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "s1",
+              "_type": "span",
+              "marks": [],
+              "text": "Forest Monitoring uses Earth-observation data to analyze the structure and change of forest cover. Satellite processing and GIS analysis enable spatial comparison of areas and the production of interpreted outputs for monitoring and decision support."
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        }
+      ]
     },
     {
       "_id": "lindimaps-project-3",
@@ -161,21 +225,53 @@
       "year": 2025,
       "featured": true,
       "titleSq": "Kalaja Lezhë 3D",
-      "summarySq": "Dokumentim dhe interpretim digjital 3D i Kalasë së Lezhës në kuadër të punës mbi Lissus dhe Akrolis. Fotogrametria dhe të dhënat gjeohapësinore përdoren për të ndërtuar përfaqësime 3D të monumentit dhe për t’i integruar ato në një eksperiencë WebGIS/StoryMap të aksesueshme online.",
+      "summarySq": "Dokumentim dhe modelim 3D i Kalasë së Lezhës për ruajtjen dhe interpretimin digjital të monumentit. Projekti kombinon fotogrametrinë, të dhënat hapësinore dhe publikimin WebGIS/3D për të paraqitur strukturën e sitit në një format interaktiv të përdorshëm për kërkim, dokumentim dhe komunikim të trashëgimisë.",
       "imageUrl": "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1200",
       "liveUrl": "https://storymaps.arcgis.com/stories/136af9b1b3be4e889d61f2b25a7f64a4",
       "titleEn": "Lezhë Castle 3D",
-      "summaryEn": "Digital 3D documentation and interpretation of Lezhë Castle within the work on Lissus and Akrolis. Photogrammetry and geospatial data are used to build 3D representations of the monument and integrate them into an online WebGIS/StoryMap experience.",
+      "summaryEn": "3D documentation and modelling of Lezhë Castle for the digital preservation and interpretation of the monument. The project combines photogrammetry, spatial data and WebGIS/3D publishing to present the site in an interactive format for research, documentation and heritage communication.",
       "technologies": [
         "Photogrammetry",
-        "3D Modeling",
+        "3D Modelling",
         "GIS",
         "WebGIS",
-        "StoryMaps"
+        "Cultural Heritage"
       ],
-      "roleSq": "Dokumentim 3D · WebGIS · vizualizim i trashëgimisë",
-      "roleEn": "3D documentation · WebGIS · heritage visualization",
-      "client": "Lissus 2025 · AKKSHI"
+      "roleSq": "Dokumentim gjeohapësinor, modelim 3D dhe publikim digjital",
+      "roleEn": "Geospatial documentation, 3D modelling and digital publishing",
+      "client": "Lissus / Lezhë research",
+      "descriptionSq": [
+        {
+          "_key": "p1",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "s1",
+              "_type": "span",
+              "marks": [],
+              "text": "Kalaja Lezhë 3D synon të ruajë dhe komunikojë informacionin hapësinor të monumentit përmes dokumentimit fotogrametrik dhe modelimit tredimensional. Rezultati krijon një bazë digjitale për vizualizim, interpretim dhe integrim me përmbajtje WebGIS të lidhur me kërkimin mbi Lissus dhe Akrolis."
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        }
+      ],
+      "descriptionEn": [
+        {
+          "_key": "p1",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "s1",
+              "_type": "span",
+              "marks": [],
+              "text": "Lezhë Castle 3D preserves and communicates spatial information about the monument through photogrammetric documentation and three-dimensional modelling. The result provides a digital basis for visualization, interpretation and integration with WebGIS content related to research on Lissus and Akrolis."
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        }
+      ]
     }
   ],
   "profile": {
