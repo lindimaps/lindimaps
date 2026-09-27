@@ -587,3 +587,8 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 /* Project cards: year as plain text only */
 .project-grid .catalogue-card.projects .project-meta span:last-child{border:0!important;background:transparent!important;border-radius:0!important;padding:0!important}
 
+
+/* iOS contact form: prevent Safari focus zoom and horizontal overflow */
+@media(max-width:600px){
+ .contact-form input,.contact-form textarea,.contact-form select{font-size:16px!important;max-width:100%!important;box-sizing:border-box!important}
+}
