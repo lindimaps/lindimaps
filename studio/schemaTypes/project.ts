@@ -36,6 +36,7 @@ export const projectType = defineType({
           {title: 'Remote Sensing', value: 'remote-sensing'},
           {title: '3D / CityEngine', value: '3d'},
           {title: 'Research', value: 'research'},
+          {title: 'Web Development / Digital Platform', value: 'web-development'},
           {title: 'Other', value: 'other'},
         ],
       },
