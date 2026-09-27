@@ -2,7 +2,7 @@ import { cache } from "react";
 import starterData from "@/data/starter.json";
 export type Language = "sq" | "en";
 type Localized = Partial<Record<`${"title"|"description"|"summary"|"heroTitle"|"heroText"|"primaryCta"|"secondaryCta"|"introTitle"|"intro"|"location"|"seoDescription"|"headline"}${"Sq"|"En"}`,string>>;
-export type ContentItem = Localized & {_id:string;category?:string;year?:number;image?:string;imageAltSq?:string;imageAltEn?:string;liveUrl?:string;githubUrl?:string;roleSq?:string;roleEn?:string;client?:string;technologies?:string[]};
+export type ContentItem = Localized & {_id:string;category?:string;year?:number;image?:string;imageAltSq?:string;imageAltEn?:string;liveUrl?:string;githubUrl?:string;roleSq?:string;roleEn?:string;client?:string;clientEn?:string;technologies?:string[]};
 export type Activity={_id:string;titleSq?:string;titleEn?:string;kind?:string;date?:string;location?:string;descriptionSq?:string;descriptionEn?:string;image?:string;url?:string};
 export type GalleryItem={_id:string;titleSq?:string;titleEn?:string;captionSq?:string;captionEn?:string;image?:string;tags?:string[]};
 export type TeamMember={_id:string;name:string;roleSq?:string;roleEn?:string;bioSq?:string;bioEn?:string;image?:string;email?:string;linkedin?:string;order?:number;featured?:boolean};
@@ -23,7 +23,7 @@ const dataset=process.env.SANITY_DATASET||"production";
 const query=`{
  "home": *[_type=="homePage"]|order(_updatedAt desc)[0]{...,"image":heroImage.asset->url},
  "settings": *[_type=="siteSettings"]|order(_updatedAt desc)[0]{...,"logo":logo.asset->url,"ogImage":ogImage.asset->url},
- "projects": *[_type=="project"]|order(order asc,year desc,_createdAt desc){_id,titleSq,titleEn,summarySq,summaryEn,category,year,liveUrl,githubUrl,roleSq,roleEn,client,technologies,"image":coalesce(coverImage.asset->url,imageUrl),"imageAltSq":coverImage.altSq,"imageAltEn":coverImage.altEn},
+ "projects": *[_type=="project"]|order(order asc,year desc,_createdAt desc){_id,titleSq,titleEn,summarySq,summaryEn,category,year,liveUrl,githubUrl,roleSq,roleEn,client,clientEn,technologies,"image":coalesce(coverImage.asset->url,imageUrl),"imageAltSq":coverImage.altSq,"imageAltEn":coverImage.altEn},
  "profile": *[_type=="profile"]|order(_updatedAt desc)[0]{...,"image":photo.asset->url},
  "about": *[_type=="aboutPage"]|order(_updatedAt desc)[0]{history,values},
  "services": *[_type=="service"]|order(order asc,_createdAt asc){_id,titleSq,titleEn,descriptionSq,descriptionEn,"image":coalesce(icon.asset->url,imageUrl)},
