@@ -218,27 +218,28 @@
       "_type": "project",
       "slug": {
         "_type": "slug",
-        "current": "kalaja-lezhe-3d"
+        "current": "lissus-lezhe-webgis"
       },
       "order": 3,
-      "category": "3d",
+      "category": "webgis",
       "year": 2025,
       "featured": true,
-      "titleSq": "Kalaja Lezhë 3D",
-      "summarySq": "Dokumentim dhe modelim 3D i Kalasë së Lezhës për ruajtjen dhe interpretimin digjital të monumentit. Projekti kombinon fotogrametrinë, të dhënat hapësinore dhe publikimin WebGIS/3D për të paraqitur strukturën e sitit në një format interaktiv të përdorshëm për kërkim, dokumentim dhe komunikim të trashëgimisë.",
+      "titleSq": "Lissus / Lezhë WebGIS",
+      "summarySq": "Zhvillim WebGIS për kërkimin dhe komunikimin digjital të Lissusit dhe Lezhës, me Web Map, aplikacione web dhe StoryMap për organizimin, eksplorimin dhe publikimin interaktiv të të dhënave gjeohapësinore dhe përmbajtjes së trashëgimisë.",
       "imageUrl": "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1200",
       "liveUrl": "https://storymaps.arcgis.com/stories/136af9b1b3be4e889d61f2b25a7f64a4",
-      "titleEn": "Lezhë Castle 3D",
-      "summaryEn": "3D documentation and modelling of Lezhë Castle for the digital preservation and interpretation of the monument. The project combines photogrammetry, spatial data and WebGIS/3D publishing to present the site in an interactive format for research, documentation and heritage communication.",
+      "titleEn": "Lissus / Lezhë WebGIS",
+      "summaryEn": "WebGIS development for the research and digital communication of Lissus and Lezhë, using Web Maps, web applications and StoryMaps to organize, explore and publish geospatial data and heritage content interactively.",
       "technologies": [
-        "Photogrammetry",
-        "3D Modelling",
-        "GIS",
+        "ArcGIS Online",
         "WebGIS",
-        "Cultural Heritage"
+        "Web Map",
+        "Web App",
+        "StoryMaps",
+        "GIS"
       ],
-      "roleSq": "Dokumentim gjeohapësinor, modelim 3D dhe publikim digjital",
-      "roleEn": "Geospatial documentation, 3D modelling and digital publishing",
+      "roleSq": "Zhvillim WebGIS, Web Map, Web App dhe StoryMap",
+      "roleEn": "WebGIS, Web Map, Web App and StoryMap development",
       "client": "Lissus / Lezhë research",
       "descriptionSq": [
         {
@@ -249,7 +250,7 @@
               "_key": "s1",
               "_type": "span",
               "marks": [],
-              "text": "Kalaja Lezhë 3D synon të ruajë dhe komunikojë informacionin hapësinor të monumentit përmes dokumentimit fotogrametrik dhe modelimit tredimensional. Rezultati krijon një bazë digjitale për vizualizim, interpretim dhe integrim me përmbajtje WebGIS të lidhur me kërkimin mbi Lissus dhe Akrolis."
+              "text": "Projekti fokusohet në zhvillimin e produkteve WebGIS për Lissus dhe Lezhën. Kontributi përfshin ndërtimin e Web Map, aplikacioneve web dhe StoryMap për paraqitjen, interpretimin dhe komunikimin interaktiv të informacionit gjeohapësinor dhe të trashëgimisë."
             }
           ],
           "markDefs": [],
@@ -265,7 +266,7 @@
               "_key": "s1",
               "_type": "span",
               "marks": [],
-              "text": "Lezhë Castle 3D preserves and communicates spatial information about the monument through photogrammetric documentation and three-dimensional modelling. The result provides a digital basis for visualization, interpretation and integration with WebGIS content related to research on Lissus and Akrolis."
+              "text": "The project focuses on developing WebGIS products for Lissus and Lezhë. The contribution includes Web Maps, web applications and StoryMaps for the interactive presentation, interpretation and communication of geospatial and heritage information."
             }
           ],
           "markDefs": [],
