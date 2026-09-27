@@ -9,6 +9,7 @@ export const publicationType = defineType({
       {title:'Artikull shkencor',value:'Journal article'},
       {title:'Kapitull libri',value:'Book chapter'},
       {title:'Punim konference',value:'Conference paper'},
+      {title:'Raport shkencor / teknik',value:'Technical Report'},
       {title:'Raport',value:'Report'},
       {title:'Poster / Prezantim',value:'Presentation'},
       {title:'Tjetër',value:'Other'}
