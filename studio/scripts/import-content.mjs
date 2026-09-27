@@ -10,7 +10,8 @@ const documents = [
   data.about,
   ...data.services,
   ...data.projects,
-]
+  ...(data.publications || []),
+].filter(Boolean)
 const dryRun = process.argv.includes('--dry-run')
 const client = getCliClient({apiVersion: '2025-02-19'}).withConfig({
   useCdn: false,
@@ -21,7 +22,7 @@ async function main() {
   const config = client.config()
   if (config.projectId !== 'oyagunrg' || config.dataset !== 'production')
     throw new Error('Expected LindiMaps project oyagunrg / production; import stopped.')
-  const existing = await client.fetch('*[_type in $types]{_id,_type,titleSq,name,slug}', {
+  const existing = await client.fetch('*[_type in $types]{_id,_type,title,titleSq,name,slug,doi}', {
     types: [...new Set(documents.map((d) => d._type))],
   })
   const singletons = new Set(['homePage', 'siteSettings', 'profile', 'aboutPage'])
@@ -32,8 +33,10 @@ async function main() {
           old._id.replace(/^drafts\./, '') === doc._id ||
           (old._type === doc._type &&
             (singletons.has(doc._type) ||
+              (doc.doi && old.doi === doc.doi) ||
               (doc.slug?.current && old.slug?.current === doc.slug.current) ||
-              (doc.titleSq && old.titleSq === doc.titleSq))),
+              (doc.titleSq && old.titleSq === doc.titleSq) ||
+              (doc.title && old.title === doc.title))),
       ),
   )
   console.log(
@@ -41,7 +44,7 @@ async function main() {
   )
   for (const doc of pending)
     console.log(
-      `${dryRun ? 'PREVIEW' : 'CREATE'} ${doc._type}: ${doc.titleSq || doc.name || doc._id}`,
+      `${dryRun ? 'PREVIEW' : 'CREATE'} ${doc._type}: ${doc.titleSq || doc.title || doc.name || doc._id}`,
     )
   if (dryRun || !pending.length) return
   let transaction = client.transaction()
