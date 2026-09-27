@@ -577,3 +577,9 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 
 /* Final header behavior: keep the approved visual overlay and pin navigation during scroll */
 .site-header,.home-site-header{position:sticky!important;top:0!important;z-index:1000!important}
+
+/* Partner cards: keep full institution names inside each card */
+.partners-section .partner-card{height:auto!important;min-height:160px!important;overflow:visible!important}
+.partners-section .partner-card strong,.partners-section .partner-card small{width:100%!important;max-width:100%!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important}
+@media(max-width:850px){.partners-section .partner-card{height:auto!important;min-height:145px!important}}
+@media(max-width:560px){.partners-section .partner-card{height:auto!important;min-height:135px!important}}
