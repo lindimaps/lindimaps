@@ -291,3 +291,20 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .projects-showcase .catalogue-card p,.projects-showcase .catalogue-card small{color:#aebfce}
 .projects-showcase .catalogue-card:hover{border-color:rgba(103,219,230,.38);background:rgba(255,255,255,.065);transform:translateY(-4px)}
 @media(max-width:760px){.services-showcase,.projects-showcase{padding-top:76px;padding-bottom:86px}.services-showcase .section-head,.projects-showcase .section-head{align-items:flex-start;gap:24px}.services-showcase .section-head h2,.projects-showcase .section-head h2{font-size:clamp(2.8rem,14vw,4.5rem)}.services-showcase .section-link,.projects-showcase .section-link{align-self:flex-start}.projects-showcase:before{width:100vw;height:100vw;right:-55vw;top:-15vw}.projects-showcase:after{background-size:64px 64px}}
+
+/* Home collaboration close — editorial CTA flowing directly into the global footer */
+.modern-contact{position:relative;overflow:hidden;padding:clamp(100px,12vw,180px) 0 clamp(92px,11vw,156px);background:#f7f9fb;color:#071426;border-top:1px solid #dfe6ed}
+.modern-contact:before{content:"";position:absolute;left:0;top:0;width:34%;height:100%;pointer-events:none;background:linear-gradient(90deg,rgba(7,20,38,.035),transparent)}
+.modern-contact .contact-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.55fr);gap:clamp(60px,10vw,160px);align-items:end}
+.modern-contact .eyebrow{margin-bottom:28px;color:#3c6574;font-size:.62rem;letter-spacing:.18em}
+.modern-contact h2{max-width:950px;margin:0;font-size:clamp(3.4rem,7.2vw,7.6rem);line-height:.88;letter-spacing:-.07em;font-weight:430}
+.modern-contact .contact-copy{max-width:660px;margin:38px 0 0;color:#526272;font-size:clamp(1rem,1.3vw,1.18rem);line-height:1.72}
+.modern-contact .contact-side{align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;border-left:1px solid #d6dfe7;padding-left:clamp(26px,4vw,54px)}
+.modern-contact .contact-email{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 0 18px;border-bottom:1px solid #0b2435;color:#071426;font-size:clamp(1rem,1.4vw,1.25rem);font-weight:650;overflow-wrap:anywhere}
+.modern-contact .contact-email svg{flex:0 0 auto;transition:transform .2s ease}.modern-contact .contact-email:hover svg{transform:translateX(5px)}
+.modern-contact .contact-side>p{margin:22px 0 0;color:#667585}
+.modern-contact .socials{display:flex;flex-wrap:wrap;gap:9px 18px;margin-top:36px}
+.modern-contact .socials a{display:inline-flex;align-items:center;gap:7px;color:#314756;font-size:.69rem;font-weight:750;letter-spacing:.06em;text-transform:uppercase}
+.modern-contact .socials svg{width:14px;height:14px}
+.modern-contact+*{margin-top:0}
+@media(max-width:760px){.modern-contact{padding:82px 0 88px}.modern-contact .contact-layout{grid-template-columns:1fr;gap:58px}.modern-contact h2{font-size:clamp(3rem,14.5vw,4.9rem)}.modern-contact .contact-copy{margin-top:28px}.modern-contact .contact-side{border-left:0;border-top:1px solid #d6dfe7;padding:30px 0 0}.modern-contact .socials{margin-top:28px}}
