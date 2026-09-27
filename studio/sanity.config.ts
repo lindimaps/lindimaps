@@ -4,6 +4,12 @@ import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
 
 const singletonTypes = new Set(['homePage','siteSettings','profile','aboutPage'])
+const singletonIds = {
+  homePage: 'lindimaps-home',
+  siteSettings: 'lindimaps-settings',
+  profile: 'lindimaps-profile',
+  aboutPage: 'lindimaps-about',
+}
 
 export default defineConfig({
   name: 'default',
@@ -12,7 +18,14 @@ export default defineConfig({
   projectId: 'oyagunrg',
   dataset: 'production',
 
-  plugins: [structureTool({structure:(S)=>S.list().title('LindiMaps').items([S.listItem().title('Home').child(S.document().schemaType('homePage').documentId('homePage')),S.listItem().title('Konfigurimi i faqes').child(S.document().schemaType('siteSettings').documentId('siteSettings')),S.listItem().title('Profili').child(S.document().schemaType('profile').documentId('profile')),S.listItem().title('Rreth nesh').child(S.document().schemaType('aboutPage').documentId('aboutPage')),S.divider(),...S.documentTypeListItems().filter(item=>!singletonTypes.has(item.getId()||''))])}), visionTool()],
+  plugins: [structureTool({structure:(S)=>S.list().title('LindiMaps').items([
+    S.listItem().title('Home').child(S.document().schemaType('homePage').documentId(singletonIds.homePage)),
+    S.listItem().title('Konfigurimi i faqes').child(S.document().schemaType('siteSettings').documentId(singletonIds.siteSettings)),
+    S.listItem().title('Profili').child(S.document().schemaType('profile').documentId(singletonIds.profile)),
+    S.listItem().title('Rreth nesh').child(S.document().schemaType('aboutPage').documentId(singletonIds.aboutPage)),
+    S.divider(),
+    ...S.documentTypeListItems().filter(item=>!singletonTypes.has(item.getId()||''))
+  ])}), visionTool()],
 
   document: {
     newDocumentOptions: (prev) => prev.filter((item) => !singletonTypes.has(item.templateId)),
