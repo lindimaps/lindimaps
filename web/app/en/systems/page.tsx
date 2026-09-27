@@ -1,1 +1,1 @@
-import SystemsHub from "@/components/systems-hub";export const metadata={title:"LindiMaps Systems"};export default function Page(){return <SystemsHub lang="en"/>}
+import type {Metadata} from "next";import SystemsHub from "@/components/systems-hub";export const metadata:Metadata={title:"LindiMaps Systems",robots:{index:false,follow:false}};export default function Page(){return <SystemsHub lang="en"/>}
