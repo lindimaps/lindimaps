@@ -490,3 +490,87 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 }
 /* Sticky header without pushing the approved page/hero composition downward */
 .home-site-header{position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:1000!important}
+
+/* Restored approved About/Partners presentation from protected pre-regression state */
+/* About: editorial portrait treatment + CMS-managed team */
+.about-profile .profile-photo{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:24px 4px 24px 4px;box-shadow:0 28px 70px rgba(7,20,38,.16);transform:rotate(-.7deg);transition:transform .45s ease,box-shadow .45s ease}.about-profile .profile-grid:hover .profile-photo{transform:rotate(0) translateY(-4px);box-shadow:0 34px 80px rgba(7,20,38,.2)}.about-team-section{padding:clamp(70px,9vw,125px) 0;background:#071426;color:#fff}.team-heading{display:grid;grid-template-columns:.55fr 1.45fr;gap:5vw;align-items:end;margin-bottom:48px}.team-heading h2{font-size:clamp(2.6rem,5vw,5rem);font-weight:450;letter-spacing:-.055em}.team-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.team-card{background:#0b1c31;border:1px solid rgba(255,255,255,.09);overflow:hidden}.team-photo-wrap{position:relative;aspect-ratio:4/5;overflow:hidden;background:#10243a;display:grid;place-items:center;font-size:3rem}.team-photo-wrap:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 58%,rgba(3,15,25,.38))}.team-photo-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease,filter .6s ease}.team-card:hover .team-photo-wrap img{transform:scale(1.035);filter:saturate(1.05)}.team-card-body{padding:24px}.team-card-body small{color:#67dbe6;font-size:.62rem;font-weight:850;letter-spacing:.12em;text-transform:uppercase}.team-card-body h3{color:#fff;margin-top:8px;font-size:1.7rem}.team-card-body p{color:#94a7bb;margin-top:14px;font-size:.9rem;line-height:1.7}.team-card-body>div{display:flex;gap:16px;margin-top:20px}.team-card-body a{color:#dbe8f5;font-size:.72rem;font-weight:800}.team-card-featured{grid-column:span 2;display:grid;grid-template-columns:1.05fr .95fr}.team-card-featured .team-photo-wrap{aspect-ratio:auto;min-height:520px}@media(max-width:900px){.team-grid{grid-template-columns:1fr 1fr}.team-card-featured{grid-column:1/-1}}@media(max-width:600px){.about-profile .profile-photo{border-radius:18px 3px 18px 3px;transform:none}.team-heading{grid-template-columns:1fr;gap:12px}.team-grid{grid-template-columns:1fr}.team-card-featured{display:block;grid-column:auto}.team-card-featured .team-photo-wrap{aspect-ratio:4/5;min-height:0}}
+
+
+/* Publications: stable cards on desktop and comfortable mobile gutters */
+.publications-section .publication-list{gap:22px}
+.publications-section .publication-card{padding:30px;gap:34px;overflow:hidden;transition:border-color .25s ease,box-shadow .25s ease}
+.publications-section .publication-card:hover{padding-left:30px;transform:none;border-color:#cbd8e5;box-shadow:0 14px 36px rgba(15,23,42,.055)}
+.publications-section .pub-content{min-width:0;padding:4px 0}
+.publications-section .publication-card h2,.publications-section .pub-authors,.publications-section .pub-publisher,.publications-section .pub-abstract,.publications-section .pub-citation{overflow-wrap:anywhere}
+@media(max-width:760px){
+ .publications-section{width:calc(100% - 28px)}
+ .publications-section .publication-list{gap:18px}
+ .publications-section .publication-card{grid-template-columns:1fr;gap:22px;padding:16px 16px 22px;border-radius:16px}
+ .publications-section .publication-card:hover{padding-left:16px;transform:none}
+ .publications-section .pub-visual{width:100%}
+ .publications-section .pub-visual img,.publications-section .pub-placeholder{width:100%;height:auto;aspect-ratio:16/10;min-height:0}
+ .publications-section .pub-content{padding:0 2px}
+ .publications-section .publication-card h2{font-size:clamp(1.35rem,7vw,1.85rem);line-height:1.12}
+ .publications-section .pub-authors{font-size:.88rem;line-height:1.55}
+ .publications-section .pub-publisher,.publications-section .pub-abstract,.publications-section .pub-citation{font-size:.86rem;line-height:1.65}
+ .publications-section .pub-actions{gap:12px;margin-top:20px}
+ .publications-section .pub-link{padding:9px 0}
+}
+
+
+/* Partner carousel: keep institutional identity visible */
+.partners-section .partner-card{width:230px;min-width:230px;height:160px;justify-content:flex-start;gap:10px;padding:14px 12px}
+.partners-section .partner-card img{height:78px;max-height:78px;max-width:175px;object-fit:contain}
+.partners-section .partner-card strong{display:block;font-size:.82rem;line-height:1.25;font-weight:800;color:#0f172a;max-width:210px}
+.partners-section .partner-card small{display:block;font-size:.66rem;line-height:1.3;color:#64748b}
+@media(max-width:850px){.partners-section .partner-card{width:195px;min-width:195px;height:145px}.partners-section .partner-card img{height:68px;max-height:68px;max-width:150px}}
+@media(max-width:560px){.partners-section .partner-card{width:170px;min-width:170px;height:135px}.partners-section .partner-card img{height:60px;max-height:60px;max-width:135px}.partners-section .partner-card strong{font-size:.74rem}}
+
+
+/* About lead profile: complete presentation even before a wider team is published */
+.about-profile .profile-grid{align-items:stretch}
+.about-profile .profile-copy{display:flex;flex-direction:column;justify-content:center;padding:clamp(10px,3vw,34px) 0}
+.about-profile .profile-name{font-size:.72rem;font-weight:850;letter-spacing:.16em;text-transform:uppercase;color:#526779;margin:0 0 14px}
+.about-profile .profile-copy h2{font-size:clamp(2.5rem,5vw,5rem);font-weight:500;letter-spacing:-.055em;max-width:760px}
+.about-profile .profile-copy .prose{max-width:760px}
+.about-profile .profile-skills{margin-top:28px}
+.about-profile .profile-socials{padding-top:22px;border-top:1px solid #dce4eb}
+.about-profile .profile-socials a{padding-bottom:4px;border-bottom:1px solid transparent}
+.about-profile .profile-socials a:hover{border-bottom-color:#2563eb}
+.about-profile .profile-email{margin-top:18px;font-size:.82rem;font-weight:750;color:#526779}
+@media(max-width:850px){.about-profile .profile-copy{padding-top:8px}.about-profile .profile-copy h2{font-size:clamp(2.35rem,9vw,4.2rem)}}
+
+
+/* Mobile Workspace: quiet utility group, visually secondary to public navigation */
+@media(max-width:900px){
+ .mobile-menu-panel>.mobile-workspace-nav{margin-top:6px!important;padding-top:10px!important;border-top:1px solid rgba(148,163,184,.22)!important}
+ .mobile-workspace-nav>summary{min-height:38px!important;padding:4px 0!important;color:#7d8da1!important;font-size:.64rem!important;font-weight:850!important;letter-spacing:.14em!important;text-transform:uppercase!important}
+ .mobile-workspace-nav>summary svg{width:9px!important;height:6px!important;opacity:.7}
+ .mobile-workspace-subnav{grid-template-columns:1fr 1fr!important;gap:8px!important;padding:8px 0 2px!important;margin:0!important}
+ .mobile-workspace-subnav>a{min-height:40px!important;padding:0 12px!important;border:1px solid rgba(148,163,184,.18)!important;border-radius:9px!important;background:rgba(255,255,255,.035)!important;color:#d5e0eb!important;font-size:.76rem!important;font-weight:750!important}
+ .mobile-workspace-subnav>a:hover{background:rgba(255,255,255,.07)!important;color:#fff!important}
+ .home-site-header .mobile-menu-panel .mobile-workspace-nav>summary{color:#7d8da1!important}
+ .home-site-header .mobile-workspace-subnav>a{color:#334155!important;background:#f8fafc!important;border-color:#e4eaf0!important}
+ .home-site-header .mobile-workspace-subnav>a:hover{color:#2563eb!important;background:#f1f5f9!important}
+}
+
+
+/* Project category navigation */
+.spatial-capabilities span>a{display:flex;width:100%;height:100%;flex:1;flex-direction:column;align-items:flex-start;gap:15px;color:inherit;text-decoration:none}
+
+
+/* Service images: preserve natural proportions without squeezing or cropping */
+.service-grid .card-media{display:block;background:#f7f9fb}
+.service-grid .project-image{display:block;width:100%;height:auto!important;max-height:none!important;object-fit:unset!important;object-position:center!important;transform:none!important}
+@media(max-width:700px){.service-grid .project-image{width:100%;height:auto!important}}
+
+
+/* Services: full-width media cards */
+.service-grid{grid-template-columns:1fr!important}
+.service-grid .catalogue-card.services{width:100%!important;display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)!important;align-items:stretch!important;padding:0!important;border:1px solid #e2e8f0!important;border-radius:16px!important;overflow:hidden!important;background:#fff!important}
+.service-grid .catalogue-card.services .card-media{width:100%!important;height:100%!important;min-height:360px!important;background:#f7f9fb!important}
+.service-grid .catalogue-card.services .project-image{width:100%!important;height:100%!important;min-height:360px!important;object-fit:cover!important;object-position:center!important}
+.service-grid .catalogue-card.services .project-body{padding:40px!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
+@media(max-width:700px){.service-grid .catalogue-card.services{grid-template-columns:1fr!important}.service-grid .catalogue-card.services .card-media,.service-grid .catalogue-card.services .project-image{min-height:0!important;height:auto!important;aspect-ratio:auto!important;object-fit:contain!important}.service-grid .catalogue-card.services .project-body{padding:24px!important}}
+
+/* Preserve current project filters and sticky header; restored blocks above are scoped to About/Partners. */
