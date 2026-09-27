@@ -446,3 +446,5 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .site-header:not(.home-site-header) .mobile-menu>summary span{background:#071426!important}
 .site-header:not(.home-site-header):after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:14px;pointer-events:none;background:linear-gradient(180deg,rgba(7,20,38,.08),rgba(7,20,38,0));opacity:.55}
 @media(max-width:900px){.site-header:not(.home-site-header) .mobile-menu-panel{background:#fff!important;border-top:1px solid #e3e9ef!important}.site-header:not(.home-site-header) .mobile-menu-panel>a,.site-header:not(.home-site-header) .mobile-workspace-nav>summary{color:#071426!important}.site-header:not(.home-site-header) .mobile-workspace-subnav>a{color:#526779!important}}
+
+.not-found-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.not-found-actions a{margin-top:0!important}.not-found-actions a+ a{background:transparent!important;color:inherit!important;border:1px solid currentColor}

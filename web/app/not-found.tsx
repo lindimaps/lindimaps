@@ -1,12 +1,1 @@
-import Link from "next/link";
-
-export default function NotFound() {
-  return <main className="not-found-page">
-    <div>
-      <p className="eyebrow">404 / LINDIMAPS</p>
-      <h1>Beyond this map.</h1>
-      <p>The page you are looking for could not be found.</p>
-      <Link href="/">Return home <span>→</span></Link>
-    </div>
-  </main>;
-}
+import Link from "next/link";export default function NotFound(){return <main className="not-found-page"><div><p className="eyebrow">404 / LINDIMAPS</p><h1>Beyond this map.</h1><p>Faqja që kërkoni nuk u gjet. / The page you are looking for could not be found.</p><div className="not-found-actions"><Link href="/">Shqip <span>→</span></Link><Link href="/en">English <span>→</span></Link></div></div></main>}
