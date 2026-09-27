@@ -306,7 +306,8 @@
         "LiDAR",
         "Geophysics"
       ],
-      "featured": true
+      "featured": true,
+      "_type": "publication"
     },
     {
       "_id": "pub-lubonja-intechopen-2025",
@@ -339,7 +340,8 @@
         "Drone",
         "LiDAR",
         "Laser scanner"
-      ]
+      ],
+      "_type": "publication"
     },
     {
       "_id": "pub-ijim-2025",
@@ -364,7 +366,8 @@
         "Laser Scanning",
         "Data Visualization",
         "Lubonja"
-      ]
+      ],
+      "_type": "publication"
     },
     {
       "_id": "pub-lubonja-report-2025",
@@ -411,7 +414,8 @@
         "LiDAR",
         "Laser Scanner",
         "AKKSHI"
-      ]
+      ],
+      "_type": "publication"
     }
   ],
   "partners": [
