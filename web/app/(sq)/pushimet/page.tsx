@@ -1,1 +1,1 @@
-export const metadata={title:"Pushimet | LindiMaps Systems"};export default function Page(){return <main className="legacy-system-bridge"><section><small>LINDIMAPS SYSTEMS</small><h1>Pushimet</h1><p>Sistemi ekzistues ruan llogaritë dhe të dhënat e pushimeve në Firebase. Migrimi po bëhet pa ndryshuar strukturën e të dhënave.</p><a href="/pushimet-legacy.html">Hap sistemin aktual ↗</a></section></main>}
+import PushimetApp from "@/components/pushimet-app";export const metadata={title:"Pushimet | LindiMaps Systems"};export default function Page(){return <PushimetApp/>}
