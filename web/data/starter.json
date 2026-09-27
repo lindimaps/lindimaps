@@ -413,5 +413,88 @@
         "AKKSHI"
       ]
     }
+  ],
+  "partners": [
+    {
+      "_id": "lindimaps-partner-akkshi",
+      "_type": "partner",
+      "name": "AKKSHI",
+      "roleSq": "Institucion partner",
+      "roleEn": "Partner institution",
+      "url": "https://nasri.gov.al",
+      "order": 1
+    },
+    {
+      "_id": "lindimaps-partner-fgjm",
+      "_type": "partner",
+      "name": "Fakulteti i Gjeologjisë dhe i Minierave",
+      "roleSq": "Institucion partner",
+      "roleEn": "Partner institution",
+      "url": "https://fgjm.edu.al",
+      "order": 2
+    },
+    {
+      "_id": "lindimaps-partner-ashsh",
+      "_type": "partner",
+      "name": "Akademia e Shkencave e Shqipërisë",
+      "roleSq": "Institucion partner",
+      "roleEn": "Partner institution",
+      "url": "https://akad.gov.al/",
+      "order": 3
+    },
+    {
+      "_id": "lindimaps-partner-unitir",
+      "_type": "partner",
+      "name": "Universiteti i Tiranës",
+      "roleSq": "Institucion partner",
+      "roleEn": "Partner institution",
+      "url": "https://unitir.edu.al/",
+      "order": 4
+    },
+    {
+      "_id": "lindimaps-partner-fhf",
+      "_type": "partner",
+      "name": "Fakulteti i Historisë dhe i Filologjisë",
+      "roleSq": "Institucion partner",
+      "roleEn": "Partner institution",
+      "url": "https://fhf.edu.al/",
+      "order": 5
+    },
+    {
+      "_id": "lindimaps-partner-drtk-korce",
+      "_type": "partner",
+      "name": "DRTK Korçë",
+      "roleSq": "Institucion partner",
+      "roleEn": "Partner institution",
+      "url": "https://drtkkorce.com/",
+      "order": 6
+    },
+    {
+      "_id": "lindimaps-partner-bashkia-korce",
+      "_type": "partner",
+      "name": "Bashkia Korçë",
+      "roleSq": "Institucion partner",
+      "roleEn": "Partner institution",
+      "url": "https://bashkiakorce.gov.al",
+      "order": 7
+    },
+    {
+      "_id": "lindimaps-partner-bashkia-lezhe",
+      "_type": "partner",
+      "name": "Bashkia Lezhë",
+      "roleSq": "Institucion partner",
+      "roleEn": "Partner institution",
+      "url": "https://lezha.gov.al/",
+      "order": 8
+    },
+    {
+      "_id": "lindimaps-partner-upt",
+      "_type": "partner",
+      "name": "Universiteti Politeknik i Tiranës",
+      "roleSq": "Institucion partner",
+      "roleEn": "Partner institution",
+      "url": "https://upt.edu.al/",
+      "order": 9
+    }
   ]
 }
