@@ -557,3 +557,17 @@ body:has(.home-map-hero) main{padding-top:0}
 .about-profile .profile-socials a:hover{border-bottom-color:#2563eb}
 .about-profile .profile-email{margin-top:18px;font-size:.82rem;font-weight:750;color:#526779}
 @media(max-width:850px){.about-profile .profile-copy{padding-top:8px}.about-profile .profile-copy h2{font-size:clamp(2.35rem,9vw,4.2rem)}}
+
+
+/* Mobile Workspace: quiet utility group, visually secondary to public navigation */
+@media(max-width:900px){
+ .mobile-menu-panel>.mobile-workspace-nav{margin-top:6px!important;padding-top:10px!important;border-top:1px solid rgba(148,163,184,.22)!important}
+ .mobile-workspace-nav>summary{min-height:38px!important;padding:4px 0!important;color:#7d8da1!important;font-size:.64rem!important;font-weight:850!important;letter-spacing:.14em!important;text-transform:uppercase!important}
+ .mobile-workspace-nav>summary svg{width:9px!important;height:6px!important;opacity:.7}
+ .mobile-workspace-subnav{grid-template-columns:1fr 1fr!important;gap:8px!important;padding:8px 0 2px!important;margin:0!important}
+ .mobile-workspace-subnav>a{min-height:40px!important;padding:0 12px!important;border:1px solid rgba(148,163,184,.18)!important;border-radius:9px!important;background:rgba(255,255,255,.035)!important;color:#d5e0eb!important;font-size:.76rem!important;font-weight:750!important}
+ .mobile-workspace-subnav>a:hover{background:rgba(255,255,255,.07)!important;color:#fff!important}
+ .home-site-header .mobile-menu-panel .mobile-workspace-nav>summary{color:#7d8da1!important}
+ .home-site-header .mobile-workspace-subnav>a{color:#334155!important;background:#f8fafc!important;border-color:#e4eaf0!important}
+ .home-site-header .mobile-workspace-subnav>a:hover{color:#2563eb!important;background:#f1f5f9!important}
+}
