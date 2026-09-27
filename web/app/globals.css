@@ -219,3 +219,19 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .home-map-hero,.map-hero-center{min-height:100svh}
 .map-hero-center{padding-top:134px}
 @media(max-width:900px){.home-site-header{background:linear-gradient(180deg,rgba(3,15,25,.88),rgba(3,15,25,.35) 75%,transparent)}.home-site-header .mobile-menu-panel{color:#0f172a}.home-site-header .mobile-menu-panel>a{color:#0f172a}.home-site-header .mobile-workspace>summary{color:#0f172a}.home-map-hero,.map-hero-center{min-height:100svh}}
+
+/* Home header logo contrast + definitive mobile Workspace navigation */
+.home-site-header .home-brand .lm-word strong{color:#fff!important}.home-site-header .home-brand .lm-word strong span{color:#67dbe6!important}.home-site-header .home-brand .lm-word small{color:rgba(226,240,247,.78)!important}.home-site-header .home-brand .lm-icon{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16)}
+.mobile-workspace-nav{display:none}
+@media(max-width:900px){
+.mobile-menu-panel>.mobile-workspace,.mobile-menu-panel>.mobile-workspace-nav{display:block!important;margin:0!important;padding:0!important;border:0!important;border-top:1px solid #e5eaf0!important}
+.mobile-workspace-nav>summary{list-style:none!important;display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:50px!important;padding:0!important;cursor:pointer!important;color:#0f172a!important;font-size:.9rem!important;font-weight:700!important;letter-spacing:0!important}
+.mobile-workspace-nav>summary::-webkit-details-marker{display:none!important}
+.mobile-workspace-nav>summary svg{width:12px;height:8px;fill:none;stroke:#64748b;stroke-width:1.5;transition:transform .2s ease;margin-right:3px}
+.mobile-workspace-nav[open]>summary svg{transform:rotate(180deg)}
+.mobile-workspace-subnav{display:grid!important;margin:0 0 10px 0!important;padding:0 0 0 18px!important;border-left:1px solid #d7dee7!important}
+.mobile-workspace-nav:not([open])>.mobile-workspace-subnav{display:none!important}
+.mobile-workspace-subnav>a{display:flex!important;align-items:center!important;min-height:43px!important;padding:0 12px!important;color:#475569!important;font-size:.84rem!important;font-weight:650!important;border:0!important;border-radius:0!important;background:transparent!important}
+.mobile-workspace-subnav>a:hover{color:#2563eb!important;background:#f8fafc!important}
+.home-site-header .mobile-menu-panel .mobile-workspace-nav>summary{color:#0f172a!important}
+}
