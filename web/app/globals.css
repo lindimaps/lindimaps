@@ -583,3 +583,6 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .partners-section .partner-card strong,.partners-section .partner-card small{width:100%!important;max-width:100%!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important}
 @media(max-width:850px){.partners-section .partner-card{height:auto!important;min-height:145px!important}}
 @media(max-width:560px){.partners-section .partner-card{height:auto!important;min-height:135px!important}}
+
+/* Project cards: year as plain text only */
+.project-grid .catalogue-card.projects .project-meta span:last-child{border:0!important;background:transparent!important;border-radius:0!important;padding:0!important}
