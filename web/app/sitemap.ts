@@ -1,3 +1,12 @@
 import type {MetadataRoute} from "next";import {routes} from "@/lib/routes";
 const base="https://www.lindimaps.com";
-export default function sitemap():MetadataRoute.Sitemap{const now=new Date();const publicPages=Object.values(routes).flatMap(route=>[{url:base+route.sq,lastModified:now,changeFrequency:route.sq==="/"?"weekly":"monthly",priority:route.sq==="/"?1:.8,alternates:{languages:{"sq-AL":base+route.sq,en:base+route.en}}},{url:base+route.en,lastModified:now,changeFrequency:route.en==="/en"?"weekly":"monthly",priority:route.en==="/en"?1:.8,alternates:{languages:{"sq-AL":base+route.sq,en:base+route.en}}}]);const pairs=[["/sq/privacy","/en/privacy"],["/sq/termsofuse","/en/termsofuse"],["/sq/cookies","/en/cookies"]];const legal=pairs.flatMap(([sq,en])=>[sq,en].map(path=>({url:base+path,lastModified:now,changeFrequency:"yearly" as const,priority:.3,alternates:{languages:{"sq-AL":base+sq,en:base+en}}})));return [...publicPages,...legal]}
+export default function sitemap():MetadataRoute.Sitemap{
+ const now=new Date();
+ const publicPages:MetadataRoute.Sitemap=Object.values(routes).flatMap(route=>[
+  {url:base+route.sq,lastModified:now,changeFrequency:route.sq==="/"?"weekly":"monthly",priority:route.sq==="/"?1:.8,alternates:{languages:{"sq-AL":base+route.sq,en:base+route.en}}},
+  {url:base+route.en,lastModified:now,changeFrequency:route.en==="/en"?"weekly":"monthly",priority:route.en==="/en"?1:.8,alternates:{languages:{"sq-AL":base+route.sq,en:base+route.en}}}
+ ]);
+ const pairs=[["/sq/privacy","/en/privacy"],["/sq/termsofuse","/en/termsofuse"],["/sq/cookies","/en/cookies"]] as const;
+ const legal:MetadataRoute.Sitemap=pairs.flatMap(([sq,en])=>[sq,en].map(path=>({url:base+path,lastModified:now,changeFrequency:"yearly" as const,priority:.3,alternates:{languages:{"sq-AL":base+sq,en:base+en}}})));
+ return [...publicPages,...legal];
+}
