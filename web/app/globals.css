@@ -505,3 +505,7 @@ body:has(.home-map-hero) main{padding-top:0}
 /* Final accessibility/performance safeguards */
 :where(a,button,summary,input,textarea,select):focus-visible{outline:2px solid #3b82f6;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+
+/* iOS contact form: prevent Safari focus zoom and horizontal viewport drift */
+@media(max-width:900px){.contact-form-new input,.contact-form-new textarea{font-size:16px;line-height:1.45;min-width:0}.contact-form-new,.contact-fields,.contact-form-new label{min-width:0;max-width:100%}}
