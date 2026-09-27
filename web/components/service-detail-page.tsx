@@ -1,1 +1,15 @@
-export default function ServiceDetailPage(){return null}
+import {notFound} from "next/navigation";
+import {getSiteContent,type Language} from "@/lib/sanity";
+import {getServiceDetail} from "@/data/service-details";
+import {SiteHeader,SiteFooter} from "./site-shell";
+export default async function ServiceDetailPage({lang,slug}:{lang:Language;slug:string}){
+ const d=getServiceDetail(slug);if(!d)notFound();const data=await getSiteContent();const sq=lang==="sq";
+ const title=sq?d.titleSq:d.titleEn, capabilities=sq?d.capabilitiesSq:d.capabilitiesEn, workflow=sq?d.workflowSq:d.workflowEn, deliverables=sq?d.deliverablesSq:d.deliverablesEn, applications=sq?d.applicationsSq:d.applicationsEn;
+ return <><SiteHeader lang={lang} page="services" settings={data.settings}/><main id="main" className="service-detail-page">
+ <section className="service-detail-hero"><div className="container"><p className="eyebrow">LINDIMAPS / {sq?"SHERBIME":"SERVICES"}</p><h1>{title}</h1><p className="service-detail-lead">{sq?d.leadSq:d.leadEn}</p><a className="service-detail-back" href={sq?"/sq/sherbime/":"/en/services/"}>{sq?"Te gjitha sherbimet":"All services"}</a></div></section>
+ <section className="container service-detail-content"><div className="service-detail-intro"><span>01</span><div><p className="eyebrow">{sq?"QASJA":"APPROACH"}</p><h2>{sq?"Nga nevoja te nje rezultat i perdorshem.":"From the requirement to a usable result."}</h2><p>{sq?d.introSq:d.introEn}</p></div></div>
+ <div className="service-detail-columns"><section><p className="eyebrow">02 / {sq?"KAPACITETET":"CAPABILITIES"}</p><h2>{sq?"Cfare perfshin":"What it covers"}</h2><ul>{capabilities.map(x=><li key={x}>{x}</li>)}</ul></section><section><p className="eyebrow">03 / WORKFLOW</p><h2>{sq?"Si realizohet":"How it works"}</h2><ol>{workflow.map((x,i)=><li key={x}><span>{String(i+1).padStart(2,"0")}</span>{x}</li>)}</ol></section></div>
+ <div className="service-detail-columns service-detail-secondary"><section><p className="eyebrow">04 / {sq?"DOREZIMET":"DELIVERABLES"}</p><h2>{sq?"Cfare merr klienti":"What the client receives"}</h2><ul>{deliverables.map(x=><li key={x}>{x}</li>)}</ul></section><section><p className="eyebrow">05 / {sq?"PERDORIME":"APPLICATIONS"}</p><h2>{sq?"Ku aplikohet":"Where it applies"}</h2><ul>{applications.map(x=><li key={x}>{x}</li>)}</ul></section></div>
+ <section className="service-detail-tech"><p className="eyebrow">06 / TECHNOLOGY</p><h2>{sq?"Teknologji dhe standarde":"Technology and standards"}</h2><div>{d.technologies.map(x=><span key={x}>{x}</span>)}</div></section>
+ <section className="service-detail-cta"><p className="eyebrow">LINDIMAPS / START A PROJECT</p><h2>{sq?"Ke nje projekt qe kerkon kete ekspertize?":"Have a project that needs this expertise?"}</h2><p>{sq?"Pershkruaj objektivin, te dhenat qe ke dhe rezultatin qe kerkon.":"Describe your objective, the data you have and the result you need."}</p><a href={sq?"/sq/kontakte/":"/en/contact/"}>{sq?"Diskuto projektin":"Discuss the project"}</a></section></section></main><SiteFooter lang={lang} settings={data.settings}/></>
+}
