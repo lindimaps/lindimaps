@@ -22,7 +22,7 @@ export default async function ContentPage({lang,page}:{lang:Language;page:Exclud
     {pub.authors?.length?<p className="pub-authors">{pub.authors.join(" · ")}</p>:null}
     {pub.publisher?<p className="pub-publisher">{pub.publisher}</p>:null}
     {(sq?pub.abstractSq:pub.abstractEn)&&<p className="pub-abstract">{sq?pub.abstractSq:pub.abstractEn}</p>}
-    {pub.citation?<p className="pub-citation">{pub.citation}</p>:null}
+    {(lang==="en"?(pub.citationEn||pub.citation):pub.citation)?<p className="pub-citation">{lang==="en"?(pub.citationEn||pub.citation):pub.citation}</p>:null}
     {pub.keywords?.length?<ul className="project-tech pub-keywords" aria-label={sq?"Fjalë kyçe":"Keywords"}>{pub.keywords.map(keyword=><li key={keyword}>{keyword}</li>)}</ul>:null}
     <div className="pub-actions">{safeUrl(pub.url)&&<a className="pub-link" href={safeUrl(pub.url)} target="_blank" rel="noopener noreferrer"><span>{sq?"Publikimi online":"Online publication"}</span></a>}{safeUrl(pub.pdfUrl)&&<a className="pub-link" href={safeUrl(pub.pdfUrl)} target="_blank" rel="noopener noreferrer"><span>{sq?"Hap PDF":"Open PDF"}</span></a>}</div></div>
   </article>)}{!data.publications.length&&<div className="publication-empty"><span>01</span><h3>{sq?"Arkivi i publikimeve po përgatitet.":"The publications archive is being prepared."}</h3><p>{sq?"Publikimet do të shfaqen automatikisht këtu sapo të publikohen në CMS.":"Publications will appear here automatically once published in the CMS."}</p></div>}</div></section>}
