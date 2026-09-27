@@ -21,6 +21,7 @@ export const publicationType = defineType({
     defineField({name:'url',title:'URL',type:'url'}),
     defineField({name:'pdf',title:'PDF / Dokument',type:'file',options:{accept:'.pdf'}}),
     defineField({name:'citation',title:'Referenca bibliografike',type:'text',rows:3}),
+    defineField({name:'citationEn',title:'Bibliographic reference (EN)',type:'text',rows:3}),
     defineField({name:'keywords',title:'Fjalë kyçe / Keywords',type:'array',of:[{type:'string'}],options:{layout:'tags'}}),
     defineField({name:'abstractSq',title:'Përmbledhje',type:'text',rows:5}),
     defineField({name:'abstractEn',title:'Abstract (EN)',type:'text',rows:5}),
