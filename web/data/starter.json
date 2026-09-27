@@ -274,5 +274,144 @@
         "descriptionEn": "Transparency and professionalism in handling projects."
       }
     ]
-  }
+  },
+  "publications": [
+    {
+      "_id": "pub-lissus-2026",
+      "title": "The Use of Drone, LiDAR, Geophysics, GIS and WebGIS Technologies in Archeological Mapping, Documentation, 3D Modeling and Archeological Prospection. Case Study: New Data and Corrections. Akrolis and Proto-Urban Lissus, Lezhë, Albania",
+      "publicationType": "Book chapter",
+      "authors": [
+        "Neritan Ceka",
+        "Edmond Hoxha",
+        "Jeton Pekmezi",
+        "Elio Hobdari",
+        "Altin Karriqi",
+        "Elva Leka",
+        "Përparim Alikaj",
+        "Paulin Zefi",
+        "Ervin Kujtila",
+        "Erland Alla",
+        "Elion Kuqali"
+      ],
+      "year": 2026,
+      "publisher": "IntechOpen",
+      "doi": "10.5772/intechopen.1014713",
+      "url": "https://doi.org/10.5772/intechopen.1014713",
+      "keywords": [
+        "Lezha",
+        "Cultural heritage",
+        "Lissus",
+        "Akrolis",
+        "GIS",
+        "LiDAR",
+        "Geophysics"
+      ],
+      "featured": true
+    },
+    {
+      "_id": "pub-lubonja-intechopen-2025",
+      "title": "Mapping of Cultural and Natural Heritage Using Advanced Technologies Such as GIS, Drone, Lidar and Laser Scanner: Case Study – Lubonja Village, Korçë, Albania",
+      "publicationType": "Book chapter",
+      "authors": [
+        "Edmond Hoxha",
+        "Neritan Ceka",
+        "Skënder Aliu",
+        "Perikli Qirjazi",
+        "Jeton Pekmezi",
+        "Elio Hobdari",
+        "Elva Leka",
+        "Emiliano Qose",
+        "Erland Alla",
+        "Spartak Kuçaj",
+        "Era Xhaferaj",
+        "Fjoralba Prifti",
+        "Genti Proko",
+        "Jani Zoica"
+      ],
+      "year": 2025,
+      "publisher": "IntechOpen",
+      "doi": "10.5772/intechopen.1009659",
+      "url": "https://doi.org/10.5772/intechopen.1009659",
+      "keywords": [
+        "Lubonja",
+        "Cultural heritage",
+        "GIS",
+        "Drone",
+        "LiDAR",
+        "Laser scanner"
+      ]
+    },
+    {
+      "_id": "pub-ijim-2025",
+      "title": "Design and Implementation of a Web GIS Application for Heritage Documentation Using Drones, Lidar, and Laser Scanning: The Case of Lubonja, Korçë, Albania",
+      "publicationType": "Journal article",
+      "authors": [
+        "Elva Leka",
+        "Edmond Hoxha",
+        "Erland Alla",
+        "Jeton Pekmezi",
+        "Emiliano Qose"
+      ],
+      "year": 2025,
+      "publisher": "International Journal of Interactive Mobile Technologies (iJIM), 19(13), 133–147",
+      "doi": "10.3991/ijim.v19i13.54599",
+      "url": "https://doi.org/10.3991/ijim.v19i13.54599",
+      "keywords": [
+        "Web GIS",
+        "Cultural Heritage",
+        "Geospatial Analysis",
+        "Drones",
+        "Laser Scanning",
+        "Data Visualization",
+        "Lubonja"
+      ]
+    },
+    {
+      "_id": "pub-lubonja-report-2025",
+      "title": "Lubonja – Një kapitull i ri në Trashëgiminë Kulturore dhe Natyrore Shqiptare",
+      "titleEn": "Lubonja – A New Chapter in Albanian Cultural and Natural Heritage",
+      "publicationType": "Technical Report",
+      "authors": [
+        "Edmond Hoxha",
+        "Neritan Ceka",
+        "Skënder Aliu",
+        "Perikli Qirjazi",
+        "Jeton Pekmezi",
+        "Elio Hobdari",
+        "Elva Leka",
+        "Fjoralba Prifti",
+        "Era Bushi Xhaferaj",
+        "Genti Proko",
+        "Jani Zoica",
+        "Spartak Kuçaj",
+        "Sabri Laçi",
+        "Pal Nikolli",
+        "Emiliano Qose",
+        "Aida Bode",
+        "Erland Alla",
+        "Renata Myftari",
+        "Fjona Alikollari",
+        "Valter Aga",
+        "Denis Nika",
+        "Elmira Alushaj",
+        "Xhesika Buraku",
+        "Xhesian Toska",
+        "Xhejms Krasniqi"
+      ],
+      "year": 2025,
+      "publisher": "Polytechnic University of Tirana · Faculty of Geology and Mining",
+      "doi": "10.13140/RG.2.2.11689.92000",
+      "url": "https://doi.org/10.13140/RG.2.2.11689.92000",
+      "keywords": [
+        "Lubonja",
+        "Cultural heritage",
+        "Natural heritage",
+        "GIS",
+        "Drone",
+        "LiDAR",
+        "Laser Scanner",
+        "AKKSHI"
+      ]
+    }
+  ]
 }
