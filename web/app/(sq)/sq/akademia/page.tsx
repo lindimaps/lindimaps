@@ -1,0 +1,1 @@
+import AcademyPage from "@/components/academy-page";export const metadata={title:"LindiMaps Academy"};export default function Page(){return <AcademyPage lang="sq"/>}
