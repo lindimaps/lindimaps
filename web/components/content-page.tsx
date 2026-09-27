@@ -11,7 +11,8 @@ function Biography({blocks}:{blocks?:TextBlock[]}){return <div className="prose"
 export default async function ContentPage({lang,page,projectCategory}:{lang:Language;page:Exclude<PageKey,"home">;projectCategory?:string}){
  const data=await getSiteContent();const {profile,settings,about}=data;const sq=lang==="sq";
  const fallbackProjectFilters=[["gis","GIS"],["webgis","WebGIS"],["remote-sensing","Remote Sensing"],["3d","3D"]] as const;
- const projectFilters=data.projectCategories.length?data.projectCategories.map(category=>[category.slug,localized(category,"title",lang,category.titleSq||category.slug)] as const):fallbackProjectFilters;
+ const cmsProjectFilters=data.projectCategories.map(category=>[category.slug,localized(category,"title",lang,category.titleSq||category.slug)] as const);
+ const projectFilters=(cmsProjectFilters.length?cmsProjectFilters:fallbackProjectFilters).filter(([value],index,items)=>value&&items.findIndex(([candidate])=>candidate===value)===index);
  const activeProjectCategory=projectFilters.some(([value])=>value===projectCategory)?projectCategory:undefined;
  const visibleProjects=activeProjectCategory?data.projects.filter(item=>item.categories?.some(category=>category.slug===activeProjectCategory)||item.category===activeProjectCategory):data.projects;
  return <><SiteHeader lang={lang} page={page} settings={settings}/><main id="main" tabIndex={-1}>
