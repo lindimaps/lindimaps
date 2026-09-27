@@ -258,3 +258,15 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .home-site-header .brand .lm-word strong>span{color:#3b82f6!important}
 .home-site-header .brand .lm-word small{color:rgba(255,255,255,.78)!important}
 .home-site-header .brand .lm-icon{background:initial!important;border-color:initial!important}
+
+/* Home cinematic polish — geospatial depth and a seamless transition into Spatial Intelligence */
+.home-map-hero:before{background-position:center 46%;filter:saturate(.72) contrast(1.16) brightness(.78);transform:scale(1.025)}
+.map-hero-shade{background:radial-gradient(circle at 58% 42%,rgba(8,55,69,.08),rgba(2,13,23,.46) 68%),linear-gradient(90deg,rgba(2,18,31,.8) 0%,rgba(2,17,29,.36) 48%,rgba(3,14,24,.62) 100%),linear-gradient(180deg,rgba(2,13,22,.2) 0%,rgba(2,13,22,.14) 62%,rgba(2,13,22,.82) 100%)}
+.map-hero-grid{opacity:.12;background-size:96px 96px}
+.map-hero-contours{opacity:.25;filter:blur(.15px)}
+.map-hero-center:after{content:"";position:absolute;left:50%;bottom:0;width:1px;height:72px;background:linear-gradient(transparent,rgba(103,219,230,.6));transform:translateX(-50%)}
+.map-hero-brand{position:relative}.map-hero-brand:after{content:"";position:absolute;inset:-70px -120px;z-index:-1;background:radial-gradient(ellipse,rgba(5,31,44,.34),transparent 67%);pointer-events:none}
+.map-hero-copy{line-height:1.7}.map-hero-actions a{transition:color .2s ease,border-color .2s ease,transform .2s ease}.map-hero-actions a:hover{transform:translateY(-2px)}
+.spatial-intro{position:relative}.spatial-intro:before{content:"";position:absolute;top:0;left:50%;width:min(92%,1440px);height:1px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,#dbe3ed 12%,#dbe3ed 88%,transparent)}
+.spatial-intro-title h2{max-width:900px}.spatial-intro-copy>p{max-width:520px}
+@media(max-width:760px){.home-map-hero:before{background-position:center center;transform:scale(1.04)}.map-hero-grid{background-size:64px 64px;opacity:.1}.map-hero-center:after{height:48px}.map-hero-brand:after{inset:-45px -45px}.map-hero-copy{line-height:1.6}.spatial-intro:before{width:88%}}
