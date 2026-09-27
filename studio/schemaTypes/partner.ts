@@ -6,6 +6,7 @@ export const partnerType=defineType({
   defineField({name:'roleSq',title:'Roli / Përshkrimi',type:'string'}),
   defineField({name:'roleEn',title:'Role / Description (EN)',type:'string'}),
   defineField({name:'logo',title:'Logo',type:'image'}),
+  defineField({name:'logoUrl',title:'Logo URL',type:'url',description:'Logo zyrtare nga website i institucionit'}),
   defineField({name:'url',title:'Website',type:'url'}),
   defineField({name:'order',title:'Renditja',type:'number',validation:r=>r.integer().min(0)})
  ],preview:{select:{title:'name',subtitle:'roleSq',media:'logo'}}
