@@ -574,3 +574,6 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 @media(max-width:700px){.service-grid .catalogue-card.services{grid-template-columns:1fr!important}.service-grid .catalogue-card.services .card-media,.service-grid .catalogue-card.services .project-image{min-height:0!important;height:auto!important;aspect-ratio:auto!important;object-fit:contain!important}.service-grid .catalogue-card.services .project-body{padding:24px!important}}
 
 /* Preserve current project filters and sticky header; restored blocks above are scoped to About/Partners. */
+
+/* Final header behavior: keep the approved visual overlay and pin navigation during scroll */
+.site-header,.home-site-header{position:sticky!important;top:0!important;z-index:1000!important}
