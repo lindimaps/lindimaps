@@ -3,7 +3,7 @@ import starterData from "@/data/starter.json";
 export type Language = "sq" | "en";
 type Localized = Partial<Record<`${"title"|"description"|"summary"|"heroTitle"|"heroText"|"primaryCta"|"secondaryCta"|"introTitle"|"intro"|"location"|"seoDescription"|"headline"}${"Sq"|"En"}`,string>>;
 export type ContentItem = Localized & {_id:string;category?:string;year?:number;image?:string;imageAltSq?:string;imageAltEn?:string;liveUrl?:string;githubUrl?:string;roleSq?:string;roleEn?:string;client?:string;clientEn?:string;technologies?:string[]};
-export type Activity={_id:string;titleSq?:string;titleEn?:string;kind?:string;date?:string;location?:string;descriptionSq?:string;descriptionEn?:string;image?:string;url?:string};
+export type Activity={_id:string;titleSq?:string;titleEn?:string;kind?:string;date?:string;location?:string;locationEn?:string;descriptionSq?:string;descriptionEn?:string;image?:string;url?:string};
 export type GalleryItem={_id:string;titleSq?:string;titleEn?:string;captionSq?:string;captionEn?:string;image?:string;tags?:string[]};
 export type TeamMember={_id:string;name:string;roleSq?:string;roleEn?:string;bioSq?:string;bioEn?:string;image?:string;email?:string;linkedin?:string;order?:number;featured?:boolean};
 export type Partner={_id:string;name:string;roleSq?:string;roleEn?:string;logo?:string;url?:string};
@@ -28,7 +28,7 @@ const query=`{
  "about": *[_type=="aboutPage"]|order(_updatedAt desc)[0]{history,values},
  "services": *[_type=="service"]|order(order asc,_createdAt asc){_id,titleSq,titleEn,descriptionSq,descriptionEn,"image":coalesce(icon.asset->url,imageUrl)},
  "publications": *[_type=="publication"]|order(featured desc,year desc,_createdAt desc){_id,title,titleEn,publicationType,authors,year,publisher,doi,url,citation,citationEn,keywords,abstractSq,abstractEn,featured,"image":coverImage.asset->url,"pdfUrl":pdf.asset->url},
- "activities": *[_type=="activity"]|order(date desc,_createdAt desc){_id,titleSq,titleEn,kind,date,location,descriptionSq,descriptionEn,url,"image":image.asset->url},
+ "activities": *[_type=="activity"]|order(date desc,_createdAt desc){_id,titleSq,titleEn,kind,date,location,locationEn,descriptionSq,descriptionEn,url,"image":image.asset->url},
  "gallery": *[_type=="galleryItem"]|order(_createdAt desc){_id,titleSq,titleEn,captionSq,captionEn,tags,"image":image.asset->url},
  "partners": *[_type=="partner"]|order(order asc,name asc){_id,name,roleSq,roleEn,url,"logo":coalesce(logo.asset->url,logoUrl)},
  "team": *[_type=="teamMember"]|order(featured desc,order asc,name asc){_id,name,roleSq,roleEn,bioSq,bioEn,email,linkedin,order,featured,"image":photo.asset->url}
