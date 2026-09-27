@@ -173,5 +173,3 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 /* Legal pages integrated into the main LindiMaps shell */
 .legal-page{background:#fff}.legal-page>.legal-hero{padding-top:clamp(80px,10vw,138px)}.legal-hero p{color:#2563eb}.legal-content{padding-bottom:clamp(80px,10vw,130px)}.legal-content aside{border-radius:20px}.legal-page+.editorial-footer{margin-top:0}
 
-/* Legal-document language switch keeps the visitor on the same document */
-.legal-language-switch{position:fixed;right:max(24px,calc((100vw - 1280px)/2));top:96px;z-index:900;display:flex;gap:2px;padding:3px;border:1px solid #e2e8f0;border-radius:9px;background:rgba(255,255,255,.96);box-shadow:0 8px 24px rgba(15,23,42,.08)}.legal-language-switch a{padding:5px 9px;border-radius:5px;font-size:.7rem;font-weight:900}.legal-language-switch a[aria-current="page"]{background:#2563eb;color:#fff}@media(max-width:700px){.legal-language-switch{right:18px;top:94px}}
