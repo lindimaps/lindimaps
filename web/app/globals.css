@@ -235,3 +235,14 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .mobile-workspace-subnav>a:hover{color:#2563eb!important;background:#f8fafc!important}
 .home-site-header .mobile-menu-panel .mobile-workspace-nav>summary{color:#0f172a!important}
 }
+
+/* Final home logo + mobile Workspace cleanup */
+.home-site-header .home-brand .lm-word strong{color:#fff!important}
+.home-site-header .home-brand .lm-word strong span{color:inherit!important}
+@media(max-width:900px){
+.mobile-menu-panel>.mobile-workspace-nav{border:0!important;border-top:0!important}
+.mobile-workspace-nav>summary{border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important}
+.mobile-workspace-nav>summary svg{display:block!important;width:10px!important;height:6px!important;border:0!important;outline:0!important;background:none!important}
+.mobile-workspace-subnav{border:0!important;margin:0 0 8px!important;padding:0 0 0 14px!important}
+.mobile-workspace-subnav>a{border:0!important;box-shadow:none!important;background:transparent!important;padding-left:8px!important}
+}
