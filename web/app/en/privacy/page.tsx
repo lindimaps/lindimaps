@@ -1,1 +1,1 @@
-import LegalPage from "@/components/legal-page";export const metadata={title:"Privacy Policy | LindiMaps"};export default function Page(){return <LegalPage lang="en" type="privacy"/>}
+import type {Metadata} from "next";import LegalPage from "@/components/legal-page";export const metadata:Metadata={title:"Privacy Policy",alternates:{canonical:"/en/privacy",languages:{"sq-AL":"/sq/privacy",en:"/en/privacy","x-default":"/sq/privacy"}}};export default function Page(){return <LegalPage lang="en" type="privacy"/>}

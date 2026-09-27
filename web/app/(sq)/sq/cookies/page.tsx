@@ -1,1 +1,1 @@
-import LegalPage from "@/components/legal-page";export const metadata={title:"Politika e Cookies | LindiMaps"};export default function Page(){return <LegalPage lang="sq" type="cookies"/>}
+import type {Metadata} from "next";import LegalPage from "@/components/legal-page";export const metadata:Metadata={title:"Politika e Cookies",alternates:{canonical:"/sq/cookies",languages:{"sq-AL":"/sq/cookies",en:"/en/cookies","x-default":"/sq/cookies"}}};export default function Page(){return <LegalPage lang="sq" type="cookies"/>}

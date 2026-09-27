@@ -1,1 +1,1 @@
-import LegalPage from "@/components/legal-page";export const metadata={title:"Cookie Policy | LindiMaps"};export default function Page(){return <LegalPage lang="en" type="cookies"/>}
+import type {Metadata} from "next";import LegalPage from "@/components/legal-page";export const metadata:Metadata={title:"Cookie Policy",alternates:{canonical:"/en/cookies",languages:{"sq-AL":"/sq/cookies",en:"/en/cookies","x-default":"/sq/cookies"}}};export default function Page(){return <LegalPage lang="en" type="cookies"/>}
