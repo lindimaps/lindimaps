@@ -350,3 +350,53 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .map-hero-brand strong{font-size:2.35rem}
 .spatial-capabilities{grid-template-columns:1fr}
 }
+
+/* Public pages final harmonization — shared system, distinct page identities */
+.page-heading{position:relative;padding-top:clamp(72px,8vw,118px);padding-bottom:clamp(38px,5vw,68px);overflow:hidden}
+.page-heading:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,#0f172a 0 12%,#dce4eb 12% 100%)}
+.page-heading .eyebrow{margin-bottom:22px;color:#567080}
+.page-heading h1{font-size:clamp(3.6rem,8.2vw,8.4rem);line-height:.84;letter-spacing:-.07em;font-weight:470}
+.content-section{padding-top:clamp(34px,5vw,66px);padding-bottom:clamp(90px,10vw,150px)}
+.section-signature,.projects-signature{display:grid;grid-template-columns:auto minmax(36px,1fr) auto;align-items:center;gap:16px;margin-bottom:clamp(36px,5vw,62px);color:#647789}
+.section-signature>span,.projects-signature>span{font-size:.64rem;font-weight:900;letter-spacing:.14em;color:#2563eb}
+.section-signature>i,.projects-signature>i{height:1px;background:#dce4eb}
+.section-signature>small,.projects-signature>small{font-size:.58rem;font-weight:850;letter-spacing:.16em}
+.services-editorial .catalogue-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border-top:1px solid #dce4eb}
+.services-editorial .catalogue-card{border:0;border-bottom:1px solid #dce4eb;border-radius:0;box-shadow:none;background:transparent;padding:0}
+.services-editorial .catalogue-card:nth-child(odd){border-right:1px solid #dce4eb}
+.services-editorial .project-body{padding:34px 34px 38px}
+.services-editorial .catalogue-card:hover{transform:none;box-shadow:none;background:#f7f9fb}
+.activities-section .activity-list{border-top:1px solid #dce4eb}
+.activities-section .activity-item{transition:background .2s,padding .2s}
+.activities-section .activity-item:hover{background:#f8fafc;padding-left:12px;padding-right:12px}
+.gallery-section .gallery-masonry{padding-top:10px}
+.gallery-section .gallery-tile{border-radius:2px}
+.about-profile .profile-grid{margin-top:0;align-items:start}
+.about-profile .profile-photo,.about-profile .profile-monogram{border-radius:2px}
+.about-profile .profile-photo{max-height:720px}
+.about-profile .profile-grid h2{font-size:clamp(2.3rem,4.6vw,4.8rem);line-height:.94;letter-spacing:-.055em}
+.about-profile .prose{max-width:720px}
+.profile-socials a{border-bottom:1px solid #b9c7d4;padding-bottom:4px}
+.contact-page-new .contact-intro-new{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:clamp(48px,9vw,130px);align-items:end;padding-bottom:clamp(48px,7vw,86px)}
+.contact-page-new .contact-intro-new h2{font-size:clamp(3rem,6vw,6.2rem);line-height:.9;letter-spacing:-.065em}
+.contact-page-new .contact-intro-new>div:first-child>p:last-child{max-width:650px;margin-top:28px;color:#617080;font-size:1.05rem;line-height:1.75}
+.contact-direct{border-left:1px solid #d7e0e8;padding-left:32px;display:flex;flex-direction:column;gap:14px}
+.contact-direct small{font-size:.58rem;font-weight:900;letter-spacing:.16em;color:#657789}
+.contact-direct a{font-size:clamp(1rem,1.4vw,1.25rem);font-weight:750;overflow-wrap:anywhere}
+.contact-direct span{color:#6b7b8b}
+.contact-form-new{border-top:1px solid #0f172a;padding-top:38px}
+.contact-form-new label{display:grid;gap:9px;font-size:.65rem;font-weight:850;letter-spacing:.1em;text-transform:uppercase;color:#566a7b}
+.contact-fields{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.contact-form-new>label{margin-top:24px}
+.contact-form-new input,.contact-form-new textarea{width:100%;border:0;border-bottom:1px solid #cfd9e2;border-radius:0;background:transparent;padding:13px 0;color:#0f172a;outline:0;text-transform:none;letter-spacing:0;font-weight:500}
+.contact-form-new textarea{resize:vertical;min-height:160px}
+.contact-form-new input:focus,.contact-form-new textarea:focus{border-bottom-color:#2563eb}
+.contact-hp{position:absolute!important;left:-9999px!important}
+.contact-form-foot{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:34px}
+.contact-form-foot button{border:0;background:#071426;color:#fff;padding:15px 20px;display:inline-flex;align-items:center;gap:28px;cursor:pointer;font-weight:800}
+.contact-form-foot button:hover{background:#2563eb}.contact-form-foot button:disabled{opacity:.55;cursor:wait}
+.contact-form-foot p{color:#526779;font-size:.86rem}
+.partners-section{padding-block:clamp(78px,9vw,130px)}
+.partners-section h2{font-size:clamp(2.6rem,5vw,5rem)}
+@media(max-width:900px){.services-editorial .catalogue-grid{grid-template-columns:1fr}.services-editorial .catalogue-card:nth-child(odd){border-right:0}.contact-page-new .contact-intro-new{grid-template-columns:1fr}.contact-direct{border-left:0;border-top:1px solid #d7e0e8;padding:26px 0 0}}
+@media(max-width:600px){.page-heading{padding-top:54px;padding-bottom:34px}.page-heading h1{font-size:clamp(3rem,17vw,5.2rem)}.content-section{padding-top:30px;padding-bottom:82px}.section-signature,.projects-signature{gap:10px;margin-bottom:32px}.section-signature>small,.projects-signature>small{font-size:.52rem}.services-editorial .project-body{padding:26px 4px 30px}.activities-section .activity-item:hover{padding-left:0;padding-right:0}.contact-fields{grid-template-columns:1fr;gap:22px}.contact-form-foot{align-items:flex-start;flex-direction:column}.contact-form-foot button{width:100%;justify-content:space-between}.partner-grid{grid-template-columns:1fr}.partner-card{min-height:150px}}
