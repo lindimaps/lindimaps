@@ -206,3 +206,16 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .mobile-menu-panel .mobile-workspace-children span{font-size:.82rem;font-weight:750}
 .mobile-menu-panel .mobile-workspace-children small{font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8}
 }
+
+/* Home shell integration — header floats over the cinematic map */
+.home-site-header{position:absolute;top:0;left:0;right:0;z-index:50;background:linear-gradient(180deg,rgba(3,15,25,.78),rgba(3,15,25,.28) 72%,transparent);border-bottom:1px solid rgba(255,255,255,.1);box-shadow:none;backdrop-filter:none}
+.home-site-header .nav-row{min-height:84px}
+.home-site-header .desktop-nav>a,.home-site-header .workspace-menu>summary,.home-site-header .languages,.home-site-header .languages a{color:rgba(238,247,251,.86)}
+.home-site-header .desktop-nav>a:hover,.home-site-header .desktop-nav>a[aria-current="page"],.home-site-header .languages a:hover,.home-site-header .languages a[aria-current="page"]{color:#fff}
+.home-site-header .desktop-nav>a[aria-current="page"]:after{background:#67dbe6}
+.home-site-header .languages{border-color:rgba(255,255,255,.22);background:rgba(4,19,31,.24)}
+.home-site-header .workspace-grid i{background:#eaf7fa}
+.home-site-header .mobile-menu>summary span{background:#fff}
+.home-map-hero,.map-hero-center{min-height:100svh}
+.map-hero-center{padding-top:134px}
+@media(max-width:900px){.home-site-header{background:linear-gradient(180deg,rgba(3,15,25,.88),rgba(3,15,25,.35) 75%,transparent)}.home-site-header .mobile-menu-panel{color:#0f172a}.home-site-header .mobile-menu-panel>a{color:#0f172a}.home-site-header .mobile-workspace>summary{color:#0f172a}.home-map-hero,.map-hero-center{min-height:100svh}}
