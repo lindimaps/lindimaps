@@ -659,3 +659,28 @@ a.service-tech-item{text-decoration:none!important;color:#172033!important}
     box-sizing:border-box!important;
   }
 }
+
+
+/* iOS contact form: target the current form class and prevent horizontal viewport growth */
+@media (max-width: 600px){
+  .contact-form-new,
+  .contact-form-new .contact-fields,
+  .contact-form-new label,
+  .contact-form-new input,
+  .contact-form-new textarea,
+  .contact-form-new select{
+    min-width:0!important;
+    max-width:100%!important;
+    width:100%!important;
+    box-sizing:border-box!important;
+  }
+  .contact-form-new input,
+  .contact-form-new textarea,
+  .contact-form-new select{
+    font-size:16px!important;
+    -webkit-text-size-adjust:100%;
+  }
+  .contact-form-new .contact-fields{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+}
