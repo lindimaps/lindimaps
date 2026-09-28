@@ -3,7 +3,9 @@ import starterData from "@/data/starter.json";
 export type Language = "sq" | "en";
 type Localized = Partial<Record<`${"title"|"description"|"summary"|"heroTitle"|"heroText"|"primaryCta"|"secondaryCta"|"introTitle"|"intro"|"location"|"seoDescription"|"headline"}${"Sq"|"En"}`,string>>;
 export type ProjectCategory={_id:string;titleSq?:string;titleEn?:string;slug:string;order?:number};
+export type ServiceTechnology={name:string;logo?:string;url?:string};
 export type ContentItem = Localized & {_id:string;category?:string;categories?:ProjectCategory[];year?:number;image?:string;imageAltSq?:string;imageAltEn?:string;liveUrl?:string;githubUrl?:string;roleSq?:string;roleEn?:string;client?:string;clientEn?:string;technologies?:string[]};
+export type ServiceItem=ContentItem&{slug?:string;leadSq?:string;leadEn?:string;introSq?:string;introEn?:string;capabilitiesSq?:string[];capabilitiesEn?:string[];workflowSq?:string[];workflowEn?:string[];deliverablesSq?:string[];deliverablesEn?:string[];applicationsSq?:string[];applicationsEn?:string[];serviceTechnologies?:ServiceTechnology[];ctaTitleSq?:string;ctaTitleEn?:string;ctaTextSq?:string;ctaTextEn?:string};
 export type Activity={_id:string;titleSq?:string;titleEn?:string;kind?:string;date?:string;location?:string;locationEn?:string;descriptionSq?:string;descriptionEn?:string;image?:string;url?:string};
 export type GalleryItem={_id:string;titleSq?:string;titleEn?:string;captionSq?:string;captionEn?:string;image?:string;tags?:string[]};
 export type TeamMember={_id:string;name:string;roleSq?:string;roleEn?:string;bioSq?:string;bioEn?:string;image?:string;email?:string;linkedin?:string;order?:number;featured?:boolean};
@@ -15,7 +17,7 @@ export type SiteContent={
  settings:(Localized&{useStarterContent?:boolean;siteName?:string;email?:string;logo?:string;ogImage?:string;seoTitle?:string;linkedin?:string;instagram?:string;github?:string;researchGate?:string})|null;
  profile:(Localized&{name:string;image?:string;bioSq?:TextBlock[];bioEn?:TextBlock[];cvUrl?:string;email?:string;linkedin?:string;researchGate?:string;github?:string;scholar?:string;orcid?:string;skills?:string[]})|null;
  about:{history:(Localized&{_key:string})[];values:(Localized&{_key:string})[]}|null;
- projects:ContentItem[];projectCategories:ProjectCategory[];services:ContentItem[];publications:Publication[];activities:Activity[];gallery:GalleryItem[];partners:Partner[];team:TeamMember[];
+ projects:ContentItem[];projectCategories:ProjectCategory[];services:ServiceItem[];publications:Publication[];activities:Activity[];gallery:GalleryItem[];partners:Partner[];team:TeamMember[];
 };
 export function localized(value:Localized|null|undefined,field:string,lang:Language,fallback=""){const key=`${field}${lang==="sq"?"Sq":"En"}` as keyof Localized;return value?.[key]?.trim()||fallback}
 export function safeUrl(value?:string){if(!value)return undefined;try{const url=new URL(value);return ["https:","http:"].includes(url.protocol)?url.href:undefined}catch{return undefined}}
@@ -28,7 +30,7 @@ const query=`{
  "projects": *[_type=="project"]|order(order asc,year desc,_createdAt desc){_id,titleSq,titleEn,summarySq,summaryEn,category,"categories":categories[]->{_id,titleSq,titleEn,"slug":slug.current,order},year,liveUrl,githubUrl,roleSq,roleEn,client,clientEn,technologies,"image":coalesce(coverImage.asset->url,imageUrl),"imageAltSq":coverImage.altSq,"imageAltEn":coverImage.altEn},
  "profile": *[_type=="profile"]|order(_updatedAt desc)[0]{...,"image":photo.asset->url},
  "about": *[_type=="aboutPage"]|order(_updatedAt desc)[0]{history,values},
- "services": *[_type=="service"]|order(order asc,_createdAt asc){_id,titleSq,titleEn,descriptionSq,descriptionEn,"image":coalesce(icon.asset->url,imageUrl)},
+ "services": *[_type=="service"]|order(order asc,_createdAt asc){_id,titleSq,titleEn,descriptionSq,descriptionEn,"slug":slug.current,leadSq,leadEn,introSq,introEn,capabilitiesSq,capabilitiesEn,workflowSq,workflowEn,deliverablesSq,deliverablesEn,applicationsSq,applicationsEn,ctaTitleSq,ctaTitleEn,ctaTextSq,ctaTextEn,"serviceTechnologies":technologies[]{name,url,"logo":logo.asset->url},"image":coalesce(icon.asset->url,imageUrl)},
  "publications": *[_type=="publication"]|order(featured desc,year desc,_createdAt desc){_id,title,titleEn,publicationType,authors,year,publisher,doi,url,citation,citationEn,keywords,abstractSq,abstractEn,featured,"image":coverImage.asset->url,"pdfUrl":pdf.asset->url},
  "activities": *[_type=="activity"]|order(date desc,_createdAt desc){_id,titleSq,titleEn,kind,date,location,locationEn,descriptionSq,descriptionEn,url,"image":image.asset->url},
  "gallery": *[_type=="galleryItem"]|order(_createdAt desc){_id,titleSq,titleEn,captionSq,captionEn,tags,"image":image.asset->url},
