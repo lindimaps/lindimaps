@@ -79,6 +79,8 @@ export const projectType = defineType({
       type: 'boolean',
       initialValue: false,
     }),
+    defineField({name: 'showOnHome', title: 'Shfaq në kryefaqe', description: 'Aktivizoje për ta shfaqur këtë projekt në Home.', type: 'boolean', initialValue: false}),
+    defineField({name: 'homeOrder', title: 'Renditja në kryefaqe', description: 'Numër më i vogël = shfaqet më përpara në Home.', type: 'number', validation: (r) => r.integer().min(0)}),
     defineField({name: 'order', title: 'Renditja', type: 'number', validation: (r) => r.integer().min(0)}),
   ],
   preview: {select: {title: 'titleSq', subtitle: 'category', media: 'coverImage'}},
