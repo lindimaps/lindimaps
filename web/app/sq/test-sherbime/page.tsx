@@ -2,8 +2,7 @@ import Link from "next/link";
 import {getSiteContent,localized,type Language} from "@/lib/sanity";
 import {SiteHeader,SiteFooter} from "@/components/site-shell";
 import {serviceSlugFromTitle} from "@/data/service-details";
-import styles from "./test-services.module.css";
-void styles;
+import "./test-services.css";
 
 export default async function TestServices(){
  const lang:Language="sq"; const data=await getSiteContent();
