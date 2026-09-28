@@ -1,8 +1,14 @@
+import type {Metadata} from "next";
 import Link from "next/link";
 import {getSiteContent,localized,type Language} from "@/lib/sanity";
 import {SiteHeader,SiteFooter} from "@/components/site-shell";
 import {serviceSlugFromTitle} from "@/data/service-details";
 import "./test-services.css";
+
+export const metadata:Metadata={
+ title:"Test Shërbime",
+ robots:{index:false,follow:false,nocache:true},
+};
 
 export default async function TestServices(){
  const lang:Language="sq"; const data=await getSiteContent();
