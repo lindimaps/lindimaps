@@ -12,7 +12,7 @@ export default async function ServiceDetailPage({lang,slug}:{lang:Language;slug:
  const workflow=sq?(cms?.workflowSq?.length?cms.workflowSq:d.workflowSq):(cms?.workflowEn?.length?cms.workflowEn:d.workflowEn);
  const deliverables=sq?(cms?.deliverablesSq?.length?cms.deliverablesSq:d.deliverablesSq):(cms?.deliverablesEn?.length?cms.deliverablesEn:d.deliverablesEn);
  const applications=sq?(cms?.applicationsSq?.length?cms.applicationsSq:d.applicationsSq):(cms?.applicationsEn?.length?cms.applicationsEn:d.applicationsEn);
- const technologies=cms?.serviceTechnologies?.length?cms.serviceTechnologies:d.technologies.map(name=>({name}));
+ const technologies:{name:string;logo?:string;url?:string}[]=cms?.serviceTechnologies?.length?cms.serviceTechnologies:d.technologies.map(name=>({name}));
  const ctaTitle=sq?(cms?.ctaTitleSq||"Ke një projekt që kërkon këtë ekspertizë?"):(cms?.ctaTitleEn||"Have a project that needs this expertise?");
  const ctaText=sq?(cms?.ctaTextSq||"Përshkruaj objektivin, të dhënat që ke dhe rezultatin që kërkon."):(cms?.ctaTextEn||"Describe your objective, the data you have and the result you need.");
  const languageRoutes={sq:`/sq/sherbime/${slug}/`,en:`/en/services/${slug}/`};
