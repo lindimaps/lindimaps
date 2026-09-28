@@ -8,6 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       disallow: [
         "/api/",
         "/studio/",
+        "/sq/test-sherbime/",
         "/sisteme/",
         "/en/systems/",
         "/sq/akademia/",
