@@ -607,3 +607,21 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 /* service pages production deployment trigger */
 
 /* production redeploy trigger 2026-09-28 */
+
+
+/* Service detail polish: visible navigation, technology identities and project CTA */
+.service-detail-back{display:inline-flex!important;align-items:center;gap:10px;margin-top:34px;padding:12px 18px;border:1px solid rgba(255,255,255,.28);border-radius:999px;color:#fff!important;text-decoration:none!important;font-size:.78rem;font-weight:850;letter-spacing:.02em;transition:background .2s ease,border-color .2s ease,transform .2s ease}
+.service-detail-back:before{content:"←";font-size:1rem}.service-detail-back:hover{background:#fff;color:#071426!important;border-color:#fff;transform:translateY(-1px)}
+.service-detail-tech .service-tech-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px!important;margin-top:34px}
+.service-tech-item{min-height:74px!important;display:flex!important;align-items:center;gap:14px;padding:15px 17px!important;border:1px solid #dce4eb!important;border-radius:14px!important;background:#fff;color:#172033!important;font-size:.82rem!important;font-weight:800!important}
+.service-tech-item img,.service-tech-item i{width:30px;height:30px;flex:0 0 30px;object-fit:contain}
+.service-tech-item i{display:grid;place-items:center;border-radius:8px;background:#edf2f7;color:#526277;font-size:.62rem;font-style:normal;font-weight:900}
+.service-tech-item b{font:inherit}
+.service-detail-cta{margin-top:90px;padding:clamp(30px,5vw,64px);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:48px;align-items:end;background:#071426;color:#fff;border-radius:22px;overflow:hidden;position:relative}
+.service-detail-cta:after{content:"";position:absolute;width:260px;height:260px;border:1px solid rgba(103,219,230,.18);border-radius:50%;right:-90px;top:-120px;pointer-events:none}
+.service-detail-cta .eyebrow{color:#67dbe6}.service-detail-cta h2{max-width:760px;color:#fff!important;margin-bottom:18px}.service-detail-cta p:not(.eyebrow){max-width:660px;color:#aebfd0;line-height:1.7}
+.service-project-button{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:24px;min-width:210px;padding:16px 20px;border-radius:999px;background:#fff;color:#071426!important;text-decoration:none!important;font-size:.78rem;font-weight:900;white-space:nowrap;transition:transform .2s ease,background .2s ease}
+.service-project-button:hover{transform:translateY(-2px);background:#67dbe6}
+.service-project-button span{font-size:1.15rem}
+@media(max-width:760px){.service-detail-content{padding-top:62px;padding-bottom:80px}.service-detail-columns{padding:58px 0}.service-detail-tech{padding:58px 0}.service-detail-tech .service-tech-grid{grid-template-columns:1fr 1fr}.service-detail-cta{margin-top:62px;grid-template-columns:1fr;gap:28px;border-radius:16px}.service-project-button{width:100%}}
+@media(max-width:440px){.service-detail-tech .service-tech-grid{grid-template-columns:1fr}.service-tech-item{min-height:64px!important}}
