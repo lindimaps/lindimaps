@@ -35,6 +35,8 @@ export const serviceType = defineType({
     defineField({name:'ctaTitleEn',title:'CTA title (EN)',type:'string'}),
     defineField({name:'ctaTextSq',title:'Teksti “Diskuto projektin”',type:'text',rows:3}),
     defineField({name:'ctaTextEn',title:'CTA text (EN)',type:'text',rows:3}),
+    defineField({name:'showOnHome',title:'Shfaq në kryefaqe',description:'Aktivizoje për ta shfaqur këtë shërbim në Home.',type:'boolean',initialValue:false}),
+    defineField({name:'homeOrder',title:'Renditja në kryefaqe',description:'Numër më i vogël = shfaqet më përpara në Home.',type:'number',validation:(r)=>r.integer().min(0)}),
     defineField({name:'order',title:'Renditja',type:'number'}),
   ],
   preview:{select:{title:'titleSq',subtitle:'titleEn',media:'icon'}},
