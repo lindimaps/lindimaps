@@ -643,3 +643,7 @@ body:not(.systems-app){background-image:radial-gradient(circle at 8% 5%,rgba(59,
 .service-detail-tech:before{left:0;background:linear-gradient(90deg,#fff,rgba(255,255,255,0))}
 .service-detail-tech:after{right:0;background:linear-gradient(270deg,#fff,rgba(255,255,255,0))}
 @media(max-width:760px){.service-detail-content{width:min(100% - 28px,1180px)!important}.service-detail-secondary{padding-left:18px!important;padding-right:18px!important}.service-detail-tech .service-tech-grid{display:flex!important;grid-template-columns:none!important;animation-duration:22s}.service-tech-item{width:150px;min-width:150px}.service-detail-tech:before,.service-detail-tech:after{width:28px}}
+
+
+/* CMS technology items can optionally link to their official product page */
+a.service-tech-item{text-decoration:none!important;color:#172033!important}
