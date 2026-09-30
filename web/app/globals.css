@@ -2834,3 +2834,7 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
   background:currentColor!important;
   opacity:.95!important;
 }
+
+/* CMS-managed footer social icons */
+.footer-socials .footer-social-custom-icon{width:20px;height:20px;object-fit:contain;display:block}
+.footer-socials .footer-social-fallback{font-size:.72rem;font-weight:800;line-height:1;color:currentColor}
