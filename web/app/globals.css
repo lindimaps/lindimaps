@@ -2811,3 +2811,29 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
 .site-footer a:focus-visible{
   outline-color:#1495FF!important;
 }
+
+
+/* Theme system control — restore compact LindiMaps pixel squares */
+.theme-toggle-track{position:relative!important}
+.theme-toggle-track:before,
+.theme-toggle-track:after{
+  content:""!important;
+  position:absolute!important;
+  z-index:3!important;
+  width:4px!important;
+  height:4px!important;
+  border-radius:1px!important;
+  background:#1495FF!important;
+  pointer-events:none!important;
+  opacity:.95!important;
+}
+.theme-toggle-track:before{left:8px!important;top:6px!important;box-shadow:6px 5px 0 rgba(114,199,255,.82)!important}
+.theme-toggle-track:after{right:8px!important;bottom:6px!important;box-shadow:-6px -5px 0 rgba(8,124,240,.72)!important}
+[data-theme="dark"] .theme-toggle-track:before,.dark .theme-toggle-track:before{
+  background:#72C7FF!important;
+  box-shadow:6px 5px 0 rgba(20,149,255,.85)!important;
+}
+[data-theme="dark"] .theme-toggle-track:after,.dark .theme-toggle-track:after{
+  background:#1495FF!important;
+  box-shadow:-6px -5px 0 rgba(114,199,255,.62)!important;
+}
