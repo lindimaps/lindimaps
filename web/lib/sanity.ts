@@ -13,7 +13,7 @@ export type Partner={_id:string;name:string;roleSq?:string;roleEn?:string;logo?:
 export type Publication = {_id:string;title:string;titleEn?:string;publicationType?:string;authors?:string[];year?:number;publisher?:string;doi?:string;url?:string;pdfUrl?:string;citation?:string;citationEn?:string;keywords?:string[];abstractSq?:string;abstractEn?:string;image?:string;featured?:boolean};
 export type TextBlock={_key:string;_type:string;children?:{_key:string;text:string}[]};
 export type SiteContent={
- home:(Localized&{image?:string;video?:string})|null;
+ home:(Localized&{image?:string;video?:string;heroUseVideo?:boolean;heroVideoPosition?:string})|null;
  settings:(Localized&{useStarterContent?:boolean;siteName?:string;email?:string;logo?:string;logoDark?:string;logoFooter?:string;favicon?:string;ogImage?:string;seoTitle?:string;linkedin?:string;instagram?:string;github?:string;researchGate?:string})|null;
  profile:(Localized&{name:string;image?:string;bioSq?:TextBlock[];bioEn?:TextBlock[];cvUrl?:string;email?:string;linkedin?:string;researchGate?:string;github?:string;scholar?:string;orcid?:string;skills?:string[]})|null;
  about:{history:(Localized&{_key:string})[];values:(Localized&{_key:string})[]}|null;
