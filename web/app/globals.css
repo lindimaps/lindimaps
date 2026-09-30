@@ -2793,3 +2793,21 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
 .dark .legal-page .legal-content>aside p{color:#A8BCD0!important}
 [data-theme="dark"] .legal-page .legal-content>aside a,
 .dark .legal-page .legal-content>aside a{color:#72C7FF!important}
+
+
+/* Footer interaction colors — current LindiMaps palette */
+.site-footer a:hover,
+.site-footer .footer-nav a:hover,
+.site-footer .footer-links a:hover,
+.site-footer .back-link:hover,
+.site-footer .footer-static a:hover,
+.site-footer .office-list a:hover{
+  color:#72C7FF!important;
+}
+.site-footer .footer-socials a:hover{
+  background:#087CF0!important;
+  color:#FFFFFF!important;
+}
+.site-footer a:focus-visible{
+  outline-color:#1495FF!important;
+}
