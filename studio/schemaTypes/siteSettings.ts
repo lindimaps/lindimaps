@@ -23,6 +23,17 @@ export const siteSettingsType = defineType({
     defineField({name:'githubIcon',title:'GitHub – Ikona',description:'Opsionale. Nëse lihet bosh përdoret ikona automatike e GitHub.',type:'image'}),
     defineField({name:'researchGate',title:'ResearchGate',type:'url'}),
     defineField({name:'researchGateIcon',title:'ResearchGate – Ikona',description:'Opsionale. Nëse lihet bosh përdoret ikona automatike e ResearchGate.',type:'image'}),
+    defineField({
+      name:'footerSocialLinks',
+      title:'Footer – Rrjetet sociale shtesë',
+      description:'Shto rrjete të tjera sociale në footer. Për rrjetet e njohura ikona gjenerohet automatikisht; ikona e ngarkuar ka përparësi.',
+      type:'array',
+      of:[{type:'object',fields:[
+        defineField({name:'name',title:'Emri i rrjetit',type:'string',validation:(r)=>r.required().min(2).max(40)}),
+        defineField({name:'url',title:'Linku',type:'url',validation:(r)=>r.required()}),
+        defineField({name:'icon',title:'Ikona',description:'Opsionale. Ngarko ikonën tënde; nëse lihet bosh përdoret ikona automatike kur rrjeti njihet.',type:'image'})
+      ],preview:{select:{title:'name',subtitle:'url',media:'icon'}}}],
+    }),
     defineField({name:'seoTitle',title:'SEO title',type:'string',validation:(r)=>r.max(70)}),
     defineField({name:'seoDescriptionSq',title:'SEO description',type:'text',rows:3,validation:(r)=>r.max(180)}),
     defineField({name:'seoDescriptionEn',title:'SEO description (EN)',type:'text',rows:3,validation:(r)=>r.max(180)}),
