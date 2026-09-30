@@ -2640,3 +2640,75 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
   .presentation-video-copy h3{margin-top:10px!important}
   .presentation-video-copy p{margin-top:14px!important}
 }
+
+
+/* Final contrast + presentation corrections */
+.presentation-fallback{
+  width:100%!important;
+  margin:32px 0 0!important;
+  padding:0!important;
+  display:block!important;
+  background:transparent!important;
+  border:0!important;
+}
+.presentation-video-shell{
+  width:100%!important;
+  aspect-ratio:16/9!important;
+  border-radius:22px!important;
+  overflow:hidden!important;
+  background:#031426!important;
+}
+.presentation-video-shell video{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+}
+.presentation-video-copy{display:none!important}
+
+/* Home collaboration contact: preserve readable contrast */
+.modern-contact .contact-email,
+.modern-contact .contact-email:visited{
+  color:#F2F7FC!important;
+}
+.modern-contact .contact-email svg{color:#1495FF!important}
+.modern-contact .contact-side>p{color:#A8BCD0!important}
+
+/* Contact form: remove legacy turquoise accent */
+.contact-page-new .contact-form,
+.contact-page-new form{--contact-accent:#087CF0!important}
+.contact-page-new .contact-form:before,
+.contact-page-new .contact-form:after,
+.contact-page-new form:before,
+.contact-page-new form:after{
+  background:#087CF0!important;
+}
+.contact-page-new button,
+.contact-page-new input[type="submit"]{
+  background:#087CF0!important;
+  border-color:#087CF0!important;
+}
+
+/* Legal pages: soften bright panels in dark mode */
+[data-theme="dark"] .legal-page .card,
+[data-theme="dark"] .legal-page .legal-card,
+[data-theme="dark"] .legal-page article,
+[data-theme="dark"] .legal-page .legal-contact,
+.dark .legal-page .card,
+.dark .legal-page .legal-card,
+.dark .legal-page article,
+.dark .legal-page .legal-contact{
+  background:rgba(8,32,57,.62)!important;
+  border-color:rgba(114,199,255,.12)!important;
+  color:#F2F7FC!important;
+  box-shadow:none!important;
+}
+[data-theme="dark"] .legal-page .card p,
+[data-theme="dark"] .legal-page .legal-card p,
+[data-theme="dark"] .legal-page article p,
+[data-theme="dark"] .legal-page .legal-contact p,
+.dark .legal-page .card p,
+.dark .legal-page .legal-card p,
+.dark .legal-page article p,
+.dark .legal-page .legal-contact p{color:#A8BCD0!important}
+[data-theme="dark"] .legal-page a,.dark .legal-page a{color:#72C7FF}
