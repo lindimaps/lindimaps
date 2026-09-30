@@ -1031,3 +1031,141 @@ a.service-tech-item{color:var(--lm-text)!important}
 .hero,.hero-v2,.home-map-hero,.service-detail-hero,.about-team-section,.modern-contact,.contact,.service-detail-cta,.site-footer,footer{
   color:var(--lm-dark-text);
 }
+
+
+/* =========================================================
+   LINDIMAPS GRAPHIC LANGUAGE — integrated, not card-like
+   ========================================================= */
+
+/* Continuous page canvas */
+html,body,.site-shell{background:var(--lm-bg)}
+main{background:var(--lm-bg)}
+.page-heading,.content-section,.modern-intro,.projects-showcase,.services-showcase,
+.publications-section,.about-profile,.section,.soft{
+  background-color:var(--lm-bg)!important;
+}
+.soft,.services-showcase{background-image:linear-gradient(180deg,rgba(234,244,253,.62),rgba(247,250,253,0))}
+
+/* Topographic texture: quiet spatial identity */
+.modern-intro,.about-profile,.publications-section{position:relative;isolation:isolate;overflow:hidden}
+.modern-intro:before,.about-profile:before,.publications-section:before{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  width:520px;height:520px;right:-180px;top:-180px;opacity:.22;
+  background:
+    repeating-radial-gradient(ellipse at 55% 45%,
+      transparent 0 24px,
+      rgba(23,103,199,.11) 25px 26px,
+      transparent 27px 43px);
+  transform:rotate(-12deg);
+  mask-image:radial-gradient(circle,#000 20%,transparent 70%);
+}
+
+/* GIS grid: only where it adds spatial structure */
+.projects-showcase,.services-showcase{position:relative;isolation:isolate;overflow:hidden}
+.projects-showcase:before,.services-showcase:before{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  inset:0;opacity:.16;
+  background-image:
+    linear-gradient(rgba(8,124,240,.09) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(8,124,240,.09) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:linear-gradient(90deg,transparent,#000 35%,#000 65%,transparent);
+}
+
+/* Small pixel/layer motif for section headings */
+.section-head,.page-heading .container,.publications-intro{position:relative}
+.section-head:after,.publications-intro:after{
+  content:"";width:42px;height:42px;flex:0 0 auto;opacity:.72;
+  background:
+    linear-gradient(var(--lm-primary),var(--lm-primary)) 0 0/10px 10px no-repeat,
+    linear-gradient(var(--lm-gis-blue),var(--lm-gis-blue)) 14px 0/10px 10px no-repeat,
+    linear-gradient(var(--lm-layer-blue),var(--lm-layer-blue)) 0 14px/10px 10px no-repeat,
+    linear-gradient(var(--lm-ice-blue),var(--lm-ice-blue)) 14px 14px/10px 10px no-repeat,
+    linear-gradient(var(--lm-primary),var(--lm-primary)) 28px 14px/10px 10px no-repeat,
+    linear-gradient(var(--lm-layer-blue),var(--lm-layer-blue)) 14px 28px/10px 10px no-repeat;
+}
+
+/* Cards merge into the page instead of floating like white boxes */
+.card,.catalogue-card,.publication-card,.workspace-card,.partners-section .partner-card,
+.service-grid .catalogue-card.services{
+  background:rgba(255,255,255,.58)!important;
+  border-color:rgba(180,207,232,.58)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.75),0 10px 34px rgba(3,27,56,.035)!important;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.catalogue-card:hover,.publication-card:hover,.workspace-card:hover,.partners-section .partner-card:hover{
+  background:rgba(255,255,255,.82)!important;
+  border-color:rgba(8,124,240,.3)!important;
+  box-shadow:0 18px 44px rgba(3,27,56,.075)!important;
+}
+
+/* Service wide cards: media and content feel like one continuous object */
+.service-grid .catalogue-card.services .card-media{background:#EEF5FB!important}
+.service-grid .catalogue-card.services .project-body{background:linear-gradient(90deg,rgba(255,255,255,.72),rgba(247,250,253,.64))}
+
+/* Spatial divider used between large content blocks */
+.section+.section,.content-section+.section{
+  border-top:1px solid rgba(180,207,232,.42);
+}
+
+/* Dark areas: contour + GIS-layer decorations */
+.home-map-hero,.hero-v2,.service-detail-hero,.modern-contact,.about-team-section,.site-footer{
+  position:relative;isolation:isolate;overflow:hidden;
+}
+.service-detail-hero:before,.modern-contact:after,.about-team-section:before,.site-footer:before{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  width:560px;height:560px;opacity:.18;
+  background:
+    repeating-radial-gradient(ellipse at center,
+      transparent 0 28px,
+      rgba(114,199,255,.28) 29px 30px,
+      transparent 31px 48px);
+  mask-image:radial-gradient(circle,#000 20%,transparent 72%);
+}
+.service-detail-hero:before{right:-170px;top:-220px}
+.modern-contact:after{right:-170px;bottom:-250px}
+.about-team-section:before{left:-230px;bottom:-240px}
+.site-footer:before{right:-240px;bottom:-300px}
+
+/* Layered GIS geometry */
+.service-detail-cta:before{
+  content:"";position:absolute;right:70px;top:35px;width:110px;height:78px;
+  border:1px solid rgba(114,199,255,.25);transform:skewY(-16deg) rotate(-5deg);
+  box-shadow:
+    14px 12px 0 -1px rgba(8,124,240,.08),
+    28px 24px 0 -1px rgba(20,149,255,.05);
+  pointer-events:none;
+}
+
+/* Graphic line accent */
+.eyebrow{display:inline-flex;align-items:center;gap:12px}
+.eyebrow:before{content:"";width:24px;height:2px;background:linear-gradient(90deg,var(--lm-primary),var(--lm-ice-blue))}
+
+/* Graphic dot field — restrained, used on contact only */
+.modern-contact:before{
+  width:190px;height:120px;border:0;border-radius:0;right:4%;bottom:8%;
+  opacity:.28;
+  background-image:radial-gradient(circle,var(--lm-gis-blue) 2px,transparent 2.5px);
+  background-size:18px 18px;
+  mask-image:linear-gradient(135deg,#000,transparent 78%);
+}
+
+/* Footer wave instead of a visible boxed decoration */
+.site-footer:after{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  left:-5%;right:-5%;bottom:-120px;height:260px;opacity:.16;
+  background:
+    radial-gradient(ellipse at 50% 0,rgba(20,149,255,.65),transparent 58%),
+    radial-gradient(ellipse at 20% 20%,rgba(114,199,255,.35),transparent 50%);
+  filter:blur(18px);
+}
+
+/* Keep decorative language quiet on small screens */
+@media(max-width:700px){
+ .modern-intro:before,.about-profile:before,.publications-section:before{width:320px;height:320px;right:-170px;top:-100px;opacity:.14}
+ .projects-showcase:before,.services-showcase:before{background-size:48px 48px;opacity:.1}
+ .section-head:after,.publications-intro:after{display:none}
+ .service-detail-cta:before{opacity:.45;right:25px}
+ .modern-contact:before{opacity:.16;right:-45px}
+}
