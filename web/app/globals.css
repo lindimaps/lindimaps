@@ -1963,3 +1963,58 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
 .card-placeholder{
   background:radial-gradient(circle at 80% 10%,rgba(20,149,255,.13),transparent 35%),linear-gradient(135deg,#06182A,#0A2036)!important;
 }
+
+
+/* =========================================================
+   PROJECT CARD DETAIL CONSISTENCY
+   Tags + CTA indicators follow the current theme
+   ========================================================= */
+.tags{display:flex;flex-wrap:wrap;gap:7px}
+.tags li{
+  background:color-mix(in srgb,var(--lm-primary) 5%,var(--lm-panel-solid))!important;
+  color:var(--lm-ink-2)!important;
+  border:1px solid var(--lm-line)!important;
+  border-radius:6px!important;
+  box-shadow:none!important;
+}
+[data-theme="dark"] .tags li,.dark .tags li{
+  background:rgba(114,199,255,.075)!important;
+  color:#B9CCDE!important;
+  border-color:rgba(114,199,255,.14)!important;
+}
+[data-theme="dark"] .tags li:hover,.dark .tags li:hover{
+  background:rgba(20,149,255,.12)!important;
+  color:#EAF5FF!important;
+  border-color:rgba(20,149,255,.28)!important;
+}
+
+/* One clean project indicator — remove legacy duplicate arrows */
+.text-link,.section-link,.pub-link{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:8px!important;
+}
+.text-link:before,.section-link:before,.pub-link:before{content:none!important}
+.text-link:after,.section-link:after,.pub-link:after{
+  content:"›"!important;
+  position:static!important;
+  width:auto!important;height:auto!important;
+  background:none!important;
+  color:var(--lm-gis-blue)!important;
+  font-size:1.3em!important;line-height:1!important;
+  transform:none!important;
+  transition:transform .2s ease!important;
+}
+.text-link:hover:after,.section-link:hover:after,.pub-link:hover:after{
+  transform:translateX(3px)!important;
+}
+
+/* If markup already contains a decorative arrow, keep only the final one */
+.text-link>span[aria-hidden="true"]{display:none!important}
+
+/* Project copy uses one hierarchy in night mode */
+[data-theme="dark"] .project-body>p:not(.eyebrow),.dark .project-body>p:not(.eyebrow){color:#9FB2C7!important}
+[data-theme="dark"] .project-body h3,.dark .project-body h3{color:#F4F8FC!important}
+[data-theme="dark"] .catalogue-card,.dark .catalogue-card{
+  border-color:rgba(114,199,255,.13)!important;
+}
