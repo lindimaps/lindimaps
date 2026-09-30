@@ -2197,3 +2197,73 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
   border-color:transparent!important;
   box-shadow:none!important;
 }
+
+
+/* =========================================================
+   LEGAL PAGES — Privacy / Terms / Cookies
+   Same spatial system, no isolated white legal cards
+   ========================================================= */
+.legal-page{
+  min-height:100vh;
+  background:var(--lm-canvas)!important;
+  color:var(--lm-ink)!important;
+  position:relative;isolation:isolate;overflow:hidden;
+}
+.legal-page:before{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  width:620px;height:620px;right:-220px;top:40px;opacity:.52;
+  background:repeating-radial-gradient(ellipse at 52% 48%,transparent 0 26px,var(--lm-contour) 27px 28px,transparent 29px 45px);
+  -webkit-mask-image:radial-gradient(ellipse at center,#000 0 34%,rgba(0,0,0,.68) 50%,transparent 76%);
+  mask-image:radial-gradient(ellipse at center,#000 0 34%,rgba(0,0,0,.68) 50%,transparent 76%);
+}
+.legal-page>header,.legal-page .legal-hero,.legal-page .legal-content,.legal-page main{
+  background:transparent!important;
+}
+.legal-page .legal-hero{
+  border-bottom:1px solid var(--lm-line)!important;
+  background-image:radial-gradient(circle at 86% 20%,var(--lm-section-glow),transparent 30%)!important;
+}
+.legal-page h1,.legal-page h2,.legal-page h3,.legal-page h4{color:var(--lm-ink)!important}
+.legal-page p,.legal-page li{color:var(--lm-ink-2)!important}
+.legal-page a:not(.brand):not(.button){color:var(--lm-primary)!important}
+.legal-page a:not(.brand):not(.button):hover{color:var(--lm-gis-blue)!important}
+.legal-page section,.legal-page article,.legal-page .legal-section{
+  background:transparent!important;
+  border-color:var(--lm-line)!important;
+  box-shadow:none!important;
+}
+.legal-page .legal-card,.legal-page .policy-card,.legal-page .cookie-card{
+  background:var(--lm-panel)!important;
+  color:var(--lm-ink)!important;
+  border:1px solid var(--lm-line)!important;
+  box-shadow:0 12px 36px var(--lm-shadow)!important;
+}
+.legal-page table{border-color:var(--lm-line)!important;color:var(--lm-ink)!important}
+.legal-page th{
+  background:color-mix(in srgb,var(--lm-primary) 6%,var(--lm-panel-solid))!important;
+  color:var(--lm-ink)!important;border-color:var(--lm-line)!important;
+}
+.legal-page td{background:transparent!important;color:var(--lm-ink-2)!important;border-color:var(--lm-line)!important}
+
+/* Dark legal pages remain continuous navy */
+[data-theme="dark"] .legal-page,.dark .legal-page{background:var(--lm-canvas)!important}
+[data-theme="dark"] .legal-page .legal-card,[data-theme="dark"] .legal-page .policy-card,[data-theme="dark"] .legal-page .cookie-card,
+.dark .legal-page .legal-card,.dark .legal-page .policy-card,.dark .legal-page .cookie-card{
+  background:rgba(8,31,52,.60)!important;
+  border-color:rgba(114,199,255,.13)!important;
+}
+[data-theme="dark"] .legal-page th,.dark .legal-page th{
+  background:rgba(20,149,255,.07)!important;color:#EAF3FB!important;
+}
+[data-theme="dark"] .legal-page h1,[data-theme="dark"] .legal-page h2,[data-theme="dark"] .legal-page h3,
+.dark .legal-page h1,.dark .legal-page h2,.dark .legal-page h3{color:#F2F7FC!important}
+[data-theme="dark"] .legal-page p,[data-theme="dark"] .legal-page li,[data-theme="dark"] .legal-page td,
+.dark .legal-page p,.dark .legal-page li,.dark .legal-page td{color:#A8BCD0!important}
+
+/* Light legal pages avoid stark pure-white blocks */
+[data-theme="light"] .legal-page .legal-card,
+[data-theme="light"] .legal-page .policy-card,
+[data-theme="light"] .legal-page .cookie-card{
+  background:rgba(255,255,255,.46)!important;
+  border-color:rgba(180,207,232,.48)!important;
+}
