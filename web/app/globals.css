@@ -877,13 +877,13 @@ a.service-tech-item{color:var(--lm-text)!important}
 .site-header .desktop-nav,
 .home-site-header .desktop-nav,
 .site-header .desktop-nav>a,
-.home-site-header .desktop-nav>a,
+.home-site-header .desktop-nav>a{
   color:var(--lm-text)!important;
 }
 .site-header .desktop-nav>a:hover,
 .home-site-header .desktop-nav>a:hover,
 .site-header .desktop-nav>a[aria-current="page"],
-.home-site-header .desktop-nav>a[aria-current="page"],
+.home-site-header .desktop-nav>a[aria-current="page"]{
   color:var(--lm-primary)!important;
 }
 .site-header .desktop-nav>a[aria-current="page"],
