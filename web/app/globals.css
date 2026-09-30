@@ -2731,3 +2731,65 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
   width:100%!important;
   max-width:none!important;
 }
+
+
+/* Clean navy surfaces — no thin technical grid/white lines */
+[data-theme="dark"] body,
+.dark body,
+[data-theme="dark"] main,
+.dark main{
+  background-image:none!important;
+}
+[data-theme="dark"] .spatial-intro:before,
+[data-theme="dark"] .spatial-intro:after,
+[data-theme="dark"] .services-showcase:before,
+[data-theme="dark"] .services-showcase:after,
+[data-theme="dark"] .projects-showcase:before,
+[data-theme="dark"] .projects-showcase:after,
+[data-theme="dark"] .modern-contact:before,
+[data-theme="dark"] .modern-contact:after,
+.dark .spatial-intro:before,.dark .spatial-intro:after,
+.dark .services-showcase:before,.dark .services-showcase:after,
+.dark .projects-showcase:before,.dark .projects-showcase:after,
+.dark .modern-contact:before,.dark .modern-contact:after{
+  background-image:none!important;
+}
+[data-theme="dark"] .workspace-grid,
+.dark .workspace-grid{display:none!important}
+
+/* Legal pages — continuous navy, remove bright white card contrast */
+[data-theme="dark"] .legal-page,
+.dark .legal-page{
+  background:#031426!important;
+  background-image:none!important;
+}
+[data-theme="dark"] .legal-page:before,
+[data-theme="dark"] .legal-page:after,
+.dark .legal-page:before,
+.dark .legal-page:after{
+  display:none!important;
+  background:none!important;
+}
+[data-theme="dark"] .legal-page .legal-content,
+.dark .legal-page .legal-content{
+  background:transparent!important;
+}
+[data-theme="dark"] .legal-page .legal-content>section,
+.dark .legal-page .legal-content>section{
+  background:transparent!important;
+  border-color:rgba(114,199,255,.10)!important;
+  box-shadow:none!important;
+}
+[data-theme="dark"] .legal-page .legal-content>aside,
+.dark .legal-page .legal-content>aside{
+  background:#082039!important;
+  border:1px solid rgba(114,199,255,.12)!important;
+  color:#F2F7FC!important;
+  box-shadow:none!important;
+}
+[data-theme="dark"] .legal-page .legal-content>aside h3,
+.dark .legal-page .legal-content>aside h3{color:#F2F7FC!important}
+[data-theme="dark"] .legal-page .legal-content>aside p,
+.dark .legal-page .legal-content>aside p{color:#A8BCD0!important}
+[data-theme="dark"] .legal-page .legal-content>aside a,
+.dark .legal-page .legal-content>aside a{color:#72C7FF!important}
