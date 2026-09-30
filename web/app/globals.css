@@ -2868,3 +2868,8 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
 [data-theme="dark"] .about-test-hero-grid p,[data-theme="dark"] .about-test-pillars p,[data-theme="dark"] .about-test-person-copy>p:not(.eyebrow),[data-theme="dark"] .about-test-partner-grid span{color:#A8BCD0}
 [data-theme="dark"] .about-test-partners{background:#061a2e}
 @media(max-width:760px){.about-test-hero{padding-top:50px}.about-test-hero-grid,.about-test-cap-grid,.about-test-person{grid-template-columns:1fr}.about-test-hero-grid>div:last-child{border-left:0;border-top:1px solid var(--lm-border);padding:24px 0 0}.about-test-pillars{grid-template-columns:1fr}.about-test-pillars article{border-right:0;border-bottom:1px solid var(--lm-border);padding-left:0;padding-right:0}.about-test-partner-grid{grid-template-columns:repeat(2,1fr)}.about-test-person{padding-bottom:75px}.about-test-cta>div{flex-direction:column;align-items:stretch}.about-test-cta a{text-align:center}}
+
+
+/* 404 — current CMS brand logo */
+.not-found-page .nf-cms-logo{display:block;width:auto;height:auto;max-width:min(270px,72vw);max-height:76px;object-fit:contain;object-position:left center}
+.not-found-page .nf-logo:has(.nf-cms-logo){display:flex;align-items:center;justify-content:flex-start}
