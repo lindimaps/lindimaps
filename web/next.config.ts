@@ -35,5 +35,3 @@ const legacySystemRewrites=[
 ];
 const nextConfig:NextConfig={poweredByHeader:false,compress:true,experimental:{globalNotFound:true},async redirects(){return legacyRedirects},async rewrites(){return legacySystemRewrites},async headers(){return[{source:"/:path*",headers:securityHeaders},{source:"/sitemap.xml",headers:[{key:"Cache-Control",value:"public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"}]},{source:"/robots.txt",headers:[{key:"Cache-Control",value:"public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"}]}]}};
 export default nextConfig;
-
-// Vercel production trigger 2026-09-27
