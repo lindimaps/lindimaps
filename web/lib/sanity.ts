@@ -13,7 +13,7 @@ export type Partner={_id:string;name:string;roleSq?:string;roleEn?:string;logo?:
 export type Publication = {_id:string;title:string;titleEn?:string;publicationType?:string;authors?:string[];year?:number;publisher?:string;doi?:string;url?:string;pdfUrl?:string;citation?:string;citationEn?:string;keywords?:string[];abstractSq?:string;abstractEn?:string;image?:string;featured?:boolean};
 export type TextBlock={_key:string;_type:string;children?:{_key:string;text:string}[]};
 export type SiteContent={
- home:(Localized&{image?:string})|null;
+ home:(Localized&{image?:string;video?:string})|null;
  settings:(Localized&{useStarterContent?:boolean;siteName?:string;email?:string;logo?:string;logoDark?:string;logoFooter?:string;favicon?:string;ogImage?:string;seoTitle?:string;linkedin?:string;instagram?:string;github?:string;researchGate?:string})|null;
  profile:(Localized&{name:string;image?:string;bioSq?:TextBlock[];bioEn?:TextBlock[];cvUrl?:string;email?:string;linkedin?:string;researchGate?:string;github?:string;scholar?:string;orcid?:string;skills?:string[]})|null;
  about:{history:(Localized&{_key:string})[];values:(Localized&{_key:string})[]}|null;
@@ -24,7 +24,7 @@ export function safeUrl(value?:string){if(!value)return undefined;try{const url=
 const projectId=process.env.SANITY_PROJECT_ID||"oyagunrg";
 const dataset=process.env.SANITY_DATASET||"production";
 const query=`{
- "home": *[_type=="homePage"]|order(_updatedAt desc)[0]{...,"image":heroImage.asset->url},
+ "home": *[_type=="homePage"]|order(_updatedAt desc)[0]{...,"image":heroImage.asset->url,"video":heroVideo.asset->url},
  "settings": *[_type=="siteSettings"]|order(_updatedAt desc)[0]{...,"logo":logo.asset->url,"logoDark":logoDark.asset->url,"logoFooter":logoFooter.asset->url,"favicon":favicon.asset->url,"ogImage":ogImage.asset->url},
  "projectCategories": *[_type=="projectCategory"]|order(order asc,titleSq asc){_id,titleSq,titleEn,"slug":slug.current,order},
  "projects": *[_type=="project"]|order(order asc,year desc,_createdAt desc){_id,titleSq,titleEn,summarySq,summaryEn,category,"categories":categories[]->{_id,titleSq,titleEn,"slug":slug.current,order},year,liveUrl,githubUrl,roleSq,roleEn,client,clientEn,technologies,showOnHome,homeOrder,"image":coalesce(coverImage.asset->url,imageUrl),"imageAltSq":coverImage.altSq,"imageAltEn":coverImage.altEn},
