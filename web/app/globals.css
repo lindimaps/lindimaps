@@ -2018,3 +2018,50 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
 [data-theme="dark"] .catalogue-card,.dark .catalogue-card{
   border-color:rgba(114,199,255,.13)!important;
 }
+
+
+/* =========================================================
+   NIGHT CHIP CONTRAST REFINEMENT
+   Publications / metadata / taxonomy
+   ========================================================= */
+[data-theme="dark"] .pub-meta span,.dark .pub-meta span,
+[data-theme="dark"] .publication-card .tags li,.dark .publication-card .tags li,
+[data-theme="dark"] .publication-card [class*="tag"] li,.dark .publication-card [class*="tag"] li{
+  background:rgba(114,199,255,.065)!important;
+  color:#AFC3D6!important;
+  border:1px solid rgba(114,199,255,.12)!important;
+  box-shadow:none!important;
+}
+[data-theme="dark"] .pub-meta span,.dark .pub-meta span{
+  color:#86A3BE!important;
+  background:rgba(114,199,255,.055)!important;
+  border-color:rgba(114,199,255,.15)!important;
+}
+[data-theme="dark"] .publication-card .tags li:hover,.dark .publication-card .tags li:hover{
+  background:rgba(20,149,255,.11)!important;
+  color:#DCECF8!important;
+  border-color:rgba(20,149,255,.24)!important;
+}
+
+/* Light mode keeps the same visual weight, reversed */
+[data-theme="light"] .pub-meta span,
+[data-theme="light"] .publication-card .tags li{
+  background:rgba(8,124,240,.045)!important;
+  color:#526A81!important;
+  border:1px solid rgba(23,103,199,.12)!important;
+}
+
+/* Metadata is secondary; taxonomy slightly stronger but never white-on-dark blocks */
+.pub-meta span{
+  font-weight:750!important;
+  letter-spacing:.07em!important;
+}
+.publication-card .tags li{
+  font-weight:700!important;
+}
+
+/* Online publication remains the intentional action accent */
+.pub-link{
+  color:var(--lm-gis-blue)!important;
+  font-weight:850!important;
+}
