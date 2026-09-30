@@ -4,6 +4,7 @@ export type Language = "sq" | "en";
 type Localized = Partial<Record<`${"title"|"description"|"summary"|"heroTitle"|"heroText"|"primaryCta"|"secondaryCta"|"introTitle"|"intro"|"location"|"seoDescription"|"headline"}${"Sq"|"En"}`,string>>;
 export type ProjectCategory={_id:string;titleSq?:string;titleEn?:string;slug:string;order?:number};
 export type ServiceTechnology={name:string;logo?:string;url?:string};
+export type SocialLink={_key?:string;name:string;url:string;icon?:string};
 export type ContentItem = Localized & {_id:string;category?:string;categories?:ProjectCategory[];year?:number;image?:string;imageAltSq?:string;imageAltEn?:string;liveUrl?:string;githubUrl?:string;roleSq?:string;roleEn?:string;client?:string;clientEn?:string;technologies?:string[];showOnHome?:boolean;homeOrder?:number};
 export type ServiceItem=ContentItem&{slug?:string;leadSq?:string;leadEn?:string;introSq?:string;introEn?:string;capabilitiesSq?:string[];capabilitiesEn?:string[];workflowSq?:string[];workflowEn?:string[];deliverablesSq?:string[];deliverablesEn?:string[];applicationsSq?:string[];applicationsEn?:string[];serviceTechnologies?:ServiceTechnology[];ctaTitleSq?:string;ctaTitleEn?:string;ctaTextSq?:string;ctaTextEn?:string};
 export type Activity={_id:string;titleSq?:string;titleEn?:string;kind?:string;date?:string;location?:string;locationEn?:string;descriptionSq?:string;descriptionEn?:string;image?:string;url?:string};
@@ -14,7 +15,7 @@ export type Publication = {_id:string;title:string;titleEn?:string;publicationTy
 export type TextBlock={_key:string;_type:string;children?:{_key:string;text:string}[]};
 export type SiteContent={
  home:(Localized&{image?:string;video?:string;heroUseVideo?:boolean;heroVideoPosition?:string})|null;
- settings:(Localized&{useStarterContent?:boolean;siteName?:string;email?:string;logo?:string;logoDark?:string;logoFooter?:string;favicon?:string;ogImage?:string;seoTitle?:string;linkedin?:string;instagram?:string;github?:string;researchGate?:string;presentationVideo?:string;presentationVideoPoster?:string})|null;
+ settings:(Localized&{useStarterContent?:boolean;siteName?:string;email?:string;logo?:string;logoDark?:string;logoFooter?:string;favicon?:string;ogImage?:string;seoTitle?:string;linkedin?:string;instagram?:string;github?:string;researchGate?:string;presentationVideo?:string;presentationVideoPoster?:string;socialLinks?:SocialLink[]})|null;
  profile:(Localized&{name:string;image?:string;bioSq?:TextBlock[];bioEn?:TextBlock[];cvUrl?:string;email?:string;linkedin?:string;researchGate?:string;github?:string;scholar?:string;orcid?:string;skills?:string[]})|null;
  about:{history:(Localized&{_key:string})[];values:(Localized&{_key:string})[]}|null;
  projects:ContentItem[];projectCategories:ProjectCategory[];services:ServiceItem[];publications:Publication[];activities:Activity[];gallery:GalleryItem[];partners:Partner[];team:TeamMember[];
@@ -25,7 +26,7 @@ const projectId=process.env.SANITY_PROJECT_ID||"oyagunrg";
 const dataset=process.env.SANITY_DATASET||"production";
 const query=`{
  "home": *[_type=="homePage"]|order(_updatedAt desc)[0]{...,"image":heroImage.asset->url,"video":heroVideo.asset->url},
- "settings": *[_type=="siteSettings"]|order(_updatedAt desc)[0]{...,"logo":logo.asset->url,"logoDark":logoDark.asset->url,"logoFooter":logoFooter.asset->url,"favicon":favicon.asset->url,"ogImage":ogImage.asset->url,"presentationVideo":presentationVideo.asset->url,"presentationVideoPoster":presentationVideoPoster.asset->url},
+ "settings": *[_type=="siteSettings"]|order(_updatedAt desc)[0]{...,"logo":logo.asset->url,"logoDark":logoDark.asset->url,"logoFooter":logoFooter.asset->url,"favicon":favicon.asset->url,"ogImage":ogImage.asset->url,"presentationVideo":presentationVideo.asset->url,"presentationVideoPoster":presentationVideoPoster.asset->url,"socialLinks":socialLinks[]{_key,name,url,"icon":icon.asset->url}},
  "projectCategories": *[_type=="projectCategory"]|order(order asc,titleSq asc){_id,titleSq,titleEn,"slug":slug.current,order},
  "projects": *[_type=="project"]|order(order asc,year desc,_createdAt desc){_id,titleSq,titleEn,summarySq,summaryEn,category,"categories":categories[]->{_id,titleSq,titleEn,"slug":slug.current,order},year,liveUrl,githubUrl,roleSq,roleEn,client,clientEn,technologies,showOnHome,homeOrder,"image":coalesce(coverImage.asset->url,imageUrl),"imageAltSq":coverImage.altSq,"imageAltEn":coverImage.altEn},
  "profile": *[_type=="profile"]|order(_updatedAt desc)[0]{...,"image":photo.asset->url},
