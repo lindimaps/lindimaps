@@ -1514,3 +1514,146 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
  [data-theme="dark"] .theme-toggle-knob,.dark .theme-toggle-knob{transform:translateX(14px)}
  .theme-toggle-sun,.theme-toggle-moon{font-size:10px}
 }
+
+
+/* =========================================================
+   LIGHT MODE CONTINUITY PASS
+   Remove visible section cuts; theme workspace correctly
+   ========================================================= */
+
+/* Light pages are one continuous canvas */
+[data-theme="light"] body,
+[data-theme="light"] main,
+[data-theme="light"] .site-shell,
+[data-theme="light"] .page-heading,
+[data-theme="light"] .content-section,
+[data-theme="light"] .modern-intro,
+[data-theme="light"] .projects-showcase,
+[data-theme="light"] .services-showcase,
+[data-theme="light"] .publications-section,
+[data-theme="light"] .about-profile,
+[data-theme="light"] .section,
+[data-theme="light"] .soft{
+  background-color:#F7FAFD!important;
+}
+[data-theme="light"] .page-heading{
+  background-image:
+    radial-gradient(circle at 86% 20%,rgba(8,124,240,.055),transparent 30%),
+    linear-gradient(180deg,#F9FCFF 0%,#F7FAFD 100%)!important;
+  border-bottom:0!important;
+}
+[data-theme="light"] .page-heading:after{
+  left:10%!important;right:10%!important;bottom:0!important;height:1px!important;
+  background:linear-gradient(90deg,transparent,rgba(159,193,222,.46) 14%,rgba(8,124,240,.16) 50%,rgba(159,193,222,.46) 86%,transparent)!important;
+}
+[data-theme="light"] .content-section,
+[data-theme="light"] .publications-section,
+[data-theme="light"] .modern-intro{
+  background-image:radial-gradient(circle at 92% 4%,rgba(8,124,240,.035),transparent 24%)!important;
+}
+[data-theme="light"] .section+.section,
+[data-theme="light"] .content-section+.section{
+  border-top-color:rgba(159,193,222,.20)!important;
+}
+[data-theme="light"] .publications-intro,
+[data-theme="light"] .editorial-intro,
+[data-theme="light"] .portfolio-intro{
+  border-top-color:rgba(159,193,222,.28)!important;
+  border-bottom-color:rgba(159,193,222,.30)!important;
+}
+
+/* Keep contour artwork flowing instead of looking like separate dark blocks */
+[data-theme="light"] .page-heading:before,
+[data-theme="light"] .modern-intro:before,
+[data-theme="light"] .about-profile:before,
+[data-theme="light"] .publications-section:before{
+  opacity:.52!important;
+  background:repeating-radial-gradient(ellipse at 52% 48%,transparent 0 25px,rgba(23,103,199,.075) 26px 27px,transparent 28px 44px)!important;
+}
+[data-theme="light"] .projects-showcase:before,
+[data-theme="light"] .services-showcase:before,
+[data-theme="light"] .workspace-section:before{
+  opacity:.38!important;
+}
+
+/* Workspace / Systems control belongs to the light header */
+[data-theme="light"] .workspace-menu>summary{
+  color:#17314B!important;
+  background:rgba(255,255,255,.72)!important;
+  border-color:rgba(159,193,222,.58)!important;
+  box-shadow:0 5px 16px rgba(3,27,56,.045)!important;
+}
+[data-theme="light"] .workspace-menu>summary:hover,
+[data-theme="light"] .workspace-menu[open]>summary{
+  color:var(--lm-primary)!important;
+  background:#EEF7FF!important;
+  border-color:rgba(8,124,240,.34)!important;
+}
+[data-theme="light"] .workspace-grid i{background:currentColor!important}
+[data-theme="light"] .workspace-panel{
+  background:rgba(249,252,255,.96)!important;
+  color:#07182D!important;
+  border-color:#DCE7F2!important;
+  box-shadow:0 22px 60px rgba(3,27,56,.14)!important;
+}
+[data-theme="light"] .workspace-panel>small{color:#6D8297!important}
+[data-theme="light"] .workspace-panel>a{color:#17314B!important}
+[data-theme="light"] .workspace-panel>a:hover{background:#EAF4FD!important}
+[data-theme="light"] .workspace-panel .product-mark strong{color:#07182D!important}
+[data-theme="light"] .workspace-panel .product-mark strong span{color:var(--lm-primary)!important}
+[data-theme="light"] .workspace-panel .product-mark small{color:#667C91!important}
+[data-theme="light"] .workspace-panel .product-icon{
+  background:#E8F3FD!important;color:var(--lm-primary)!important;border-color:#D3E8F8!important;
+}
+
+/* Dark workspace remains intentionally dark */
+[data-theme="dark"] .workspace-panel,.dark .workspace-panel{
+  background:rgba(5,20,35,.97)!important;
+  color:#F4F8FC!important;
+  border-color:rgba(114,199,255,.16)!important;
+  box-shadow:0 24px 64px rgba(0,0,0,.34)!important;
+}
+[data-theme="dark"] .workspace-panel>a,.dark .workspace-panel>a{color:#E7F0F8!important}
+[data-theme="dark"] .workspace-panel>a:hover,.dark .workspace-panel>a:hover{background:rgba(20,149,255,.09)!important}
+[data-theme="dark"] .workspace-panel .product-mark strong,.dark .workspace-panel .product-mark strong{color:#F4F8FC!important}
+
+/* Light cards should blend into the canvas, not create white slabs */
+[data-theme="light"] .card,
+[data-theme="light"] .catalogue-card,
+[data-theme="light"] .publication-card,
+[data-theme="light"] .workspace-card,
+[data-theme="light"] .partners-section .partner-card{
+  background:rgba(255,255,255,.46)!important;
+  border-color:rgba(180,207,232,.48)!important;
+  box-shadow:0 10px 32px rgba(3,27,56,.028)!important;
+}
+[data-theme="light"] .card:hover,
+[data-theme="light"] .catalogue-card:hover,
+[data-theme="light"] .publication-card:hover,
+[data-theme="light"] .workspace-card:hover,
+[data-theme="light"] .partners-section .partner-card:hover{
+  background:rgba(255,255,255,.68)!important;
+  box-shadow:0 16px 38px rgba(3,27,56,.055)!important;
+}
+
+/* Night mode gets smooth dark continuity too */
+[data-theme="dark"] .page-heading,
+[data-theme="dark"] .content-section,
+[data-theme="dark"] .modern-intro,
+[data-theme="dark"] .projects-showcase,
+[data-theme="dark"] .services-showcase,
+[data-theme="dark"] .publications-section,
+[data-theme="dark"] .about-profile,
+.dark .page-heading,.dark .content-section,.dark .modern-intro,.dark .projects-showcase,
+.dark .services-showcase,.dark .publications-section,.dark .about-profile{
+  background-color:#020C18!important;
+}
+[data-theme="dark"] .page-heading:after,.dark .page-heading:after{
+  background:linear-gradient(90deg,transparent,rgba(114,199,255,.12) 14%,rgba(20,149,255,.26) 50%,rgba(114,199,255,.12) 86%,transparent)!important;
+}
+
+/* Do not let mobile reveal hard section boundaries */
+@media(max-width:700px){
+ [data-theme="light"] .page-heading:after{left:16px!important;right:16px!important}
+ [data-theme="light"] .publications-intro,[data-theme="light"] .editorial-intro,[data-theme="light"] .portfolio-intro{border-top-color:rgba(159,193,222,.22)!important}
+}
