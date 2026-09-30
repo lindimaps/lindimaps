@@ -2811,3 +2811,26 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
 .site-footer a:focus-visible{
   outline-color:#1495FF!important;
 }
+
+
+/* Workspace/System menu icon — keep its four-square mark visible */
+[data-theme="dark"] .workspace-menu .workspace-grid,
+.dark .workspace-menu .workspace-grid,
+[data-theme="light"] .workspace-menu .workspace-grid,
+.workspace-menu .workspace-grid{
+  display:grid!important;
+}
+.workspace-menu .workspace-grid{
+  grid-template-columns:repeat(2,4px)!important;
+  grid-template-rows:repeat(2,4px)!important;
+  gap:4px!important;
+  place-content:center!important;
+}
+.workspace-menu .workspace-grid i{
+  display:block!important;
+  width:4px!important;
+  height:4px!important;
+  border-radius:1px!important;
+  background:currentColor!important;
+  opacity:.95!important;
+}
