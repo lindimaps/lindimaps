@@ -20,7 +20,17 @@ const legacyRedirects=[
  {source:"/sq/termsofuse/index.html",destination:"/sq/termsofuse",permanent:true},
  {source:"/en/termsofuse/index.html",destination:"/en/termsofuse",permanent:true}
 ];
-const nextConfig:NextConfig={poweredByHeader:false,compress:true,experimental:{globalNotFound:true},async redirects(){return legacyRedirects},async headers(){return[{source:"/:path*",headers:securityHeaders},{source:"/sitemap.xml",headers:[{key:"Cache-Control",value:"public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"}]},{source:"/robots.txt",headers:[{key:"Cache-Control",value:"public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"}]}]}};
+const legacySystemRewrites=[
+ {source:"/pagesat",destination:"/pagesat/index.html"},
+ {source:"/pagesat/",destination:"/pagesat/index.html"},
+ {source:"/pushimet",destination:"/pushimet/index.html"},
+ {source:"/pushimet/",destination:"/pushimet/index.html"},
+ {source:"/pyjetnezonatembrojtura",destination:"/pyjetnezonatembrojtura/index.html"},
+ {source:"/pyjetnezonatembrojtura/",destination:"/pyjetnezonatembrojtura/index.html"},
+ {source:"/raportASIG",destination:"/raportASIG/index.html"},
+ {source:"/raportASIG/",destination:"/raportASIG/index.html"}
+];
+const nextConfig:NextConfig={poweredByHeader:false,compress:true,experimental:{globalNotFound:true},async redirects(){return legacyRedirects},async rewrites(){return legacySystemRewrites},async headers(){return[{source:"/:path*",headers:securityHeaders},{source:"/sitemap.xml",headers:[{key:"Cache-Control",value:"public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"}]},{source:"/robots.txt",headers:[{key:"Cache-Control",value:"public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"}]}]}};
 export default nextConfig;
 
 // Vercel production trigger 2026-09-27
