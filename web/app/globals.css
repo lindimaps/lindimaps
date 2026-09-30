@@ -684,3 +684,8 @@ a.service-tech-item{text-decoration:none!important;color:#172033!important}
     grid-template-columns:minmax(0,1fr)!important;
   }
 }
+
+/* CMS brand assets: preserve the current header/footer footprint */
+.lm-cms-logo{display:block;width:auto;height:44px;max-width:220px;object-fit:contain}
+.footer-brand .lm-cms-logo{height:44px;max-width:220px}
+@media(max-width:600px){.lm-cms-logo,.footer-brand .lm-cms-logo{height:40px;max-width:180px}}
