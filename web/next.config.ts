@@ -18,9 +18,12 @@ const legacyRedirects=[
  {source:"/sq/privacy/index.html",destination:"/sq/privacy",permanent:true},
  {source:"/en/privacy/index.html",destination:"/en/privacy",permanent:true},
  {source:"/sq/termsofuse/index.html",destination:"/sq/termsofuse",permanent:true},
- {source:"/en/termsofuse/index.html",destination:"/en/termsofuse",permanent:true}
+ {source:"/en/termsofuse/index.html",destination:"/en/termsofuse",permanent:true},
+ {source:"/aktivitete-system.html",destination:"/aktiviteteASIG",permanent:true}
 ];
 const legacySystemRewrites=[
+ {source:"/aktiviteteASIG",destination:"/aktiviteteASIG/index.html"},
+ {source:"/aktiviteteASIG/",destination:"/aktiviteteASIG/index.html"},
  {source:"/pagesat",destination:"/pagesat/index.html"},
  {source:"/pagesat/",destination:"/pagesat/index.html"},
  {source:"/pushimet",destination:"/pushimet/index.html"},
