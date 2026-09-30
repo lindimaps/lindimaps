@@ -2535,3 +2535,32 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
   opacity:.28!important;
   filter:saturate(.62) contrast(1.05) brightness(.82)!important;
 }
+
+
+/* Presentation fallback — Activities / Gallery */
+.presentation-fallback{
+  margin-top:30px;padding:clamp(14px,2vw,22px);
+  background:rgba(255,255,255,.42);
+  border:1px solid var(--lm-border);
+  border-radius:24px;
+  display:grid;grid-template-columns:minmax(0,1.65fr) minmax(240px,.65fr);
+  gap:clamp(22px,4vw,48px);align-items:center;
+}
+.presentation-video-shell{
+  overflow:hidden;border-radius:18px;background:#031426;
+  aspect-ratio:16/9;
+}
+.presentation-video-shell video{display:block;width:100%;height:100%;object-fit:cover;background:#031426}
+.presentation-video-copy small{display:block;color:var(--lm-primary);font-weight:800;letter-spacing:.13em;font-size:.7rem;margin-bottom:14px}
+.presentation-video-copy h3{margin:0 0 12px;color:var(--lm-ink);font-size:clamp(1.45rem,2.5vw,2.15rem)}
+.presentation-video-copy p{margin:0;color:var(--lm-ink-2);line-height:1.7}
+[data-theme="dark"] .presentation-fallback,.dark .presentation-fallback{
+  background:rgba(8,32,57,.52);border-color:rgba(114,199,255,.12);
+}
+[data-theme="dark"] .presentation-video-copy h3,.dark .presentation-video-copy h3{color:#F2F7FC}
+[data-theme="dark"] .presentation-video-copy p,.dark .presentation-video-copy p{color:#A8BCD0}
+@media(max-width:760px){
+ .presentation-fallback{grid-template-columns:1fr;padding:12px;border-radius:18px}
+ .presentation-video-shell{border-radius:13px}
+ .presentation-video-copy{padding:4px 6px 10px}
+}
