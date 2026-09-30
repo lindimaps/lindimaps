@@ -1407,3 +1407,110 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
  .service-detail-hero:after,.hero-v2:before{width:230px;height:130px;right:-60px;opacity:.14}
  .partners-section:after,.about-team-section:after{opacity:.12}
 }
+
+
+/* =========================================================
+   THEME SWITCH CONTROL + CMS LOGO VARIANTS
+   ========================================================= */
+.theme-toggle{
+  appearance:none;border:0;background:transparent;padding:0;margin:0 2px 0 0;
+  display:inline-grid;place-items:center;cursor:pointer;flex:0 0 auto;
+}
+.theme-toggle-track{
+  position:relative;width:58px;height:32px;border-radius:999px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 8px;
+  background:#EAF2F9;border:1px solid #D6E4F0;color:#6C8196;
+  box-shadow:inset 0 1px 2px rgba(3,27,56,.05);
+  transition:background .25s ease,border-color .25s ease,color .25s ease;
+}
+.theme-toggle-sun,.theme-toggle-moon{
+  position:relative;z-index:2;font-size:14px;line-height:1;font-weight:800;
+}
+.theme-toggle-knob{
+  position:absolute;z-index:1;left:3px;top:3px;width:24px;height:24px;border-radius:50%;
+  background:#fff;box-shadow:0 3px 9px rgba(3,27,56,.18);
+  transition:transform .28s cubic-bezier(.2,.8,.2,1),background .25s ease;
+}
+[data-theme="dark"] .theme-toggle-track,.dark .theme-toggle-track{
+  background:#0A2036;border-color:rgba(114,199,255,.2);color:#AFC7DB;
+}
+[data-theme="dark"] .theme-toggle-knob,.dark .theme-toggle-knob{
+  transform:translateX(26px);background:linear-gradient(135deg,var(--lm-primary),var(--lm-gis-blue));
+  box-shadow:0 4px 14px rgba(8,124,240,.34);
+}
+[data-theme="dark"] .theme-toggle-moon,.dark .theme-toggle-moon{color:#EAF5FF}
+[data-theme="light"] .theme-toggle-sun{color:#0C6FD6}
+.theme-toggle:focus-visible .theme-toggle-track{outline:3px solid rgba(20,149,255,.28);outline-offset:3px}
+
+/* CMS header logo swaps with theme */
+.lm-theme-logo-dark{display:none}
+[data-theme="dark"] .lm-theme-logo-light,.dark .lm-theme-logo-light{display:none}
+[data-theme="dark"] .lm-theme-logo-dark,.dark .lm-theme-logo-dark{display:block}
+
+/* Header fallback wordmark also follows mode */
+[data-theme="dark"] .site-header .lm-word strong,
+[data-theme="dark"] .site-header .lm-word strong span,
+[data-theme="dark"] .home-site-header .brand .lm-word strong,
+[data-theme="dark"] .home-site-header .brand .lm-word strong span,
+.dark .site-header .lm-word strong,
+.dark .site-header .lm-word strong span,
+.dark .home-site-header .brand .lm-word strong,
+.dark .home-site-header .brand .lm-word strong span{color:#F4F8FC!important}
+[data-theme="dark"] .site-header .lm-word small,
+[data-theme="dark"] .home-site-header .brand .lm-word small,
+.dark .site-header .lm-word small,
+.dark .home-site-header .brand .lm-word small{color:#9FB2C7!important}
+
+/* Dark mode: remove remaining light-only hardcoded surfaces */
+[data-theme="dark"] .soft,[data-theme="dark"] .services-showcase,
+.dark .soft,.dark .services-showcase{
+ background-color:var(--lm-canvas)!important;
+ background-image:linear-gradient(180deg,rgba(20,149,255,.035),rgba(2,12,24,0))!important;
+}
+[data-theme="dark"] .service-grid .catalogue-card.services .card-media,
+.dark .service-grid .catalogue-card.services .card-media{background:#06182A!important}
+[data-theme="dark"] .service-grid .catalogue-card.services .project-body,
+.dark .service-grid .catalogue-card.services .project-body{
+ background:linear-gradient(90deg,rgba(7,26,45,.86),rgba(6,24,42,.72))!important;
+}
+[data-theme="dark"] .service-detail-secondary,.dark .service-detail-secondary{background:#06182A!important}
+[data-theme="dark"] .service-detail-tech:before,.dark .service-detail-tech:before{background:linear-gradient(90deg,var(--lm-canvas),transparent)}
+[data-theme="dark"] .service-detail-tech:after,.dark .service-detail-tech:after{background:linear-gradient(270deg,var(--lm-canvas),transparent)}
+[data-theme="dark"] .mobile-workspace-subnav>a,.dark .mobile-workspace-subnav>a,
+[data-theme="dark"] .mobile-menu-panel .mobile-workspace-children>a,.dark .mobile-menu-panel .mobile-workspace-children>a{
+ background:#081D32!important;color:#C9D9E8!important;border-color:var(--lm-line)!important;
+}
+[data-theme="dark"] .mobile-workspace-subnav>a:hover,.dark .mobile-workspace-subnav>a:hover,
+[data-theme="dark"] .mobile-menu-panel .mobile-workspace-children>a:hover,.dark .mobile-menu-panel .mobile-workspace-children>a:hover{
+ background:#0B2742!important;color:var(--lm-gis-blue)!important;
+}
+
+/* Dark-mode fields and cards inherit readable text */
+[data-theme="dark"] .card,[data-theme="dark"] .catalogue-card,[data-theme="dark"] .publication-card,
+[data-theme="dark"] .workspace-card,[data-theme="dark"] .partners-section .partner-card,
+.dark .card,.dark .catalogue-card,.dark .publication-card,.dark .workspace-card,.dark .partners-section .partner-card{
+ color:var(--lm-ink)!important;
+}
+[data-theme="dark"] .project-body h3,[data-theme="dark"] .publication-card h2,
+[data-theme="dark"] .partners-section .partner-card strong,[data-theme="dark"] .profile-copy h2,
+.dark .project-body h3,.dark .publication-card h2,.dark .partners-section .partner-card strong,.dark .profile-copy h2{
+ color:var(--lm-ink)!important;
+}
+
+/* Compact placement on smaller screens */
+@media(max-width:1120px){.theme-toggle-track{width:52px;height:30px}.theme-toggle-knob{width:22px;height:22px}[data-theme="dark"] .theme-toggle-knob,.dark .theme-toggle-knob{transform:translateX(22px)}}
+@media(max-width:850px){
+ .theme-toggle{order:1;margin-left:auto}
+ .languages{order:2;margin-left:0!important}
+ .mobile-menu{order:3}
+ .theme-toggle-track{width:46px;height:28px;padding:0 6px}
+ .theme-toggle-knob{width:20px;height:20px}
+ [data-theme="dark"] .theme-toggle-knob,.dark .theme-toggle-knob{transform:translateX(18px)}
+ .theme-toggle-sun,.theme-toggle-moon{font-size:12px}
+}
+@media(max-width:430px){
+ .theme-toggle-track{width:40px;height:26px;padding:0 5px}
+ .theme-toggle-knob{width:18px;height:18px}
+ [data-theme="dark"] .theme-toggle-knob,.dark .theme-toggle-knob{transform:translateX(14px)}
+ .theme-toggle-sun,.theme-toggle-moon{font-size:10px}
+}
