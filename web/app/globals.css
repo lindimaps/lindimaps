@@ -779,3 +779,151 @@ a:focus-visible{outline-color:var(--lm-gis-blue)}
 .service-detail-back:hover{background:var(--lm-primary);border-color:var(--lm-primary);color:#fff!important}
 .service-project-button{background:linear-gradient(135deg,var(--lm-primary),var(--lm-gis-blue));color:#fff!important;box-shadow:0 10px 28px rgba(8,124,240,.2)}
 .service-project-button:hover{background:linear-gradient(135deg,var(--lm-layer-blue),var(--lm-primary));color:#fff!important}
+
+
+/* =========================================================
+   LINDIMAPS FINAL VISUAL SYSTEM — GLOBAL APPLICATION
+   Manual-logo reference / Midnight + GIS Blue
+   ========================================================= */
+
+/* Global surfaces and typography */
+::selection{background:rgba(20,149,255,.22);color:var(--lm-midnight)}
+.page-heading,.content-section,.modern-intro,.projects-showcase,.publications-section,.about-profile{background:var(--lm-bg)}
+.page-heading h1,.section-head h2,.intro-layout h2,.profile-copy h2,.publication-card h2,.project-body h3{color:var(--lm-text)}
+.intro-layout>div:last-child>p,.prose,.pub-publisher,.pub-abstract,.project-body>p:not(.eyebrow){color:var(--lm-muted)}
+.capability-row span,.pub-meta span,.service-detail-tech span{border-color:var(--lm-border);color:var(--lm-muted);background:rgba(255,255,255,.55)}
+
+/* Header + navigation */
+.site-header,.home-site-header{box-shadow:0 6px 28px rgba(3,27,56,.055)}
+.desktop-nav>a:not(.nav-product){transition:color .2s ease,border-color .2s ease}
+.languages{border-color:var(--lm-border);background:rgba(255,255,255,.68)}
+.mobile-menu summary{border-color:var(--lm-border);background:rgba(255,255,255,.72)}
+.mobile-menu summary span{background:var(--lm-midnight)}
+.mobile-menu-panel{background:rgba(247,250,253,.985);border-color:var(--lm-border);box-shadow:0 24px 55px rgba(3,27,56,.13)}
+.mobile-menu-panel .product-mark{border-color:var(--lm-border)}
+
+/* Hero + spatial language */
+.hero-grid{opacity:.11;background-image:linear-gradient(rgba(114,199,255,.2) 1px,transparent 1px),linear-gradient(90deg,rgba(114,199,255,.2) 1px,transparent 1px)}
+.hero-orbit{border-color:rgba(114,199,255,.18)}
+.hero-scroll span{background:var(--lm-gis-blue)}
+.hero-description,.service-detail-lead{color:#B8C9DB}
+
+/* Catalogue cards — services/projects */
+.catalogue-card{border-color:var(--lm-border);background:var(--lm-surface);box-shadow:0 8px 26px rgba(3,27,56,.035)}
+.catalogue-card:hover{transform:translateY(-5px);border-color:#AFCFEB;box-shadow:0 24px 55px rgba(3,27,56,.11)}
+.card-index{background:rgba(3,27,56,.84)}
+.card-placeholder{background:radial-gradient(circle at 80% 10%,rgba(20,149,255,.18),transparent 36%),linear-gradient(135deg,var(--lm-midnight),var(--lm-deep-navy))}
+.card-placeholder svg{color:var(--lm-ice-blue)}
+.tags li{background:#EDF5FC;color:#38536D;border:1px solid #D8E9F7}
+.text-link,.section-link{color:var(--lm-primary)}
+.text-link:hover,.section-link:hover{color:var(--lm-gis-blue)}
+
+/* Project/category filters and chips */
+.project-filters a{border-color:var(--lm-border)!important;background:var(--lm-surface)!important;color:var(--lm-muted)!important;transition:background .2s,border-color .2s,color .2s,transform .2s}
+.project-filters a:hover{border-color:#9CC9EF!important;background:#EAF4FD!important;color:var(--lm-primary)!important;transform:translateY(-1px)}
+.project-filters a.active,.project-filters a[aria-current="page"]{background:var(--lm-primary)!important;border-color:var(--lm-primary)!important;color:#fff!important;box-shadow:0 7px 18px rgba(8,124,240,.16)}
+
+/* About + profile */
+.about-profile .profile-photo{box-shadow:0 28px 70px rgba(3,27,56,.14)}
+.about-profile .profile-grid:hover .profile-photo{box-shadow:0 34px 80px rgba(3,27,56,.19)}
+.about-profile .profile-name,.about-profile .profile-email{color:var(--lm-muted)}
+.about-profile .profile-socials{border-color:var(--lm-border)}
+.about-profile .profile-socials a:hover{border-bottom-color:var(--lm-primary);color:var(--lm-primary)}
+.profile-monogram{background:linear-gradient(135deg,var(--lm-midnight),var(--lm-layer-blue));color:var(--lm-ice-blue)}
+
+/* Team — intentional dark spatial section */
+.about-team-section{background:var(--lm-dark-bg)}
+.team-card{background:var(--lm-dark-surface);border-color:var(--lm-dark-border);box-shadow:0 18px 45px rgba(0,0,0,.12)}
+.team-photo-wrap{background:#0B2239}
+.team-card-body small{color:var(--lm-ice-blue)}
+.team-card-body p{color:#9FB2C7}
+.team-card-body a{color:#E2EEF8}
+.team-card-body a:hover{color:var(--lm-gis-blue)}
+
+/* Publications */
+.publications-intro{border-color:var(--lm-border)}
+.publications-section .publication-card{background:var(--lm-surface);border:1px solid var(--lm-border);border-radius:18px}
+.publications-section .publication-card:hover{border-color:#AFCFEB;box-shadow:0 16px 42px rgba(3,27,56,.075)}
+.pub-placeholder{background:linear-gradient(145deg,var(--lm-midnight),var(--lm-deep-navy))}
+.pub-placeholder:before{border-color:rgba(114,199,255,.22)}
+.pub-placeholder strong span{color:var(--lm-gis-blue)}
+.pub-placeholder>span,.pub-placeholder small{color:#9FB2C7}
+.pub-authors{color:#263D54}
+.pub-link{color:var(--lm-primary)}
+.pub-link:hover{color:var(--lm-gis-blue)}
+
+/* Partners */
+.partners-section .partner-card{background:var(--lm-surface);border-color:var(--lm-border);box-shadow:0 8px 24px rgba(3,27,56,.035);transition:transform .22s,border-color .22s,box-shadow .22s}
+.partners-section .partner-card:hover{transform:translateY(-3px);border-color:#AFCFEB;box-shadow:0 15px 34px rgba(3,27,56,.08)}
+.partners-section .partner-card strong{color:var(--lm-text)}
+.partners-section .partner-card small{color:var(--lm-muted)}
+
+/* Technology rail */
+.service-detail-tech{border-color:var(--lm-border)}
+.service-tech-item{color:var(--lm-text)!important}
+a.service-tech-item{color:var(--lm-text)!important}
+.service-tech-item i{background:#EAF4FD;color:var(--lm-primary)}
+.service-tech-item:hover{color:var(--lm-primary)!important}
+.service-detail-tech:before{background:linear-gradient(90deg,var(--lm-bg),rgba(247,250,253,0))}
+.service-detail-tech:after{background:linear-gradient(270deg,var(--lm-bg),rgba(247,250,253,0))}
+
+/* Service details */
+.service-detail-hero{background:radial-gradient(circle at 88% 12%,rgba(23,103,199,.3),transparent 35%),var(--lm-midnight)}
+.service-detail-content{color:var(--lm-text)}
+.service-detail-intro,.service-detail-columns,.service-detail-tech{border-color:var(--lm-border)}
+.service-detail-intro>span,.service-detail-columns ol li span{color:#7C91A7}
+.service-detail-intro>div>p:last-child,.service-detail-columns li{color:var(--lm-muted)}
+.service-detail-columns li{border-color:var(--lm-border)}
+.service-detail-secondary{background:#EFF5FA}
+.service-detail-cta{border:1px solid rgba(114,199,255,.1)}
+.service-detail-cta:after{border-color:rgba(114,199,255,.2)}
+
+/* Contact + forms */
+.modern-contact{background:radial-gradient(circle at 85% 8%,rgba(23,103,199,.38),transparent 35%),var(--lm-midnight)}
+.contact-copy,.contact-side .socials a{color:#AFC1D4}
+.contact-side{border-color:rgba(114,199,255,.18)}
+.contact-email:hover,.socials a:hover{color:var(--lm-ice-blue)}
+.contact-form-new input,.contact-form-new textarea,.contact-form-new select,
+.contact-form input,.contact-form textarea,.contact-form select{
+  border-color:var(--lm-border)!important;
+  background:var(--lm-surface)!important;
+  color:var(--lm-text)!important;
+  outline:none;
+  transition:border-color .2s ease,box-shadow .2s ease;
+}
+.contact-form-new input:focus,.contact-form-new textarea:focus,.contact-form-new select:focus,
+.contact-form input:focus,.contact-form textarea:focus,.contact-form select:focus{
+  border-color:var(--lm-primary)!important;
+  box-shadow:0 0 0 4px rgba(8,124,240,.11)!important;
+}
+.contact-form-new input::placeholder,.contact-form-new textarea::placeholder{color:#8A9CAF}
+
+/* Workspace utilities */
+.workspace-card{border-color:var(--lm-border);background:var(--lm-surface)}
+.workspace-card:hover{border-color:#AFCFEB;box-shadow:0 16px 38px rgba(3,27,56,.08)}
+.workspace-card>span{color:var(--lm-primary)}
+.workspace-card p,.workspace-card>small{color:var(--lm-muted)}
+
+/* Footer — darkest brand anchor */
+.site-footer,footer{background:var(--lm-dark-bg);color:#9FB2C7}
+.site-footer h5{color:#F4F8FC}
+.footer-about p,.footer-nav,.footer-static,.office-list{color:#8EA3B8}
+.footer-nav a,.footer-links a{transition:color .2s ease}
+.office-list p>span{color:var(--lm-gis-blue)}
+.footer-socials a{background:rgba(255,255,255,.055);color:#E2EEF8;border:1px solid rgba(114,199,255,.08)}
+.site-footer .footer-row{border-color:rgba(114,199,255,.1);color:#70869B}
+
+/* Floating utility */
+.back-top-float{background:var(--lm-surface);box-shadow:0 10px 30px rgba(3,27,56,.18)}
+.back-top-float:hover{background:var(--lm-primary);color:#fff;border-color:var(--lm-primary)}
+
+/* Consistent motion */
+@media(prefers-reduced-motion:no-preference){
+ .button,.catalogue-card,.partner-card,.workspace-card,.back-top-float{will-change:transform}
+}
+
+/* Mobile keeps the same brand hierarchy */
+@media(max-width:900px){
+ .home-site-header .mobile-workspace-subnav>a{background:#F2F7FB!important;border-color:var(--lm-border)!important;color:#304A63!important}
+ .home-site-header .mobile-workspace-subnav>a:hover{background:#EAF4FD!important;color:var(--lm-primary)!important}
+}
