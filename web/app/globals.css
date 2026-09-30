@@ -2913,3 +2913,18 @@ html:has(.not-found-page),body:has(.not-found-page){margin:0;background:#031426!
  .not-found-page .not-found-copy span{display:block!important;margin-top:4px!important}
  .not-found-page .not-found-home{margin:0!important;padding:13px 17px!important}
 }
+
+
+/* 404 v4 — self-contained fallback for global/root not-found rendering */
+.not-found-page,.not-found-page *{box-sizing:border-box}
+.not-found-page{margin:0!important;min-height:100vh!important;min-height:100svh!important;background:#031426!important;color:#f4f8fc!important;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:32px 22px!important;text-align:center!important}
+.not-found-content{width:min(560px,100%)!important;margin:auto!important;display:flex!important;flex-direction:column!important;align-items:center!important}
+.not-found-page .nf-logo{display:flex!important;width:100%!important;justify-content:center!important;align-items:center!important;margin:0 0 58px!important}
+.not-found-page .nf-cms-logo{display:block!important;width:auto!important;height:auto!important;max-width:190px!important;max-height:58px!important;object-fit:contain!important;object-position:center!important}
+.not-found-page .not-found-tagline{position:static!important;width:auto!important;height:auto!important;overflow:visible!important;clip:auto!important;white-space:normal!important;margin:0 0 18px!important;color:#72c7ff!important;font-size:.68rem!important;font-weight:800!important;line-height:1.4!important;letter-spacing:.22em!important;text-transform:uppercase!important}
+.not-found-page .not-found-number{display:block!important;margin:0!important;color:#f4f8fc!important;font-size:clamp(7.8rem,35vw,11.5rem)!important;font-weight:850!important;line-height:.78!important;letter-spacing:-.08em!important}
+.not-found-page h1{margin:38px 0 0!important;padding:0!important;color:#f4f8fc!important;font-family:inherit!important;font-size:clamp(2.15rem,9vw,3.35rem)!important;font-weight:800!important;line-height:1!important;letter-spacing:-.05em!important}
+.not-found-page .not-found-copy{margin:20px auto 30px!important;max-width:460px!important;color:#a8bcd0!important;font-family:inherit!important;font-size:.98rem!important;line-height:1.65!important}
+.not-found-page .not-found-copy span{display:block!important;margin-top:3px!important;color:#7892aa!important}
+.not-found-page .not-found-home{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;margin:0!important;padding:13px 18px!important;border:1px solid rgba(114,199,255,.28)!important;border-radius:10px!important;background:rgba(8,124,240,.08)!important;color:#f4f8fc!important;text-decoration:none!important;font-family:inherit!important;font-size:.9rem!important;font-weight:750!important;box-shadow:none!important}
+@media(max-width:600px){.not-found-page{padding:42px 22px!important}.not-found-page .nf-logo{margin-bottom:52px!important}.not-found-page .nf-cms-logo{max-width:175px!important;max-height:52px!important}.not-found-page .not-found-number{font-size:clamp(8rem,42vw,10.5rem)!important}.not-found-page h1{margin-top:34px!important}.not-found-page .not-found-copy br{display:none!important}}
