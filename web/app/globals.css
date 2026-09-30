@@ -1657,3 +1657,159 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
  [data-theme="light"] .page-heading:after{left:16px!important;right:16px!important}
  [data-theme="light"] .publications-intro,[data-theme="light"] .editorial-intro,[data-theme="light"] .portfolio-intro{border-top-color:rgba(159,193,222,.22)!important}
 }
+
+
+/* =========================================================
+   FINAL LEGACY-COLOR AUDIT / TOKEN COMPATIBILITY
+   Eliminates mixed old/new UI without changing dark art areas
+   ========================================================= */
+
+/* Contact form — correct surface hierarchy in both modes */
+.contact-form-new{
+  position:relative;
+  background:var(--lm-panel)!important;
+  border:1px solid var(--lm-line)!important;
+  border-top:1px solid var(--lm-line)!important;
+  border-radius:24px!important;
+  padding:clamp(28px,4vw,48px)!important;
+  box-shadow:0 22px 60px var(--lm-shadow)!important;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  overflow:hidden;
+}
+.contact-form-new:after{
+  content:"";position:absolute;right:-55px;top:-70px;width:170px;height:170px;border-radius:50%;
+  border:1px solid var(--lm-line);box-shadow:inset 0 0 0 36px rgba(8,124,240,.018);pointer-events:none;
+}
+.contact-form-new label{
+  color:var(--lm-ink)!important;
+  background:transparent!important;
+  font-size:.66rem!important;font-weight:850!important;letter-spacing:.11em!important;
+}
+.contact-form-new input,.contact-form-new textarea,.contact-form-new select{
+  width:100%;
+  background:color-mix(in srgb,var(--lm-panel-solid) 72%,transparent)!important;
+  color:var(--lm-ink)!important;
+  border:1px solid var(--lm-line)!important;
+  border-radius:10px!important;
+  padding:14px 15px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+.contact-form-new textarea{min-height:180px;resize:vertical}
+.contact-form-new input:hover,.contact-form-new textarea:hover,.contact-form-new select:hover{border-color:var(--lm-line-strong)!important}
+.contact-form-new input:focus,.contact-form-new textarea:focus,.contact-form-new select:focus{
+  border-color:var(--lm-primary)!important;
+  box-shadow:0 0 0 4px rgba(8,124,240,.10)!important;
+}
+.contact-form-new input::placeholder,.contact-form-new textarea::placeholder{color:color-mix(in srgb,var(--lm-ink-2) 72%,transparent)!important}
+.contact-form-foot{border-color:var(--lm-line)!important}
+.contact-form-foot button{
+  background:linear-gradient(135deg,var(--lm-primary),var(--lm-gis-blue))!important;
+  color:#fff!important;border:1px solid rgba(20,149,255,.38)!important;
+  box-shadow:0 10px 28px rgba(8,124,240,.20)!important;
+}
+.contact-form-foot button:hover{background:linear-gradient(135deg,var(--lm-layer-blue),var(--lm-primary))!important;color:#fff!important}
+.contact-form-foot button span,.contact-form-foot button b{color:#fff!important;background:transparent!important}
+
+/* Old blue/cyan accents -> brand tokens */
+.eyebrow,.profile-socials,.publication-empty>span,.section-signature>span,.projects-signature>span,
+.spatial-intro-index span,.spatial-capabilities b,.workspace-card>small{
+  color:var(--lm-primary)!important;
+}
+.projects-showcase .section-head .eyebrow,.footer-kicker,.service-detail-hero .eyebrow,.service-detail-cta .eyebrow{
+  color:var(--lm-ice-blue)!important;
+}
+
+/* Light editorial surfaces */
+[data-theme="light"] .spatial-intro,
+[data-theme="light"] .partners-section,
+[data-theme="light"] .legal-page,
+[data-theme="light"] .legal-page>header{
+  background:var(--lm-canvas)!important;color:var(--lm-ink)!important;
+}
+[data-theme="light"] .spatial-intro-index,
+[data-theme="light"] .spatial-intro-copy>p,
+[data-theme="light"] .workspace-intro p{color:var(--lm-ink-2)!important}
+[data-theme="light"] .spatial-intro-index i,
+[data-theme="light"] .spatial-intro-copy,
+[data-theme="light"] .spatial-capabilities{
+  border-color:var(--lm-line)!important;
+}
+[data-theme="light"] .spatial-capabilities span{
+  background:rgba(255,255,255,.46)!important;color:var(--lm-ink)!important;border-color:var(--lm-line)!important;
+}
+[data-theme="light"] .spatial-capabilities span:hover{background:rgba(255,255,255,.72)!important}
+[data-theme="light"] .workspace-intro h2,
+[data-theme="light"] .workspace-card h3,
+[data-theme="light"] .workspace-card b{color:var(--lm-ink)!important}
+
+/* Filters */
+.project-filters a{
+  color:var(--lm-ink-2)!important;background:var(--lm-panel)!important;border-color:var(--lm-line)!important;
+}
+.project-filters a:hover{color:var(--lm-primary)!important;background:color-mix(in srgb,var(--lm-primary) 7%,var(--lm-panel-solid))!important;border-color:var(--lm-line-strong)!important}
+.project-filters a.active,.project-filters a[aria-current="page"]{
+  color:#fff!important;background:var(--lm-primary)!important;border-color:var(--lm-primary)!important;
+}
+
+/* Partner/profile/editorial residuals */
+.partner-card strong,.partners-section .partner-card strong{color:var(--lm-ink)!important}
+.partner-card small,.partners-section .partner-card small{color:var(--lm-ink-2)!important}
+.profile-socials,.about-profile .profile-socials{color:var(--lm-primary)!important}
+.about-profile .profile-socials a:hover{border-bottom-color:var(--lm-primary)!important}
+
+/* Services cards that still forced pure white */
+.service-grid .catalogue-card.services,
+.services-editorial .catalogue-card{
+  background:var(--lm-panel)!important;border-color:var(--lm-line)!important;
+  box-shadow:0 12px 36px var(--lm-shadow)!important;
+}
+.service-grid .catalogue-card.services:nth-child(odd){border-right-color:var(--lm-line)!important}
+.services-editorial .catalogue-card:hover{border-color:var(--lm-line-strong)!important}
+
+/* Service details */
+.service-detail-columns{border-color:var(--lm-line)!important}
+.service-detail-columns li{border-color:var(--lm-line)!important;color:var(--lm-ink-2)!important}
+.service-detail-columns ol li span{color:color-mix(in srgb,var(--lm-ink-2) 75%,transparent)!important}
+.service-detail-secondary{background:var(--lm-canvas-2)!important}
+
+/* Mobile menu residual hardcoded slate */
+.mobile-menu-panel>.mobile-workspace-toggle>summary,
+.mobile-workspace-nav>summary{color:var(--lm-ink)!important}
+.mobile-menu-panel>.mobile-workspace-toggle>summary small,
+.mobile-menu-panel>.mobile-workspace-toggle>summary svg,
+.mobile-workspace-nav>summary svg{color:var(--lm-ink-2)!important;stroke:currentColor!important}
+.mobile-workspace-subnav>a:hover,.mobile-menu-panel .mobile-workspace-children>a:hover{color:var(--lm-primary)!important}
+
+/* Back-to-top follows theme */
+.back-top-float{background:var(--lm-panel-solid)!important;color:var(--lm-ink)!important;border-color:var(--lm-line)!important}
+.back-top-float:hover{background:var(--lm-primary)!important;color:#fff!important;border-color:var(--lm-primary)!important}
+
+/* Dark form: no white slab, no black input mismatch */
+[data-theme="dark"] .contact-form-new,.dark .contact-form-new{
+  background:rgba(7,26,45,.72)!important;border-color:rgba(114,199,255,.16)!important;
+}
+[data-theme="dark"] .contact-form-new input,[data-theme="dark"] .contact-form-new textarea,[data-theme="dark"] .contact-form-new select,
+.dark .contact-form-new input,.dark .contact-form-new textarea,.dark .contact-form-new select{
+  background:rgba(2,12,24,.54)!important;color:#F4F8FC!important;border-color:rgba(114,199,255,.18)!important;
+}
+[data-theme="dark"] .contact-form-new label,.dark .contact-form-new label{color:#DCEAF6!important}
+
+/* Light form: no dark input mismatch */
+[data-theme="light"] .contact-form-new{
+  background:rgba(255,255,255,.52)!important;
+}
+[data-theme="light"] .contact-form-new input,
+[data-theme="light"] .contact-form-new textarea,
+[data-theme="light"] .contact-form-new select{
+  background:rgba(255,255,255,.72)!important;color:#07182D!important;border-color:#D3E2EF!important;
+}
+[data-theme="light"] .contact-form-new label{color:#17314B!important}
+
+/* Reduce legacy teal visual identity in logo fallback only to current GIS blue */
+.lm-word strong span,.product-mark strong span{
+  background:linear-gradient(90deg,var(--lm-primary),var(--lm-gis-blue))!important;
+  background-clip:text!important;-webkit-background-clip:text!important;color:transparent!important;
+}
+.brand:hover .lm-icon{background:var(--lm-primary)!important}
+.logo-dot{fill:var(--lm-gis-blue)!important}
