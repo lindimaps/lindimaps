@@ -1,9 +1,11 @@
-# Sanity Clean Content Studio
+# LindiMaps — Sanity Studio
 
-Congratulations, you have now installed the Sanity Content Studio, an open-source real-time content editing environment connected to the Sanity backend.
+Content Studio for the LindiMaps production website.
 
-Now you can do the following things:
+- Project: `oyagunrg`
+- Dataset: `production`
+- Development: `npm ci && npm run dev`
+- Build: `npm run build`
+- Deploy Studio: `npm run deploy`
 
-- [Read “getting started” in the docs](https://www.sanity.io/docs/introduction/getting-started?utm_source=readme)
-- [Join the Sanity community](https://www.sanity.io/community/join?utm_source=readme)
-- [Extend and build plugins](https://www.sanity.io/docs/content-studio/extending?utm_source=readme)
+Schemas live in `schemaTypes/`. Administrative and migration utilities live in `scripts/`; they are not part of the public website runtime. Review a script before running it against production.
