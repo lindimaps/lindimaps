@@ -2494,3 +2494,27 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
   .map-hero-video{display:none}
   .home-map-hero.has-video:before{opacity:.13!important}
 }
+
+
+/* =========================================================
+   HERO CLEAN MIDNIGHT — remove grid / thin line geometry
+   ========================================================= */
+.home-map-hero .map-hero-grid,
+.home-map-hero .map-hero-frame,
+.home-map-hero .map-hero-network,
+.home-map-hero .map-hero-layers{
+  display:none!important;
+}
+.home-map-hero .map-hero-contours{
+  opacity:.10!important;
+  filter:blur(.15px);
+}
+.home-map-hero{
+  border:0!important;
+  outline:0!important;
+}
+.home-map-hero .map-hero-center{
+  border:0!important;
+  outline:0!important;
+  background:transparent!important;
+}
