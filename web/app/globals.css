@@ -689,3 +689,93 @@ a.service-tech-item{text-decoration:none!important;color:#172033!important}
 .lm-cms-logo{display:block;width:auto;height:44px;max-width:220px;object-fit:contain}
 .footer-brand .lm-cms-logo{height:44px;max-width:220px}
 @media(max-width:600px){.lm-cms-logo,.footer-brand .lm-cms-logo{height:40px;max-width:180px}}
+
+
+/* LindiMaps final brand palette — logo manuale */
+:root{
+  --lm-midnight:#031B38;
+  --lm-deep-navy:#062B57;
+  --lm-primary:#087CF0;
+  --lm-gis-blue:#1495FF;
+  --lm-layer-blue:#1767C7;
+  --lm-ice-blue:#72C7FF;
+  --lm-bg:#F7FAFD;
+  --lm-surface:#FFFFFF;
+  --lm-border:#DCE7F2;
+  --lm-text:#07182D;
+  --lm-muted:#53677D;
+  --lm-dark-bg:#020C18;
+  --lm-dark-surface:#071A2D;
+  --lm-dark-border:#15334F;
+  --lm-dark-text:#F4F8FC;
+  --bg:var(--lm-bg);
+  --text:var(--lm-text);
+  --muted:var(--lm-muted);
+  --soft:#F0F5FA;
+  --border:var(--lm-border);
+  --blue:var(--lm-primary);
+  --navy:var(--lm-midnight);
+  --cyan:var(--lm-ice-blue);
+}
+body{background:var(--lm-bg);color:var(--lm-text)}
+.site-header{background:rgba(247,250,253,.94);border-bottom-color:rgba(220,231,242,.85)}
+.desktop-nav>a:hover,.desktop-nav>[aria-current="page"],.mobile-menu-panel>a[aria-current="page"],.text-link,.section-link,.profile-socials{color:var(--lm-primary)}
+.desktop-nav>[aria-current="page"]{border-bottom-color:var(--lm-primary)}
+.languages [aria-current]{background:var(--lm-primary)}
+.hero,.service-detail-hero{background:var(--lm-midnight)}
+.hero-v2{background:var(--lm-dark-bg)}
+.hero-v2:after{background:linear-gradient(90deg,rgba(2,12,24,.95) 0%,rgba(3,27,56,.78) 48%,rgba(8,124,240,.20) 100%),linear-gradient(0deg,rgba(2,12,24,.5),transparent 55%)}
+.hero-v2 h1 strong{background:linear-gradient(90deg,#fff 4%,var(--lm-ice-blue) 52%,var(--lm-gis-blue) 100%);background-clip:text;color:transparent}
+.eyebrow,.hero .eyebrow,.contact .eyebrow,.service-detail-hero .eyebrow,.service-detail-cta .eyebrow{color:var(--lm-ice-blue)}
+.soft,.services-showcase{background:#F0F5FA}
+.card,.publication-card,.service-grid .catalogue-card.services{background:var(--lm-surface);border-color:var(--lm-border)}
+.catalogue-card:hover{border-color:#B9D4EE;box-shadow:0 24px 55px rgba(3,27,56,.12)}
+.contact,.modern-contact,.service-detail-cta{background:radial-gradient(circle at 85% 10%,rgba(23,103,199,.32) 0,transparent 36%),var(--lm-midnight)}
+.site-footer,footer{background:var(--lm-dark-bg)}
+.footer-socials a:hover,.back-top-float:hover{background:var(--lm-primary)}
+.footer-links a:hover,.back-link:hover,.footer-nav a:hover{color:var(--lm-ice-blue)}
+.back-top-float{color:var(--lm-midnight);border-color:var(--lm-border)}
+a:focus-visible{outline-color:var(--lm-gis-blue)}
+
+/* Buttons: premium GIS hierarchy */
+.button{
+  border-radius:12px;
+  padding:15px 25px;
+  background:linear-gradient(135deg,var(--lm-primary),var(--lm-gis-blue));
+  color:#fff;
+  border:1px solid rgba(8,124,240,.9);
+  box-shadow:0 8px 22px rgba(8,124,240,.18);
+  transition:transform .22s ease,box-shadow .22s ease,filter .22s ease,background .22s ease;
+}
+.button:hover{
+  background:linear-gradient(135deg,var(--lm-layer-blue),var(--lm-primary));
+  transform:translateY(-2px);
+  box-shadow:0 13px 30px rgba(8,124,240,.26);
+}
+.button.secondary{
+  background:rgba(3,27,56,.42);
+  color:#fff;
+  border-color:rgba(114,199,255,.42);
+  box-shadow:none;
+  backdrop-filter:blur(8px);
+}
+.button.secondary:hover{
+  background:rgba(8,124,240,.18);
+  border-color:var(--lm-ice-blue);
+  box-shadow:0 10px 26px rgba(2,12,24,.2);
+}
+.button.secondary-light{
+  background:transparent;
+  color:var(--lm-midnight);
+  border-color:#B9D4EE;
+  box-shadow:none;
+}
+.button.secondary-light:hover{
+  background:#EAF4FD;
+  color:var(--lm-primary);
+  border-color:var(--lm-primary);
+}
+.service-detail-back{border-color:rgba(114,199,255,.42)}
+.service-detail-back:hover{background:var(--lm-primary);border-color:var(--lm-primary);color:#fff!important}
+.service-project-button{background:linear-gradient(135deg,var(--lm-primary),var(--lm-gis-blue));color:#fff!important;box-shadow:0 10px 28px rgba(8,124,240,.2)}
+.service-project-button:hover{background:linear-gradient(135deg,var(--lm-layer-blue),var(--lm-primary));color:#fff!important}
