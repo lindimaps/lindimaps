@@ -15,8 +15,9 @@ export default function robots(): MetadataRoute.Robots {
         "/pushimet/",
         "/pagesat/",
         "/aktivitete-system.html",
-        "/pushimet-legacy.html",
-        "/pagesat-legacy.html"
+        "/aktiviteteASIG/",
+        "/raportASIG/",
+        "/pyjetnezonatembrojtura/"
       ],
     }],
     sitemap: "https://www.lindimaps.com/sitemap.xml",
