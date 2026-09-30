@@ -2065,3 +2065,135 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
   color:var(--lm-gis-blue)!important;
   font-weight:850!important;
 }
+
+
+/* =========================================================
+   NAVY CLEANUP — post-backup
+   Readability + continuous navy surfaces, no white islands
+   ========================================================= */
+
+/* Dark canvas: one navy family throughout */
+[data-theme="dark"],.dark{
+  --lm-canvas:#031426;
+  --lm-canvas-2:#061A2E;
+  --lm-panel:rgba(8,31,52,.66);
+  --lm-panel-solid:#082039;
+  --lm-ink:#F2F7FC;
+  --lm-ink-2:#A8BCD0;
+  --lm-line:rgba(114,199,255,.14);
+  --lm-shadow:rgba(0,0,0,.20);
+}
+[data-theme="dark"] body,[data-theme="dark"] main,[data-theme="dark"] .site-shell,
+.dark body,.dark main,.dark .site-shell{background:var(--lm-canvas)!important}
+
+/* Intro/editorial headings: restore readable hierarchy */
+[data-theme="dark"] .spatial-intro h1,
+[data-theme="dark"] .spatial-intro h2,
+[data-theme="dark"] .spatial-intro h3,
+[data-theme="dark"] .modern-intro h1,
+[data-theme="dark"] .modern-intro h2,
+[data-theme="dark"] .modern-intro h3,
+[data-theme="dark"] .content-section h1,
+[data-theme="dark"] .content-section h2,
+[data-theme="dark"] .content-section h3,
+[data-theme="dark"] .service-detail-content h1,
+[data-theme="dark"] .service-detail-content h2,
+[data-theme="dark"] .service-detail-content h3,
+.dark .spatial-intro h1,.dark .spatial-intro h2,.dark .spatial-intro h3,
+.dark .modern-intro h1,.dark .modern-intro h2,.dark .modern-intro h3,
+.dark .content-section h1,.dark .content-section h2,.dark .content-section h3{
+  color:#F2F7FC!important;
+}
+[data-theme="dark"] .spatial-intro-copy>p,
+[data-theme="dark"] .modern-intro p,
+[data-theme="dark"] .content-section p,
+.dark .spatial-intro-copy>p,.dark .modern-intro p,.dark .content-section p{
+  color:#A8BCD0!important;
+}
+
+/* Eyebrows/indices use brand blue, not legacy muted navy */
+[data-theme="dark"] .eyebrow,[data-theme="dark"] .spatial-intro-index span,
+[data-theme="dark"] .section-signature>span,[data-theme="dark"] .projects-signature>span,
+.dark .eyebrow,.dark .spatial-intro-index span,.dark .section-signature>span,.dark .projects-signature>span{
+  color:var(--lm-gis-blue)!important;
+}
+
+/* Dark sections stay navy instead of alternating black-ish slabs */
+[data-theme="dark"] .page-heading,[data-theme="dark"] .content-section,
+[data-theme="dark"] .modern-intro,[data-theme="dark"] .projects-showcase,
+[data-theme="dark"] .services-showcase,[data-theme="dark"] .publications-section,
+[data-theme="dark"] .about-profile,[data-theme="dark"] .spatial-intro,
+[data-theme="dark"] .workspace-section,
+.dark .page-heading,.dark .content-section,.dark .modern-intro,.dark .projects-showcase,
+.dark .services-showcase,.dark .publications-section,.dark .about-profile,.dark .spatial-intro,.dark .workspace-section{
+  background-color:var(--lm-canvas)!important;
+}
+
+/* No white cards/panels on navy */
+[data-theme="dark"] .card,[data-theme="dark"] .catalogue-card,
+[data-theme="dark"] .publication-card,[data-theme="dark"] .workspace-card,
+[data-theme="dark"] .partners-section .partner-card,[data-theme="dark"] .service-grid .catalogue-card.services,
+.dark .card,.dark .catalogue-card,.dark .publication-card,.dark .workspace-card,
+.dark .partners-section .partner-card,.dark .service-grid .catalogue-card.services{
+  background:rgba(8,31,52,.62)!important;
+  border-color:rgba(114,199,255,.13)!important;
+  color:#F2F7FC!important;
+  box-shadow:0 14px 38px rgba(0,0,0,.12)!important;
+}
+[data-theme="dark"] .catalogue-card:hover,[data-theme="dark"] .publication-card:hover,
+[data-theme="dark"] .workspace-card:hover,[data-theme="dark"] .partners-section .partner-card:hover,
+.dark .catalogue-card:hover,.dark .publication-card:hover,.dark .workspace-card:hover,.dark .partners-section .partner-card:hover{
+  background:rgba(10,39,66,.76)!important;
+  border-color:rgba(20,149,255,.26)!important;
+}
+
+/* Chips/tags/meta: navy glass only */
+[data-theme="dark"] .tags li,[data-theme="dark"] .pub-meta span,
+[data-theme="dark"] .capability-row span,[data-theme="dark"] .service-detail-tech span,
+.dark .tags li,.dark .pub-meta span,.dark .capability-row span,.dark .service-detail-tech span{
+  background:rgba(114,199,255,.065)!important;
+  color:#B7CADC!important;
+  border-color:rgba(114,199,255,.13)!important;
+}
+
+/* Capability matrix: integrated navy cells, no rectangles of white */
+[data-theme="dark"] .spatial-capabilities span,.dark .spatial-capabilities span{
+  background:rgba(8,31,52,.54)!important;
+  color:#E5F0F9!important;
+  border-color:rgba(114,199,255,.13)!important;
+}
+
+/* Contact/forms: navy-on-navy glass */
+[data-theme="dark"] .contact-form-new,.dark .contact-form-new{
+  background:rgba(8,31,52,.64)!important;
+}
+[data-theme="dark"] .contact-form-new input,[data-theme="dark"] .contact-form-new textarea,[data-theme="dark"] .contact-form-new select,
+.dark .contact-form-new input,.dark .contact-form-new textarea,.dark .contact-form-new select{
+  background:rgba(3,20,38,.64)!important;
+  color:#F2F7FC!important;
+  border-color:rgba(114,199,255,.14)!important;
+}
+
+/* Service secondary areas remain navy too */
+[data-theme="dark"] .service-detail-secondary,.dark .service-detail-secondary{background:var(--lm-canvas-2)!important}
+[data-theme="dark"] .service-grid .catalogue-card.services .project-body,.dark .service-grid .catalogue-card.services .project-body{
+  background:linear-gradient(90deg,rgba(8,31,52,.72),rgba(3,20,38,.48))!important;
+}
+
+/* Preserve intentional primary actions, but secondary buttons become navy glass */
+[data-theme="dark"] .button.secondary,[data-theme="dark"] .button.secondary-light,
+.dark .button.secondary,.dark .button.secondary-light{
+  background:rgba(8,31,52,.68)!important;
+  color:#EAF3FB!important;
+  border-color:rgba(114,199,255,.18)!important;
+}
+
+/* Seam-free navy backgrounds */
+[data-theme="dark"] .page-heading,
+[data-theme="dark"] .spatial-intro,
+[data-theme="dark"] .modern-intro,
+[data-theme="dark"] .content-section,
+.dark .page-heading,.dark .spatial-intro,.dark .modern-intro,.dark .content-section{
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
