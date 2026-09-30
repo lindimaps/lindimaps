@@ -10,6 +10,8 @@ export const siteSettingsType = defineType({
     defineField({name:'logoDark',title:'Logo – Dark mode',description:'Opsionale. Nëse lihet bosh përdoret logoja kryesore.',type:'image'}),
     defineField({name:'logoFooter',title:'Logo – Footer',description:'Opsionale. Nëse lihet bosh përdoret logoja kryesore.',type:'image'}),
     defineField({name:'favicon',title:'Site Icon / Favicon',description:'Ikona që shfaqet në tab-in e browser-it. Preferohet imazh katror.',type:'image'}),
+    defineField({name:'presentationVideo',title:'Video prezantuese – Aktivitetet & Galeria',description:'Video fallback që shfaqet te Aktivitetet ose Galeria vetëm kur nuk ka përmbajtje të publikuar. MP4/WebM.',type:'file',options:{accept:'video/mp4,video/webm'}}),
+    defineField({name:'presentationVideoPoster',title:'Poster i videos prezantuese',description:'Opsionale. Imazhi që shfaqet para nisjes së videos.',type:'image',options:{hotspot:true}}),
     defineField({name:'email',title:'Email',type:'string',validation:(r)=>r.email()}),
     defineField({name:'locationSq',title:'Vendndodhja',type:'string'}),
     defineField({name:'locationEn',title:'Location (EN)',type:'string'}),
