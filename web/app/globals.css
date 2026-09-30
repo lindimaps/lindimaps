@@ -2712,3 +2712,22 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
 .dark .legal-page article p,
 .dark .legal-page .legal-contact p{color:#A8BCD0!important}
 [data-theme="dark"] .legal-page a,.dark .legal-page a{color:#72C7FF}
+
+
+/* Gallery empty-state video must escape masonry columns */
+.gallery-masonry:has(.presentation-fallback){
+  columns:auto!important;
+  column-count:1!important;
+  display:block!important;
+  width:100%!important;
+}
+.gallery-masonry>.presentation-fallback{
+  width:100%!important;
+  max-width:none!important;
+  column-span:all!important;
+  break-inside:avoid!important;
+}
+.gallery-masonry>.presentation-fallback .presentation-video-shell{
+  width:100%!important;
+  max-width:none!important;
+}
