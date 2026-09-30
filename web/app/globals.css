@@ -940,7 +940,7 @@ a.service-tech-item{color:var(--lm-text)!important}
   border-top-color:var(--lm-border)!important;
 }
 .site-header .mobile-menu-panel>a,
-.home-site-header .mobile-menu-panel>a,
+.home-site-header .mobile-menu-panel>a{
   color:var(--lm-text)!important;
 }
 .site-header .mobile-menu-panel>a:hover,
