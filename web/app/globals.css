@@ -2518,3 +2518,20 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
   outline:0!important;
   background:transparent!important;
 }
+
+
+/* Hero media visibility — retain clean midnight character */
+.map-hero-video{
+  opacity:.48!important;
+  filter:saturate(.72) contrast(1.04) brightness(.78)!important;
+}
+.home-map-hero:after{
+  background:rgba(3,20,38,.20)!important;
+}
+.home-map-hero .map-hero-shade{
+  background:rgba(3,20,38,.18)!important;
+}
+.home-map-hero:not(.has-video):before{
+  opacity:.28!important;
+  filter:saturate(.62) contrast(1.05) brightness(.82)!important;
+}
