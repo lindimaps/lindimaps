@@ -927,3 +927,107 @@ a.service-tech-item{color:var(--lm-text)!important}
  .home-site-header .mobile-workspace-subnav>a{background:#F2F7FB!important;border-color:var(--lm-border)!important;color:#304A63!important}
  .home-site-header .mobile-workspace-subnav>a:hover{background:#EAF4FD!important;color:var(--lm-primary)!important}
 }
+
+
+/* FINAL CONTRAST PASS — light header/navigation */
+.site-header,
+.home-site-header{
+  background:rgba(247,250,253,.97)!important;
+  color:var(--lm-text)!important;
+  border-bottom:1px solid var(--lm-border)!important;
+  box-shadow:0 6px 28px rgba(3,27,56,.06)!important;
+  backdrop-filter:blur(16px)!important;
+  -webkit-backdrop-filter:blur(16px)!important;
+}
+.site-header .desktop-nav,
+.home-site-header .desktop-nav,
+.site-header .desktop-nav>a,
+.home-site-header .desktop-nav>a,
+.site-header .workspace-menu>summary,
+.home-site-header .workspace-menu>summary{
+  color:var(--lm-text)!important;
+}
+.site-header .desktop-nav>a:hover,
+.home-site-header .desktop-nav>a:hover,
+.site-header .desktop-nav>a[aria-current="page"],
+.home-site-header .desktop-nav>a[aria-current="page"],
+.site-header .workspace-menu>summary:hover,
+.home-site-header .workspace-menu>summary:hover{
+  color:var(--lm-primary)!important;
+}
+.site-header .desktop-nav>a[aria-current="page"],
+.home-site-header .desktop-nav>a[aria-current="page"]{
+  border-bottom-color:var(--lm-primary)!important;
+}
+.home-site-header .desktop-nav>a[aria-current="page"]:after{background:var(--lm-primary)!important}
+
+.site-header .languages,
+.home-site-header .languages{
+  color:var(--lm-text)!important;
+  background:#fff!important;
+  border-color:var(--lm-border)!important;
+}
+.site-header .languages a,
+.home-site-header .languages a{color:var(--lm-text)!important}
+.site-header .languages a:hover,
+.home-site-header .languages a:hover{color:var(--lm-primary)!important}
+.site-header .languages a[aria-current],
+.home-site-header .languages a[aria-current],
+.site-header .languages a[aria-current="page"],
+.home-site-header .languages a[aria-current="page"]{
+  background:var(--lm-primary)!important;
+  color:#fff!important;
+}
+
+.site-header .lm-word strong,
+.site-header .lm-word strong span,
+.home-site-header .brand .lm-word strong,
+.home-site-header .brand .lm-word strong span,
+.home-site-header .home-brand .lm-word strong,
+.home-site-header .home-brand .lm-word strong span{
+  color:var(--lm-midnight)!important;
+}
+.site-header .lm-word small,
+.home-site-header .brand .lm-word small,
+.home-site-header .home-brand .lm-word small{color:var(--lm-muted)!important}
+
+.site-header .mobile-menu>summary,
+.home-site-header .mobile-menu>summary{
+  background:#fff!important;
+  border-color:var(--lm-border)!important;
+}
+.site-header .mobile-menu>summary span,
+.home-site-header .mobile-menu>summary span,
+.home-site-header .mobile-menu>summary>span{
+  background:var(--lm-midnight)!important;
+}
+
+.site-header .mobile-menu-panel,
+.home-site-header .mobile-menu-panel{
+  background:#F7FAFD!important;
+  color:var(--lm-text)!important;
+  border-top-color:var(--lm-border)!important;
+}
+.site-header .mobile-menu-panel>a,
+.home-site-header .mobile-menu-panel>a,
+.site-header .mobile-menu-panel .mobile-workspace>summary,
+.home-site-header .mobile-menu-panel .mobile-workspace>summary,
+.site-header .mobile-menu-panel .mobile-workspace-nav>summary,
+.home-site-header .mobile-menu-panel .mobile-workspace-nav>summary{
+  color:var(--lm-text)!important;
+}
+.site-header .mobile-menu-panel>a:hover,
+.home-site-header .mobile-menu-panel>a:hover,
+.site-header .mobile-menu-panel>a[aria-current="page"],
+.home-site-header .mobile-menu-panel>a[aria-current="page"]{
+  color:var(--lm-primary)!important;
+}
+.mobile-menu-panel .mobile-workspace-children>a,
+.mobile-workspace-subnav>a{color:#304A63!important}
+.mobile-menu-panel .mobile-workspace-children>a:hover,
+.mobile-workspace-subnav>a:hover{color:var(--lm-primary)!important;background:#EAF4FD!important}
+
+/* Keep intentionally dark sections light-on-dark */
+.hero,.hero-v2,.home-map-hero,.service-detail-hero,.about-team-section,.modern-contact,.contact,.service-detail-cta,.site-footer,footer{
+  color:var(--lm-dark-text);
+}
