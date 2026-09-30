@@ -2436,3 +2436,61 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
  .map-coordinate{display:none!important}
  .home-map-hero+.spatial-intro{padding-top:105px!important}
 }
+
+
+/* =========================================================
+   HERO CLEAN NAVY + CMS VIDEO
+   No decorative gradients / no white panels
+   ========================================================= */
+.home-map-hero{
+  background:#031426!important;
+}
+.map-hero-video{
+  position:absolute;z-index:-5;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  opacity:.30;filter:saturate(.58) contrast(1.08) brightness(.62);
+  pointer-events:none;
+}
+.home-map-hero.has-video:before{opacity:0!important}
+.home-map-hero:after{
+  background:rgba(3,20,38,.34)!important;
+}
+.map-hero-shade{
+  background:rgba(3,20,38,.32)!important;
+}
+.map-hero-network:before,.map-hero-network:after{
+  background:rgba(114,199,255,.38)!important;
+}
+.map-hero-layers i{
+  background:rgba(20,149,255,.035)!important;
+}
+.map-hero-rule{
+  background:var(--lm-gis-blue)!important;
+}
+.map-hero-actions>a:first-child{
+  background:var(--lm-primary)!important;
+}
+.map-hero-actions>a:first-child:hover{
+  background:var(--lm-gis-blue)!important;
+}
+.home-map-hero+.spatial-intro,
+[data-theme="light"] .home-map-hero+.spatial-intro,
+[data-theme="dark"] .home-map-hero+.spatial-intro,
+.dark .home-map-hero+.spatial-intro{
+  background:var(--lm-canvas)!important;
+}
+[data-theme="dark"] .home-map-hero+.spatial-intro,.dark .home-map-hero+.spatial-intro{
+  background:#031426!important;
+}
+/* Keep hero/interior surfaces navy — never white rectangles */
+.home-map-hero .map-hero-center,
+.home-map-hero .map-hero-brand,
+.home-map-hero .map-hero-actions,
+.home-map-hero .map-hero-network,
+.home-map-hero .map-hero-layers{
+  box-shadow:none;
+}
+@media(prefers-reduced-motion:reduce){
+  .map-hero-video{display:none}
+  .home-map-hero.has-video:before{opacity:.13!important}
+}
