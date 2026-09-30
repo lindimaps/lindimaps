@@ -1813,3 +1813,153 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
 }
 .brand:hover .lm-icon{background:var(--lm-primary)!important}
 .logo-dot{fill:var(--lm-gis-blue)!important}
+
+
+/* =========================================================
+   VISUAL CONSISTENCY PASS II
+   Dark capability cells, brand indices, unified CTAs, seamless textures
+   ========================================================= */
+
+/* Capability matrix follows the surrounding theme — no white islands in dark mode */
+[data-theme="dark"] .spatial-intro,.dark .spatial-intro{
+  background:#020C18!important;color:var(--lm-ink)!important;
+}
+[data-theme="dark"] .spatial-intro-copy,.dark .spatial-intro-copy,
+[data-theme="dark"] .spatial-capabilities,.dark .spatial-capabilities{
+  border-color:var(--lm-line)!important;
+}
+[data-theme="dark"] .spatial-intro-copy>p,.dark .spatial-intro-copy>p{color:var(--lm-ink-2)!important}
+[data-theme="dark"] .spatial-capabilities span,.dark .spatial-capabilities span{
+  background:rgba(7,26,45,.46)!important;
+  color:#EAF3FB!important;
+  border-color:rgba(114,199,255,.14)!important;
+}
+[data-theme="dark"] .spatial-capabilities span:hover,.dark .spatial-capabilities span:hover{
+  background:rgba(11,39,66,.68)!important;border-color:rgba(20,149,255,.34)!important;
+}
+[data-theme="dark"] .spatial-capabilities b,.dark .spatial-capabilities b{
+  color:var(--lm-gis-blue)!important;
+}
+
+/* Every editorial index / number uses current palette */
+.card-index{
+  background:color-mix(in srgb,var(--lm-midnight) 84%,transparent)!important;
+  color:#fff!important;border-color:rgba(114,199,255,.18)!important;
+}
+.system-number,.system-card small,.system-card>b,
+.spatial-intro-index span,.spatial-capabilities b,
+.section-signature>span,.projects-signature>span,
+.publication-empty>span,.activity-date small{
+  color:var(--lm-primary)!important;
+}
+[data-theme="dark"] .system-number,[data-theme="dark"] .system-card small,[data-theme="dark"] .system-card>b,
+[data-theme="dark"] .spatial-intro-index span,[data-theme="dark"] .spatial-capabilities b,
+[data-theme="dark"] .section-signature>span,[data-theme="dark"] .projects-signature>span,
+.dark .system-number,.dark .system-card small,.dark .system-card>b,.dark .spatial-intro-index span,
+.dark .spatial-capabilities b,.dark .section-signature>span,.dark .projects-signature>span{
+  color:var(--lm-gis-blue)!important;
+}
+.section-signature>i,.projects-signature>i,.spatial-intro-index i{background:var(--lm-line)!important}
+.section-signature,.projects-signature,.spatial-intro-index{color:var(--lm-ink-2)!important}
+
+/* Public CTA family */
+.button,.service-project-button,.contact-form-foot button,.footer-contact-cta{
+  min-height:46px;
+  border-radius:999px!important;
+  border:1px solid rgba(20,149,255,.34)!important;
+  background:linear-gradient(135deg,var(--lm-primary),var(--lm-gis-blue))!important;
+  color:#fff!important;
+  box-shadow:0 10px 26px rgba(8,124,240,.17)!important;
+  font-weight:800;
+}
+.button:hover,.service-project-button:hover,.contact-form-foot button:hover,.footer-contact-cta:hover{
+  background:linear-gradient(135deg,var(--lm-layer-blue),var(--lm-primary))!important;
+  color:#fff!important;border-color:rgba(114,199,255,.5)!important;
+  transform:translateY(-2px);
+}
+.button.secondary,.button.secondary-light{
+  background:var(--lm-glass)!important;
+  color:var(--lm-ink)!important;
+  border-color:var(--lm-line)!important;
+  box-shadow:0 8px 22px var(--lm-shadow)!important;
+}
+.button.secondary:hover,.button.secondary-light:hover{
+  background:color-mix(in srgb,var(--lm-primary) 8%,var(--lm-panel-solid))!important;
+  color:var(--lm-primary)!important;border-color:var(--lm-line-strong)!important;
+}
+.hero .button.secondary,.home-map-hero .button.secondary,
+[data-theme="dark"] .button.secondary,.dark .button.secondary{
+  background:rgba(7,26,45,.58)!important;color:#F4F8FC!important;border-color:rgba(114,199,255,.24)!important;
+}
+.hero .button.secondary:hover,.home-map-hero .button.secondary:hover,
+[data-theme="dark"] .button.secondary:hover,.dark .button.secondary:hover{
+  background:rgba(20,149,255,.12)!important;color:#fff!important;border-color:rgba(20,149,255,.48)!important;
+}
+
+/* Text CTAs stay lightweight but branded */
+.text-link,.section-link,.pub-link{
+  color:var(--lm-primary)!important;
+}
+[data-theme="dark"] .text-link,[data-theme="dark"] .section-link,[data-theme="dark"] .pub-link,
+.dark .text-link,.dark .section-link,.dark .pub-link{color:var(--lm-gis-blue)!important}
+
+/* Systems hub obeys the selected theme, overriding legacy forced-light block */
+[data-theme="dark"] .systems-hub,.dark .systems-hub{
+  background:#020C18!important;color:#EEF6FF!important;
+}
+[data-theme="dark"] .systems-hub>header,.dark .systems-hub>header{
+  background:rgba(2,12,24,.82)!important;border-color:var(--lm-line)!important;
+}
+[data-theme="dark"] .systems-logo,[data-theme="dark"] .systems-logo strong,[data-theme="dark"] .systems-return,
+[data-theme="dark"] .product-nav-links>a,.dark .systems-logo,.dark .systems-logo strong,.dark .systems-return,.dark .product-nav-links>a{
+  color:#EAF3FB!important;
+}
+[data-theme="dark"] .systems-hero h1,.dark .systems-hero h1{color:#F4F8FC!important}
+[data-theme="dark"] .systems-hero>span,.dark .systems-hero>span{color:#9FB2C7!important}
+[data-theme="dark"] .system-card,.dark .system-card{
+  background:rgba(7,26,45,.58)!important;color:#F4F8FC!important;border-color:var(--lm-line)!important;
+  box-shadow:0 14px 38px rgba(0,0,0,.16)!important;
+}
+[data-theme="dark"] .system-card:hover,.dark .system-card:hover{
+  background:rgba(11,39,66,.68)!important;border-color:var(--lm-line-strong)!important;
+}
+[data-theme="dark"] .system-card p,.dark .system-card p{color:#9FB2C7!important}
+
+/* No rectangular ends on contour / grid decoration layers */
+.page-heading:before,.modern-intro:before,.about-profile:before,.publications-section:before,
+.service-detail-hero:before,.modern-contact:after,.about-team-section:before,.site-footer:before{
+  -webkit-mask-image:radial-gradient(ellipse at center,#000 0 34%,rgba(0,0,0,.72) 50%,transparent 76%)!important;
+  mask-image:radial-gradient(ellipse at center,#000 0 34%,rgba(0,0,0,.72) 50%,transparent 76%)!important;
+}
+.projects-showcase:before,.services-showcase:before,.workspace-section:before{
+  inset:-3px!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%),
+                     linear-gradient(180deg,transparent 0,#000 14%,#000 86%,transparent 100%)!important;
+  mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%),
+             linear-gradient(180deg,transparent 0,#000 14%,#000 86%,transparent 100%)!important;
+  mask-composite:intersect;
+}
+.map-hero-contours,.hero-orbit{
+  -webkit-mask-image:radial-gradient(ellipse at center,#000 0 58%,transparent 82%);
+  mask-image:radial-gradient(ellipse at center,#000 0 58%,transparent 82%);
+}
+
+/* Section boundaries become accents, never slabs */
+.page-heading,.spatial-intro,.content-section,.modern-intro,.projects-showcase,.services-showcase,
+.publications-section,.about-profile,.workspace-section{
+  border-top-color:transparent!important;
+  border-bottom-color:transparent!important;
+}
+.publications-intro,.editorial-intro,.portfolio-intro,.contact-intro-new{
+  border-color:var(--lm-line)!important;
+}
+
+/* Current palette for remaining visible icon accents */
+.systems-symbol,.product-icon{background:var(--lm-midnight)!important}
+.systems-logo strong span,.academy-brand strong span{color:var(--lm-primary)!important}
+[data-theme="dark"] .systems-logo strong span,[data-theme="dark"] .academy-brand strong span,
+.dark .systems-logo strong span,.dark .academy-brand strong span{color:var(--lm-gis-blue)!important}
+.card-placeholder svg{color:var(--lm-gis-blue)!important}
+.card-placeholder{
+  background:radial-gradient(circle at 80% 10%,rgba(20,149,255,.13),transparent 35%),linear-gradient(135deg,#06182A,#0A2036)!important;
+}
