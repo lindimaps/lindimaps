@@ -13,4 +13,4 @@ export async function NotFoundContent(){
   <footer className="nf-meta"><span>GEOSPATIAL SOLUTIONS.</span><span>LINDIMAPS / 404</span></footer>
  </div></main>
 }
-export default async function GlobalNotFound(){return <html lang="sq"><body>{await NotFoundContent()}</body></html>}
+export default async function GlobalNotFound(){return <html lang="sq"><head><link rel="icon" href="/favicon.ico" sizes="any"/><link rel="shortcut icon" href="/favicon.ico"/></head><body>{await NotFoundContent()}</body></html>}
