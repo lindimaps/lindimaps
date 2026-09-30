@@ -19,6 +19,17 @@ export const siteSettingsType = defineType({
     defineField({name:'instagram',title:'Instagram',type:'url'}),
     defineField({name:'github',title:'GitHub',type:'url'}),
     defineField({name:'researchGate',title:'ResearchGate',type:'url'}),
+    defineField({
+      name:'socialLinks',
+      title:'Rrjetet sociale – Link + Ikonë',
+      description:'Opsionale. Menaxho rrjetet sociale të footer-it nga CMS. Ikona e ngarkuar këtu përdoret në vend të ikonës fallback.',
+      type:'array',
+      of:[{type:'object',fields:[
+        defineField({name:'name',title:'Emri',type:'string',validation:(r)=>r.required().min(2).max(40)}),
+        defineField({name:'url',title:'Linku',type:'url',validation:(r)=>r.required()}),
+        defineField({name:'icon',title:'Ikona',description:'Ngarko SVG, PNG ose WebP. Preferohet ikonë katrore/transparente.',type:'image'})
+      ],preview:{select:{title:'name',subtitle:'url',media:'icon'}}}],
+    }),
     defineField({name:'seoTitle',title:'SEO title',type:'string',validation:(r)=>r.max(70)}),
     defineField({name:'seoDescriptionSq',title:'SEO description',type:'text',rows:3,validation:(r)=>r.max(180)}),
     defineField({name:'seoDescriptionEn',title:'SEO description (EN)',type:'text',rows:3,validation:(r)=>r.max(180)}),
