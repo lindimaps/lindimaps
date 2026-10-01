@@ -2838,3 +2838,23 @@ html:has(.not-found-page),body:has(.not-found-page){margin:0;background:#031426!
 .nf-meta{display:flex!important;justify-content:space-between!important;gap:20px!important;padding-top:22px!important;border-top:1px solid rgba(168,188,208,.14)!important;color:#6f89a3!important;font-size:.58rem!important;font-weight:750!important;letter-spacing:.2em!important}
 @media(max-width:820px){.not-found-page{overflow:auto!important}.not-found-shell{padding:30px 22px 24px!important}.nf-stage{grid-template-columns:1fr!important;gap:52px!important;align-content:center!important;padding:56px 0!important}.nf-code{font-size:clamp(8.7rem,39vw,13rem)!important;justify-content:flex-start!important}.nf-code i{width:clamp(62px,18vw,90px)!important;height:clamp(62px,18vw,90px)!important;border-width:clamp(11px,3.7vw,17px)!important;margin-left:clamp(17px,5vw,28px)!important}.nf-message{padding:0!important;border-left:0!important}.not-found-page .nf-message h1{font-size:clamp(2.65rem,12vw,4.4rem)!important}.nf-meta{font-size:.52rem!important;letter-spacing:.14em!important}}
 @media(max-width:480px){.not-found-page .nf-cms-logo{max-width:180px!important;max-height:52px!important}.nf-stage{padding:48px 0!important;gap:44px!important}.nf-code{font-size:clamp(8rem,38vw,10.2rem)!important}.not-found-page .nf-message>p:not(.nf-kicker){margin-top:20px!important}.nf-meta span:first-child{display:none!important}.nf-meta{justify-content:flex-end!important}}
+
+
+/* About LindiMaps concept test */
+.about-brand-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:clamp(2rem,6vw,7rem);align-items:end;padding:clamp(1.5rem,4vw,4rem) 0}
+.about-brand-hero h2{font-size:clamp(2.4rem,5vw,5.6rem);line-height:.96;letter-spacing:-.055em;max-width:900px;margin:.7rem 0 0}
+.about-brand-hero>p{font-size:clamp(1.05rem,1.5vw,1.3rem);line-height:1.7;opacity:.76;max-width:650px}
+.about-brand-pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;padding:1rem 0 5rem}
+.about-brand-pillars article{border:1px solid var(--line,rgba(127,127,127,.25));border-radius:24px;padding:clamp(1.4rem,3vw,2.4rem);min-height:240px;display:flex;flex-direction:column}
+.about-brand-pillars small{font-size:.72rem;letter-spacing:.18em;opacity:.55}
+.about-brand-pillars h3{font-size:1.65rem;margin:auto 0 .65rem}
+.about-brand-pillars p{margin:0;line-height:1.6;opacity:.7}
+.about-founder-test{padding:clamp(4rem,8vw,8rem) 0;background:color-mix(in srgb,var(--foreground,#111) 4%,transparent)}
+.founder-test-heading{display:flex;justify-content:space-between;gap:2rem;align-items:end;margin-bottom:2rem}
+.founder-test-heading h2{font-size:clamp(2.2rem,4vw,4.5rem);letter-spacing:-.045em;margin:0}
+.founder-test-card{display:grid;grid-template-columns:minmax(260px,.7fr) minmax(0,1.3fr);gap:clamp(2rem,6vw,7rem);align-items:center}
+.founder-test-card>img,.founder-test-card>.profile-monogram{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:28px}
+.founder-test-copy small{letter-spacing:.16em;opacity:.55}.founder-test-copy h3{font-size:clamp(2.6rem,5vw,5rem);letter-spacing:-.05em;margin:.5rem 0}.founder-role{font-size:1.15rem;font-weight:600;max-width:650px}.founder-test-copy>p:not(.founder-role){max-width:700px;line-height:1.75;opacity:.72}
+.founder-profile-link{display:inline-flex;gap:.7rem;align-items:center;margin-top:1.25rem;padding:.9rem 1.15rem;border:1px solid currentColor;border-radius:999px;text-decoration:none;font-weight:650}
+.about-brand-closing{padding-top:clamp(5rem,9vw,9rem)!important;padding-bottom:clamp(5rem,9vw,9rem)!important}.about-brand-closing h2{font-size:clamp(2.4rem,5vw,5rem);line-height:1;letter-spacing:-.05em;max-width:1000px}.about-brand-closing>p:last-child{font-size:1.15rem;line-height:1.7;opacity:.7;max-width:700px}
+@media(max-width:760px){.about-brand-hero,.founder-test-card{grid-template-columns:1fr}.about-brand-pillars{grid-template-columns:1fr}.about-brand-pillars article{min-height:190px}.founder-test-heading{display:block}.founder-test-card>img,.founder-test-card>.profile-monogram{max-height:520px}.about-brand-hero h2{font-size:clamp(2.5rem,12vw,4rem)}}
