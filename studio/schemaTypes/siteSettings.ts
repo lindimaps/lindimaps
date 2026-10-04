@@ -85,6 +85,17 @@ export const siteSettingsType = defineType({
     defineField({group:'seo',name:'seoTitle',title:'SEO title (legacy)',description:'Fushë e vjetër për kompatibilitet. Përdor SEO title (SQ) dhe SEO title (EN).',type:'string',hidden:true,validation:(r)=>r.max(70)}),
     defineField({group:'seo',name:'seoDescriptionSq',title:'SEO description',type:'text',rows:3,validation:(r)=>r.max(180)}),
     defineField({group:'seo',name:'seoDescriptionEn',title:'SEO description (EN)',type:'text',rows:3,validation:(r)=>r.max(180)}),
+    defineField({
+      group:'seo',name:'pageSeo',title:'SEO – Faqet individuale',
+      description:'Opsionale. Personalizo title dhe description për secilën faqe. Nëse lihet bosh, përdoret automatikisht vlera aktuale.',
+      type:'array',of:[{type:'object',fields:[
+        defineField({name:'page',title:'Faqja',type:'string',options:{list:[{title:'Shërbime',value:'services'},{title:'Projekte',value:'projects'},{title:'Publikime',value:'publications'},{title:'Aktivitete',value:'activities'},{title:'Galeri',value:'gallery'},{title:'Rreth nesh',value:'about'},{title:'Kontakt',value:'contact'}]},validation:(r)=>r.required()}),
+        defineField({name:'titleSq',title:'SEO title (SQ)',type:'string',validation:(r)=>r.max(70)}),
+        defineField({name:'titleEn',title:'SEO title (EN)',type:'string',validation:(r)=>r.max(70)}),
+        defineField({name:'descriptionSq',title:'SEO description (SQ)',type:'text',rows:3,validation:(r)=>r.max(180)}),
+        defineField({name:'descriptionEn',title:'SEO description (EN)',type:'text',rows:3,validation:(r)=>r.max(180)}),
+      ],preview:{select:{title:'page',subtitle:'titleSq'}}}]
+    }),
     defineField({group:'seo',name:'ogImage',title:'Social / Open Graph image',type:'image'}),
   ],
   preview:{prepare:()=>({title:'LindiMaps – Site settings'})},
