@@ -1397,10 +1397,6 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
 [data-theme="dark"] .service-detail-secondary,.dark .service-detail-secondary{background:#06182A!important}
 [data-theme="dark"] .service-detail-tech:before,.dark .service-detail-tech:before{background:linear-gradient(90deg,var(--lm-canvas),transparent)}
 [data-theme="dark"] .service-detail-tech:after,.dark .service-detail-tech:after{background:linear-gradient(270deg,var(--lm-canvas),transparent)}
- background:#081D32!important;color:#C9D9E8!important;border-color:var(--lm-line)!important;
-}
- background:#0B2742!important;color:var(--lm-gis-blue)!important;
-}
 
 /* Dark-mode fields and cards inherit readable text */
 [data-theme="dark"] .card,[data-theme="dark"] .catalogue-card,[data-theme="dark"] .publication-card,
