@@ -10,6 +10,31 @@ export const siteSettingsType = defineType({
     defineField({name:'logoDark',title:'Logo – Dark mode',description:'Opsionale. Nëse lihet bosh përdoret logoja kryesore.',type:'image'}),
     defineField({name:'logoFooter',title:'Logo – Footer',description:'Opsionale. Nëse lihet bosh përdoret logoja kryesore.',type:'image'}),
     defineField({name:'favicon',title:'Site Icon / Favicon',description:'Ikona që shfaqet në tab-in e browser-it. Preferohet imazh katror.',type:'image'}),
+    defineField({
+      name:'headerMenu',
+      title:'Header & Menu',
+      description:'Opsionale. Nëse lihet bosh, përdoret menuja aktuale e faqes. Rendit elementet me drag & drop. Mbështet një nivel submenuje.',
+      type:'array',
+      of:[{type:'object',fields:[
+        defineField({name:'labelSq',title:'Emri (SQ)',type:'string',validation:(r)=>r.required().max(50)}),
+        defineField({name:'labelEn',title:'Name (EN)',type:'string',validation:(r)=>r.required().max(50)}),
+        defineField({name:'urlSq',title:'Linku (SQ)',description:'P.sh. /sq/sherbime ose https://...',type:'string',validation:(r)=>r.required()}),
+        defineField({name:'urlEn',title:'Link (EN)',description:'P.sh. /en/services ose https://...',type:'string',validation:(r)=>r.required()}),
+        defineField({name:'visible',title:'Shfaq në menu',type:'boolean',initialValue:true}),
+        defineField({name:'newTab',title:'Hap në tab të ri',type:'boolean',initialValue:false}),
+        defineField({
+          name:'children',title:'Submenu',description:'Opsionale. Vetëm një nivel submenuje.',
+          type:'array',of:[{type:'object',fields:[
+            defineField({name:'labelSq',title:'Emri (SQ)',type:'string',validation:(r)=>r.required().max(50)}),
+            defineField({name:'labelEn',title:'Name (EN)',type:'string',validation:(r)=>r.required().max(50)}),
+            defineField({name:'urlSq',title:'Linku (SQ)',type:'string',validation:(r)=>r.required()}),
+            defineField({name:'urlEn',title:'Link (EN)',type:'string',validation:(r)=>r.required()}),
+            defineField({name:'visible',title:'Shfaq',type:'boolean',initialValue:true}),
+            defineField({name:'newTab',title:'Hap në tab të ri',type:'boolean',initialValue:false}),
+          ],preview:{select:{title:'labelSq',subtitle:'labelEn'}}}]
+        }),
+      ],preview:{select:{title:'labelSq',subtitle:'labelEn'}}}]
+    }),
     defineField({name:'presentationVideo',title:'Video prezantuese – Aktivitetet & Galeria',description:'Video fallback që shfaqet te Aktivitetet ose Galeria vetëm kur nuk ka përmbajtje të publikuar. MP4/WebM.',type:'file',options:{accept:'video/mp4,video/webm'}}),
     defineField({name:'presentationVideoPoster',title:'Poster i videos prezantuese',description:'Opsionale. Imazhi që shfaqet para nisjes së videos.',type:'image',options:{hotspot:true}}),
     defineField({name:'email',title:'Email',type:'string',validation:(r)=>r.email()}),
