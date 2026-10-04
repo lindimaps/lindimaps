@@ -8,10 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       disallow: [
         "/api/",
         "/studio/",
-        "/sisteme/",
-        "/en/systems/",
-        "/sq/akademia/",
-        "/en/academy/",
         "/pushimet",
         "/pushimet/",
         "/pagesat",
