@@ -2680,20 +2680,6 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
 
 
 /* Workspace/System menu icon — keep its four-square mark visible */
-  display:grid!important;
-}
-  grid-template-columns:repeat(2,4px)!important;
-  grid-template-rows:repeat(2,4px)!important;
-  gap:4px!important;
-  place-content:center!important;
-}
-  display:block!important;
-  width:4px!important;
-  height:4px!important;
-  border-radius:1px!important;
-  background:currentColor!important;
-  opacity:.95!important;
-}
 
 /* CMS-managed footer social icons */
 .footer-socials .footer-social-custom-icon{width:20px;height:20px;object-fit:contain;display:block}
