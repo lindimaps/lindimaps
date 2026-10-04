@@ -1,7 +1,7 @@
 import { cache } from "react";
 import starterData from "@/data/starter.json";
 export type Language = "sq" | "en";
-type Localized = Partial<Record<`${"title"|"description"|"summary"|"heroTitle"|"heroText"|"primaryCta"|"secondaryCta"|"introTitle"|"intro"|"location"|"seoDescription"|"headline"}${"Sq"|"En"}`,string>>;
+type Localized = Partial<Record<`${"title"|"description"|"summary"|"heroTitle"|"heroText"|"primaryCta"|"secondaryCta"|"introTitle"|"intro"|"location"|"seoDescription"|"seoTitle"|"headline"}${"Sq"|"En"}`,string>>;
 export type ProjectCategory={_id:string;titleSq?:string;titleEn?:string;slug:string;order?:number};
 export type ServiceTechnology={name:string;logo?:string;url?:string};
 export type FooterSocialLink={_key?:string;name:string;url:string;icon?:string};
