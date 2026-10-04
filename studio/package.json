@@ -10,7 +10,8 @@
     "deploy-graphql": "sanity graphql deploy",
     "dev": "sanity dev",
     "start": "sanity start",
-    "seed-navigation": "sanity exec scripts/seed-navigation.mjs --with-user-token"
+    "seed-navigation": "sanity exec scripts/seed-navigation.mjs --with-user-token",
+    "seed-footer": "sanity exec scripts/seed-footer.mjs --with-user-token"
   },
   "keywords": [
     "sanity"
