@@ -5,7 +5,6 @@ const seoTitles:Record<string,string>={
  "sistemet-gis":"Sisteme & Shërbime GIS | LindiMaps",
  "fotogrametri":"Fotogrametri & Hartografim me Dron | LindiMaps",
  "analize-territori":"Analizë Territori & Analizë Hapësinore | LindiMaps",
- "kadastra-dixhitale":"Kadastër Dixhitale & GIS Kadastral | LindiMaps",
  "konsulence-teknike":"Konsulencë GIS & Gjeohapësinore | LindiMaps",
  "web-gis-developer":"WebGIS Development & Harta Interaktive | LindiMaps",
  "zhvillim-web-platforma-digjitale":"Zhvillim Web & Platforma Digjitale | LindiMaps"
