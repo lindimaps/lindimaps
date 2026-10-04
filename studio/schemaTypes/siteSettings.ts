@@ -80,7 +80,9 @@ export const siteSettingsType = defineType({
         defineField({name:'icon',title:'Ikona',description:'Opsionale. Ngarko ikonën tënde; nëse lihet bosh përdoret ikona automatike kur rrjeti njihet.',type:'image'})
       ],preview:{select:{title:'name',subtitle:'url',media:'icon'}}}],
     }),
-    defineField({group:'seo',name:'seoTitle',title:'SEO title',type:'string',validation:(r)=>r.max(70)}),
+    defineField({group:'seo',name:'seoTitleSq',title:'SEO title (SQ)',type:'string',validation:(r)=>r.max(70)}),
+    defineField({group:'seo',name:'seoTitleEn',title:'SEO title (EN)',type:'string',validation:(r)=>r.max(70)}),
+    defineField({group:'seo',name:'seoTitle',title:'SEO title (legacy)',description:'Fushë e vjetër për kompatibilitet. Përdor SEO title (SQ) dhe SEO title (EN).',type:'string',hidden:true,validation:(r)=>r.max(70)}),
     defineField({group:'seo',name:'seoDescriptionSq',title:'SEO description',type:'text',rows:3,validation:(r)=>r.max(180)}),
     defineField({group:'seo',name:'seoDescriptionEn',title:'SEO description (EN)',type:'text',rows:3,validation:(r)=>r.max(180)}),
     defineField({group:'seo',name:'ogImage',title:'Social / Open Graph image',type:'image'}),
