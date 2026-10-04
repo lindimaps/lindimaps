@@ -20,6 +20,7 @@ export default defineConfig({
 
   plugins: [structureTool({structure:(S)=>S.list().title('LindiMaps').items([
     S.listItem().title('Home').child(S.document().schemaType('homePage').documentId(singletonIds.homePage)),
+    S.listItem().title('Header & Menu').child(S.document().schemaType('siteSettings').documentId(singletonIds.siteSettings).views([S.view.form().title('Header & Menu')])),
     S.listItem().title('Konfigurimi i faqes').child(S.document().schemaType('siteSettings').documentId(singletonIds.siteSettings)),
     S.listItem().title('Profili').child(S.document().schemaType('profile').documentId(singletonIds.profile)),
     S.listItem().title('Rreth nesh').child(S.document().schemaType('aboutPage').documentId(singletonIds.aboutPage)),
