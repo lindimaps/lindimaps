@@ -1490,29 +1490,6 @@ html,body,.site-shell,main{background:var(--lm-canvas)!important;color:var(--lm-
 }
 
 /* Workspace / Systems control belongs to the light header */
-  color:#17314B!important;
-  background:rgba(255,255,255,.72)!important;
-  border-color:rgba(159,193,222,.58)!important;
-  box-shadow:0 5px 16px rgba(3,27,56,.045)!important;
-}
-  color:var(--lm-primary)!important;
-  background:#EEF7FF!important;
-  border-color:rgba(8,124,240,.34)!important;
-}
-  background:rgba(249,252,255,.96)!important;
-  color:#07182D!important;
-  border-color:#DCE7F2!important;
-  box-shadow:0 22px 60px rgba(3,27,56,.14)!important;
-}
-  background:#E8F3FD!important;color:var(--lm-primary)!important;border-color:#D3E8F8!important;
-}
-
-/* Dark workspace remains intentionally dark */
-  background:rgba(5,20,35,.97)!important;
-  color:#F4F8FC!important;
-  border-color:rgba(114,199,255,.16)!important;
-  box-shadow:0 24px 64px rgba(0,0,0,.34)!important;
-}
 
 /* Light cards should blend into the canvas, not create white slabs */
 [data-theme="light"] .card,
