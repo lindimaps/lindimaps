@@ -11,7 +11,8 @@
     "dev": "sanity dev",
     "start": "sanity start",
     "seed-navigation": "sanity exec scripts/seed-navigation.mjs --with-user-token",
-    "seed-footer": "sanity exec scripts/seed-footer.mjs --with-user-token"
+    "seed-footer": "sanity exec scripts/seed-footer.mjs --with-user-token",
+    "seed-page-seo": "sanity exec scripts/seed-page-seo.mjs --with-user-token"
   },
   "keywords": [
     "sanity"
