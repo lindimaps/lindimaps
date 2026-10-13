@@ -8,7 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       disallow: [
         "/api/",
         "/studio/"
-
       ],
     }],
     sitemap: "https://www.lindimaps.com/sitemap.xml",
