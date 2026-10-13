@@ -7,18 +7,8 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: [
         "/api/",
-        "/studio/",
-        "/pushimet",
-        "/pushimet/",
-        "/pagesat",
-        "/pagesat/",
-        "/aktivitete-system.html",
-        "/aktiviteteASIG",
-        "/aktiviteteASIG/",
-        "/raportASIG",
-        "/raportASIG/",
-        "/pyjetnezonatembrojtura",
-        "/pyjetnezonatembrojtura/"
+        "/studio/"
+
       ],
     }],
     sitemap: "https://www.lindimaps.com/sitemap.xml",
